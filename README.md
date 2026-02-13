@@ -3,6 +3,8 @@
 **Live:** [astra-command-center.vercel.app](https://astra-command-center.vercel.app)
 **Repo:** [github.com/gabosaturno11/astra-command-center](https://github.com/gabosaturno11/astra-command-center)
 **Local:** `~/dev/astra-command-center/`
+**Vercel Team:** `gabosaturno03s-projects` (Saturno OS)
+**Vercel Project:** `astra-command-center`
 
 A zero-dependency, single-file command center for creative solopreneurs. Built as one self-contained HTML file — no frameworks, no build tools, no external APIs. Everything runs in the browser, persists to localStorage.
 
@@ -54,23 +56,36 @@ Endel-inspired dark interface with neutral grey gradients and mint-green accents
 - **Works offline** — open the file, it works
 - **Browser storage** — localStorage for all persistence
 
-## Run It
+## Deployment
+
+| What | Where |
+|------|-------|
+| **Production** | [astra-command-center.vercel.app](https://astra-command-center.vercel.app) |
+| **Vercel Team** | `gabosaturno03s-projects` (Saturno OS) |
+| **Vercel Project** | `astra-command-center` |
+| **GitHub Repo** | [gabosaturno11/astra-command-center](https://github.com/gabosaturno11/astra-command-center) |
+| **Local Path** | `~/dev/astra-command-center/` |
+| **Deploy Method** | `vercel --prod` from project root |
 
 ```bash
+# Run locally
 open index.html
-```
 
-Or deploy anywhere that serves static files (Vercel, Netlify, GitHub Pages, S3).
+# Deploy
+cd ~/dev/astra-command-center
+vercel --prod
+```
 
 ## Structure
 
 ```
-astra-command-center/
-  index.html    # The entire application
+~/dev/astra-command-center/
+  index.html    # The entire application (120 KB)
   README.md     # This file
+  .vercel/      # Vercel project config (gitignored)
 ```
 
-That's it. One file. Everything inside.
+One file. Everything inside.
 
 ## License
 
