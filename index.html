@@ -1665,11 +1665,17 @@ function renderProjectsSidebar() {
   el.innerHTML = projects.map(p => {
     const statusClass = p.status === 'active' ? 'active-s' : p.status === 'paused' ? 'paused-s' : 'complete-s';
     const isActive = activeProject === p.id;
+    const projTasks = S.tasks.filter(t => t.project === p.name);
+    const doneTasks = projTasks.filter(t => t.status === 'done').length;
+    const totalTasks = projTasks.length;
+    const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
     return `<div class="sidebar-project-item ${isActive?'active':''}" onclick="openProject('${p.id}')" style="${isActive?'border-left:3px solid '+p.color:'border-left:3px solid transparent'}">
       <span class="proj-icon" style="color:${p.color}">${getIconSVG(p.icon,14)}</span>
       <span class="proj-name">${esc(p.name)}</span>
+      ${totalTasks>0?`<span style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-left:auto">${pct}%</span>`:''}
       <span class="proj-status ${statusClass}"></span>
-    </div>`;
+    </div>${totalTasks>0?`<div style="height:2px;background:var(--border);margin:0 12px 2px;border-radius:1px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${p.color};border-radius:1px;transition:width 0.3s"></div></div>`:''}`;
+
   }).join('') + `<div class="sidebar-add-project" onclick="openNewProjectModal()">+ New Project</div>`;
 }
 
