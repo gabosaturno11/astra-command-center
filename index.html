@@ -842,6 +842,8 @@ textarea{resize:vertical;line-height:1.6}
             <input type="text" class="specs-title-input" id="specs-title" placeholder="Project Name..." oninput="onSpecChange()">
             <button class="voice-btn" id="specs-voice-btn" onclick="toggleVoice('specs')" title="Voice Input">M</button>
             <button class="btn btn-sm" onclick="addSpecSection()">+ Section</button>
+            <button class="btn btn-sm" onclick="collapseAllSections()" title="Collapse all">Collapse</button>
+            <button class="btn btn-sm" onclick="expandAllSections()" title="Expand all">Expand</button>
           </div>
           <div class="specs-sections" id="specs-sections"></div>
           <div class="specs-statusbar">
@@ -1347,6 +1349,115 @@ function migrateV2() {
     );
     save();
   }
+  // Rename kernel spec and assign to all projects
+  const kernel = S.specs.find(s => s.id === 1000);
+  if(kernel && kernel.title === 'Saturno Living Canvas v2.0') {
+    kernel.title = 'Saturno OS Complete Map';
+    kernel.icon = 'globe';
+    kernel.color = '#4ade80';
+    save();
+  }
+  // Ensure icon/color fields on all specs
+  S.specs.forEach(s => { if(!s.icon) s.icon = 'file'; if(!s.color) s.color = '#8b8b8b'; });
+  // Seed per-project living docs if not present
+  if(!(S.specs||[]).find(s => s.id === 'ld_bonus')) {
+    const now = new Date().toISOString();
+    S.specs.push({
+      id:'ld_bonus', title:'Saturno Bonus — Project Spec', projectId:'proj_saturno_bonus', icon:'rocket', color:'#4ade80',
+      created:now, updated:now,
+      sections:[
+        {id:'ld_b1',title:'Design & Branding',icon:'palette',color:'#8b5cf6',body:'<p><b>Visual Identity:</b> Dark cosmic theme (#050711 base), teal accents (#06b6d4, #22d3ee), Sora font.</p><p><b>Logo:</b> planet-logo.png (white silhouette). Used in header, gate, footer.</p><p><b>Layout:</b> Hero + category sections + tool grid + music player + PDF cards + footer.</p><p><b>Target Feel:</b> Premium vault, exclusive access, cosmic luxury.</p>',collapsed:false},
+        {id:'ld_b2',title:'Technical Architecture',icon:'cpu',color:'#22d3ee',body:'<p><b>Stack:</b> Static HTML + Vercel serverless functions. Single-page bonus.html (~1,500 lines).</p><p><b>Auth:</b> Cookie-based password gate (saturno2025). Redirects on auth fail.</p><p><b>API:</b> /api/verify (password), /api/brevo (email capture), /api/config (feature flags), /api/admin-verify.</p><p><b>Storage:</b> No database. PDFs/tools served as static files from bonuses/ directory.</p><p><b>Music:</b> manifest.json for track metadata. Audio files gitignored (need CDN).</p>',collapsed:false},
+        {id:'ld_b3',title:'Content Inventory',icon:'layers',color:'#f59e0b',body:'<p><b>Tools (60):</b> 19 Training + 25 Experience + 16 unlisted. Each is a standalone HTML file in bonuses/tools/.</p><p><b>PDFs (18):</b> HBF phases, skill programming, routines. In bonuses/pdfs/.</p><p><b>Music (119 tracks):</b> 8 categories. In bonuses/music/ (gitignored, needs CDN).</p><p><b>Video:</b> app-promo.mov needs MP4 conversion.</p>',collapsed:true},
+        {id:'ld_b4',title:'Blockers & Dependencies',icon:'alert',color:'#ef4444',body:'<p><b>BLOCKER 1:</b> Domain — bonus.saturnomovement.com (Cloudflare CNAME needed by Gabo)</p><p><b>BLOCKER 2:</b> Brevo API keys not in Vercel env vars (email capture broken)</p><p><b>BLOCKER 3:</b> Audio files 404 on Vercel (gitignored + vercelignored, needs CDN solution)</p><p><b>BLOCKER 4:</b> app-promo.mov is .mov format (needs .mp4 conversion for web)</p><p><b>BLOCKER 5:</b> Physical device testing (Gabo must QA on phone/iPad)</p>',collapsed:false},
+        {id:'ld_b5',title:'Roadmap & Milestones',icon:'flag',color:'#06b6d4',body:'<p><b>Phase 1 (DONE):</b> Core page live, auth, tools, PDFs, descriptions rewritten, categories sorted.</p><p><b>Phase 2 (NOW):</b> Domain setup, Brevo integration, music CDN, device QA.</p><p><b>Phase 3:</b> 100 tools, 100 PDFs, album artwork, polished footer, video embed.</p><p><b>Phase 4:</b> Analytics review, A/B test gate, referral system, subscriber dashboard.</p>',collapsed:true},
+        {id:'ld_b6',title:'Links & Resources',icon:'link',color:'#a78bfa',body:'<p><b>Live:</b> <a href="https://saturno-bonus-omega.vercel.app/index.html" target="_blank">saturno-bonus-omega.vercel.app</a></p><p><b>Repo:</b> github.com/gabosaturno11/saturno-bonus</p><p><b>Gate:</b> saturno-bonus-omega.vercel.app/gate.html (password: saturno2025)</p><p><b>Vercel Dashboard:</b> vercel.com/gabosaturno</p><p><b>Cloudflare:</b> dash.cloudflare.com (saturnomovement.com)</p>',collapsed:false}
+      ]
+    });
+    save();
+  }
+  if(!(S.specs||[]).find(s => s.id === 'ld_sm_app')) {
+    const now = new Date().toISOString();
+    S.specs.push({
+      id:'ld_sm_app', title:'SM App Rebuild — Project Spec', projectId:'proj_sm_app', icon:'code', color:'#8b5cf6',
+      created:now, updated:now,
+      sections:[
+        {id:'ld_a1',title:'Architecture Overview',icon:'cpu',color:'#8b5cf6',body:'',collapsed:false},
+        {id:'ld_a2',title:'Developer Handoff Status',icon:'users',color:'#f59e0b',body:'',collapsed:false},
+        {id:'ld_a3',title:'Tech Stack & Dependencies',icon:'layers',color:'#22d3ee',body:'',collapsed:false},
+        {id:'ld_a4',title:'Blockers & Risks',icon:'alert',color:'#ef4444',body:'',collapsed:false},
+        {id:'ld_a5',title:'Roadmap & Timeline',icon:'flag',color:'#4ade80',body:'',collapsed:false}
+      ]
+    });
+    save();
+  }
+  if(!(S.specs||[]).find(s => s.id === 'ld_book')) {
+    const now = new Date().toISOString();
+    S.specs.push({
+      id:'ld_book', title:'Book (AOC) — Project Spec', projectId:'proj_book', icon:'book', color:'#f59e0b',
+      created:now, updated:now,
+      sections:[
+        {id:'ld_k1',title:'Submission Package Status',icon:'file',color:'#f59e0b',body:'',collapsed:false},
+        {id:'ld_k2',title:'Chapter Outline',icon:'list',color:'#22d3ee',body:'',collapsed:false},
+        {id:'ld_k3',title:'Publisher Communications',icon:'mail',color:'#a78bfa',body:'',collapsed:false},
+        {id:'ld_k4',title:'Blockers & Dependencies',icon:'alert',color:'#ef4444',body:'',collapsed:false},
+        {id:'ld_k5',title:'Timeline & Deadlines',icon:'flag',color:'#4ade80',body:'',collapsed:false}
+      ]
+    });
+    save();
+  }
+  if(!(S.specs||[]).find(s => s.id === 'ld_hbs')) {
+    const now = new Date().toISOString();
+    S.specs.push({
+      id:'ld_hbs', title:'HBS Program — Project Spec', projectId:'proj_hbs', icon:'target', color:'#06b6d4',
+      created:now, updated:now,
+      sections:[
+        {id:'ld_h1',title:'Program Structure',icon:'layers',color:'#06b6d4',body:'',collapsed:false},
+        {id:'ld_h2',title:'Content Inventory',icon:'file',color:'#f59e0b',body:'',collapsed:false},
+        {id:'ld_h3',title:'Digital Assets (SSK Drive)',icon:'hdd',color:'#8b5cf6',body:'',collapsed:false},
+        {id:'ld_h4',title:'Blockers & Dependencies',icon:'alert',color:'#ef4444',body:'',collapsed:false},
+        {id:'ld_h5',title:'Launch Plan',icon:'flag',color:'#4ade80',body:'',collapsed:false}
+      ]
+    });
+    save();
+  }
+  if(!(S.specs||[]).find(s => s.id === 'ld_karina')) {
+    const now = new Date().toISOString();
+    S.specs.push({
+      id:'ld_karina', title:'De Aqui a Saturno — Project Spec', projectId:'proj_karina', icon:'heart', color:'#ec4899',
+      created:now, updated:now,
+      sections:[
+        {id:'ld_d1',title:'Site Architecture',icon:'globe',color:'#ec4899',body:'',collapsed:false},
+        {id:'ld_d2',title:'Content & Copy',icon:'file',color:'#f59e0b',body:'',collapsed:false},
+        {id:'ld_d3',title:'Design System',icon:'palette',color:'#8b5cf6',body:'',collapsed:false},
+        {id:'ld_d4',title:'Blockers & Dependencies',icon:'alert',color:'#ef4444',body:'',collapsed:false},
+        {id:'ld_d5',title:'Deployment & Maintenance',icon:'flag',color:'#4ade80',body:'',collapsed:false}
+      ]
+    });
+    save();
+  }
+  if(!(S.specs||[]).find(s => s.id === 'ld_claude')) {
+    const now = new Date().toISOString();
+    S.specs.push({
+      id:'ld_claude', title:'Claude Code — Project Spec', projectId:'proj_claude_code', icon:'terminal', color:'#a78bfa',
+      created:now, updated:now,
+      sections:[
+        {id:'ld_c1',title:'Session Continuity Protocol',icon:'refresh',color:'#a78bfa',body:'',collapsed:false},
+        {id:'ld_c2',title:'Repo & Deployment Map',icon:'globe',color:'#22d3ee',body:'',collapsed:false},
+        {id:'ld_c3',title:'Kernel Rules',icon:'lock',color:'#ef4444',body:'',collapsed:false},
+        {id:'ld_c4',title:'Blockers & Open Issues',icon:'alert',color:'#f59e0b',body:'',collapsed:false},
+        {id:'ld_c5',title:'Session Logs',icon:'file',color:'#4ade80',body:'',collapsed:false}
+      ]
+    });
+    save();
+  }
+  // Add bonus project link if not present
+  if(S.projects && S.projects.find(p => p.id === 'proj_saturno_bonus')) {
+    if(!S.links.find(l => l.url === 'https://saturno-bonus-omega.vercel.app/index.html')) {
+      S.links.push({id:Date.now(), title:'Saturno Bonus — Live', url:'https://saturno-bonus-omega.vercel.app/index.html', category:'Production', projectId:'proj_saturno_bonus', created:new Date().toISOString()});
+      save();
+    }
+  }
   // Add asset catalog to Saturno Bonus if not present
   if(S.projects && S.projects.find(p => p.id === 'proj_saturno_bonus') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_bonus_assets')) {
     const now = new Date().toISOString();
@@ -1635,19 +1746,25 @@ function writerExport(fmt){const d=getActiveDoc();if(!d||!fmt)return;const t=d.t
 function htmlToMd(html,title){let md='# '+(title||'Untitled')+'\n\n';const tmp=document.createElement('div');tmp.innerHTML=html;const walk=n=>{if(n.nodeType===3)return n.textContent;if(n.nodeType!==1)return'';const tag=n.tagName.toLowerCase(),ch=Array.from(n.childNodes).map(walk).join('');switch(tag){case'h1':return'\n# '+ch+'\n\n';case'h2':return'\n## '+ch+'\n\n';case'h3':return'\n### '+ch+'\n\n';case'p':return ch+'\n\n';case'br':return'\n';case'strong':case'b':return'**'+ch+'**';case'em':case'i':return'*'+ch+'*';case'code':return'`'+ch+'`';case'pre':return'\n```\n'+ch+'\n```\n\n';case'blockquote':return'\n> '+ch.replace(/\n/g,'\n> ')+'\n\n';case'ul':return'\n'+ch+'\n';case'ol':return'\n'+ch+'\n';case'li':return'- '+ch+'\n';case'a':return'['+ch+']('+n.href+')';case'hr':return'\n---\n\n';case'div':return ch+'\n';default:return ch;}};md+=Array.from(tmp.childNodes).map(walk).join('');return md.replace(/\n{3,}/g,'\n\n').trim()+'\n';}
 
 // === LIVING DOCS ===
-function getActiveSpec(){return S.specs.find(s=>s.id===S.activeSpec);}
+function getActiveSpec(){return S.specs.find(s=>String(s.id)===String(S.activeSpec));}
 function renderSpecs(){renderSpecList();loadSpec();document.getElementById('specs-count').textContent=S.specs.length;}
-function renderSpecList(){document.getElementById('specs-doc-list').innerHTML=S.specs.map(s=>{const sc=s.sections?s.sections.length:0;const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="specs-doc-item ${s.id===S.activeSpec?'active':''}" onclick="switchSpec(${s.id})"><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div><div class="specs-doc-meta"><span>${sc} sections</span><span>${dt}</span>${S.specs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec(${s.id})">x</span>`:''}</div></div>`;}).join('');}
+function renderSpecList(){document.getElementById('specs-doc-list').innerHTML=S.specs.map(s=>{const sc=s.sections?s.sections.length:0;const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';const ic=s.icon||'file';const c=s.color||'#8b8b8b';const path=specSectionIcon(ic);const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;return`<div class="specs-doc-item ${String(s.id)===String(S.activeSpec)?'active':''}" onclick="switchSpec('${s.id}')"><div style="display:flex;align-items:center;gap:6px"><span style="color:${c};display:flex;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div></div><div class="specs-doc-meta"><span>${sc} sec</span>${proj?`<span style="color:${proj.color||c}">${esc(proj.name)}</span>`:'<span>unassigned</span>'}<span>${dt}</span>${S.specs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec('${s.id}')">x</span>`:''}</div></div>`;}).join('');}
 function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';renderSpecSections();updateSpecStatus();}
-function switchSpec(id){snapshotSpec();S.activeSpec=id;save();renderSpecs();const s=S.specs.find(x=>x.id===id);if(s)trackRecent('spec',id,s.title);updateBreadcrumb();}
+function switchSpec(id){snapshotSpec();S.activeSpec=id;save();renderSpecs();const s=S.specs.find(x=>String(x.id)===String(id));if(s)trackRecent('spec',id,s.title);updateBreadcrumb();}
 function newSpec(){snapshotSpec();const s={id:Date.now(),title:'',sections:[{id:Date.now()+1,title:'Overview',body:'',collapsed:false}],created:new Date().toISOString(),updated:new Date().toISOString()};S.specs.unshift(s);S.activeSpec=s.id;save();renderSpecs();document.getElementById('specs-title').focus();}
-function delSpec(id){if(S.specs.length<=1){toast('Cannot delete last spec');return;}S.specs=S.specs.filter(s=>s.id!==id);if(S.activeSpec===id)S.activeSpec=S.specs[0].id;save();renderSpecs();toast('Deleted');}
+function delSpec(id){if(S.specs.length<=1){toast('Cannot delete last spec');return;}S.specs=S.specs.filter(s=>String(s.id)!==String(id));if(String(S.activeSpec)===String(id))S.activeSpec=S.specs[0].id;save();renderSpecs();toast('Deleted');}
 function snapshotSpec(){const s=getActiveSpec();if(!s)return;const t=document.getElementById('specs-title');if(t)s.title=t.value;if(!s.sections)s.sections=[];s.sections.forEach(sec=>{const el=document.getElementById('spec-editor-'+sec.id);if(el)sec.body=el.innerHTML;const tEl=document.getElementById('spec-title-'+sec.id);if(tEl)sec.title=tEl.value;});s.updated=new Date().toISOString();}
-function renderSpecSections(){const s=getActiveSpec();if(!s)return;const el=document.getElementById('specs-sections');el.innerHTML=(s.sections||[]).map((sec,i)=>`<div class="specs-section ${sec.collapsed?'collapsed':''}" data-id="${sec.id}"><div class="specs-section-header" onclick="toggleSpecSection(${sec.id})"><span class="specs-section-toggle">v</span><input type="text" class="specs-section-title" id="spec-title-${sec.id}" value="${escA(sec.title||'Section '+(i+1))}" onclick="event.stopPropagation()" oninput="onSpecChange()" style="background:transparent;border:none;color:var(--text);font-size:12px;font-weight:600;flex:1;padding:0"><div style="display:flex;gap:2px;opacity:0.4"><button class="task-action-btn" onclick="event.stopPropagation();moveSpecSection(${sec.id},-1)" title="Move up" style="font-size:10px">^</button><button class="task-action-btn" onclick="event.stopPropagation();moveSpecSection(${sec.id},1)" title="Move down" style="font-size:10px">v</button><button class="task-action-btn del" onclick="event.stopPropagation();delSpecSection(${sec.id})" title="Delete">x</button></div></div><div class="specs-section-body"><div class="specs-section-editor" id="spec-editor-${sec.id}" contenteditable="true" oninput="onSpecChange()">${sec.body||''}</div></div></div>`).join('')+`<div class="specs-add-section" onclick="addSpecSection()">+ Add Section</div>`;}
-function addSpecSection(){const s=getActiveSpec();if(!s)return;snapshotSpec();s.sections.push({id:Date.now(),title:'New Section',body:'',collapsed:false});save();renderSpecSections();}
-function delSpecSection(id){const s=getActiveSpec();if(!s||s.sections.length<=1)return;snapshotSpec();s.sections=s.sections.filter(x=>x.id!==id);save();renderSpecSections();}
-function toggleSpecSection(id){const s=getActiveSpec();if(!s)return;const sec=s.sections.find(x=>x.id===id);if(sec){sec.collapsed=!sec.collapsed;renderSpecSections();}}
-function moveSpecSection(id,dir){const s=getActiveSpec();if(!s)return;snapshotSpec();const i=s.sections.findIndex(x=>x.id===id);const ni=i+dir;if(ni<0||ni>=s.sections.length)return;[s.sections[i],s.sections[ni]]=[s.sections[ni],s.sections[i]];save();renderSpecSections();}
+function specSectionIcon(name){const m={palette:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',cpu:'M18 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2z',layers:'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',alert:'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01',flag:'M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7',link:'M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71',file:'M13 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V9z',globe:'M12 2a10 10 0 100 20 10 10 0 000-20z',lock:'M19 11H5a2 2 0 00-2 2v7a2 2 0 002 2h14a2 2 0 002-2v-7a2 2 0 00-2-2zM7 11V7a5 5 0 0110 0v4',refresh:'M23 4v6h-6M1 20v-6h6',users:'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2',list:'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',mail:'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z',hdd:'M22 12H2M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z',rocket:'M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09zM12 15l-3-3M22 2l-7.5 7.5',book:'M4 19.5A2.5 2.5 0 016.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z',heart:'M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z',target:'M12 22a10 10 0 100-20 10 10 0 000 20zM12 18a6 6 0 100-12 6 6 0 000 12zM12 14a2 2 0 100-4 2 2 0 000 4z',terminal:'M4 17l6-6-6-6M12 19h8',code:'M16 18l6-6-6-6M8 6l-6 6 6 6'};return m[name]||m.file;}
+function renderSpecSections(){const s=getActiveSpec();if(!s)return;const el=document.getElementById('specs-sections');const secColors=['#4ade80','#22d3ee','#8b5cf6','#f59e0b','#ef4444','#a78bfa','#06b6d4','#ec4899'];el.innerHTML=(s.sections||[]).map((sec,i)=>{const c=sec.color||secColors[i%secColors.length];const ic=sec.icon||'file';const path=specSectionIcon(ic);return`<div class="specs-section ${sec.collapsed?'collapsed':''}" data-id="${sec.id}"><div class="specs-section-header" onclick="toggleSpecSection('${sec.id}')"><span class="specs-section-toggle">v</span><span class="spec-sec-icon" style="color:${c};flex-shrink:0;display:flex;align-items:center" onclick="event.stopPropagation();cycleSecIcon('${sec.id}')" title="Click to change icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><input type="text" class="specs-section-title" id="spec-title-${sec.id}" value="${escA(sec.title||'Section '+(i+1))}" onclick="event.stopPropagation()" oninput="onSpecChange()" style="background:transparent;border:none;color:var(--text);font-size:12px;font-weight:600;flex:1;padding:0"><div style="display:flex;gap:2px;opacity:0.4"><button class="task-action-btn" onclick="event.stopPropagation();moveSpecSection('${sec.id}',-1)" title="Move up" style="font-size:10px">^</button><button class="task-action-btn" onclick="event.stopPropagation();moveSpecSection('${sec.id}',1)" title="Move down" style="font-size:10px">v</button><button class="task-action-btn del" onclick="event.stopPropagation();delSpecSection('${sec.id}')" title="Delete">x</button></div></div><div class="specs-section-body"><div class="specs-section-editor" id="spec-editor-${sec.id}" contenteditable="true" oninput="onSpecChange()">${sec.body||''}</div></div></div>`;}).join('')+`<div class="specs-add-section" onclick="addSpecSection()">+ Add Section</div>`;}
+function addSpecSection(){const s=getActiveSpec();if(!s)return;snapshotSpec();s.sections.push({id:'sec_'+Date.now(),title:'New Section',body:'',collapsed:false});save();renderSpecSections();}
+function delSpecSection(id){const s=getActiveSpec();if(!s||s.sections.length<=1)return;snapshotSpec();s.sections=s.sections.filter(x=>String(x.id)!==String(id));save();renderSpecSections();}
+function toggleSpecSection(id){const s=getActiveSpec();if(!s)return;const sec=s.sections.find(x=>String(x.id)===String(id));if(sec){sec.collapsed=!sec.collapsed;renderSpecSections();}}
+function moveSpecSection(id,dir){const s=getActiveSpec();if(!s)return;snapshotSpec();const i=s.sections.findIndex(x=>String(x.id)===String(id));const ni=i+dir;if(ni<0||ni>=s.sections.length)return;[s.sections[i],s.sections[ni]]=[s.sections[ni],s.sections[i]];save();renderSpecSections();}
+const specIconList=['file','palette','cpu','layers','alert','flag','link','globe','lock','refresh','users','list','mail','hdd','rocket','book','heart','target','terminal','code'];
+const specColorList=['#4ade80','#22d3ee','#8b5cf6','#f59e0b','#ef4444','#a78bfa','#06b6d4','#ec4899','#facc15','#fb923c'];
+function cycleSecIcon(id){const s=getActiveSpec();if(!s)return;const sec=s.sections.find(x=>String(x.id)===String(id));if(!sec)return;const cur=specIconList.indexOf(sec.icon||'file');sec.icon=specIconList[(cur+1)%specIconList.length];const ci=specColorList.indexOf(sec.color||'#8b8b8b');sec.color=specColorList[(ci+1)%specColorList.length];save();renderSpecSections();}
+function collapseAllSections(){const s=getActiveSpec();if(!s)return;snapshotSpec();s.sections.forEach(x=>x.collapsed=true);save();renderSpecSections();}
+function expandAllSections(){const s=getActiveSpec();if(!s)return;snapshotSpec();s.sections.forEach(x=>x.collapsed=false);save();renderSpecSections();}
 function onSpecChange(){clearTimeout(specTimer);document.getElementById('specs-status').textContent='Unsaved';document.getElementById('specs-status').style.color='var(--yellow)';specTimer=setTimeout(()=>{snapshotSpec();save();renderSpecList();document.getElementById('specs-status').textContent='Saved';document.getElementById('specs-status').style.color='var(--green)';updateSpecStatus();},1000);}
 function updateSpecStatus(){const s=getActiveSpec();if(!s)return;let total=0;(s.sections||[]).forEach(sec=>{total+=countW(sec.body);});document.getElementById('specs-word-count').textContent=total+' words';}
 function specExport(fmt){if(!fmt)return;snapshotSpec();const s=getActiveSpec();if(!s)return;const t=s.title||'spec';let c;if(fmt==='clipboard'){let txt=t+'\n'+'='.repeat(t.length)+'\n\n';(s.sections||[]).forEach(sec=>{txt+=sec.title+'\n'+'-'.repeat(sec.title.length)+'\n';const d=document.createElement('div');d.innerHTML=sec.body||'';txt+=(d.innerText||'')+'\n\n';});navigator.clipboard.writeText(txt);toast('Copied');return;}if(fmt==='md'){c='# '+t+'\n\n';(s.sections||[]).forEach(sec=>{c+='## '+sec.title+'\n\n';c+=htmlToMd(sec.body||'',null).replace(/^# .*\n\n/,'')+'\n';});}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px;border-bottom:2px solid #eee;padding-bottom:8px}h2{font-size:20px;margin-top:24px;color:#333}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}</style></head><body><h1>${esc(t)}</h1>`+(s.sections||[]).map(sec=>`<h2>${esc(sec.title)}</h2>${sec.body||''}`).join('')+'</body></html>';}const blob=new Blob([c],{type:fmt==='md'?'text/markdown':'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+(fmt==='md'?'md':'html');a.click();toast('Exported');}
@@ -1862,8 +1979,9 @@ function renderProjDocs() {
       const sc = d.sections ? d.sections.length : 0;
       const dt = d.updated ? new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
       const preview = d.sections && d.sections[0] ? d.sections[0].title : '';
-      return `<div class="proj-doc-card" onclick="goToLivingDoc(${d.id})">
-        <div class="proj-doc-card-title">${esc(d.title||'Untitled')}</div>
+      const ic = d.icon||'file'; const c = d.color||'#8b8b8b'; const path = specSectionIcon(ic);
+      return `<div class="proj-doc-card" onclick="goToLivingDoc('${d.id}')">
+        <div style="display:flex;align-items:center;gap:6px"><span style="color:${c};display:flex"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><div class="proj-doc-card-title">${esc(d.title||'Untitled')}</div></div>
         <div class="proj-doc-card-meta"><span>${sc} sections</span><span>${dt}</span></div>
         <div class="proj-doc-card-preview">${esc(preview)}</div>
       </div>`;
@@ -1871,7 +1989,7 @@ function renderProjDocs() {
     if(unassigned.length) {
       html += `<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
         <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">${unassigned.length} unassigned doc${unassigned.length>1?'s':''}</div>
-        ${unassigned.map(d => `<div class="proj-doc-card" style="opacity:0.6;cursor:pointer" onclick="assignDocToProject(${d.id})">
+        ${unassigned.map(d => `<div class="proj-doc-card" style="opacity:0.6;cursor:pointer" onclick="assignDocToProject('${d.id}')">
           <div class="proj-doc-card-title">${esc(d.title||'Untitled')}</div>
           <div style="font-size:9px;color:var(--accent);margin-top:4px">Click to assign to this project</div>
         </div>`).join('')}
@@ -1881,7 +1999,7 @@ function renderProjDocs() {
   grid.innerHTML = html;
 }
 function assignDocToProject(docId) {
-  const doc = S.specs.find(s => s.id === docId);
+  const doc = S.specs.find(s => String(s.id) === String(docId));
   if(!doc || !activeProject) return;
   doc.projectId = activeProject;
   doc.updated = new Date().toISOString();
