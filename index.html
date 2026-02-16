@@ -38,18 +38,29 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondary);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-.app{display:grid;grid-template-columns:var(--sidebar-width) 1fr;height:100vh;transition:grid-template-columns 0.25s cubic-bezier(0.4,0,0.2,1)}
-.app.project-open{grid-template-columns:var(--sidebar-width) 1fr 420px}
+.app{display:grid;grid-template-columns:var(--sidebar-width) 4px 1fr;height:100vh;transition:grid-template-columns 0.25s cubic-bezier(0.4,0,0.2,1)}
+.app.project-open{grid-template-columns:var(--sidebar-width) 4px 1fr 5px 420px}
 .app.project-open .project-view{display:flex}
-.app.context-open{grid-template-columns:var(--sidebar-width) 1fr var(--context-width)}
+.app.context-open{grid-template-columns:var(--sidebar-width) 4px 1fr 4px var(--context-width)}
 .app.context-open .context-panel{display:flex}
-.app.mode-focus{grid-template-columns:0px 1fr}
+.app.context-open .context-resize{display:block}
+.app.mode-focus{grid-template-columns:1fr}
 .app.mode-focus .sidebar{display:none}
-.app.mode-extended{grid-template-columns:var(--sidebar-width) 1fr var(--context-width)}
+.app.mode-focus .sidebar-resize{display:none}
+.app.mode-extended{grid-template-columns:var(--sidebar-width) 4px 1fr 4px var(--context-width)}
 .app.mode-extended .context-panel{display:flex}
-.project-resize-handle{width:5px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0}
+.app.mode-extended .context-resize{display:block}
+.context-resize{display:none}
+.project-resize-handle{width:5px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0;display:none}
+.app.project-open .project-resize-handle{display:block}
 .project-resize-handle:hover,.project-resize-handle.dragging{background:var(--accent);opacity:0.4}
 .project-resize-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:32px;border-radius:2px;background:var(--text-muted);opacity:0}
+
+/* RESIZE HANDLES */
+.sidebar-resize{width:4px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0;margin-left:-2px}
+.sidebar-resize:hover,.sidebar-resize.dragging{background:var(--accent);opacity:0.3}
+.context-resize{width:4px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0;margin-right:-2px}
+.context-resize:hover,.context-resize.dragging{background:var(--accent);opacity:0.3}
 
 /* SIDEBAR */
 .sidebar{background:linear-gradient(180deg, #080810 0%, #060608 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
@@ -568,6 +579,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm btn-danger" style="width:100%;margin-top:4px;font-size:8px;opacity:0.5" onclick="undoImport()">Undo Import</button>
     </div>
   </aside>
+  <div class="sidebar-resize" id="sidebar-resize"></div>
 
   <main class="main">
     <div class="header">
@@ -867,6 +879,7 @@ textarea{resize:vertical;line-height:1.6}
       </div>
     </div>
   <!-- CONTEXT PANEL -->
+  <div class="context-resize" id="context-resize"></div>
   <div class="context-panel" id="context-panel">
     <div class="context-header">
       <span class="context-header-title">Context</span>
@@ -2905,6 +2918,45 @@ function toggleContextPanel() {
   app.classList.toggle('context-open');
   updateContextStats();
 }
+
+// === PANEL RESIZING ===
+(function initResize() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const sidebarHandle = document.getElementById('sidebar-resize');
+    const contextHandle = document.getElementById('context-resize');
+    const root = document.documentElement;
+    let resizing = null;
+    function onMouseDown(e, type) {
+      e.preventDefault();
+      resizing = type;
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      const handle = type === 'sidebar' ? sidebarHandle : contextHandle;
+      if(handle) handle.classList.add('dragging');
+    }
+    if(sidebarHandle) sidebarHandle.addEventListener('mousedown', e => onMouseDown(e, 'sidebar'));
+    if(contextHandle) contextHandle.addEventListener('mousedown', e => onMouseDown(e, 'context'));
+    document.addEventListener('mousemove', e => {
+      if(!resizing) return;
+      if(resizing === 'sidebar') {
+        const w = Math.max(160, Math.min(400, e.clientX));
+        root.style.setProperty('--sidebar-width', w + 'px');
+      } else if(resizing === 'context') {
+        const w = Math.max(200, Math.min(500, window.innerWidth - e.clientX));
+        root.style.setProperty('--context-width', w + 'px');
+      }
+    });
+    document.addEventListener('mouseup', () => {
+      if(!resizing) return;
+      const handle = resizing === 'sidebar' ? sidebarHandle : contextHandle;
+      if(handle) handle.classList.remove('dragging');
+      resizing = null;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    });
+  });
+})();
+
 function updateContextStats() {
   const activeTasks = S.tasks.filter(t => t.status !== 'done').length;
   const el = id => { const e = document.getElementById(id); if(e) return e; return {textContent:''}; };
