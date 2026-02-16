@@ -775,6 +775,7 @@ textarea{resize:vertical;line-height:1.6}
             <span id="ws-words">0 words</span>
             <span id="ws-chars">0 chars</span>
             <span id="ws-reading">0 min read</span>
+            <span id="ws-goal" style="cursor:pointer" onclick="setWriterGoal()" title="Click to set word goal"></span>
             <span id="ws-saved" style="margin-left:auto">Saved</span>
           </div>
         </div>
@@ -1515,7 +1516,10 @@ function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versi
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
 function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},1000);updateWS();}
-function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=t.length+' chars';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';}
+function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=t.length+' chars';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
+  const d=getActiveDoc();const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
+  if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
+function setWriterGoal(){const d=getActiveDoc();if(!d)return;const g=prompt('Word count goal:',d.wordGoal||'');if(g===null)return;d.wordGoal=parseInt(g)||0;save();updateWS();}
 function countW(html){const d=document.createElement('div');d.innerHTML=html||'';return(d.innerText||'').trim().split(/\s+/).filter(x=>x.length).length;}
 function execCmd(c){document.execCommand(c,false,null);document.getElementById('writer-editor').focus();}
 function execBlock(tag){document.execCommand('formatBlock',false,'<'+tag+'>');document.getElementById('writer-editor').focus();}
