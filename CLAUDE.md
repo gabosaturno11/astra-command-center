@@ -50,7 +50,7 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 |------|------|----------|---------------|
 | saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `1b1912a` |
 | titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `c2308fa` |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `84b0b45` |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `71299b0` |
 | de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno.vercel.app | (check) |
 
 ### ASTRA COMMAND CENTER — V2.0 UPGRADE (Feb 16 session)
@@ -81,6 +81,18 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 - FIXED: migrateV2 runs after seedProjects (Claude Code project now appears on first load)
 - FIXED: Duplicate saveLink override removed
 - FIXED: Sidebar item highlighting when switchSection called programmatically
+- FIXED: Collapsible sidebar — icon-only strip (52px) with << chevron, persists in localStorage
+- FIXED: Collapsible project panel — >> chevron at bottom to close
+- FIXED: Removed confusing ||| context toggle button (context panel controlled by mode switcher only)
+- FIXED: Cmd+S now saves entire workspace (prevents browser Save Page dialog)
+- NEW: Living Docs ecosystem — per-project specs with icon + color on each section
+- NEW: 6 project-specific living docs seeded (Bonus has CTO-level content, others have 5 blank sections)
+- NEW: Collapse All / Expand All buttons for spec sections
+- NEW: Clickable section icons to cycle through 20 icons and 10 colors
+- NEW: Spec list shows project name and icon/color
+- NEW: Saturno Bonus live link added to project links
+- NEW: Kernel spec renamed to "Saturno OS Complete Map"
+- 12 commits this session (eccdc1f through 71299b0)
 
 ### BONUS PAGE — DECOUPLED TO saturno-bonus (Feb 17)
 
