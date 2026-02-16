@@ -2210,12 +2210,6 @@ function seedProjects() {
   );
 }
 
-// Extend whiteboard for doc references
-const origWbCanvasDown = wbCanvasDown;
-function wbCanvasDownV2(e) {
-  origWbCanvasDown(e);
-}
-
 // Handle KB drop on whiteboard
 function handleWbDrop(e) {
   const data = e.dataTransfer?.getData('text/plain');
