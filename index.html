@@ -1289,6 +1289,16 @@ function migrateV2() {
     );
     save();
   }
+  // Add v2.0 fix session log
+  if(S.projects && S.projects.find(p => p.id === 'proj_claude_code') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_cc_v2_fixes')) {
+    const now = new Date().toISOString();
+    S.knowledgeBase.push(
+      { id:'kb_cc_v2_fixes', projectId:'proj_claude_code', name:'v2.0 UX Fix Session — Feb 16, 2026 (evening)', type:'md', storage:'inline',
+        content:'# v2.0 UX Fix Session — Feb 16, 2026\n\n## Critical fix: Panel resize breaking layout\n- Project panel resize was setting app.style.gridTemplateColumns as inline style\n- This permanently overrode all CSS class-based grid definitions\n- After any drag, closing panel or switching modes left broken inline style\n- FIX: Now uses --project-width CSS variable instead of inline style\n\n## Panel conflicts resolved\n- Opening a project now closes context panel (they share same grid slot)\n- Toggling context panel now closes project panel first\n- Focus mode properly closes both project and context panels\n- Extended mode closes project panel, opens context panel\n\n## Migration ordering fix\n- migrateV2() was running inside load() before seedProjects()\n- On fresh localStorage, S.projects.length was 0 so Claude Code project was never created\n- FIX: migrateV2 now runs after seedProjects()\n\n## Other fixes\n- Links added from project panel now get projectId assigned\n- Removed duplicate saveLink monkeypatch override\n- Archive project now requires confirmation dialog\n- switchSection properly highlights sidebar item when called programmatically\n- Removed dead wbCanvasDownV2 wrapper code\n- Removed conflicting explicit width on context panel CSS\n- Removed negative margins on resize handles causing misalignment\n\n## Deployment discovery\n- Live URL is astra-command-center-sigma.vercel.app\n- NOT astra-command-center.vercel.app (that is an OLD Vercel project)\n\n## Commits (7):\neccdc1f, 6fdb2f2, 955273b, 12141fe, e806f0e, 84b0b45, 804ee06',
+        description:'UX bug fixes for panel resize, mode switching, migration ordering', tags:['v2','fixes','session','ux'], created:now, updated:now }
+    );
+    save();
+  }
   // Add asset catalog to Saturno Bonus if not present
   if(S.projects && S.projects.find(p => p.id === 'proj_saturno_bonus') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_bonus_assets')) {
     const now = new Date().toISOString();
