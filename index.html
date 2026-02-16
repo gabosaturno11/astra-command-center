@@ -909,6 +909,10 @@ textarea{resize:vertical;line-height:1.6}
         <div class="context-section-title">Related Items</div>
         <div id="ctx-related-items" style="font-size:10px;color:var(--text-muted);padding:8px 0">Select an item to see related content</div>
       </div>
+      <div class="context-section" id="ctx-graph">
+        <div class="context-section-title">Knowledge Graph</div>
+        <canvas id="ctx-graph-canvas" width="280" height="160" style="width:100%;height:160px;border-radius:var(--radius);background:var(--bg-surface);border:1px solid var(--border);cursor:grab"></canvas>
+      </div>
       <div class="context-section" id="ctx-quick-actions">
         <div class="context-section-title">Quick Actions</div>
         <div class="context-item" onclick="openContentModal()"><span class="context-item-icon">+</span>Add Content</div>
@@ -2589,6 +2593,143 @@ function folderContextMenu(event, id) {
   }
 }
 
+// === MINI KNOWLEDGE GRAPH ===
+let graphNodes = [], graphEdges = [], graphAnimId = null;
+function buildGraph() {
+  graphNodes = []; graphEdges = [];
+  const colors = { project: '#4ade80', doc: '#22d3ee', spec: '#a78bfa', task: '#fbbf24', kb: '#fb923c' };
+  // Add project nodes
+  (S.projects||[]).forEach(p => {
+    graphNodes.push({ id: 'p_'+p.id, label: p.name, type: 'project', color: colors.project, x: Math.random()*260+10, y: Math.random()*140+10, vx:0, vy:0 });
+  });
+  // Add doc nodes
+  S.docs.forEach(d => {
+    graphNodes.push({ id: 'd_'+d.id, label: d.title||'Untitled', type: 'doc', color: colors.doc, x: Math.random()*260+10, y: Math.random()*140+10, vx:0, vy:0 });
+  });
+  // Add spec nodes
+  S.specs.forEach(s => {
+    graphNodes.push({ id: 's_'+s.id, label: s.title||'Untitled', type: 'spec', color: colors.spec, x: Math.random()*260+10, y: Math.random()*140+10, vx:0, vy:0 });
+  });
+  // Build edges from wiki-links
+  S.docs.forEach(d => {
+    if(!d.body) return;
+    const links = d.body.match(/\[\[([^\]]+)\]\]/g)||[];
+    links.forEach(m => {
+      const name = m.slice(2,-2).trim();
+      const target = findLinkedItem(name);
+      if(target) {
+        const srcId = 'd_'+d.id;
+        let tgtId = '';
+        if(target.type==='project') tgtId='p_'+target.id;
+        else if(target.type==='doc') tgtId='d_'+target.id;
+        else if(target.type==='spec') tgtId='s_'+target.id;
+        if(tgtId && graphNodes.find(n=>n.id===tgtId)) graphEdges.push({from:srcId,to:tgtId});
+      }
+    });
+  });
+  S.specs.forEach(s => {
+    (s.sections||[]).forEach(sec => {
+      if(!sec.body) return;
+      const links = sec.body.match(/\[\[([^\]]+)\]\]/g)||[];
+      links.forEach(m => {
+        const name = m.slice(2,-2).trim();
+        const target = findLinkedItem(name);
+        if(target) {
+          const srcId = 's_'+s.id;
+          let tgtId = '';
+          if(target.type==='project') tgtId='p_'+target.id;
+          else if(target.type==='doc') tgtId='d_'+target.id;
+          else if(target.type==='spec') tgtId='s_'+target.id;
+          if(tgtId && graphNodes.find(n=>n.id===tgtId)) graphEdges.push({from:srcId,to:tgtId});
+        }
+      });
+    });
+  });
+  // Connect KB items to their projects
+  (S.knowledgeBase||[]).forEach(k => {
+    if(k.projectId) {
+      const projNode = graphNodes.find(n=>n.id==='p_'+k.projectId);
+      if(projNode) {
+        graphNodes.push({ id: 'k_'+k.id, label: k.name, type: 'kb', color: colors.kb, x: projNode.x+Math.random()*40-20, y: projNode.y+Math.random()*40-20, vx:0, vy:0 });
+        graphEdges.push({from:'p_'+k.projectId,to:'k_'+k.id});
+      }
+    }
+  });
+  // Limit to max 30 nodes for performance
+  if(graphNodes.length > 30) graphNodes = graphNodes.slice(0, 30);
+}
+function renderGraph() {
+  const canvas = document.getElementById('ctx-graph-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  buildGraph();
+  if(!graphNodes.length) {
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.font = '10px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('Add items + [[links]] to see connections', w/2, h/2);
+    return;
+  }
+  let steps = 80;
+  function simulate() {
+    const k = 0.01, repulsion = 800, damping = 0.85;
+    graphNodes.forEach(n => { n.vx = 0; n.vy = 0; });
+    // Repulsion
+    for(let i=0;i<graphNodes.length;i++) {
+      for(let j=i+1;j<graphNodes.length;j++) {
+        let dx=graphNodes[j].x-graphNodes[i].x, dy=graphNodes[j].y-graphNodes[i].y;
+        let dist=Math.sqrt(dx*dx+dy*dy)+1;
+        let f=repulsion/(dist*dist);
+        graphNodes[i].vx -= dx/dist*f; graphNodes[i].vy -= dy/dist*f;
+        graphNodes[j].vx += dx/dist*f; graphNodes[j].vy += dy/dist*f;
+      }
+    }
+    // Attraction along edges
+    graphEdges.forEach(e => {
+      const a=graphNodes.find(n=>n.id===e.from), b=graphNodes.find(n=>n.id===e.to);
+      if(!a||!b) return;
+      let dx=b.x-a.x, dy=b.y-a.y, dist=Math.sqrt(dx*dx+dy*dy)+1;
+      let f=dist*k;
+      a.vx += dx*f; a.vy += dy*f;
+      b.vx -= dx*f; b.vy -= dy*f;
+    });
+    // Center gravity
+    graphNodes.forEach(n => {
+      n.vx += (w/2-n.x)*0.002;
+      n.vy += (h/2-n.y)*0.002;
+      n.vx *= damping; n.vy *= damping;
+      n.x += n.vx; n.y += n.vy;
+      n.x = Math.max(10, Math.min(w-10, n.x));
+      n.y = Math.max(10, Math.min(h-10, n.y));
+    });
+  }
+  for(let i=0;i<steps;i++) simulate();
+  // Draw
+  ctx.clearRect(0,0,w,h);
+  // Edges
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  graphEdges.forEach(e => {
+    const a=graphNodes.find(n=>n.id===e.from), b=graphNodes.find(n=>n.id===e.to);
+    if(!a||!b) return;
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  });
+  // Nodes
+  graphNodes.forEach(n => {
+    const r = n.type==='project' ? 5 : 3;
+    ctx.beginPath(); ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle = n.color; ctx.globalAlpha = 0.7; ctx.fill(); ctx.globalAlpha = 1;
+    // Label
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '8px system-ui';
+    ctx.textAlign = 'center';
+    const label = n.label.length > 12 ? n.label.slice(0,11) + '..' : n.label;
+    ctx.fillText(label, n.x, n.y - r - 3);
+  });
+}
+
 // === CROSS-LINKING [[wiki-links]] ===
 function parseWikiLinks(html) {
   if(!html) return html;
@@ -2772,6 +2913,7 @@ function updateContextStats() {
   el('ctx-stat-projects').textContent = (S.projects||[]).length;
   el('ctx-stat-kb').textContent = (S.knowledgeBase||[]).length;
   updateContextRelated();
+  renderGraph();
 }
 function updateContextRelated() {
   const el = document.getElementById('ctx-related-items');
