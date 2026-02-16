@@ -81,6 +81,7 @@ body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondar
 .sidebar-divider{height:1px;background:var(--border);margin:4px 12px}
 .sidebar-header{position:relative}
 .sidebar-toggle-btn{padding:3px 5px!important}
+.ctx-toggle-hidden{display:none!important}
 .sidebar-collapse-chevron{display:flex;align-items:center;justify-content:center;padding:12px;cursor:pointer;color:var(--text-muted);transition:var(--transition-fast);border-top:1px solid var(--border);margin-top:auto;flex-shrink:0}
 .sidebar-collapse-chevron:hover{color:var(--text);background:var(--bg-hover)}
 .sidebar-collapse-chevron svg{opacity:0.5;transition:opacity 0.15s}
@@ -673,7 +674,7 @@ textarea{resize:vertical;line-height:1.6}
         <button class="btn btn-sm btn-ghost" onclick="openCommandPalette()" title="Command Palette (Cmd+K)" style="font-family:var(--mono);font-size:9px;padding:3px 8px;gap:4px">
           <span class="cmd-key" style="min-width:14px;height:14px;font-size:8px">K</span>
         </button>
-        <button class="btn btn-sm btn-ghost" onclick="toggleContextPanel()" title="Close context panel" id="context-toggle-btn" style="display:none">
+        <button class="btn btn-sm btn-ghost ctx-toggle-hidden" onclick="toggleContextPanel()" title="Close context panel" id="context-toggle-btn">
           <span style="font-size:10px">|||</span>
         </button>
         <div class="header-actions" id="header-actions"></div>
@@ -3208,7 +3209,9 @@ function toggleSidebar() {
 function syncContextToggleBtn() {
   const app = document.querySelector('.app');
   const btn = document.getElementById('context-toggle-btn');
-  if(btn) btn.style.display = app.classList.contains('context-open') ? '' : 'none';
+  if(!btn) return;
+  if(app.classList.contains('context-open')) btn.classList.remove('ctx-toggle-hidden');
+  else btn.classList.add('ctx-toggle-hidden');
 }
 function toggleContextPanel() {
   const app = document.querySelector('.app');
