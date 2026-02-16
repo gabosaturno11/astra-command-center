@@ -50,12 +50,13 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 |------|------|----------|---------------|
 | saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `1b1912a` |
 | titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `c2308fa` |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `31ae7f5` |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `84b0b45` |
 | de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno.vercel.app | (check) |
 
 ### ASTRA COMMAND CENTER — V2.0 UPGRADE (Feb 16 session)
 - Full v2.0 upgrade to "SATURNO HUB v2.0 - Command Center"
-- 3,280+ lines, 224 functions, single-file HTML app
+- LIVE URL: **astra-command-center-sigma.vercel.app** (NOT astra-command-center.vercel.app — old project)
+- 3,400+ lines, 224+ functions, single-file HTML app
 - 3-panel resizable layout (sidebar + primary + context panel)
 - Command Palette (Cmd+K) with fuzzy search across all item types
 - Folder system with nested folders, drag-drop, context menu
@@ -73,7 +74,13 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 - Responsive design (mobile breakpoints)
 - Glass morphism modals, logo breathing animation
 - Endel-inspired deeper blacks (#050508 base)
-- 12 commits pushed in this session
+- 12 commits in first session, 6+ fix commits in follow-up
+- FIXED: Panel resize no longer breaks layout (used CSS var instead of inline style)
+- FIXED: Project/context panel conflicts resolved (they share grid slot)
+- FIXED: Mode switching properly handles all panel states
+- FIXED: migrateV2 runs after seedProjects (Claude Code project now appears on first load)
+- FIXED: Duplicate saveLink override removed
+- FIXED: Sidebar item highlighting when switchSection called programmatically
 
 ### BONUS PAGE — DECOUPLED TO saturno-bonus (Feb 17)
 
