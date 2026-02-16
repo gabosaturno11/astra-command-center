@@ -35,6 +35,11 @@
 body{font-family:var(--font);background:linear-gradient(180deg, #09090b 0%, #0c0c10 50%, #0a0a0e 100%);color:var(--text-secondary);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
 
 .app{display:grid;grid-template-columns:220px 1fr;height:100vh}
+.app.project-open{grid-template-columns:220px 1fr 420px}
+.app.project-open .project-view{display:flex}
+.project-resize-handle{width:5px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0}
+.project-resize-handle:hover,.project-resize-handle.dragging{background:var(--accent);opacity:0.4}
+.project-resize-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:32px;border-radius:2px;background:var(--text-muted);opacity:0}
 
 /* SIDEBAR */
 .sidebar{background:linear-gradient(180deg, #0e0e12 0%, #0c0c0f 100%);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
@@ -305,14 +310,20 @@ textarea{resize:vertical;line-height:1.6}
 .sidebar-add-project{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius);cursor:pointer;transition:all 0.15s;font-size:11px;color:var(--text-muted)}
 .sidebar-add-project:hover{color:var(--text-secondary);background:var(--bg-hover)}
 
-/* PROJECT DETAIL VIEW */
-.project-view{display:none;flex-direction:column;height:100%}
-.project-view.active{display:flex}
+/* PROJECT DETAIL VIEW — right panel */
+.project-view{display:none;flex-direction:column;height:100vh;overflow:hidden;background:linear-gradient(180deg, #0e0e12 0%, #0c0c0f 100%);border-left:1px solid var(--border)}
 .project-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
 .project-header .proj-icon-lg{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border-radius:var(--radius);border:1px solid var(--border)}
 .project-header .proj-icon-lg svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .project-header-name{font-size:18px;font-weight:700;color:var(--text);flex:1}
-.project-header-actions{display:flex;gap:4px}
+.project-header-actions{display:flex;gap:4px;position:relative}
+.export-menu{position:absolute;top:100%;right:0;margin-top:6px;background:var(--bg-elevated);border:1px solid var(--border-hover);border-radius:var(--radius-lg);padding:6px;min-width:180px;z-index:999;box-shadow:0 8px 32px rgba(0,0,0,0.5);backdrop-filter:blur(20px);animation:fadeIn 0.12s ease}
+.export-menu-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius);cursor:pointer;font-size:11px;color:var(--text-secondary);transition:all 0.12s}
+.export-menu-item:hover{background:var(--bg-hover);color:var(--text)}
+.export-menu-item .export-icon{width:16px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--accent)}
+.export-menu-label{font-weight:500}
+.export-menu-desc{font-size:9px;color:var(--text-muted)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .project-tabs{display:flex;gap:2px;padding:0 24px;border-bottom:1px solid var(--border);flex-shrink:0}
 .project-tab{padding:8px 14px;border:none;background:transparent;color:var(--text-muted);font-family:var(--font);font-size:11px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
 .project-tab:hover{color:var(--text-secondary)}
@@ -685,17 +696,18 @@ textarea{resize:vertical;line-height:1.6}
       <div class="content-area"><div class="links-grid" id="links-grid"></div></div>
     </div>
   </main>
-</div>
-
-    <!-- PROJECT VIEW -->
-    <div class="project-view" id="panel-project">
+  <div class="project-resize-handle" id="project-resize-handle"></div>
+  <!-- PROJECT VIEW — right panel inside grid -->
+  <div class="project-view" id="panel-project">
       <div class="project-header">
         <div class="proj-icon-lg" id="proj-header-icon"></div>
         <span class="project-header-name" id="proj-header-name"></span>
         <span class="badge" id="proj-header-status"></span>
         <div class="project-header-actions">
           <button class="btn btn-sm" onclick="editProject()">Edit</button>
+          <button class="btn btn-sm" onclick="showExportMenu(event)" title="Export project">Export</button>
           <button class="btn btn-sm btn-danger" onclick="archiveProject()">Archive</button>
+          <button class="btn btn-sm" onclick="closeProjectPanel()" title="Close panel" style="font-size:14px;padding:2px 6px">x</button>
         </div>
       </div>
       <div class="project-tabs" id="proj-tabs">
@@ -741,6 +753,7 @@ textarea{resize:vertical;line-height:1.6}
         </div>
       </div>
     </div>
+</div><!-- /app -->
 
 <!-- CONTENT MODAL -->
 <div class="modal-overlay" id="content-modal">
@@ -921,6 +934,31 @@ function load() {
   if(!S.specs) S.specs=[];
   if(!S.specs.length) { seedKernel(); }
   if(!S.activeSpec&&S.specs.length) S.activeSpec=S.specs[0].id;
+  migrateV2();
+}
+
+function migrateV2() {
+  // Add Claude Code project if it doesn't exist yet
+  if(S.projects && S.projects.length && !S.projects.find(p => p.id === 'proj_claude_code')) {
+    const now = new Date().toISOString();
+    S.projects.push({
+      id:'proj_claude_code', name:'Claude Code', icon:'terminal', status:'active', color:'#a78bfa',
+      instructions:'<h1>Claude Code - Session Continuity Kernel</h1><h2>Purpose</h2><p>This project is the SINGLE SOURCE OF TRUTH for every Claude Code session. Any new Claude reads this project first and knows exactly what to do without asking Gabo.</p><h2>Rules That NEVER Change</h2><ol><li>~/dev/ is canonical for ALL repos - NOT Desktop, NOT iCloud</li><li>NO DELETE - archive, never delete</li><li>Every Gabo message -> save to backend as-is (project/title/text)</li><li>Commit + deploy after EVERY meaningful change</li><li>Dark theme only, no emojis in code</li><li>Custom over SaaS, always</li><li>DO NOT ASK GABO - read the logs and specs, then execute</li></ol><h2>Active Repos</h2><table><tr><th>Repo</th><th>Local</th><th>Live</th></tr><tr><td>astra-command-center</td><td>~/dev/astra-command-center/</td><td>astra-command-center.vercel.app</td></tr><tr><td>titan-forge</td><td>~/dev/titan-forge/</td><td>titan-forge-sage.vercel.app</td></tr><tr><td>saturno-bonus</td><td>~/dev/saturno-bonus/</td><td>(pending domain)</td></tr><tr><td>de-aqui-a-saturno</td><td>~/dev/de-aqui-a-saturno/</td><td>de-aqui-a-saturno.vercel.app</td></tr></table><h2>Machine Context</h2><ul><li>C2 iMac: username Gabosaturno (CAPITAL G)</li><li>C1 MacBook Pro: username gabosaturno (lowercase)</li><li>GitHub: gabosaturno11</li></ul><h2>Design Constraints</h2><ul><li>Pure black backgrounds (#09090b)</li><li>Mint green for ASTRA (#4ade80)</li><li>Purple accents (#8b5cf6)</li><li>Dark theme ONLY</li></ul><h2>How to Use This Project</h2><p>1. Export this project as MD (click Export button)</p><p>2. The exported MD becomes CLAUDE.md in repo root</p><p>3. Next Claude Code session reads it automatically</p><p>4. Update KB items below as state changes</p>',
+      created:now, updated:now
+    });
+    S.knowledgeBase.push(
+      { id:'kb_cc_session_log', projectId:'proj_claude_code', name:'Session Log - Feb 16, 2026', type:'md', storage:'inline',
+        content:'# Session Log\n\n## What Was Done\n- Desktop cleaned\n- Claude Code project added to ASTRA\n- Export feature added (MD, JSON, clipboard)\n- CLAUDE.md kernel placed in all repos\n\n## What Needs Doing\n- Bonus page Phase 0-5\n- ASTRA polish (color tabs, mobile)\n- Gather bonus assets as TBV',
+        description:'Current session state', tags:['session','log'], created:now, updated:now },
+      { id:'kb_cc_gabo_rules', projectId:'proj_claude_code', name:'Gabo Rules (Permanent)', type:'md', storage:'inline',
+        content:'# Permanent Rules\n1. ~/dev/ is canonical\n2. NO DELETE\n3. Every message -> backend\n4. Commit + deploy after EVERY change\n5. Dark theme only\n6. Custom over SaaS\n7. DO NOT ASK - execute\n8. BOOK FIRST\n9. planet-logo.png is THE logo\n10. Audio 404s on Vercel - needs CDN\n11. Brevo needs API keys in Vercel env',
+        description:'Rules that never change', tags:['rules','permanent'], created:now, updated:now },
+      { id:'kb_cc_messages', projectId:'proj_claude_code', name:'Messages Backend', type:'md', storage:'inline',
+        content:'# Backend: ~/dev/saturno-bonus/logs/gabo-messages.json\n9 messages (id 0-8)\nRule: save EVERY message unless told otherwise',
+        description:'Message log location', tags:['messages','backend'], created:now, updated:now }
+    );
+    save();
+  }
 }
 
 function seedKernel() {
@@ -965,14 +1003,10 @@ function escA(s) { return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 // === SECTIONS ===
 function switchSection(sec, el) {
   currentSection=sec;
-  activeProject=null;
   document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
   if(el)el.classList.add('active');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel-project').classList.remove('active');
-  document.getElementById('panel-project').style.display='none';
   document.getElementById('panel-'+sec).classList.add('active');
-  renderProjectsSidebar();
   const titles={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
   document.getElementById('header-title').textContent=titles[sec]||sec;
   if(sec==='content')renderContent();
@@ -1252,15 +1286,16 @@ function renderProjectsSidebar() {
 function openProject(id) {
   activeProject = id;
   activeProjTab = 'instructions';
-  currentSection = '';
-  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  const projPanel = document.getElementById('panel-project');
-  projPanel.style.display = 'flex';
-  projPanel.classList.add('active');
-  document.getElementById('header-title').textContent = getProject(id)?.name || 'Project';
+  // Open project as right panel — keep main content visible
+  document.querySelector('.app').classList.add('project-open');
   renderProjectsSidebar();
   renderProjectView();
+}
+
+function closeProjectPanel() {
+  activeProject = null;
+  document.querySelector('.app').classList.remove('project-open');
+  renderProjectsSidebar();
 }
 
 function renderProjectView() {
@@ -1678,6 +1713,26 @@ function seedProjects() {
     instructions:'<h1>De Aqui a Saturno</h1><h2>Valentine\'s Day Experience for Karina</h2><p>Crystal cosmic scroll experience: gate -> 18 chapters -> epic end -> 11 love dimensions -> finale</p><h2>Deployment</h2><ul><li>Live: de-aqui-a-saturno.vercel.app</li><li>Repo: github.com/gabosaturno11/de-aqui-a-saturno (private)</li></ul><h2>Features</h2><ul><li>Real piano audio (dual-track crossfade)</li><li>Real couple videos</li><li>Glassmorphism, ambient orbs, star parallax</li><li>11 love dimensions with unique SVG icons</li><li>KS monogram in finale</li><li>Hidden alien Easter egg</li></ul><p><b>Gabo\'s reaction:</b> "dude wtf I am crying" / "the UI is INSANE"</p>',
     created:now, updated:now
   });
+
+  // Project 6: Claude Code (The Kernel)
+  S.projects.push({
+    id:'proj_claude_code', name:'Claude Code', icon:'terminal', status:'active', color:'#a78bfa',
+    instructions:'<h1>Claude Code - Session Continuity Kernel</h1><h2>Purpose</h2><p>This project is the SINGLE SOURCE OF TRUTH for every Claude Code session. Any new Claude reads this project first and knows exactly what to do without asking Gabo.</p><h2>Rules That NEVER Change</h2><ol><li>~/dev/ is canonical for ALL repos - NOT Desktop, NOT iCloud</li><li>NO DELETE - archive, never delete</li><li>Every Gabo message -> save to backend as-is (project/title/text)</li><li>Commit + deploy after EVERY meaningful change</li><li>Dark theme only, no emojis in code</li><li>Custom over SaaS, always</li><li>DO NOT ASK GABO - read the logs and specs, then execute</li></ol><h2>Active Repos</h2><table><tr><th>Repo</th><th>Local</th><th>Live</th></tr><tr><td>astra-command-center</td><td>~/dev/astra-command-center/</td><td>astra-command-center.vercel.app</td></tr><tr><td>titan-forge</td><td>~/dev/titan-forge/</td><td>titan-forge-sage.vercel.app</td></tr><tr><td>saturno-bonus</td><td>~/dev/saturno-bonus/</td><td>(pending domain)</td></tr><tr><td>de-aqui-a-saturno</td><td>~/dev/de-aqui-a-saturno/</td><td>de-aqui-a-saturno.vercel.app</td></tr></table><h2>Machine Context</h2><ul><li>C2 iMac: username Gabosaturno (CAPITAL G)</li><li>C1 MacBook Pro: username gabosaturno (lowercase)</li><li>GitHub: gabosaturno11</li><li>titan-forge is 3.1GB - deploy via rsync to /tmp/ (exclude music/audio/video/.git)</li></ul><h2>Design Constraints</h2><ul><li>Pure black backgrounds (#000000 or #09090b)</li><li>Purple-blue accents (#6c3aff or #8b5cf6)</li><li>Cyan secondary (#00CFFF or #22d3ee)</li><li>Mint green for ASTRA (#4ade80)</li><li>Sora font for customer pages</li><li>Dark theme ONLY</li></ul><h2>Gabo Context</h2><ul><li>Running company ALONE - 3 clients, immigration, finances, 2 companies, book deadline</li><li>Developer LEFT - building everything solo with Claude</li><li>Does NOT want to babysit Claude - autonomous plans that run for hours</li><li>DURABILITY over speed - things that LAST</li></ul><h2>How to Use This Project</h2><p>1. Export this project as MD (click Export button above)</p><p>2. The exported file goes to the local repo as CLAUDE.md</p><p>3. Next Claude Code session reads it automatically</p><p>4. Update KB items below as state changes</p>',
+    created:now, updated:now
+  });
+
+  // KB items for Claude Code project
+  S.knowledgeBase.push(
+    { id:'kb_cc_session_log', projectId:'proj_claude_code', name:'Session Log - Feb 16, 2026', type:'md', storage:'inline',
+      content:'# Session Log - Feb 16, 2026\n\n## What Was Done\n- Desktop cleaned (everything into CLAUDE NOT HERE)\n- Claude Code project added to ASTRA (this project)\n- Export feature added (MD, JSON, clipboard)\n- CLAUDE.md kernel placed in all 3 repos\n- Gabo messages backend has 9 entries (id 0-8)\n\n## What Is In Progress\n- ASTRA V2 finishing touches\n- Bonus page Phase 0-5\n\n## What Needs Doing Next\n- Finish ASTRA: project color tab accent, living docs assignment, mobile responsiveness\n- Bonus page: Phase 0 (lock surface), Phase 1 (brand), Phase 2 (mobile), Phase 3 (content), Phase 4 (gate), Phase 5 (analytics)\n- Gather bonus assets as TBV items\n\n## Git State\n- astra-command-center: uncommitted changes (export feature + Claude Code project)\n- titan-forge: .gitignore modified, logs/ untracked\n- saturno-bonus: .gitignore + gabo-messages.json modified\n- de-aqui-a-saturno: CLEAN',
+      description:'Current session state - update this every session', tags:['session','log','state'], created:now, updated:now },
+    { id:'kb_cc_gabo_rules', projectId:'proj_claude_code', name:'Gabo Rules (Permanent)', type:'md', storage:'inline',
+      content:'# Rules That Never Change\n\n1. ~/dev/ is canonical for ALL repos\n2. NO DELETE - archive only\n3. Every Gabo message -> backend as-is\n4. Commit + deploy after EVERY change\n5. Dark theme only\n6. Custom over SaaS\n7. DO NOT ASK - read logs, execute\n8. BOOK FIRST (Goal 1 priority)\n9. Desktop is NOT a battlefield\n10. planet-logo.png is THE logo (white planet silhouette)\n11. Audio 404s on Vercel (gitignored) - needs CDN\n12. Brevo email needs BREVO_API_KEY + BREVO_LIST_ID in Vercel env\n13. CONNECT dont build - 150+ tools exist\n14. Save context aggressively - 9-hour sessions are normal',
+      description:'Permanent rules that never change across sessions', tags:['rules','permanent','kernel'], created:now, updated:now },
+    { id:'kb_cc_messages', projectId:'proj_claude_code', name:'Gabo Messages Backend', type:'md', storage:'inline',
+      content:'# Gabo Messages Backend\n\n**Location:** ~/dev/saturno-bonus/logs/gabo-messages.json\n**Also:** ~/dev/titan-forge/logs/gabo-messages.json\n\n## Messages (9 total)\n- #0: NORTH STAR (pinned system msg)\n- #1: THE SHIPPING PLAN (Feb 14)\n- #2: DECOUPLE BONUS FROM TITAN (Feb 15)\n- #3: SAVE CONTEXT (Feb 15)\n- #4: ASTRA UPGRADE (Feb 15)\n- #5: ASTRA V2 KB + Whiteboard (Feb 15)\n- #6: ASTRA V2 Save Specs (Feb 15)\n- #7: GO BUILD AUTONOMOUS (Feb 15)\n- #8: SESSION START (Feb 16)\n\n## Rule\nDefault = save EVERY message Gabo sends.\nOnly skip if Gabo says "dont save".',
+      description:'Backend message log tracking', tags:['messages','backend','log'], created:now, updated:now }
+  );
 }
 
 // Extend whiteboard for doc references
@@ -1732,6 +1787,139 @@ function undoImport(){
   if(!S.projects)S.projects=[];if(!S.knowledgeBase)S.knowledgeBase=[];
   save();renderProjectsSidebar();switchSection('content',document.querySelector('.sidebar-item'));
   toast('Reverted to backup from '+(time||'unknown'));
+}
+
+// === PROJECT EXPORT ===
+let exportMenuOpen = false;
+function showExportMenu(e) {
+  e.stopPropagation();
+  if(exportMenuOpen) { closeExportMenu(); return; }
+  const existing = document.querySelector('.export-menu');
+  if(existing) existing.remove();
+  const menu = document.createElement('div');
+  menu.className = 'export-menu';
+  menu.innerHTML = `
+    <div class="export-menu-item" onclick="exportProjectMD()">
+      <span class="export-icon">MD</span>
+      <div><div class="export-menu-label">Markdown</div><div class="export-menu-desc">Full project as .md file</div></div>
+    </div>
+    <div class="export-menu-item" onclick="exportProjectJSON()">
+      <span class="export-icon">{ }</span>
+      <div><div class="export-menu-label">JSON</div><div class="export-menu-desc">Raw data for import</div></div>
+    </div>
+    <div class="export-menu-item" onclick="copyProjectMD()">
+      <span class="export-icon">CP</span>
+      <div><div class="export-menu-label">Copy as Markdown</div><div class="export-menu-desc">Copy to clipboard</div></div>
+    </div>
+  `;
+  document.querySelector('.project-header-actions').appendChild(menu);
+  exportMenuOpen = true;
+  setTimeout(() => document.addEventListener('click', closeExportMenu, {once:true}), 10);
+}
+function closeExportMenu() {
+  const m = document.querySelector('.export-menu');
+  if(m) m.remove();
+  exportMenuOpen = false;
+}
+function buildProjectMD() {
+  const p = getProject(activeProject);
+  if(!p) return '';
+  const kbItems = (S.knowledgeBase||[]).filter(k => k.projectId === activeProject);
+  const docs = (S.specs||[]).filter(s => s.projectId === activeProject);
+  const tasks = (S.tasks||[]).filter(t => t.project === p.name);
+  const links = (S.links||[]).filter(l => l.projectId === activeProject);
+  // Convert HTML instructions to readable text
+  const div = document.createElement('div');
+  div.innerHTML = p.instructions || '';
+  const instrText = div.innerText || div.textContent || '';
+  let md = `# ${p.name}\n`;
+  md += `**Status:** ${p.status} | **Icon:** ${p.icon} | **Color:** ${p.color}\n`;
+  md += `**Updated:** ${p.updated || p.created}\n\n`;
+  md += `---\n\n## Instructions\n\n${instrText}\n\n`;
+  if(kbItems.length) {
+    md += `---\n\n## Knowledge Base (${kbItems.length} items)\n\n`;
+    kbItems.forEach(k => {
+      md += `### ${k.name}\n`;
+      md += `**Type:** ${k.type} | **Storage:** ${k.storage}\n`;
+      if(k.description) md += `${k.description}\n`;
+      if(k.tags && k.tags.length) md += `**Tags:** ${k.tags.join(', ')}\n`;
+      if(k.content && k.type !== 'img') md += `\n${k.content}\n`;
+      if(k.filePath) md += `**File:** ${k.filePath}\n`;
+      if(k.url) md += `**URL:** ${k.url}\n`;
+      md += '\n';
+    });
+  }
+  if(docs.length) {
+    md += `---\n\n## Living Docs (${docs.length})\n\n`;
+    docs.forEach(d => {
+      md += `### ${d.title}\n`;
+      if(d.sections) d.sections.forEach(s => {
+        md += `#### ${s.title}\n`;
+        const sdiv = document.createElement('div');
+        sdiv.innerHTML = s.body || '';
+        md += (sdiv.innerText || '') + '\n\n';
+      });
+    });
+  }
+  if(tasks.length) {
+    md += `---\n\n## Tasks (${tasks.length})\n\n`;
+    tasks.forEach(t => {
+      const check = t.status === 'done' ? 'x' : ' ';
+      md += `- [${check}] ${t.title} (${t.status}${t.due ? ', due: '+t.due : ''})\n`;
+    });
+    md += '\n';
+  }
+  if(links.length) {
+    md += `---\n\n## Links (${links.length})\n\n`;
+    links.forEach(l => {
+      md += `- [${l.title}](${l.url})${l.desc ? ' — '+l.desc : ''}\n`;
+    });
+    md += '\n';
+  }
+  md += `---\n\n*Exported from ASTRA Command Center on ${new Date().toISOString().split('T')[0]}*\n`;
+  return md;
+}
+function exportProjectMD() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  const md = buildProjectMD();
+  const blob = new Blob([md], {type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.md';
+  a.click();
+  closeExportMenu();
+  toast('Exported as Markdown');
+}
+function exportProjectJSON() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  const data = {
+    project: p,
+    knowledgeBase: (S.knowledgeBase||[]).filter(k => k.projectId === activeProject),
+    livingDocs: (S.specs||[]).filter(s => s.projectId === activeProject),
+    tasks: (S.tasks||[]).filter(t => t.project === p.name),
+    links: (S.links||[]).filter(l => l.projectId === activeProject),
+    exportedAt: new Date().toISOString(),
+    exportedFrom: 'ASTRA Command Center'
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.json';
+  a.click();
+  closeExportMenu();
+  toast('Exported as JSON');
+}
+function copyProjectMD() {
+  const md = buildProjectMD();
+  navigator.clipboard.writeText(md).then(() => {
+    closeExportMenu();
+    toast('Copied to clipboard');
+  }).catch(() => {
+    closeExportMenu();
+    toast('Copy failed — try Export instead');
+  });
 }
 
 // === VOICE INPUT ===
@@ -2074,7 +2262,42 @@ document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDr
 document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 window.addEventListener('beforeunload',()=>{snapshotWriter();snapshotSpec();wbPersist();save();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+    if(activeProject) closeProjectPanel();
+  }
+});
+
+// === RESIZE HANDLE FOR PROJECT PANEL ===
+(function(){
+  const handle = document.getElementById('project-resize-handle');
+  const app = document.querySelector('.app');
+  let dragging = false;
+  let startX, startWidth;
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    handle.classList.add('dragging');
+    startX = e.clientX;
+    startWidth = document.getElementById('panel-project').offsetWidth;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if(!dragging) return;
+    const delta = startX - e.clientX;
+    const newWidth = Math.max(280, Math.min(800, startWidth + delta));
+    app.style.gridTemplateColumns = '220px 1fr ' + newWidth + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if(!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
 </script>
 </body>
 </html>
