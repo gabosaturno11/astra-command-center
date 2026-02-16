@@ -1333,7 +1333,7 @@ function renderContent() {
   if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
   if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+c.source).toLowerCase().includes(q));
   const g=document.getElementById('content-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>`<div class="content-card"><div class="content-card-body">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))"><div class="content-card-body">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`).join('');
   document.getElementById('content-count').textContent=S.content.length;
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -1462,7 +1462,7 @@ function renderLinks(){
   const q=(document.getElementById('link-search')?.value||'').toLowerCase();
   let items=S.links;if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
   const g=document.getElementById('links-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No links. Click + Add.</div>`:items.map(l=>`<div class="link-card" onclick="window.open('${escA(l.url)}','_blank')"><div class="link-card-title">${esc(l.title)}</div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No links. Click + Add.</div>`:items.map(l=>`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')"><div class="link-card-title">${esc(l.title)}</div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`).join('');
   document.getElementById('links-count').textContent=S.links.length;
 }
 function setLinkCat(c,el){linkCategory=c;document.querySelectorAll('#link-category-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderLinks();}
@@ -2623,7 +2623,7 @@ function renderFolderLevel(items, all, depth) {
     const count = countFolderItems(f.id);
     const isActive = activeFolderId === f.id;
     const indent = depth * 12;
-    let html = `<div class="folder-item ${isActive ? 'active' : ''}" style="padding-left:${8 + indent}px" onclick="selectFolder('${f.id}')" oncontextmenu="event.preventDefault();folderContextMenu(event,'${f.id}')">`;
+    let html = `<div class="folder-item ${isActive ? 'active' : ''}" style="padding-left:${8 + indent}px" onclick="selectFolder('${f.id}')" oncontextmenu="event.preventDefault();folderContextMenu(event,'${f.id}')" ondragover="event.preventDefault();this.style.background='var(--accent-glow)'" ondragleave="this.style.background=''" ondrop="event.preventDefault();this.style.background='';folderDrop(event,'${f.id}')">`;
     html += `<span class="folder-item-icon">${children.length ? (isActive ? 'v' : '>') : '-'}</span>`;
     html += `<span class="folder-item-name">${esc(f.name)}</span>`;
     if(count > 0) html += `<span class="folder-item-count">${count}</span>`;
@@ -2653,6 +2653,14 @@ function addFolderFromSidebar() {
   addFolder(name.trim());
   renderFolderTree();
   toast('Folder created');
+}
+function folderDrop(event, folderId) {
+  const data = event.dataTransfer.getData('text/plain');
+  if(!data) return;
+  try {
+    const { type, id } = JSON.parse(data);
+    if(type && id) { moveToFolder(type, id, folderId); renderFolderTree(); }
+  } catch(e) {}
 }
 function folderContextMenu(event, id) {
   const action = prompt('Folder action: (r)ename, (d)elete, (s)ub-folder');
