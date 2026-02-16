@@ -34,12 +34,13 @@
   --transition-smooth: all 0.25s cubic-bezier(0.4,0,0.2,1);
   --sidebar-width: 220px;
   --context-width: 320px;
+  --project-width: 420px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondary);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
 
 .app{display:grid;grid-template-columns:var(--sidebar-width) 4px 1fr;height:100vh;transition:grid-template-columns 0.25s cubic-bezier(0.4,0,0.2,1)}
-.app.project-open{grid-template-columns:var(--sidebar-width) 4px 1fr 5px 420px}
+.app.project-open{grid-template-columns:var(--sidebar-width) 4px 1fr 5px var(--project-width)}
 .app.project-open .project-view{display:flex}
 .app.context-open{grid-template-columns:var(--sidebar-width) 4px 1fr 4px var(--context-width)}
 .app.context-open .context-panel{display:flex}
@@ -1735,7 +1736,9 @@ function openProject(id) {
 
 function closeProjectPanel() {
   activeProject = null;
-  document.querySelector('.app').classList.remove('project-open');
+  const app = document.querySelector('.app');
+  app.classList.remove('project-open');
+  document.documentElement.style.setProperty('--project-width', '420px');
   renderProjectsSidebar();
 }
 
@@ -3379,7 +3382,7 @@ document.addEventListener('keydown',e=>{
 // === RESIZE HANDLE FOR PROJECT PANEL ===
 (function(){
   const handle = document.getElementById('project-resize-handle');
-  const app = document.querySelector('.app');
+  const root = document.documentElement;
   let dragging = false;
   let startX, startWidth;
   handle.addEventListener('mousedown', e => {
@@ -3395,7 +3398,7 @@ document.addEventListener('keydown',e=>{
     if(!dragging) return;
     const delta = startX - e.clientX;
     const newWidth = Math.max(280, Math.min(800, startWidth + delta));
-    app.style.gridTemplateColumns = '220px 1fr ' + newWidth + 'px';
+    root.style.setProperty('--project-width', newWidth + 'px');
   });
   document.addEventListener('mouseup', () => {
     if(!dragging) return;
