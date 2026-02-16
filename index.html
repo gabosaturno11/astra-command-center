@@ -587,6 +587,7 @@ textarea{resize:vertical;line-height:1.6}
   <main class="main">
     <div class="header">
       <span class="header-title" id="header-title">Content</span>
+      <span id="header-breadcrumb" style="font-size:10px;color:var(--text-muted);font-family:var(--mono);display:flex;align-items:center;gap:4px"></span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
         <div class="mode-switcher">
           <button class="mode-btn" onclick="setMode('focus')" id="mode-focus-btn" title="Focus: Primary only">F</button>
@@ -962,6 +963,40 @@ textarea{resize:vertical;line-height:1.6}
   </div>
 </div><!-- /app -->
 
+<!-- SHORTCUTS HELP -->
+<div class="modal-overlay" id="shortcuts-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:480px">
+    <div class="modal-title">Keyboard Shortcuts</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:11px">
+      <div>
+        <div style="font-weight:600;color:var(--text);margin-bottom:8px">Navigation</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Command Palette</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+K</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Content</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+1</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Tasks</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+2</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Calendar</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+3</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Writing Hub</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+4</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Living Docs</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+5</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Links</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+6</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Whiteboard</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+7</span></div>
+      </div>
+      <div>
+        <div style="font-weight:600;color:var(--text);margin-bottom:8px">Actions</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>New Item</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+N</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Context Panel</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+E</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Focus Mode</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+\</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Save Version</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+S</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Close/Escape</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Esc</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Show Shortcuts</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+/</span></div>
+        <div style="font-weight:600;color:var(--text);margin:12px 0 8px">Whiteboard</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Select</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">V</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Hand</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">H</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Node</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">N</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Connect</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">C</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- COMMAND PALETTE -->
 <div class="cmd-overlay" id="cmd-overlay" onclick="if(event.target===this)closeCommandPalette()">
   <div class="cmd-box">
@@ -1252,6 +1287,7 @@ function switchSection(sec, el) {
   document.getElementById('panel-'+sec).classList.add('active');
   const titles={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
   document.getElementById('header-title').textContent=titles[sec]||sec;
+  updateBreadcrumb();
   if(sec==='content')renderContent();
   if(sec==='tasks')renderTasks();
   if(sec==='calendar')renderCalendar();
@@ -1260,6 +1296,23 @@ function switchSection(sec, el) {
   if(sec==='links')renderLinks();
   if(sec==='whiteboard')wbRender();
   updateSidebarCtx();
+}
+function updateBreadcrumb() {
+  const bc = document.getElementById('header-breadcrumb');
+  if(!bc) return;
+  let parts = [];
+  if(currentSection === 'writer') {
+    const d = getActiveDoc();
+    if(d && d.title) parts.push(d.title);
+  } else if(currentSection === 'specs') {
+    const s = getActiveSpec();
+    if(s && s.title) parts.push(s.title);
+  }
+  if(activeProject) {
+    const p = (S.projects||[]).find(x=>x.id===activeProject);
+    if(p) parts.push(p.name);
+  }
+  bc.innerHTML = parts.length ? '<span style="opacity:0.4">/</span> ' + parts.map(p => '<span>'+esc(p)+'</span>').join(' <span style="opacity:0.4">/</span> ') : '';
 }
 
 function updateSidebarCtx() {
@@ -1363,7 +1416,7 @@ function getActiveDoc(){return S.docs.find(d=>d.id===S.activeDoc);}
 function renderWriter(){renderDocList();loadDoc();document.getElementById('writer-count').textContent=S.docs.length;}
 function renderDocList(){document.getElementById('writer-doc-list').innerHTML=S.docs.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div><div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span>${S.docs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
 function loadDoc(){const d=getActiveDoc();if(!d)return;document.getElementById('writer-title').value=d.title||'';document.getElementById('writer-editor').innerHTML=d.body||'';updateWS();renderVersions();}
-function switchDoc(id){snapshotWriter();S.activeDoc=id;save();renderWriter();const d=S.docs.find(x=>x.id===id);if(d)trackRecent('doc',id,d.title);}
+function switchDoc(id){snapshotWriter();S.activeDoc=id;save();renderWriter();const d=S.docs.find(x=>x.id===id);if(d)trackRecent('doc',id,d.title);updateBreadcrumb();}
 function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.getElementById('writer-title').focus();}
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
@@ -1389,7 +1442,7 @@ function getActiveSpec(){return S.specs.find(s=>s.id===S.activeSpec);}
 function renderSpecs(){renderSpecList();loadSpec();document.getElementById('specs-count').textContent=S.specs.length;}
 function renderSpecList(){document.getElementById('specs-doc-list').innerHTML=S.specs.map(s=>{const sc=s.sections?s.sections.length:0;const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="specs-doc-item ${s.id===S.activeSpec?'active':''}" onclick="switchSpec(${s.id})"><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div><div class="specs-doc-meta"><span>${sc} sections</span><span>${dt}</span>${S.specs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec(${s.id})">x</span>`:''}</div></div>`;}).join('');}
 function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';renderSpecSections();updateSpecStatus();}
-function switchSpec(id){snapshotSpec();S.activeSpec=id;save();renderSpecs();const s=S.specs.find(x=>x.id===id);if(s)trackRecent('spec',id,s.title);}
+function switchSpec(id){snapshotSpec();S.activeSpec=id;save();renderSpecs();const s=S.specs.find(x=>x.id===id);if(s)trackRecent('spec',id,s.title);updateBreadcrumb();}
 function newSpec(){snapshotSpec();const s={id:Date.now(),title:'',sections:[{id:Date.now()+1,title:'Overview',body:'',collapsed:false}],created:new Date().toISOString(),updated:new Date().toISOString()};S.specs.unshift(s);S.activeSpec=s.id;save();renderSpecs();document.getElementById('specs-title').focus();}
 function delSpec(id){if(S.specs.length<=1){toast('Cannot delete last spec');return;}S.specs=S.specs.filter(s=>s.id!==id);if(S.activeSpec===id)S.activeSpec=S.specs[0].id;save();renderSpecs();toast('Deleted');}
 function snapshotSpec(){const s=getActiveSpec();if(!s)return;const t=document.getElementById('specs-title');if(t)s.title=t.value;if(!s.sections)s.sections=[];s.sections.forEach(sec=>{const el=document.getElementById('spec-editor-'+sec.id);if(el)sec.body=el.innerHTML;const tEl=document.getElementById('spec-title-'+sec.id);if(tEl)sec.title=tEl.value;});s.updated=new Date().toISOString();}
@@ -3163,6 +3216,8 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey) && e.key==='e') { e.preventDefault(); toggleContextPanel(); return; }
   // Cmd+\\: toggle focus mode
   if((e.metaKey||e.ctrlKey) && e.key==='\\') { e.preventDefault(); setMode(currentMode==='focus'?'default':'focus'); return; }
+  // Cmd+/: show shortcuts help
+  if((e.metaKey||e.ctrlKey) && e.key==='/') { e.preventDefault(); document.getElementById('shortcuts-modal').classList.toggle('open'); return; }
 });
 
 // === RESIZE HANDLE FOR PROJECT PANEL ===
