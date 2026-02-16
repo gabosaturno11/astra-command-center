@@ -1207,6 +1207,22 @@ textarea{resize:vertical;line-height:1.6}
   </div>
 </div>
 
+<!-- QUICK CAPTURE -->
+<div id="quick-capture" style="position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:500px;max-width:90vw;z-index:500;display:none;transition:transform 0.2s ease,opacity 0.2s ease;opacity:0">
+  <div style="background:linear-gradient(135deg, rgba(16,16,20,0.98) 0%, rgba(22,22,25,0.98) 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.06);border-bottom:none;border-radius:var(--radius-lg) var(--radius-lg) 0 0;padding:10px 14px;box-shadow:0 -8px 32px rgba(0,0,0,0.5)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <select id="qc-type" style="width:auto;font-size:9px;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary)">
+        <option value="task">Task</option>
+        <option value="content">Content</option>
+        <option value="note">Quick Note</option>
+      </select>
+      <input type="text" id="qc-input" placeholder="Quick capture... (Cmd+Shift+N)" style="flex:1;font-size:12px;padding:8px 10px;border-radius:6px;background:var(--bg-input);border:1px solid var(--border)" onkeydown="if(event.key==='Enter'){qcSubmit();event.preventDefault();}if(event.key==='Escape')qcClose();">
+      <button class="btn btn-primary btn-sm" onclick="qcSubmit()" style="padding:6px 12px">Add</button>
+      <button class="btn btn-sm btn-ghost" onclick="qcClose()" style="font-size:12px">x</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1312,6 +1328,40 @@ function seedKernel() {
 
 function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); }
 function flashSave() { const el=document.getElementById('save-indicator'); if(!el) return; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0';},1500); }
+
+// === QUICK CAPTURE ===
+function qcOpen() {
+  const el = document.getElementById('quick-capture');
+  el.style.display = 'block';
+  requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
+  document.getElementById('qc-input').focus();
+}
+function qcClose() {
+  const el = document.getElementById('quick-capture');
+  el.style.opacity = '0';
+  el.style.transform = 'translateX(-50%) translateY(10px)';
+  setTimeout(() => { el.style.display = 'none'; }, 200);
+}
+function qcSubmit() {
+  const type = document.getElementById('qc-type').value;
+  const text = document.getElementById('qc-input').value.trim();
+  if(!text) return;
+  if(type === 'task') {
+    S.tasks.push({ id: Date.now(), title: text, status: 'todo', priority: 'normal', project: '', due: '', created: new Date().toISOString() });
+    save(); renderTasks();
+    toast('Task added: ' + text);
+  } else if(type === 'content') {
+    S.content.push({ id: Date.now(), type: 'caption', body: text, theme: '', source: 'Quick Capture', tags: [], created: new Date().toISOString(), updated: new Date().toISOString() });
+    save(); renderContent();
+    toast('Content added');
+  } else if(type === 'note') {
+    const d = getActiveDoc();
+    if(d) { d.body = (d.body || '') + '<p>' + esc(text) + '</p>'; save(); renderWriter(); toast('Note added to doc'); }
+    else { toast('No active document'); return; }
+  }
+  document.getElementById('qc-input').value = '';
+  qcClose();
+}
 function updateStorage() { const b=new Blob([localStorage.getItem(SK)||'']).size; const k=(b/1024).toFixed(1); document.getElementById('storage-indicator').textContent=k>1024?(k/1024).toFixed(1)+' MB':k+' KB'; updateDashboard(); }
 function updateDashboard() {
   const dt = document.getElementById('dash-tasks'); if(dt) dt.textContent = S.tasks.filter(t=>t.status!=='done').length;
@@ -2983,6 +3033,7 @@ function cmdGetItems(q) {
   if(!ql || 'new project'.includes(ql)) items.push({title:'New Project', desc:'Create a new project', icon:'+', type:'action', action:openNewProjectModal});
   if(!ql || 'export'.includes(ql)) items.push({title:'Export All', desc:'Export all data as JSON', icon:'E', type:'action', action:exportAll});
   if(!ql || 'focus timer'.includes(ql)) items.push({title:'Focus Timer', desc:'Open focus timer in context panel', icon:'FT', type:'action', action:()=>{if(!document.querySelector('.app').classList.contains('context-open'))toggleContextPanel();}});
+  if(!ql || 'quick capture'.includes(ql)) items.push({title:'Quick Capture', desc:'Add task/content instantly (Cmd+Shift+N)', icon:'+', type:'action', action:()=>{closeCommandPalette();qcOpen();}});
   return items.slice(0, 20);
 }
 function cmdSearch() {
@@ -3254,6 +3305,8 @@ document.addEventListener('keydown',e=>{
     }
     return;
   }
+  // Cmd+Shift+N: quick capture
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && e.key==='n') { e.preventDefault(); qcOpen(); return; }
   // Cmd+N: new item in current section
   if((e.metaKey||e.ctrlKey) && e.key==='n' && !e.shiftKey) {
     e.preventDefault();
