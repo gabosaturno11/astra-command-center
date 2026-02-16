@@ -417,6 +417,20 @@ textarea{resize:vertical;line-height:1.6}
 .voice-btn.recording{background:rgba(239,68,68,0.2);color:var(--red);animation:voice-pulse 1s infinite}
 @keyframes voice-pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
+/* WIKI LINKS */
+.wiki-link{color:var(--accent);cursor:pointer;border-bottom:1px dashed rgba(74,222,160,0.4);padding-bottom:1px;transition:var(--transition-fast)}
+.wiki-link:hover{border-bottom-color:var(--accent);background:var(--accent-glow);border-radius:2px}
+.wiki-link-broken{color:var(--red);border-bottom:1px dashed rgba(248,113,113,0.4)}
+
+/* FOLDER TREE */
+.folder-tree{padding:4px 0}
+.folder-item{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:var(--radius);cursor:pointer;transition:var(--transition-fast);font-size:11px;color:var(--text-secondary)}
+.folder-item:hover{background:var(--bg-hover);color:var(--text)}
+.folder-item.active{background:var(--accent-glow);color:var(--accent)}
+.folder-item-icon{font-size:10px;color:var(--text-muted);width:14px;text-align:center}
+.folder-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.folder-item-count{font-size:9px;color:var(--text-muted);font-family:var(--mono)}
+
 /* COMMAND PALETTE */
 .cmd-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:9000;display:none;align-items:flex-start;justify-content:center;padding-top:20vh}
 .cmd-overlay.open{display:flex}
@@ -1097,7 +1111,7 @@ textarea{resize:vertical;line-height:1.6}
 <script>
 // === STATE ===
 const SK = 'saturno-private-hub';
-let S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[] };
+let S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[], folders:[] };
 let currentSection = 'content';
 let contentType = 'all', contentTheme = 'all';
 let taskView = 'list', taskFilter = 'all', taskProjectFilter = null;
@@ -1108,7 +1122,7 @@ let calMonth = new Date().getMonth(), calYear = new Date().getFullYear();
 let calDragId = null;
 
 function load() {
-  try { const s = localStorage.getItem(SK); if(s) S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[], ...JSON.parse(s) }; } catch(e){}
+  try { const s = localStorage.getItem(SK); if(s) S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[], folders:[], ...JSON.parse(s) }; } catch(e){}
   if(!S.projects) S.projects = [];
   if(!S.knowledgeBase) S.knowledgeBase = [];
   if(!S.docs.length) { S.docs.push({id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()}); S.activeDoc=S.docs[0].id; }
@@ -1998,7 +2012,7 @@ function importAll(){
   // Auto-backup before import (UNDO safety net)
   const backup = localStorage.getItem(SK);
   if(backup) { localStorage.setItem(SK+'_backup', backup); localStorage.setItem(SK+'_backup_time', new Date().toISOString()); }
-  const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const f=e.target.files[0],r=new FileReader();r.onload=ev=>{try{S={content:[],tasks:[],links:[],docs:[],specs:[],activeDoc:null,activeSpec:null,whiteboard:{},projects:[],knowledgeBase:[],...JSON.parse(ev.target.result)};if(!S.projects)S.projects=[];if(!S.knowledgeBase)S.knowledgeBase=[];save();renderProjectsSidebar();switchSection(currentSection||'content',document.querySelector('.sidebar-item.active'));toast('Imported (backup saved — click Undo Import to revert)');}catch(e){toast('Invalid JSON');}};r.readAsText(f);};inp.click();
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const f=e.target.files[0],r=new FileReader();r.onload=ev=>{try{S={content:[],tasks:[],links:[],docs:[],specs:[],activeDoc:null,activeSpec:null,whiteboard:{},projects:[],knowledgeBase:[],folders:[],...JSON.parse(ev.target.result)};if(!S.projects)S.projects=[];if(!S.knowledgeBase)S.knowledgeBase=[];save();renderProjectsSidebar();switchSection(currentSection||'content',document.querySelector('.sidebar-item.active'));toast('Imported (backup saved — click Undo Import to revert)');}catch(e){toast('Invalid JSON');}};r.readAsText(f);};inp.click();
 }
 function undoImport(){
   const backup = localStorage.getItem(SK+'_backup');
@@ -2468,6 +2482,89 @@ function seedLinks() {
       {id:2021,title:'GitHub: sm-app-copy-v1',url:'https://github.com/gabosaturno11/sm-app-copy-v1',category:'repo',desc:'Clone of Saturno Movement app codebase (from Softzee)',created:new Date().toISOString()},
     ];
   }
+}
+
+// === FOLDER SYSTEM ===
+function getFolders() { return S.folders || []; }
+function addFolder(name, parentId) {
+  if(!S.folders) S.folders = [];
+  const f = { id: 'folder_' + Date.now(), name: name || 'New Folder', parentId: parentId || null, created: new Date().toISOString() };
+  S.folders.push(f);
+  save();
+  return f;
+}
+function deleteFolder(id) {
+  S.folders = (S.folders||[]).filter(f => f.id !== id);
+  // Unassign items from deleted folder
+  S.content.forEach(c => { if(c.folderId === id) c.folderId = null; });
+  S.tasks.forEach(t => { if(t.folderId === id) t.folderId = null; });
+  S.docs.forEach(d => { if(d.folderId === id) d.folderId = null; });
+  S.specs.forEach(s => { if(s.folderId === id) s.folderId = null; });
+  S.links.forEach(l => { if(l.folderId === id) l.folderId = null; });
+  save();
+}
+function renameFolder(id, name) {
+  const f = (S.folders||[]).find(x => x.id === id);
+  if(f) { f.name = name; save(); }
+}
+function moveToFolder(itemType, itemId, folderId) {
+  const collections = { content: S.content, tasks: S.tasks, docs: S.docs, specs: S.specs, links: S.links };
+  const col = collections[itemType];
+  if(!col) return;
+  const item = col.find(x => x.id === itemId || x.id == itemId);
+  if(item) { item.folderId = folderId; save(); toast('Moved to folder'); }
+}
+
+// === CROSS-LINKING [[wiki-links]] ===
+function parseWikiLinks(html) {
+  if(!html) return html;
+  return html.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
+    const target = findLinkedItem(linkText.trim());
+    if(target) {
+      return `<span class="wiki-link" onclick="navigateToItem('${target.type}','${target.id}')" title="${esc(target.desc)}" style="color:var(--accent);cursor:pointer;border-bottom:1px dashed var(--accent);padding-bottom:1px">${esc(linkText)}</span>`;
+    }
+    return `<span class="wiki-link-broken" style="color:var(--red);cursor:help;border-bottom:1px dashed var(--red)" title="Not found: ${esc(linkText)}">${esc(linkText)}</span>`;
+  });
+}
+function findLinkedItem(name) {
+  const nl = name.toLowerCase();
+  // Search projects
+  const proj = (S.projects||[]).find(p => p.name.toLowerCase() === nl);
+  if(proj) return { type: 'project', id: proj.id, desc: 'Project: ' + proj.name };
+  // Search docs
+  const doc = S.docs.find(d => d.title && d.title.toLowerCase() === nl);
+  if(doc) return { type: 'doc', id: doc.id, desc: 'Document: ' + doc.title };
+  // Search specs
+  const spec = S.specs.find(s => s.title && s.title.toLowerCase() === nl);
+  if(spec) return { type: 'spec', id: spec.id, desc: 'Living Doc: ' + spec.title };
+  // Search KB items
+  const kb = (S.knowledgeBase||[]).find(k => k.name && k.name.toLowerCase() === nl);
+  if(kb) return { type: 'kb', id: kb.id, desc: 'KB: ' + kb.name };
+  // Search tasks
+  const task = S.tasks.find(t => t.title && t.title.toLowerCase() === nl);
+  if(task) return { type: 'task', id: task.id, desc: 'Task: ' + task.title };
+  return null;
+}
+function navigateToItem(type, id) {
+  if(type === 'project') { openProject(id); }
+  else if(type === 'doc') { switchDoc(parseInt(id) || id); switchSection('writer', null); }
+  else if(type === 'spec') { switchSpec(parseInt(id) || id); switchSection('specs', null); }
+  else if(type === 'kb') { openKBViewer(id); }
+  else if(type === 'task') { switchSection('tasks', null); toast('Task: ' + (S.tasks.find(t => t.id == id)?.title || '')); }
+}
+function getBacklinks(itemType, itemName) {
+  const nl = '[[' + itemName + ']]';
+  const results = [];
+  S.docs.forEach(d => { if(d.body && d.body.includes(nl)) results.push({ type: 'doc', title: d.title || 'Untitled', id: d.id }); });
+  S.specs.forEach(s => {
+    (s.sections || []).forEach(sec => {
+      if(sec.body && sec.body.includes(nl)) results.push({ type: 'spec', title: s.title + ' > ' + sec.title, id: s.id });
+    });
+  });
+  (S.projects||[]).forEach(p => {
+    if(p.instructions && p.instructions.includes(nl)) results.push({ type: 'project', title: p.name, id: p.id });
+  });
+  return results;
 }
 
 // === COMMAND PALETTE ===
