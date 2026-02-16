@@ -1,9 +1,9 @@
 # ASTRA Command Center
 
-**Live:** [astra-command-center.vercel.app](https://astra-command-center.vercel.app)
+**Live:** [astra-command-center-sigma.vercel.app](https://astra-command-center-sigma.vercel.app)
 **Repo:** [github.com/gabosaturno11/astra-command-center](https://github.com/gabosaturno11/astra-command-center)
 **Local:** `~/dev/astra-command-center/`
-**Vercel Team:** `gabosaturno03s-projects` (Saturno OS)
+**Vercel Account:** `gabosaturno11` (Gabriele Saturno's projects)
 **Vercel Project:** `astra-command-center`
 
 A zero-dependency, single-file command center for creative solopreneurs. Built as one self-contained HTML file — no frameworks, no build tools, no external APIs. Everything runs in the browser, persists to localStorage.
@@ -60,8 +60,8 @@ Endel-inspired dark interface with neutral grey gradients and mint-green accents
 
 | What | Where |
 |------|-------|
-| **Production** | [astra-command-center.vercel.app](https://astra-command-center.vercel.app) |
-| **Vercel Team** | `gabosaturno03s-projects` (Saturno OS) |
+| **Production** | [astra-command-center-sigma.vercel.app](https://astra-command-center-sigma.vercel.app) |
+| **Vercel Account** | `gabosaturno11` (Gabriele Saturno's projects) |
 | **Vercel Project** | `astra-command-center` |
 | **GitHub Repo** | [gabosaturno11/astra-command-center](https://github.com/gabosaturno11/astra-command-center) |
 | **Local Path** | `~/dev/astra-command-center/` |
