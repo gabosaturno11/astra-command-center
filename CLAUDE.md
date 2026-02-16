@@ -42,15 +42,15 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-16 10:00 EST)
+## CURRENT STATE (Updated: 2026-02-17 04:00 EST)
 
 ### REPOS (all in ~/dev/)
 
 | Repo | Path | Live URL | Latest Commit |
 |------|------|----------|---------------|
-| titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `86dd606` |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `ab32c9a` |
-| saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `dc752ba` |
+| saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `1b1912a` |
+| titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `c2308fa` |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `6c9c3ef` |
 | de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno.vercel.app | (check) |
 
 ### ASTRA COMMAND CENTER — DONE. DO NOT TOUCH UNLESS GABO SAYS.
@@ -58,40 +58,14 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 - 6 projects, 60+ icons, KB, whiteboard, export, migration
 - DO NOT modify unless Gabo explicitly says "ASTRA"
 
-### TITAN-FORGE BONUS PAGE — CURRENT STATE
+### BONUS PAGE — DECOUPLED TO saturno-bonus (Feb 17)
 
-**What HAS been shipped (committed + pushed):**
-- 3 internal tools hidden (Master Hub, Music Organizer, Transcript to PDF)
-- Auth works on Vercel + custom domains (not just github.io)
-- og:image absolute URL on both gate.html and bonus.html
-- Vercel Analytics production script (was debug)
-- Modal signup: alert() replaced with inline feedback
-- Modal closes on overlay click
-- Music auto-advances to next track
-- Track count dynamic (was hardcoded "36")
-- Lock Vault button in footer (clears cookie + localStorage)
-- Coming Soon tease section (Handstand System, The Book, App V2)
-- BONUS badges on HBF and exclusive PDFs (green border + badge)
-- ALL 44 tool descriptions rewritten to customer-facing quality
-- Tools categorized: 19 Training + 25 Experience (was vague tags)
-- Case-sensitive audio path fixed (Tears-Of-Joy-Chill)
-- .env.example created
-- Gate og:image fixed to absolute URL
-
-**What still needs work:**
-- [ ] CF4 calendar inside CF4_COMPLETE_PROGRAM.html (emoji mess needs clean calendar)
+The bonus page was moved from titan-forge to saturno-bonus. All future bonus work happens in ~/dev/saturno-bonus/. See that repo's CLAUDE.md for full state.
 - [ ] More tools could be checked individually for UX quality
 - [ ] app-promo.mov needs MP4 conversion for cross-browser video embed
 - [ ] Consider adding PDF thumbnails (currently text-only cards)
 - [ ] Music player UX improvements (shuffle, repeat, volume control)
 - [ ] Footer could be more polished
-
-### BLOCKERS (things Claude CANNOT fix — need Gabo)
-1. Domain: bonus.saturnomovement.com (CNAME in Cloudflare) — Gabo must do
-2. BREVO_API_KEY + BREVO_LIST_ID in Vercel env vars — Gabo must add
-3. Audio on Vercel: audio/ is gitignored AND .vercelignored. Needs CDN solution — Gabo decides
-4. Physical device testing — Gabo must do on his phone/iPad
-5. app-promo.mov is MOV format — needs conversion to MP4 for web
 
 ---
 
@@ -99,36 +73,20 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 | File | Path | What It Is |
 |------|------|------------|
-| Bonus page | ~/dev/titan-forge/bonus.html | THE main deliverable (~1,370 lines) |
-| Gate page | ~/dev/titan-forge/gate.html | Password entry (485 lines) |
-| Implementation plan | ~/Desktop/CLAUDE ONLY FOLDER YOU READ/SATURNO_BONUS_IMPLEMENTATION_PLAN.html | 1,391 lines, 6 phases |
-| Gabo messages | ~/dev/saturno-bonus/logs/gabo-messages.json | 16+ messages with context |
+| Bonus page | ~/dev/saturno-bonus/index.html | THE main deliverable (1,546 lines) |
+| Gabo messages | ~/dev/saturno-bonus/logs/gabo-messages.json | 25+ messages with context — READ ALL |
 | Full convos | ~/dev/astra-command-center/logs/full convos gabo will save until claude solves this/ | READ THIS |
 | ASTRA app | ~/dev/astra-command-center/index.html | Only if Gabo says "ASTRA" |
-| BB_EDITS | ~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/BB_EDITS.md | Music track list |
-
----
-
-## WHAT TO DO (in order)
-
-1. **Read this file** (you're doing it)
-2. **Read ~/dev/saturno-bonus/logs/gabo-messages.json** — understand Gabo's intent
-3. **Read the full convos folder** in ASTRA logs
-4. **Ask Gabo what the priority is** if he's awake — otherwise continue where this list stops
-5. **Commit + deploy after every meaningful change**
-6. **Save every Gabo message** to the messages backend
-7. **UPDATE this CLAUDE.md** with what you actually did before session ends
 
 ---
 
 ## DEPLOYMENT
 
-### titan-forge
+### saturno-bonus (THE BONUS PAGE)
 ```bash
-cd ~/dev/titan-forge
+cd ~/dev/saturno-bonus
 git add <specific-files> && git commit -m "message" && git push
 ```
-Vercel auto-deploys on push to main.
 
 ### astra-command-center
 ```bash
