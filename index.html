@@ -1255,7 +1255,6 @@ function load() {
   if(!S.specs) S.specs=[];
   if(!S.specs.length) { seedKernel(); }
   if(!S.activeSpec&&S.specs.length) S.activeSpec=S.specs[0].id;
-  migrateV2();
 }
 
 function migrateV2() {
@@ -3329,6 +3328,7 @@ function ftPlaySound() {
 load();
 seedLinks();
 seedProjects();
+migrateV2();
 save();
 initVoice();
 wbLoadState();
