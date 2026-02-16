@@ -2697,6 +2697,55 @@ function updateContextStats() {
   el('ctx-stat-docs').textContent = S.docs.length + S.specs.length;
   el('ctx-stat-projects').textContent = (S.projects||[]).length;
   el('ctx-stat-kb').textContent = (S.knowledgeBase||[]).length;
+  updateContextRelated();
+}
+function updateContextRelated() {
+  const el = document.getElementById('ctx-related-items');
+  if(!el) return;
+  let html = '';
+  if(currentSection === 'writer') {
+    const doc = getActiveDoc();
+    if(doc && doc.title) {
+      const backlinks = getBacklinks('doc', doc.title);
+      if(backlinks.length) {
+        html += '<div style="font-size:9px;color:var(--text-muted);margin-bottom:6px">Backlinks to "' + esc(doc.title) + '":</div>';
+        backlinks.forEach(bl => {
+          html += '<div class="context-item" onclick="navigateToItem(\'' + bl.type + '\',\'' + bl.id + '\')"><span class="context-item-icon">' + bl.type[0].toUpperCase() + '</span>' + esc(bl.title) + '</div>';
+        });
+      }
+    }
+  } else if(currentSection === 'specs') {
+    const spec = getActiveSpec();
+    if(spec && spec.title) {
+      const backlinks = getBacklinks('spec', spec.title);
+      if(backlinks.length) {
+        html += '<div style="font-size:9px;color:var(--text-muted);margin-bottom:6px">Backlinks to "' + esc(spec.title) + '":</div>';
+        backlinks.forEach(bl => {
+          html += '<div class="context-item" onclick="navigateToItem(\'' + bl.type + '\',\'' + bl.id + '\')"><span class="context-item-icon">' + bl.type[0].toUpperCase() + '</span>' + esc(bl.title) + '</div>';
+        });
+      }
+    }
+  } else if(currentSection === 'tasks') {
+    // Show overdue tasks
+    const today = new Date().toISOString().split('T')[0];
+    const overdue = S.tasks.filter(t => t.due && t.due < today && t.status !== 'done');
+    if(overdue.length) {
+      html += '<div style="font-size:9px;color:var(--red);margin-bottom:6px">Overdue (' + overdue.length + '):</div>';
+      overdue.slice(0, 5).forEach(t => {
+        html += '<div class="context-item" style="color:var(--red)"><span class="context-item-icon">!</span>' + esc(t.title || 'Untitled') + '</div>';
+      });
+    }
+    // Show today's tasks
+    const todayTasks = S.tasks.filter(t => t.due === today && t.status !== 'done');
+    if(todayTasks.length) {
+      html += '<div style="font-size:9px;color:var(--accent);margin-bottom:6px;margin-top:8px">Today (' + todayTasks.length + '):</div>';
+      todayTasks.forEach(t => {
+        html += '<div class="context-item"><span class="context-item-icon">*</span>' + esc(t.title || 'Untitled') + '</div>';
+      });
+    }
+  }
+  if(!html) html = '<div style="font-size:10px;color:var(--text-muted);padding:4px 0">No related items for current view</div>';
+  el.innerHTML = html;
 }
 
 // === FOCUS TIMER (Embedded) ===
