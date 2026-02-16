@@ -673,7 +673,7 @@ textarea{resize:vertical;line-height:1.6}
         <button class="btn btn-sm btn-ghost" onclick="openCommandPalette()" title="Command Palette (Cmd+K)" style="font-family:var(--mono);font-size:9px;padding:3px 8px;gap:4px">
           <span class="cmd-key" style="min-width:14px;height:14px;font-size:8px">K</span>
         </button>
-        <button class="btn btn-sm btn-ghost" onclick="toggleContextPanel()" title="Toggle context panel" id="context-toggle-btn">
+        <button class="btn btn-sm btn-ghost" onclick="toggleContextPanel()" title="Close context panel" id="context-toggle-btn" style="display:none">
           <span style="font-size:10px">|||</span>
         </button>
         <div class="header-actions" id="header-actions"></div>
@@ -3195,6 +3195,7 @@ function setMode(mode) {
   }
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('mode-'+mode+'-btn').classList.add('active');
+  syncContextToggleBtn();
 }
 
 // === SIDEBAR TOGGLE ===
@@ -3204,6 +3205,11 @@ function toggleSidebar() {
 }
 
 // === CONTEXT PANEL ===
+function syncContextToggleBtn() {
+  const app = document.querySelector('.app');
+  const btn = document.getElementById('context-toggle-btn');
+  if(btn) btn.style.display = app.classList.contains('context-open') ? '' : 'none';
+}
 function toggleContextPanel() {
   const app = document.querySelector('.app');
   // Close project panel first — they share the right-side grid slot
@@ -3211,6 +3217,7 @@ function toggleContextPanel() {
     closeProjectPanel();
   }
   app.classList.toggle('context-open');
+  syncContextToggleBtn();
   updateContextStats();
 }
 
