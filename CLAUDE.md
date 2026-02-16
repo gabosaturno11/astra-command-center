@@ -42,7 +42,7 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-17 04:00 EST)
+## CURRENT STATE (Updated: 2026-02-16 session)
 
 ### REPOS (all in ~/dev/)
 
@@ -50,13 +50,30 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 |------|------|----------|---------------|
 | saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `1b1912a` |
 | titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `c2308fa` |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `6c9c3ef` |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `31ae7f5` |
 | de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno.vercel.app | (check) |
 
-### ASTRA COMMAND CENTER — DONE. DO NOT TOUCH UNLESS GABO SAYS.
-- V2 is LIVE and working
-- 6 projects, 60+ icons, KB, whiteboard, export, migration
-- DO NOT modify unless Gabo explicitly says "ASTRA"
+### ASTRA COMMAND CENTER — V2.0 UPGRADE (Feb 16 session)
+- Full v2.0 upgrade to "SATURNO HUB v2.0 - Command Center"
+- 3,280+ lines, 224 functions, single-file HTML app
+- 3-panel resizable layout (sidebar + primary + context panel)
+- Command Palette (Cmd+K) with fuzzy search across all item types
+- Folder system with nested folders, drag-drop, context menu
+- Cross-linking [[wiki-links]] with backlink engine
+- Mini knowledge graph (force-directed, canvas-based)
+- Focus Timer (Pomodoro) embedded in context panel
+- Mode switching: Focus / Default / Extended
+- SVG sidebar icons (Lucide-style)
+- Keyboard shortcuts: Cmd+1-7, Cmd+N, Cmd+E, Cmd+\, Cmd+/
+- Breadcrumb navigation in header
+- Recent items tracking
+- Global tagging system
+- Auto-save indicator
+- Sidebar mini-dashboard (tasks/docs/projects counts)
+- Responsive design (mobile breakpoints)
+- Glass morphism modals, logo breathing animation
+- Endel-inspired deeper blacks (#050508 base)
+- 12 commits pushed in this session
 
 ### BONUS PAGE — DECOUPLED TO saturno-bonus (Feb 17)
 
