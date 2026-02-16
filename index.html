@@ -1608,7 +1608,7 @@ function renderLinks(){
 function setLinkCat(c,el){linkCategory=c;document.querySelectorAll('#link-category-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderLinks();}
 function openLinkModal(id){editingLinkId=id||null;document.getElementById('link-modal-title').textContent=id?'Edit Link':'Add Link';if(id){const l=S.links.find(x=>x.id===id);if(l){document.getElementById('lm-title').value=l.title;document.getElementById('lm-url').value=l.url;document.getElementById('lm-category').value=l.category||'';document.getElementById('lm-desc').value=l.desc||'';}}else{document.getElementById('lm-title').value='';document.getElementById('lm-url').value='';document.getElementById('lm-category').value='';document.getElementById('lm-desc').value='';}document.getElementById('link-modal').classList.add('open');setTimeout(()=>document.getElementById('lm-title').focus(),100);}
 function closeLinkModal(){document.getElementById('link-modal').classList.remove('open');editingLinkId=null;}
-function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim();if(!title||!url){toast('Title and URL required');return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;}}else S.links.push({id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()});save();closeLinkModal();renderLinks();toast(editingLinkId?'Updated':'Added');}
+function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim();if(!title||!url){toast('Title and URL required');return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;}}else{const link={id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()};if(activeProject)link.projectId=activeProject;S.links.push(link);}save();closeLinkModal();renderLinks();if(activeProject)renderProjLinks();toast(editingLinkId?'Updated':'Added');}
 function delLink(id){S.links=S.links.filter(l=>l.id!==id);save();renderLinks();toast('Deleted');}
 function cpText(t){navigator.clipboard.writeText(t);toast('Copied');}
 
@@ -2069,6 +2069,7 @@ function saveProject() {
 function archiveProject() {
   const p = getProject(activeProject);
   if(!p) return;
+  if(!confirm('Archive "'+p.name+'"? This marks it as complete.')) return;
   p.status = 'complete';
   save(); renderProjectsSidebar(); renderProjectView(); toast('Archived');
 }
