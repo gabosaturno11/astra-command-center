@@ -9,13 +9,14 @@ You are a Claude Code session working on Gabo Saturno's digital ecosystem.
 1. **ASKED "where are we at?"** — THIS FILE tells you. DO NOT ASK.
 2. **ASKED "what's the priority?"** — THIS FILE tells you. DO NOT ASK.
 3. **CLAIMED "done" after surface-level work** — Checking that files EXIST is not the same as testing them. Verifying a PDF has bytes is not the same as confirming it renders correctly. Adding meta tags is not "Phase 1 complete."
-4. **Did not read Gabo's messages** — There are 15 messages at ~/dev/saturno-bonus/logs/gabo-messages.json. READ THEM before doing anything.
+4. **Did not read Gabo's messages** — There are 16+ messages at ~/dev/saturno-bonus/logs/gabo-messages.json. READ THEM before doing anything.
 5. **Spent 30 minutes "orienting"** — You have THIS FILE. Read it, then EXECUTE. No orientation phase.
 6. **Created planning documents instead of doing work** — Do NOT create new .md planning files. Work on the actual code.
 7. **Batched commits** — Commit after EVERY meaningful change. Not at the end.
 8. **Said "now I have everything I need"** — You never have everything. There's always more context. Stay humble.
 9. **Declared things "complete" or "permanent SSOT"** — Nothing is final. Delta-patches only.
 10. **Overwrote previous work instead of extending** — No crown stealing. Build ON TOP of what exists.
+11. **Made a 5-item TODO list** — The real scope is 40+ items. If your list is short, you missed things.
 
 ## GABO'S OS KERNEL RULES (from ~/dev/astra-command-center/logs/)
 - NEVER assume lack of tools or intelligence
@@ -27,18 +28,19 @@ You are a Claude Code session working on Gabo Saturno's digital ecosystem.
 - DO treat excellence as mandatory
 - All outputs must be copy-paste deployable. No placeholders.
 - Prefer fewer, higher-quality artifacts
+- READ ~/dev/astra-command-center/logs/full convos gabo will save until claude solves this/ FIRST
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-16 08:00 EST)
+## CURRENT STATE (Updated: 2026-02-16 10:00 EST)
 
 ### REPOS (all in ~/dev/)
 
 | Repo | Path | Live URL | Latest Commit |
 |------|------|----------|---------------|
-| titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `9eb54ca` |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `2dfb9ee` |
-| saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `8a3f2da` |
+| titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `86dd606` |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center.vercel.app | `ab32c9a` |
+| saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `dc752ba` |
 | de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno.vercel.app | (check) |
 
 ### ASTRA COMMAND CENTER — DONE. DO NOT TOUCH UNLESS GABO SAYS.
@@ -46,35 +48,40 @@ You are a Claude Code session working on Gabo Saturno's digital ecosystem.
 - 6 projects, 60+ icons, KB, whiteboard, export, migration
 - DO NOT modify unless Gabo explicitly says "ASTRA"
 
-### TITAN-FORGE BONUS PAGE — THIS IS THE WORK
+### TITAN-FORGE BONUS PAGE — CURRENT STATE
 
-**What IS done (infrastructure only):**
-- Password gate (gate.html) with shake animation, 7-day cookie, auto-redirect
-- Meta tags, favicon, social preview on both gate.html and bonus.html
-- Touch target CSS for mobile (min 44px)
-- Brevo email capture form HTML exists (but NOT TESTED — needs BREVO_API_KEY in Vercel env)
-- Vercel Analytics script tag added
-- 17 PDFs exist in pdfs/ directory with content
-- 49 tool entries exist in bonus.html
+**What HAS been shipped (committed + pushed):**
+- 3 internal tools hidden (Master Hub, Music Organizer, Transcript to PDF)
+- Auth works on Vercel + custom domains (not just github.io)
+- og:image absolute URL on both gate.html and bonus.html
+- Vercel Analytics production script (was debug)
+- Modal signup: alert() replaced with inline feedback
+- Modal closes on overlay click
+- Music auto-advances to next track
+- Track count dynamic (was hardcoded "36")
+- Lock Vault button in footer (clears cookie + localStorage)
+- Coming Soon tease section (Handstand System, The Book, App V2)
+- BONUS badges on HBF and exclusive PDFs (green border + badge)
+- ALL 44 tool descriptions rewritten to customer-facing quality
+- Tools categorized: 19 Training + 25 Experience (was vague tags)
+- Case-sensitive audio path fixed (Tears-Of-Joy-Chill)
+- .env.example created
+- Gate og:image fixed to absolute URL
 
-**What is NOT done (THE REAL WORK):**
-- [ ] Deep UX/UI audit of bonus.html — visual bugs, layout issues, spacing, colors
-- [ ] Tool color coding audit — GREEN=bonus, ORANGE=internal(HIDE from customers), GREY=needs fix
-- [ ] ORANGE tools should be HIDDEN from the customer view
-- [ ] Every tool link needs to be clicked and verified it works
-- [ ] CF4 section needs proper calendar (currently has emoji mess)
-- [ ] Music player needs audit — 39 MP3s in audio/, manifest.json exists, but audio 404s on Vercel
-- [ ] Tool descriptions need review — are they customer-facing quality?
-- [ ] Bottom CTA section styling
-- [ ] Next product tease section (3-panel canvas or "coming soon")
-- [ ] Mobile testing of every section
-- [ ] PDF content quality check (not just "file exists")
+**What still needs work:**
+- [ ] CF4 calendar inside CF4_COMPLETE_PROGRAM.html (emoji mess needs clean calendar)
+- [ ] More tools could be checked individually for UX quality
+- [ ] app-promo.mov needs MP4 conversion for cross-browser video embed
+- [ ] Consider adding PDF thumbnails (currently text-only cards)
+- [ ] Music player UX improvements (shuffle, repeat, volume control)
+- [ ] Footer could be more polished
 
 ### BLOCKERS (things Claude CANNOT fix — need Gabo)
 1. Domain: bonus.saturnomovement.com (CNAME in Cloudflare) — Gabo must do
 2. BREVO_API_KEY + BREVO_LIST_ID in Vercel env vars — Gabo must add
 3. Audio on Vercel: audio/ is gitignored AND .vercelignored. Needs CDN solution — Gabo decides
 4. Physical device testing — Gabo must do on his phone/iPad
+5. app-promo.mov is MOV format — needs conversion to MP4 for web
 
 ---
 
@@ -82,12 +89,13 @@ You are a Claude Code session working on Gabo Saturno's digital ecosystem.
 
 | File | Path | What It Is |
 |------|------|------------|
-| Bonus page | ~/dev/titan-forge/bonus.html | THE main deliverable (~1,270 lines) |
-| Gate page | ~/dev/titan-forge/gate.html | Password entry (437 lines) |
-| Implementation plan | ~/Desktop/CLAUDE ONLY FOLDER YOU READ/SATURNO_BONUS_IMPLEMENTATION_PLAN.html | 1,391 lines, 6 phases of detailed specs |
-| Gabo messages | ~/dev/saturno-bonus/logs/gabo-messages.json | 15 messages with context |
+| Bonus page | ~/dev/titan-forge/bonus.html | THE main deliverable (~1,370 lines) |
+| Gate page | ~/dev/titan-forge/gate.html | Password entry (485 lines) |
+| Implementation plan | ~/Desktop/CLAUDE ONLY FOLDER YOU READ/SATURNO_BONUS_IMPLEMENTATION_PLAN.html | 1,391 lines, 6 phases |
+| Gabo messages | ~/dev/saturno-bonus/logs/gabo-messages.json | 16+ messages with context |
+| Full convos | ~/dev/astra-command-center/logs/full convos gabo will save until claude solves this/ | READ THIS |
 | ASTRA app | ~/dev/astra-command-center/index.html | Only if Gabo says "ASTRA" |
-| BB_EDITS | ~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/BB_EDITS.md | Music track list, 40 tracks, 8 categories |
+| BB_EDITS | ~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/BB_EDITS.md | Music track list |
 
 ---
 
@@ -95,59 +103,51 @@ You are a Claude Code session working on Gabo Saturno's digital ecosystem.
 
 1. **Read this file** (you're doing it)
 2. **Read ~/dev/saturno-bonus/logs/gabo-messages.json** — understand Gabo's intent
-3. **Read the implementation plan** at ~/Desktop/CLAUDE ONLY FOLDER YOU READ/SATURNO_BONUS_IMPLEMENTATION_PLAN.html
-4. **Open bonus.html and actually work on it** — fix UX, fix UI, fix bugs
+3. **Read the full convos folder** in ASTRA logs
+4. **Ask Gabo what the priority is** if he's awake — otherwise continue where this list stops
 5. **Commit + deploy after every meaningful change**
 6. **Save every Gabo message** to the messages backend
-7. **Update THIS FILE** with what you actually did before session ends
+7. **UPDATE this CLAUDE.md** with what you actually did before session ends
 
 ---
 
 ## DEPLOYMENT
 
-### titan-forge (3.1GB repo — audio/video too big for normal deploy)
-```bash
-# Deploy via rsync to /tmp/ then push
-cd ~/dev/titan-forge
-rsync -av --exclude='music/' --exclude='audio/' --exclude='video/' --exclude='.git/' . /tmp/titan-forge-deploy/
-cd /tmp/titan-forge-deploy
-git add -A && git commit -m "message" && git push
-```
-
-**OR** if the repo is already connected to Vercel and pushes from ~/dev/titan-forge work:
+### titan-forge
 ```bash
 cd ~/dev/titan-forge
-git add -A && git commit -m "message" && git push
+git add <specific-files> && git commit -m "message" && git push
 ```
+Vercel auto-deploys on push to main.
 
-Check which method works. If push from ~/dev/titan-forge triggers Vercel deploy, use that.
-
-### astra-command-center (small repo, normal push)
+### astra-command-center
 ```bash
 cd ~/dev/astra-command-center
-git add -A && git commit -m "message" && git push
+git add <specific-files> && git commit -m "message" && git push
 ```
 
 ---
 
 ## DESIGN CONSTRAINTS
 
-- Dark theme ONLY — cosmic blue/teal palette
+- Dark theme ONLY — cosmic blue/teal palette (#050711 base)
 - Sora font for customer-facing pages
 - No emojis in code
 - planet-logo.png = white planet silhouette (used in 13+ places)
 - Customer page password: saturno2025
-- Accent color: #4ade80 (mint green) for ASTRA, cosmic blue/teal for bonus
+- Accent: teal (#06b6d4, #22d3ee) for bonus, mint-green (#4ade80) for ASTRA
 
 ---
 
 ## GABO'S CORE DIRECTIVE
 
 > "goal 1: next claude cannot come asking like you did"
-> "the other solution: every semi change, commit, deploy update"
+> "every semi change, commit, deploy update"
 > "only if next claude comes and doesnt know where to go, or thinks its done"
+> "READ ALL CONVOS WORD BY WORD. THEN WORK."
+> "make a TODO list of 40, not 5"
 
-Translation: You fail if you (1) ask questions this file answers, (2) think you're done when you're not, or (3) don't commit incrementally.
+Translation: You fail if you (1) ask questions this file answers, (2) think you're done when you're not, (3) don't commit incrementally, (4) make a tiny list instead of the real scope.
 
 ---
 
@@ -160,3 +160,6 @@ Translation: You fail if you (1) ask questions this file answers, (2) think you'
 5. COMMIT after every meaningful change
 6. Save every Gabo message to ~/dev/saturno-bonus/logs/gabo-messages.json
 7. UPDATE this CLAUDE.md before your session ends with honest status
+8. Specs/rules go in ~/dev/astra-command-center/logs/
+9. State goes in ~/.claude/projects/-Users-Gabosaturno/memory/MEMORY.md
+10. NEVER read stale non-version-controlled files — use repo files only
