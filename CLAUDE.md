@@ -48,10 +48,10 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 | Repo | Path | Live URL | Latest Commit |
 |------|------|----------|---------------|
-| saturno-bonus | ~/dev/saturno-bonus/ | (pending domain) | `1b1912a` |
-| titan-forge | ~/dev/titan-forge/ | titan-forge-sage.vercel.app | `c2308fa` |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `71299b0` |
-| de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno.vercel.app | (check) |
+| saturno-bonus | ~/dev/saturno-bonus/ | saturno-bonus-omega.vercel.app | `763d96c` |
+| titan-forge | ~/dev/titan-forge/ | titan-forge-ten.vercel.app | (check) |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `804bfdd` |
+| de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno-jet.vercel.app | (check) |
 
 ### ASTRA COMMAND CENTER — V2.0 UPGRADE (Feb 16 session)
 - Full v2.0 upgrade to "SATURNO HUB v2.0 - Command Center"
