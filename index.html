@@ -1369,6 +1369,35 @@ function updateDashboard() {
   const dd = document.getElementById('dash-docs'); if(dd) dd.textContent = S.docs.length + S.specs.length;
   const dp = document.getElementById('dash-projects'); if(dp) dp.textContent = (S.projects||[]).length;
 }
+function showTodayView() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayTasks = S.tasks.filter(t => t.due === today && t.status !== 'done');
+  const overdue = S.tasks.filter(t => t.due && t.due < today && t.status !== 'done');
+  const upcoming = S.tasks.filter(t => t.due && t.due > today && t.due <= new Date(Date.now()+3*86400000).toISOString().split('T')[0] && t.status !== 'done');
+  let msg = '--- TODAY ---\n';
+  if(todayTasks.length) todayTasks.forEach(t => msg += '[ ] ' + (t.title||'Untitled') + '\n');
+  else msg += 'No tasks due today.\n';
+  if(overdue.length) { msg += '\n--- OVERDUE ---\n'; overdue.forEach(t => msg += '[!] ' + (t.title||'Untitled') + ' (due ' + t.due + ')\n'); }
+  if(upcoming.length) { msg += '\n--- NEXT 3 DAYS ---\n'; upcoming.forEach(t => msg += '[ ] ' + (t.title||'Untitled') + ' (due ' + t.due + ')\n'); }
+  // Show as context panel content
+  if(!document.querySelector('.app').classList.contains('context-open')) toggleContextPanel();
+  const el = document.getElementById('ctx-related-items');
+  if(el) {
+    let html = '<div style="font-size:9px;color:var(--accent);margin-bottom:6px;font-weight:600">TODAY</div>';
+    if(todayTasks.length) todayTasks.forEach(t => { html += '<div class="context-item" onclick="switchSection(\'tasks\',null)"><span class="context-item-icon" style="color:var(--accent)">*</span>' + esc(t.title||'Untitled') + '</div>'; });
+    else html += '<div style="font-size:10px;color:var(--text-muted);padding:4px 0">No tasks due today</div>';
+    if(overdue.length) {
+      html += '<div style="font-size:9px;color:var(--red);margin:8px 0 6px;font-weight:600">OVERDUE (' + overdue.length + ')</div>';
+      overdue.forEach(t => { html += '<div class="context-item" style="color:var(--red)" onclick="switchSection(\'tasks\',null)"><span class="context-item-icon">!</span>' + esc(t.title||'Untitled') + '</div>'; });
+    }
+    if(upcoming.length) {
+      html += '<div style="font-size:9px;color:var(--accent-cyan);margin:8px 0 6px;font-weight:600">NEXT 3 DAYS</div>';
+      upcoming.forEach(t => { html += '<div class="context-item" onclick="switchSection(\'tasks\',null)"><span class="context-item-icon">></span>' + esc(t.title||'Untitled') + ' <span style="font-size:8px;color:var(--text-muted)">' + t.due + '</span></div>'; });
+    }
+    el.innerHTML = html;
+  }
+  toast('Today view loaded');
+}
 function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 function escA(s) { return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -3044,6 +3073,8 @@ function cmdGetItems(q) {
   if(!ql || 'export'.includes(ql)) items.push({title:'Export All', desc:'Export all data as JSON', icon:'E', type:'action', action:exportAll});
   if(!ql || 'focus timer'.includes(ql)) items.push({title:'Focus Timer', desc:'Open focus timer in context panel', icon:'FT', type:'action', action:()=>{if(!document.querySelector('.app').classList.contains('context-open'))toggleContextPanel();}});
   if(!ql || 'quick capture'.includes(ql)) items.push({title:'Quick Capture', desc:'Add task/content instantly (Cmd+Shift+N)', icon:'+', type:'action', action:()=>{closeCommandPalette();qcOpen();}});
+  if(!ql || 'today'.includes(ql)) items.push({title:'Today View', desc:'See tasks due today + overdue', icon:'*', type:'action', action:()=>{closeCommandPalette();showTodayView();}});
+  if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
   return items.slice(0, 20);
 }
 function cmdSearch() {
