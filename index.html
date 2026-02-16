@@ -469,7 +469,7 @@ textarea{resize:vertical;line-height:1.6}
 .cmd-key{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;background:var(--bg-elevated);border:1px solid var(--border-hover);border-radius:3px;font-size:9px;color:var(--text-muted)}
 
 /* CONTEXT PANEL */
-.context-panel{display:none;flex-direction:column;height:100vh;overflow:hidden;background:linear-gradient(180deg, #0a0a0e 0%, #080810 100%);border-left:1px solid var(--border);width:var(--context-width)}
+.context-panel{display:none;flex-direction:column;height:100vh;overflow:hidden;background:linear-gradient(180deg, #0a0a0e 0%, #080810 100%);border-left:1px solid var(--border)}
 .context-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0}
 .context-header-title{font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;flex:1}
 .context-close{width:22px;height:22px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:var(--radius);font-size:12px;display:flex;align-items:center;justify-content:center}
@@ -2234,17 +2234,7 @@ function handleWbDrop(e) {
   }
 }
 
-// Patch: override link save to attach projectId when in project context
-const origSaveLink = saveLink;
-saveLink = function() {
-  const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim();
-  if(!title||!url){toast('Title and URL required');return;}
-  if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;}}
-  else { const l = {id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()}; if(activeProject) l.projectId=activeProject; S.links.push(l); }
-  save();closeLinkModal();renderLinks();
-  if(activeProject && activeProjTab==='proj-links') renderProjLinks();
-  toast(editingLinkId?'Updated':'Added');
-};
+// projectId assignment for links is handled directly in saveLink()
 
 // === GLOBAL ===
 function exportAll(){snapshotWriter();snapshotSpec();if(activeProject){const p=getProject(activeProject);if(p){p.instructions=document.getElementById('proj-instructions-editor')?.innerHTML||p.instructions;}}const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-hub-'+new Date().toISOString().split('T')[0]+'.json';a.click();toast('Exported');}
