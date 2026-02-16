@@ -79,6 +79,23 @@ body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondar
 .sidebar-item.active .sidebar-item-icon svg{opacity:1}
 .sidebar-item-count{margin-left:auto;font-size:10px;color:var(--text-muted);font-family:var(--mono)}
 .sidebar-divider{height:1px;background:var(--border);margin:4px 12px}
+.sidebar-header{position:relative}
+.sidebar-toggle-btn{padding:3px 5px!important}
+.sidebar-collapse-chevron{display:flex;align-items:center;justify-content:center;padding:12px;cursor:pointer;color:var(--text-muted);transition:var(--transition-fast);border-top:1px solid var(--border);margin-top:auto;flex-shrink:0}
+.sidebar-collapse-chevron:hover{color:var(--text);background:var(--bg-hover)}
+.sidebar-collapse-chevron svg{opacity:0.5;transition:opacity 0.15s}
+.sidebar-collapse-chevron:hover svg{opacity:1}
+.project-collapse-chevron{display:flex;align-items:center;justify-content:center;padding:10px;cursor:pointer;color:var(--text-muted);transition:var(--transition-fast);border-top:1px solid var(--border);flex-shrink:0}
+.project-collapse-chevron:hover{color:var(--text);background:var(--bg-hover)}
+.project-collapse-chevron svg{opacity:0.5;transition:opacity 0.15s}
+.project-collapse-chevron:hover svg{opacity:1}
+
+/* COLLAPSED SIDEBAR */
+.app.sidebar-collapsed{grid-template-columns:0px 0px 1fr}
+.app.sidebar-collapsed.project-open{grid-template-columns:0px 0px 1fr 5px var(--project-width)}
+.app.sidebar-collapsed.context-open,.app.sidebar-collapsed.mode-extended{grid-template-columns:0px 0px 1fr 4px var(--context-width)}
+.app.sidebar-collapsed .sidebar{width:0;min-width:0;overflow:hidden;padding:0;border:none}
+.app.sidebar-collapsed .sidebar-resize{display:none}
 
 /* MAIN */
 .main{display:flex;flex-direction:column;overflow:hidden}
@@ -618,11 +635,15 @@ textarea{resize:vertical;line-height:1.6}
       </div>
       <button class="btn btn-sm btn-danger" style="width:100%;margin-top:4px;font-size:8px;opacity:0.5" onclick="undoImport()">Undo Import</button>
     </div>
+    <div class="sidebar-collapse-chevron" onclick="toggleSidebar()" title="Collapse sidebar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>
+    </div>
   </aside>
   <div class="sidebar-resize" id="sidebar-resize"></div>
 
   <main class="main">
     <div class="header">
+      <button class="btn btn-sm btn-ghost sidebar-toggle-btn" onclick="toggleSidebar()" title="Toggle sidebar" id="sidebar-toggle-btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg></button>
       <span class="header-title" id="header-title">Content</span>
       <span id="header-breadcrumb" style="font-size:10px;color:var(--text-muted);font-family:var(--mono);display:flex;align-items:center;gap:4px"></span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
@@ -920,6 +941,9 @@ textarea{resize:vertical;line-height:1.6}
           <div class="links-grid" id="proj-links-grid"></div>
         </div>
       </div>
+    <div class="project-collapse-chevron" onclick="closeProjectPanel()" title="Collapse panel">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+    </div>
     </div>
   <!-- CONTEXT PANEL -->
   <div class="context-resize" id="context-resize"></div>
@@ -1296,6 +1320,16 @@ function migrateV2() {
       { id:'kb_cc_v2_fixes', projectId:'proj_claude_code', name:'v2.0 UX Fix Session — Feb 16, 2026 (evening)', type:'md', storage:'inline',
         content:'# v2.0 UX Fix Session — Feb 16, 2026\n\n## Critical fix: Panel resize breaking layout\n- Project panel resize was setting app.style.gridTemplateColumns as inline style\n- This permanently overrode all CSS class-based grid definitions\n- After any drag, closing panel or switching modes left broken inline style\n- FIX: Now uses --project-width CSS variable instead of inline style\n\n## Panel conflicts resolved\n- Opening a project now closes context panel (they share same grid slot)\n- Toggling context panel now closes project panel first\n- Focus mode properly closes both project and context panels\n- Extended mode closes project panel, opens context panel\n\n## Migration ordering fix\n- migrateV2() was running inside load() before seedProjects()\n- On fresh localStorage, S.projects.length was 0 so Claude Code project was never created\n- FIX: migrateV2 now runs after seedProjects()\n\n## Other fixes\n- Links added from project panel now get projectId assigned\n- Removed duplicate saveLink monkeypatch override\n- Archive project now requires confirmation dialog\n- switchSection properly highlights sidebar item when called programmatically\n- Removed dead wbCanvasDownV2 wrapper code\n- Removed conflicting explicit width on context panel CSS\n- Removed negative margins on resize handles causing misalignment\n\n## Deployment discovery\n- Live URL is astra-command-center-sigma.vercel.app\n- NOT astra-command-center.vercel.app (that is an OLD Vercel project)\n\n## Commits (7):\neccdc1f, 6fdb2f2, 955273b, 12141fe, e806f0e, 84b0b45, 804ee06',
         description:'UX bug fixes for panel resize, mode switching, migration ordering', tags:['v2','fixes','session','ux'], created:now, updated:now }
+    );
+    save();
+  }
+  // Add collapsible sidebars log
+  if(S.projects && S.projects.find(p => p.id === 'proj_claude_code') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_cc_collapsible_panels')) {
+    const now = new Date().toISOString();
+    S.knowledgeBase.push(
+      { id:'kb_cc_collapsible_panels', projectId:'proj_claude_code', name:'Collapsible Panels — Feb 16, 2026', type:'md', storage:'inline',
+        content:'# Collapsible Panels Feature\n\n## Left Sidebar\n- Sidebar panel icon in header toggles sidebar visibility\n- Double-chevron (<<) at bottom of sidebar collapses it\n- CSS class: .app.sidebar-collapsed hides sidebar completely (0px grid column)\n- Sidebar resize handle also hidden when collapsed\n- Grid recalculates for all states: default, project-open, context-open, extended\n- Smooth transition via grid-template-columns 0.25s\n\n## Right Project Panel\n- Double-chevron (>>) at bottom of project panel to collapse/close\n- Uses existing closeProjectPanel() function\n- Minimalistic arrow design matching Claude AI reference screenshots\n\n## Implementation\n- toggleSidebar() function toggles .sidebar-collapsed class\n- CSS handles all grid states when collapsed\n- Focus mode (.mode-focus) is separate — hides sidebar via display:none\n- No conflict between collapsed state and focus mode',
+        description:'Collapsible sidebar and project panel with chevron arrows', tags:['v2','ux','panels','collapsible'], created:now, updated:now }
     );
     save();
   }
@@ -3144,6 +3178,12 @@ function setMode(mode) {
   }
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('mode-'+mode+'-btn').classList.add('active');
+}
+
+// === SIDEBAR TOGGLE ===
+function toggleSidebar() {
+  const app = document.querySelector('.app');
+  app.classList.toggle('sidebar-collapsed');
 }
 
 // === CONTEXT PANEL ===
