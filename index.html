@@ -290,6 +290,104 @@ textarea{resize:vertical;line-height:1.6}
 .wb-tpl-name{font-size:11px;font-weight:600;color:var(--text)}
 .wb-tpl-desc{font-size:9px;color:var(--text-muted);margin-top:3px}
 
+/* PROJECTS SIDEBAR */
+.sidebar-projects{padding:6px 12px}
+.sidebar-project-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius);cursor:pointer;transition:all 0.15s;font-size:12px;color:var(--text-secondary);position:relative}
+.sidebar-project-item:hover{background:var(--bg-hover);color:var(--text)}
+.sidebar-project-item.active{background:var(--accent-glow);color:var(--accent)}
+.sidebar-project-item .proj-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-project-item .proj-icon svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sidebar-project-item .proj-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-project-item .proj-status{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.sidebar-project-item .proj-status.active-s{background:var(--green)}
+.sidebar-project-item .proj-status.paused-s{background:var(--yellow)}
+.sidebar-project-item .proj-status.complete-s{background:var(--accent)}
+.sidebar-add-project{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--radius);cursor:pointer;transition:all 0.15s;font-size:11px;color:var(--text-muted)}
+.sidebar-add-project:hover{color:var(--text-secondary);background:var(--bg-hover)}
+
+/* PROJECT DETAIL VIEW */
+.project-view{display:none;flex-direction:column;height:100%}
+.project-view.active{display:flex}
+.project-header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.project-header .proj-icon-lg{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border-radius:var(--radius);border:1px solid var(--border)}
+.project-header .proj-icon-lg svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.project-header-name{font-size:18px;font-weight:700;color:var(--text);flex:1}
+.project-header-actions{display:flex;gap:4px}
+.project-tabs{display:flex;gap:2px;padding:0 24px;border-bottom:1px solid var(--border);flex-shrink:0}
+.project-tab{padding:8px 14px;border:none;background:transparent;color:var(--text-muted);font-family:var(--font);font-size:11px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.15s}
+.project-tab:hover{color:var(--text-secondary)}
+.project-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.project-content{flex:1;overflow-y:auto;padding:20px 24px}
+
+/* PROJECT INSTRUCTIONS */
+.proj-instructions-editor{min-height:200px;font-size:14px;line-height:1.8;color:var(--text-secondary);outline:none;padding:12px 0}
+.proj-instructions-editor:empty::before{content:'Describe what this project is...';color:var(--text-muted)}
+.proj-instructions-editor h1{font-size:22px;font-weight:700;color:var(--text);margin:20px 0 8px}
+.proj-instructions-editor h2{font-size:17px;font-weight:600;color:var(--text);margin:16px 0 6px}
+.proj-instructions-editor h3{font-size:14px;font-weight:600;color:var(--text);margin:12px 0 4px}
+.proj-instructions-editor p{margin-bottom:10px}
+.proj-instructions-editor ul,.proj-instructions-editor ol{padding-left:24px;margin:8px 0}
+.proj-instructions-editor li{margin-bottom:4px}
+.proj-instructions-editor code{background:var(--bg-surface);padding:1px 4px;border-radius:3px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.proj-instructions-editor pre{background:var(--bg-surface);padding:12px;border-radius:var(--radius);font-family:var(--mono);font-size:11px;overflow-x:auto;margin:12px 0;border:1px solid var(--border)}
+.proj-instructions-editor blockquote{border-left:3px solid var(--accent);padding-left:16px;margin:12px 0;color:var(--text-muted);font-style:italic}
+.proj-instructions-editor table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12px}
+.proj-instructions-editor th,.proj-instructions-editor td{border:1px solid var(--border);padding:6px 10px;text-align:left}
+.proj-instructions-editor th{background:var(--bg-surface);font-weight:600;color:var(--text)}
+
+/* KNOWLEDGE BASE */
+.kb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding-top:12px}
+.kb-card{background:linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-elevated) 100%);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;transition:all 0.2s;cursor:pointer;position:relative}
+.kb-card:hover{border-color:var(--border-hover);box-shadow:0 2px 12px rgba(0,0,0,0.3);transform:translateY(-1px)}
+.kb-card-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.kb-card-type{font-family:var(--mono);font-size:8px;letter-spacing:0.5px;text-transform:uppercase;padding:2px 6px;border-radius:3px;line-height:1;flex-shrink:0}
+.kb-type-md{background:rgba(59,130,246,0.15);color:#60a5fa}
+.kb-type-pdf{background:rgba(239,68,68,0.15);color:#f87171}
+.kb-type-img{background:rgba(34,197,94,0.15);color:#4ade80}
+.kb-type-url{background:rgba(139,92,246,0.15);color:#a78bfa}
+.kb-type-txt{background:rgba(255,255,255,0.08);color:var(--text-muted)}
+.kb-type-json{background:rgba(251,191,36,0.15);color:#fbbf24}
+.kb-type-other{background:rgba(255,255,255,0.06);color:var(--text-muted)}
+.kb-card-name{font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kb-card-desc{font-size:10px;color:var(--text-secondary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.kb-card-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.kb-card-tag{font-family:var(--mono);font-size:7px;padding:1px 5px;background:rgba(255,255,255,0.05);border-radius:3px;color:var(--text-muted)}
+.kb-card-actions{position:absolute;top:8px;right:8px;display:flex;gap:2px;opacity:0;transition:opacity 0.15s}
+.kb-card:hover .kb-card-actions{opacity:1}
+.kb-card-drag{cursor:grab;width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:10px}
+.kb-card-img{width:100%;height:100px;object-fit:cover;border-radius:var(--radius);margin-top:8px;border:1px solid var(--border)}
+.kb-empty{text-align:center;padding:40px;color:var(--text-muted);font-size:12px}
+
+/* PROJECT LIVING DOCS LIST */
+.proj-docs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding-top:12px}
+.proj-doc-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;cursor:pointer;transition:all 0.2s}
+.proj-doc-card:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:0 4px 16px rgba(74,222,160,0.08)}
+.proj-doc-card-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
+.proj-doc-card-meta{font-size:9px;color:var(--text-muted);display:flex;gap:8px}
+.proj-doc-card-preview{font-size:10px;color:var(--text-secondary);line-height:1.5;margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ICON PICKER */
+.icon-picker-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1100;display:none;align-items:center;justify-content:center}
+.icon-picker-modal.open{display:flex}
+.icon-picker-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;max-height:50vh;overflow-y:auto;padding:8px}
+.icon-picker-item{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;transition:all 0.15s;background:var(--bg-surface)}
+.icon-picker-item:hover{border-color:var(--accent);background:var(--accent-glow)}
+.icon-picker-item.selected{border-color:var(--accent);background:var(--accent-glow);box-shadow:0 0 0 2px rgba(74,222,160,0.2)}
+.icon-picker-item svg{width:18px;height:18px;stroke:var(--text-secondary);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon-picker-item:hover svg,.icon-picker-item.selected svg{stroke:var(--accent)}
+
+.pm-color-opt{width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.15s}
+.pm-color-opt:hover{transform:scale(1.2)}
+.pm-color-opt.selected{border-color:#fff;box-shadow:0 0 8px currentColor}
+
+/* KB MODAL */
+.kb-modal-tabs{display:flex;gap:2px;margin-bottom:12px}
+.kb-modal-tab{padding:5px 10px;border:none;background:transparent;color:var(--text-muted);font-family:var(--font);font-size:10px;cursor:pointer;border-radius:var(--radius);transition:all 0.15s}
+.kb-modal-tab:hover{color:var(--text-secondary);background:var(--bg-surface)}
+.kb-modal-tab.active{background:var(--accent-glow);color:var(--accent)}
+.kb-modal-panel{display:none}
+.kb-modal-panel.active{display:block}
+
 /* VOICE INPUT */
 .voice-btn{width:28px;height:28px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:var(--radius);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
 .voice-btn:hover{background:var(--bg-hover);color:var(--text)}
@@ -338,6 +436,14 @@ textarea{resize:vertical;line-height:1.6}
       </div>
     </div>
     <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Projects</span>
+        <span class="sidebar-add-project" onclick="openNewProjectModal()" style="padding:0;font-size:13px;font-weight:600" title="New Project">+</span>
+      </div>
+      <div id="sidebar-projects"></div>
+    </div>
+    <div class="sidebar-divider"></div>
     <div class="sidebar-section" id="sidebar-context"></div>
     <div style="margin-top:auto;padding:12px">
       <button class="btn btn-sm" style="width:100%;margin-bottom:4px" onclick="window.open('https://calendar.google.com','_blank')">Google Calendar</button>
@@ -348,6 +454,7 @@ textarea{resize:vertical;line-height:1.6}
         <button class="btn btn-sm" style="flex:1" onclick="exportAll()">Export</button>
         <button class="btn btn-sm" style="flex:1" onclick="importAll()">Import</button>
       </div>
+      <button class="btn btn-sm btn-danger" style="width:100%;margin-top:4px;font-size:8px;opacity:0.5" onclick="undoImport()">Undo Import</button>
     </div>
   </aside>
 
@@ -580,6 +687,61 @@ textarea{resize:vertical;line-height:1.6}
   </main>
 </div>
 
+    <!-- PROJECT VIEW -->
+    <div class="project-view" id="panel-project">
+      <div class="project-header">
+        <div class="proj-icon-lg" id="proj-header-icon"></div>
+        <span class="project-header-name" id="proj-header-name"></span>
+        <span class="badge" id="proj-header-status"></span>
+        <div class="project-header-actions">
+          <button class="btn btn-sm" onclick="editProject()">Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="archiveProject()">Archive</button>
+        </div>
+      </div>
+      <div class="project-tabs" id="proj-tabs">
+        <button class="project-tab active" onclick="setProjTab('instructions',this)">Instructions</button>
+        <button class="project-tab" onclick="setProjTab('docs',this)">Living Docs</button>
+        <button class="project-tab" onclick="setProjTab('kb',this)">Knowledge Base</button>
+        <button class="project-tab" onclick="setProjTab('proj-tasks',this)">Tasks</button>
+        <button class="project-tab" onclick="setProjTab('proj-links',this)">Links</button>
+      </div>
+      <div class="project-content" id="proj-content">
+        <!-- Instructions -->
+        <div id="proj-panel-instructions" class="proj-tab-panel">
+          <div class="proj-instructions-editor" id="proj-instructions-editor" contenteditable="true" oninput="onProjInstructionsChange()"></div>
+        </div>
+        <!-- Living Docs -->
+        <div id="proj-panel-docs" class="proj-tab-panel" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <button class="btn btn-primary btn-sm" onclick="newProjLivingDoc()">+ New Living Doc</button>
+          </div>
+          <div class="proj-docs-grid" id="proj-docs-grid"></div>
+        </div>
+        <!-- Knowledge Base -->
+        <div id="proj-panel-kb" class="proj-tab-panel" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <button class="btn btn-primary btn-sm" onclick="openKBModal()">+ Add Item</button>
+            <input type="text" id="kb-search" placeholder="Search knowledge base..." oninput="renderKB()" style="width:200px;font-size:10px;padding:5px 8px">
+          </div>
+          <div class="kb-grid" id="kb-grid"></div>
+        </div>
+        <!-- Tasks -->
+        <div id="proj-panel-proj-tasks" class="proj-tab-panel" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <button class="btn btn-primary btn-sm" onclick="addProjTask()">+ Task</button>
+          </div>
+          <div id="proj-task-rows"></div>
+        </div>
+        <!-- Links -->
+        <div id="proj-panel-proj-links" class="proj-tab-panel" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+            <button class="btn btn-primary btn-sm" onclick="openProjLinkModal()">+ Add Link</button>
+          </div>
+          <div class="links-grid" id="proj-links-grid"></div>
+        </div>
+      </div>
+    </div>
+
 <!-- CONTENT MODAL -->
 <div class="modal-overlay" id="content-modal">
   <div class="modal">
@@ -619,12 +781,128 @@ textarea{resize:vertical;line-height:1.6}
   </div>
 </div>
 
+<!-- PROJECT MODAL -->
+<div class="modal-overlay" id="project-modal" onclick="if(event.target===this)closeProjectModal()">
+  <div class="modal" style="width:480px">
+    <div class="modal-title" id="project-modal-title">New Project</div>
+    <div class="form-group">
+      <label class="form-label">Project Name</label>
+      <input type="text" id="pm-name" placeholder="Saturno Bonus">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Icon</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="pm-icon-preview" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--bg-elevated);border-radius:var(--radius);border:1px solid var(--border);cursor:pointer" onclick="openIconPicker()"></div>
+        <button class="btn btn-sm" onclick="openIconPicker()">Choose Icon</button>
+        <input type="hidden" id="pm-icon" value="folder">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select id="pm-status">
+        <option value="active">Active</option>
+        <option value="paused">Paused</option>
+        <option value="complete">Complete</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color Accent</label>
+      <div style="display:flex;gap:6px" id="pm-colors">
+        <div class="pm-color-opt" style="background:#4ade80" onclick="setPmColor('#4ade80')" data-color="#4ade80"></div>
+        <div class="pm-color-opt" style="background:#8b5cf6" onclick="setPmColor('#8b5cf6')" data-color="#8b5cf6"></div>
+        <div class="pm-color-opt" style="background:#3b82f6" onclick="setPmColor('#3b82f6')" data-color="#3b82f6"></div>
+        <div class="pm-color-opt" style="background:#06b6d4" onclick="setPmColor('#06b6d4')" data-color="#06b6d4"></div>
+        <div class="pm-color-opt" style="background:#f59e0b" onclick="setPmColor('#f59e0b')" data-color="#f59e0b"></div>
+        <div class="pm-color-opt" style="background:#ec4899" onclick="setPmColor('#ec4899')" data-color="#ec4899"></div>
+        <div class="pm-color-opt" style="background:#ef4444" onclick="setPmColor('#ef4444')" data-color="#ef4444"></div>
+        <div class="pm-color-opt" style="background:#f97316" onclick="setPmColor('#f97316')" data-color="#f97316"></div>
+      </div>
+      <input type="hidden" id="pm-color" value="#4ade80">
+    </div>
+    <div style="display:flex;gap:6px;justify-content:flex-end">
+      <button class="btn" onclick="closeProjectModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProject()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ICON PICKER MODAL -->
+<div class="icon-picker-modal" id="icon-picker-modal" onclick="if(event.target===this)closeIconPicker()">
+  <div class="modal" style="width:400px">
+    <div class="modal-title">Choose Icon</div>
+    <div class="icon-picker-grid" id="icon-picker-grid"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn" onclick="closeIconPicker()">Done</button></div>
+  </div>
+</div>
+
+<!-- KB MODAL -->
+<div class="modal-overlay" id="kb-modal" onclick="if(event.target===this)closeKBModal()">
+  <div class="modal" style="width:500px">
+    <div class="modal-title" id="kb-modal-title">Add to Knowledge Base</div>
+    <div class="kb-modal-tabs">
+      <button class="kb-modal-tab active" onclick="setKBModalTab('text',this)">Text / Markdown</button>
+      <button class="kb-modal-tab" onclick="setKBModalTab('file',this)">File Reference</button>
+      <button class="kb-modal-tab" onclick="setKBModalTab('url',this)">URL</button>
+      <button class="kb-modal-tab" onclick="setKBModalTab('image',this)">Image</button>
+    </div>
+    <div class="kb-modal-panel active" id="kb-panel-text">
+      <div class="form-group"><label class="form-label">Name</label><input type="text" id="kbm-text-name" placeholder="Design Specs"></div>
+      <div class="form-group"><label class="form-label">Content</label><textarea id="kbm-text-content" rows="8" placeholder="Paste markdown or plain text..." style="font-family:var(--mono);font-size:11px"></textarea></div>
+    </div>
+    <div class="kb-modal-panel" id="kb-panel-file">
+      <div class="form-group"><label class="form-label">File Name</label><input type="text" id="kbm-file-name" placeholder="Visual Branding.pdf"></div>
+      <div class="form-group"><label class="form-label">File Path</label><input type="text" id="kbm-file-path" placeholder="~/Downloads/Visual Branding.pdf"></div>
+      <div class="form-group"><label class="form-label">File Type</label>
+        <select id="kbm-file-type"><option value="pdf">PDF</option><option value="img">Image</option><option value="json">JSON</option><option value="other">Other</option></select>
+      </div>
+    </div>
+    <div class="kb-modal-panel" id="kb-panel-url">
+      <div class="form-group"><label class="form-label">Name</label><input type="text" id="kbm-url-name" placeholder="Saturno Movement"></div>
+      <div class="form-group"><label class="form-label">URL</label><input type="text" id="kbm-url-url" placeholder="https://saturnomovement.com"></div>
+    </div>
+    <div class="kb-modal-panel" id="kb-panel-image">
+      <div class="form-group"><label class="form-label">Name</label><input type="text" id="kbm-img-name" placeholder="Gate Screenshot"></div>
+      <div class="form-group"><label class="form-label">Paste image or drop file</label>
+        <div id="kbm-img-drop" style="border:2px dashed var(--border);border-radius:var(--radius);padding:30px;text-align:center;color:var(--text-muted);font-size:11px;cursor:pointer;transition:all 0.15s" onclick="document.getElementById('kbm-img-input').click()">
+          Click or paste (Ctrl+V) an image here
+          <input type="file" id="kbm-img-input" accept="image/*" style="display:none" onchange="handleKBImageFile(this)">
+        </div>
+        <div id="kbm-img-preview" style="display:none;margin-top:8px"><img id="kbm-img-preview-img" style="max-width:100%;max-height:150px;border-radius:var(--radius);border:1px solid var(--border)"></div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><input type="text" id="kbm-desc" placeholder="Brief description of this item"></div>
+    <div class="form-group"><label class="form-label">Tags (comma-separated)</label><input type="text" id="kbm-tags" placeholder="design, branding, specs"></div>
+    <div style="display:flex;gap:6px;justify-content:flex-end">
+      <button class="btn" onclick="closeKBModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveKBItem()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- KB VIEWER MODAL -->
+<div class="modal-overlay" id="kb-viewer-modal" onclick="if(event.target===this)closeKBViewer()">
+  <div class="modal" style="width:640px;max-height:85vh">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <span class="kb-card-type" id="kbv-type"></span>
+      <span style="font-size:14px;font-weight:600;color:var(--text);flex:1" id="kbv-name"></span>
+      <button class="btn btn-sm" onclick="editKBItem()">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteKBItem()">Delete</button>
+      <button class="btn btn-sm" onclick="closeKBViewer()">Close</button>
+    </div>
+    <div id="kbv-desc" style="font-size:11px;color:var(--text-secondary);margin-bottom:12px"></div>
+    <div id="kbv-content" style="font-size:13px;line-height:1.7;color:var(--text-secondary);max-height:60vh;overflow-y:auto;white-space:pre-wrap;font-family:var(--mono);background:var(--bg-surface);padding:14px;border-radius:var(--radius);border:1px solid var(--border)"></div>
+    <div id="kbv-image" style="display:none;text-align:center;margin-top:12px"><img id="kbv-image-img" style="max-width:100%;max-height:50vh;border-radius:var(--radius)"></div>
+    <div id="kbv-path" style="display:none;margin-top:12px;font-family:var(--mono);font-size:10px;color:var(--text-muted)"></div>
+    <div id="kbv-tags" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:12px"></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // === STATE ===
 const SK = 'saturno-private-hub';
-let S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{} };
+let S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[] };
 let currentSection = 'content';
 let contentType = 'all', contentTheme = 'all';
 let taskView = 'list', taskFilter = 'all', taskProjectFilter = null;
@@ -635,7 +913,9 @@ let calMonth = new Date().getMonth(), calYear = new Date().getFullYear();
 let calDragId = null;
 
 function load() {
-  try { const s = localStorage.getItem(SK); if(s) S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, ...JSON.parse(s) }; } catch(e){}
+  try { const s = localStorage.getItem(SK); if(s) S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[], ...JSON.parse(s) }; } catch(e){}
+  if(!S.projects) S.projects = [];
+  if(!S.knowledgeBase) S.knowledgeBase = [];
   if(!S.docs.length) { S.docs.push({id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()}); S.activeDoc=S.docs[0].id; }
   if(!S.activeDoc&&S.docs.length) S.activeDoc=S.docs[0].id;
   if(!S.specs) S.specs=[];
@@ -685,10 +965,14 @@ function escA(s) { return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 // === SECTIONS ===
 function switchSection(sec, el) {
   currentSection=sec;
+  activeProject=null;
   document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
   if(el)el.classList.add('active');
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-project').classList.remove('active');
+  document.getElementById('panel-project').style.display='none';
   document.getElementById('panel-'+sec).classList.add('active');
+  renderProjectsSidebar();
   const titles={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
   document.getElementById('header-title').textContent=titles[sec]||sec;
   if(sec==='content')renderContent();
@@ -858,9 +1142,597 @@ function saveLink(){const title=document.getElementById('lm-title').value.trim()
 function delLink(id){S.links=S.links.filter(l=>l.id!==id);save();renderLinks();toast('Deleted');}
 function cpText(t){navigator.clipboard.writeText(t);toast('Copied');}
 
+// === PROJECTS ===
+let activeProject = null;
+let activeProjTab = 'instructions';
+let editingProjectId = null;
+let editingKBId = null;
+let kbModalTab = 'text';
+let kbImageData = null;
+
+const ICON_SVGS = {
+  rocket:'<path d="M4.5 16.5c-1.5 1.37-3 4.5-3 4.5s3.13-1.5 4.5-3c.78-.78.78-2.04 0-2.83s-2.04-.78-2.83 0z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+  code:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
+  music:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  atom:'<circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5z"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  heart:'<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+  lightning:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  fire:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14 0-5.5 3.5-7.5-2.5 5 1.5 5 3 7.5 2 3.5 1 6-2 8-1.5 1-4.5 1-6-1"/>',
+  terminal:'<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>',
+  server:'<rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>',
+  cpu:'<rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>',
+  cloud:'<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+  pen:'<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
+  palette:'<circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12" r="1.5"/><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c.97 0 1.76-.79 1.76-1.76 0-.47-.18-.89-.48-1.21-.3-.31-.48-.74-.48-1.21 0-.97.79-1.76 1.76-1.76H16c3.31 0 6-2.69 6-6 0-5.17-4.49-8.06-10-8.06z"/>',
+  camera:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  video:'<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>',
+  mic:'<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>',
+  headphones:'<path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/>',
+  layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  brain:'<path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44A2.5 2.5 0 0 1 5.5 17c-1.56 0-3-1.28-3-3 0-1.16.6-2.13 1.46-2.7A2.5 2.5 0 0 1 5.5 7a2.5 2.5 0 0 1 4-2z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44A2.5 2.5 0 0 0 18.5 17c1.56 0 3-1.28 3-3 0-1.16-.6-2.13-1.46-2.7A2.5 2.5 0 0 0 18.5 7a2.5 2.5 0 0 0-4-2z"/>',
+  flask:'<path d="M9 3h6"/><path d="M10 3v7.4a2 2 0 0 1-.5 1.3L4 18.6A2 2 0 0 0 5.5 22h13a2 2 0 0 0 1.5-3.4L14.5 11.7a2 2 0 0 1-.5-1.3V3"/>',
+  telescope:'<path d="M10.065 12.493l-6.18 1.318a.934.934 0 0 1-1.108-.702l-.537-2.15a1.07 1.07 0 0 1 .691-1.265l13.504-4.44"/><path d="M13.56 11.747l4.332-.924"/><path d="M16 21l-3.105-6.21"/><path d="M16.485 5.94a2 2 0 0 1 1.455-2.425l1.09-.272a1 1 0 0 1 1.212.727l1.515 6.06a1 1 0 0 1-.727 1.213l-1.09.272a2 2 0 0 1-2.425-1.455z"/><path d="M6.158 8.633l1.114 4.456"/>',
+  map:'<polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  tools:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  key:'<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  crown:'<path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M5 16h14"/>',
+  diamond:'<rect x="12" y="1" width="15.56" height="15.56" rx="2.41" transform="rotate(45 12 12)" style="stroke-width:1.5"/>',
+  sun:'<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>',
+  moon:'<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  mountain:'<path d="M8 3l4 8 5-5 5 15H2z"/>',
+  leaf:'<path d="M11 20A7 7 0 0 1 9.8 6.9C15.5 4.9 17 3.5 19 2c1 2 2 4.5 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+  mail:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  megaphone:'<path d="M3 11l18-5v12L3 13v-2z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+  chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+  trending:'<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+  dollar:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  building:'<rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><line x1="8" y1="6" x2="8" y2="6.01"/><line x1="16" y1="6" x2="16" y2="6.01"/><line x1="12" y1="6" x2="12" y2="6.01"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="12" y1="10" x2="12" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/><line x1="12" y1="14" x2="12" y2="14.01"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+  file:'<path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>',
+  grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  archive:'<polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>',
+  activity:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+  anchor:'<circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/>',
+  feather:'<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/>',
+  gift:'<polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  git:'<circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><line x1="6" y1="9" x2="6" y2="21"/>',
+  wifi:'<path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>',
+  crosshair:'<circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/>',
+  hammer:'<path d="M15 12l-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15L22 10.64"/><path d="M20.91 11.7l-1.25-1.25c-.6-.6-.93-1.4-.93-2.25V6.5L14.5 2.25 12 4.75l1.5 1.5L9 12"/>',
+  tree:'<path d="M12 22v-7"/><path d="M5 12H2l10-10 10 10h-3"/><path d="M8 18H2l10-8 10 8h-6"/>',
+};
+const ICON_KEYS = Object.keys(ICON_SVGS);
+
+function getIconSVG(key, size) {
+  const s = size || 16;
+  const d = ICON_SVGS[key] || ICON_SVGS.folder;
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+}
+
+// Project CRUD
+function getProjects() { return S.projects || []; }
+function getProject(id) { return (S.projects||[]).find(p=>p.id===id); }
+function getKBItems(projectId) { return (S.knowledgeBase||[]).filter(k=>k.projectId===projectId); }
+
+function renderProjectsSidebar() {
+  const el = document.getElementById('sidebar-projects');
+  const projects = getProjects();
+  el.innerHTML = projects.map(p => {
+    const statusClass = p.status === 'active' ? 'active-s' : p.status === 'paused' ? 'paused-s' : 'complete-s';
+    const isActive = activeProject === p.id;
+    return `<div class="sidebar-project-item ${isActive?'active':''}" onclick="openProject('${p.id}')" style="${isActive?'border-left:3px solid '+p.color:'border-left:3px solid transparent'}">
+      <span class="proj-icon" style="color:${p.color}">${getIconSVG(p.icon,14)}</span>
+      <span class="proj-name">${esc(p.name)}</span>
+      <span class="proj-status ${statusClass}"></span>
+    </div>`;
+  }).join('') + `<div class="sidebar-add-project" onclick="openNewProjectModal()">+ New Project</div>`;
+}
+
+function openProject(id) {
+  activeProject = id;
+  activeProjTab = 'instructions';
+  currentSection = '';
+  document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const projPanel = document.getElementById('panel-project');
+  projPanel.style.display = 'flex';
+  projPanel.classList.add('active');
+  document.getElementById('header-title').textContent = getProject(id)?.name || 'Project';
+  renderProjectsSidebar();
+  renderProjectView();
+}
+
+function renderProjectView() {
+  const p = getProject(activeProject);
+  if (!p) return;
+  document.getElementById('proj-header-icon').innerHTML = getIconSVG(p.icon, 18);
+  document.getElementById('proj-header-icon').style.borderColor = p.color;
+  document.getElementById('proj-header-name').textContent = p.name;
+  const statusEl = document.getElementById('proj-header-status');
+  statusEl.textContent = p.status;
+  statusEl.className = 'badge badge-' + (p.status==='active'?'green':p.status==='paused'?'yellow':'blue');
+  setProjTab(activeProjTab);
+}
+
+function setProjTab(tab, el) {
+  activeProjTab = tab;
+  document.querySelectorAll('.project-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('.project-tab').forEach(t => { if(t.textContent.toLowerCase().replace(/\s/g,'-').includes(tab.replace('proj-',''))|| (tab==='instructions'&&t.textContent==='Instructions') || (tab==='docs'&&t.textContent==='Living Docs') || (tab==='kb'&&t.textContent==='Knowledge Base') || (tab==='proj-tasks'&&t.textContent==='Tasks') || (tab==='proj-links'&&t.textContent==='Links')) t.classList.add('active'); });
+  document.querySelectorAll('.proj-tab-panel').forEach(p=>p.style.display='none');
+  const panel = document.getElementById('proj-panel-'+tab);
+  if(panel) panel.style.display = 'block';
+  if(tab==='instructions') loadProjInstructions();
+  if(tab==='docs') renderProjDocs();
+  if(tab==='kb') renderKB();
+  if(tab==='proj-tasks') renderProjTasks();
+  if(tab==='proj-links') renderProjLinks();
+}
+
+// Instructions
+function loadProjInstructions() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  document.getElementById('proj-instructions-editor').innerHTML = p.instructions || '';
+}
+let projInstrTimer = null;
+function onProjInstructionsChange() {
+  clearTimeout(projInstrTimer);
+  projInstrTimer = setTimeout(() => {
+    const p = getProject(activeProject);
+    if(p) { p.instructions = document.getElementById('proj-instructions-editor').innerHTML; p.updated = new Date().toISOString(); save(); }
+  }, 1000);
+}
+
+// Project Living Docs
+function renderProjDocs() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  const docs = S.specs.filter(s => s.projectId === activeProject);
+  const grid = document.getElementById('proj-docs-grid');
+  grid.innerHTML = !docs.length ? '<div class="kb-empty">No living docs for this project. Click + to add one.</div>' :
+    docs.map(d => {
+      const sc = d.sections ? d.sections.length : 0;
+      const dt = d.updated ? new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+      const preview = d.sections && d.sections[0] ? d.sections[0].title : '';
+      return `<div class="proj-doc-card" onclick="goToLivingDoc(${d.id})">
+        <div class="proj-doc-card-title">${esc(d.title||'Untitled')}</div>
+        <div class="proj-doc-card-meta"><span>${sc} sections</span><span>${dt}</span></div>
+        <div class="proj-doc-card-preview">${esc(preview)}</div>
+      </div>`;
+    }).join('');
+}
+function newProjLivingDoc() {
+  snapshotSpec();
+  const s = {id:Date.now(), title:'', projectId:activeProject, sections:[{id:Date.now()+1,title:'Overview',body:'',collapsed:false}], created:new Date().toISOString(), updated:new Date().toISOString()};
+  S.specs.unshift(s);
+  S.activeSpec = s.id;
+  save();
+  switchSection('specs', document.querySelector('.sidebar-item:nth-child(5)'));
+  toast('Living Doc created — editing now');
+}
+function goToLivingDoc(id) {
+  S.activeSpec = id;
+  save();
+  switchSection('specs', null);
+  document.querySelectorAll('.sidebar-item').forEach(i => { if(i.textContent.includes('Living Docs')) { i.classList.add('active'); } else { i.classList.remove('active'); }});
+}
+
+// Knowledge Base
+function renderKB() {
+  const items = getKBItems(activeProject);
+  const q = (document.getElementById('kb-search')?.value||'').toLowerCase();
+  let filtered = items;
+  if(q) filtered = filtered.filter(k => (k.name+' '+k.description+' '+(k.tags||[]).join(' ')).toLowerCase().includes(q));
+  const grid = document.getElementById('kb-grid');
+  grid.innerHTML = !filtered.length ? '<div class="kb-empty">No knowledge base items yet. Click + Add Item to start building.</div>' :
+    filtered.map(k => {
+      const typeClass = 'kb-type-'+(k.type||'other');
+      const hasImg = k.type === 'img' && k.content;
+      return `<div class="kb-card" onclick="openKBViewer('${k.id}')" draggable="true" ondragstart="kbDragStart(event,'${k.id}')">
+        <div class="kb-card-actions">
+          <button class="btn btn-sm btn-ghost kb-card-drag" draggable="false" title="Drag to whiteboard">&#x2630;</button>
+          <button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();confirmDeleteKB('${k.id}')">x</button>
+        </div>
+        <div class="kb-card-header">
+          <span class="kb-card-type ${typeClass}">${(k.type||'other').toUpperCase()}</span>
+          <span class="kb-card-name">${esc(k.name)}</span>
+        </div>
+        <div class="kb-card-desc">${esc(k.description||'')}</div>
+        ${hasImg ? `<img class="kb-card-img" src="${k.content}" alt="${escA(k.name)}">` : ''}
+        ${k.tags && k.tags.length ? `<div class="kb-card-tags">${k.tags.map(t=>`<span class="kb-card-tag">${esc(t)}</span>`).join('')}</div>` : ''}
+      </div>`;
+    }).join('');
+}
+
+// KB Modal
+function openKBModal(id) {
+  editingKBId = id || null;
+  kbImageData = null;
+  document.getElementById('kb-modal-title').textContent = id ? 'Edit Knowledge Base Item' : 'Add to Knowledge Base';
+  if(id) {
+    const k = (S.knowledgeBase||[]).find(x=>x.id===id);
+    if(k) {
+      if(k.type==='md'||k.type==='txt'||k.type==='json') { setKBModalTab('text'); document.getElementById('kbm-text-name').value=k.name; document.getElementById('kbm-text-content').value=k.content||''; }
+      else if(k.type==='img') { setKBModalTab('image'); document.getElementById('kbm-img-name').value=k.name; if(k.content){kbImageData=k.content;document.getElementById('kbm-img-preview').style.display='block';document.getElementById('kbm-img-preview-img').src=k.content;} }
+      else if(k.type==='url') { setKBModalTab('url'); document.getElementById('kbm-url-name').value=k.name; document.getElementById('kbm-url-url').value=k.url||''; }
+      else { setKBModalTab('file'); document.getElementById('kbm-file-name').value=k.name; document.getElementById('kbm-file-path').value=k.filePath||''; document.getElementById('kbm-file-type').value=k.type||'other'; }
+      document.getElementById('kbm-desc').value=k.description||'';
+      document.getElementById('kbm-tags').value=(k.tags||[]).join(', ');
+    }
+  } else {
+    setKBModalTab('text');
+    ['kbm-text-name','kbm-text-content','kbm-file-name','kbm-file-path','kbm-url-name','kbm-url-url','kbm-img-name','kbm-desc','kbm-tags'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('kbm-img-preview').style.display='none';
+  }
+  document.getElementById('kb-modal').classList.add('open');
+}
+function closeKBModal() { document.getElementById('kb-modal').classList.remove('open'); editingKBId=null; kbImageData=null; }
+function setKBModalTab(tab, el) {
+  kbModalTab = tab;
+  document.querySelectorAll('.kb-modal-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else document.querySelectorAll('.kb-modal-tab').forEach(t => { if((tab==='text'&&t.textContent.includes('Text'))||(tab==='file'&&t.textContent.includes('File'))||(tab==='url'&&t.textContent==='URL')||(tab==='image'&&t.textContent==='Image')) t.classList.add('active'); });
+  document.querySelectorAll('.kb-modal-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('kb-panel-'+tab).classList.add('active');
+}
+function handleKBImageFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 500*1024) { toast('Image too large (>500KB). Use file reference instead.'); return; }
+  const reader = new FileReader();
+  reader.onload = e => { kbImageData = e.target.result; document.getElementById('kbm-img-preview').style.display='block'; document.getElementById('kbm-img-preview-img').src = kbImageData; };
+  reader.readAsDataURL(file);
+}
+function saveKBItem() {
+  if(!S.knowledgeBase) S.knowledgeBase = [];
+  let item;
+  if(kbModalTab==='text') {
+    const name = document.getElementById('kbm-text-name').value.trim();
+    const content = document.getElementById('kbm-text-content').value.trim();
+    if(!name) { toast('Name required'); return; }
+    item = { name, type:'md', storage:'inline', content, filePath:null, url:null };
+  } else if(kbModalTab==='file') {
+    const name = document.getElementById('kbm-file-name').value.trim();
+    const path = document.getElementById('kbm-file-path').value.trim();
+    const type = document.getElementById('kbm-file-type').value;
+    if(!name) { toast('Name required'); return; }
+    item = { name, type, storage:'reference', content:null, filePath:path, url:null };
+  } else if(kbModalTab==='url') {
+    const name = document.getElementById('kbm-url-name').value.trim();
+    const url = document.getElementById('kbm-url-url').value.trim();
+    if(!name||!url) { toast('Name and URL required'); return; }
+    item = { name, type:'url', storage:'inline', content:null, filePath:null, url };
+  } else if(kbModalTab==='image') {
+    const name = document.getElementById('kbm-img-name').value.trim();
+    if(!name||!kbImageData) { toast('Name and image required'); return; }
+    item = { name, type:'img', storage:'inline', content:kbImageData, filePath:null, url:null };
+  }
+  item.description = document.getElementById('kbm-desc').value.trim();
+  item.tags = document.getElementById('kbm-tags').value.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);
+  item.projectId = activeProject;
+  if(editingKBId) {
+    const existing = S.knowledgeBase.find(k=>k.id===editingKBId);
+    if(existing) Object.assign(existing, item, {updated:new Date().toISOString()});
+  } else {
+    item.id = 'kb_'+Date.now();
+    item.created = new Date().toISOString();
+    item.updated = new Date().toISOString();
+    S.knowledgeBase.push(item);
+  }
+  save(); closeKBModal(); renderKB(); toast(editingKBId?'Updated':'Added');
+}
+
+// KB Viewer
+let viewingKBId = null;
+function openKBViewer(id) {
+  viewingKBId = id;
+  const k = (S.knowledgeBase||[]).find(x=>x.id===id);
+  if(!k) return;
+  document.getElementById('kbv-type').textContent = (k.type||'other').toUpperCase();
+  document.getElementById('kbv-type').className = 'kb-card-type kb-type-'+(k.type||'other');
+  document.getElementById('kbv-name').textContent = k.name;
+  document.getElementById('kbv-desc').textContent = k.description||'';
+  const contentEl = document.getElementById('kbv-content');
+  const imageEl = document.getElementById('kbv-image');
+  const pathEl = document.getElementById('kbv-path');
+  contentEl.style.display = 'none'; imageEl.style.display = 'none'; pathEl.style.display = 'none';
+  if(k.type==='img' && k.content) { imageEl.style.display='block'; document.getElementById('kbv-image-img').src=k.content; }
+  else if(k.content) { contentEl.style.display='block'; contentEl.textContent=k.content; }
+  else if(k.url) { contentEl.style.display='block'; contentEl.innerHTML=`<a href="${escA(k.url)}" target="_blank" style="color:var(--accent)">${esc(k.url)}</a>`; }
+  if(k.filePath) { pathEl.style.display='block'; pathEl.textContent='File: '+k.filePath; }
+  document.getElementById('kbv-tags').innerHTML = (k.tags||[]).map(t=>`<span class="kb-card-tag">${esc(t)}</span>`).join('');
+  document.getElementById('kb-viewer-modal').classList.add('open');
+}
+function closeKBViewer() { document.getElementById('kb-viewer-modal').classList.remove('open'); viewingKBId=null; }
+function editKBItem() { closeKBViewer(); openKBModal(viewingKBId); }
+function deleteKBItem() { if(!viewingKBId) return; S.knowledgeBase = (S.knowledgeBase||[]).filter(k=>k.id!==viewingKBId); save(); closeKBViewer(); renderKB(); toast('Deleted'); }
+function confirmDeleteKB(id) { S.knowledgeBase = (S.knowledgeBase||[]).filter(k=>k.id!==id); save(); renderKB(); toast('Deleted'); }
+
+// KB drag to whiteboard
+function kbDragStart(e, id) {
+  e.dataTransfer.setData('text/plain', 'kb:'+id);
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+// Project Tasks
+function renderProjTasks() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  const tasks = S.tasks.filter(t => t.project === p.name);
+  const el = document.getElementById('proj-task-rows');
+  el.innerHTML = tasks.map(t => `<div class="task-row ${t.status==='done'?'completed':''}" style="grid-template-columns:36px 1fr 110px 100px 50px">
+    <div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id});setTimeout(()=>renderProjTasks(),50)"></div>
+    <div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name..."></div>
+    <div><select class="task-select" onchange="updateTask(${t.id},'status',this.value);setTimeout(()=>renderProjTasks(),50)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div>
+    <div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)"></div>
+    <div class="task-actions" style="opacity:1"><button class="task-action-btn del" onclick="deleteTask(${t.id});setTimeout(()=>renderProjTasks(),50)">x</button></div>
+  </div>`).join('') + `<div class="add-task-row" onclick="addProjTask()">+ Add task</div>`;
+}
+function addProjTask() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  S.tasks.unshift({id:Date.now(), title:'', status:'todo', priority:'p1', project:p.name, due:new Date().toISOString().split('T')[0], created:new Date().toISOString()});
+  save(); renderProjTasks(); renderTasks();
+  setTimeout(()=>{const i=document.querySelector('#proj-task-rows .task-title-input');if(i)i.focus();},50);
+}
+
+// Project Links
+function renderProjLinks() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  const links = S.links.filter(l => l.projectId === activeProject);
+  const grid = document.getElementById('proj-links-grid');
+  grid.innerHTML = !links.length ? '<div class="kb-empty">No links for this project.</div>' :
+    links.map(l => `<div class="link-card" onclick="window.open('${escA(l.url)}','_blank')">
+      <div class="link-card-title">${esc(l.title)}</div>
+      <div class="link-card-url">${esc(l.url)}</div>
+      ${l.desc?`<div class="link-card-desc">${esc(l.desc)}</div>`:''}
+      <div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}
+        <div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();removeProjLink('${l.id}')">Del</button></div>
+      </div>
+    </div>`).join('');
+}
+function openProjLinkModal() {
+  editingLinkId = null;
+  document.getElementById('link-modal-title').textContent = 'Add Link';
+  document.getElementById('lm-title').value='';document.getElementById('lm-url').value='';document.getElementById('lm-category').value='';document.getElementById('lm-desc').value='';
+  document.getElementById('link-modal').classList.add('open');
+}
+function removeProjLink(id) { const l = S.links.find(x=>x.id==id); if(l) { l.projectId=null; save(); renderProjLinks(); toast('Removed from project'); }}
+
+// Project Modal
+function openNewProjectModal() { editingProjectId=null; document.getElementById('project-modal-title').textContent='New Project'; document.getElementById('pm-name').value=''; document.getElementById('pm-icon').value='folder'; document.getElementById('pm-status').value='active'; document.getElementById('pm-color').value='#4ade80'; updatePmIconPreview(); updatePmColorSelection(); document.getElementById('project-modal').classList.add('open'); setTimeout(()=>document.getElementById('pm-name').focus(),100); }
+function editProject() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  editingProjectId = p.id;
+  document.getElementById('project-modal-title').textContent = 'Edit Project';
+  document.getElementById('pm-name').value = p.name;
+  document.getElementById('pm-icon').value = p.icon;
+  document.getElementById('pm-status').value = p.status;
+  document.getElementById('pm-color').value = p.color;
+  updatePmIconPreview();
+  updatePmColorSelection();
+  document.getElementById('project-modal').classList.add('open');
+}
+function closeProjectModal() { document.getElementById('project-modal').classList.remove('open'); editingProjectId=null; }
+function saveProject() {
+  const name = document.getElementById('pm-name').value.trim();
+  if(!name) { toast('Name required'); return; }
+  const icon = document.getElementById('pm-icon').value;
+  const status = document.getElementById('pm-status').value;
+  const color = document.getElementById('pm-color').value;
+  if(!S.projects) S.projects = [];
+  if(editingProjectId) {
+    const p = getProject(editingProjectId);
+    if(p) { p.name=name; p.icon=icon; p.status=status; p.color=color; p.updated=new Date().toISOString(); }
+  } else {
+    const p = { id:'proj_'+Date.now(), name, icon, status, color, instructions:'', created:new Date().toISOString(), updated:new Date().toISOString() };
+    S.projects.push(p);
+    activeProject = p.id;
+  }
+  save(); closeProjectModal(); renderProjectsSidebar();
+  if(activeProject) { openProject(activeProject); }
+  toast(editingProjectId?'Updated':'Created');
+}
+function archiveProject() {
+  const p = getProject(activeProject);
+  if(!p) return;
+  p.status = 'complete';
+  save(); renderProjectsSidebar(); renderProjectView(); toast('Archived');
+}
+function updatePmIconPreview() {
+  const icon = document.getElementById('pm-icon').value;
+  const color = document.getElementById('pm-color').value;
+  document.getElementById('pm-icon-preview').innerHTML = getIconSVG(icon, 20);
+  document.getElementById('pm-icon-preview').style.color = color;
+}
+function setPmColor(c) { document.getElementById('pm-color').value=c; updatePmColorSelection(); updatePmIconPreview(); }
+function updatePmColorSelection() {
+  const c = document.getElementById('pm-color').value;
+  document.querySelectorAll('.pm-color-opt').forEach(el => { el.classList.toggle('selected', el.dataset.color===c); });
+}
+
+// Icon Picker
+function openIconPicker() {
+  const grid = document.getElementById('icon-picker-grid');
+  const current = document.getElementById('pm-icon').value;
+  grid.innerHTML = ICON_KEYS.map(k => `<div class="icon-picker-item ${k===current?'selected':''}" onclick="selectIcon('${k}')" title="${k}">${getIconSVG(k,18)}</div>`).join('');
+  document.getElementById('icon-picker-modal').classList.add('open');
+}
+function closeIconPicker() { document.getElementById('icon-picker-modal').classList.remove('open'); }
+function selectIcon(k) {
+  document.getElementById('pm-icon').value = k;
+  updatePmIconPreview();
+  document.querySelectorAll('.icon-picker-item').forEach(el => el.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  closeIconPicker();
+}
+
+// Image paste handler
+document.addEventListener('paste', e => {
+  if(!document.getElementById('kb-modal').classList.contains('open')) return;
+  if(kbModalTab !== 'image') return;
+  const items = e.clipboardData?.items;
+  if(!items) return;
+  for(let i=0; i<items.length; i++) {
+    if(items[i].type.startsWith('image/')) {
+      const file = items[i].getAsFile();
+      if(file.size > 500*1024) { toast('Image too large (>500KB)'); return; }
+      const reader = new FileReader();
+      reader.onload = ev => { kbImageData = ev.target.result; document.getElementById('kbm-img-preview').style.display='block'; document.getElementById('kbm-img-preview-img').src=kbImageData; };
+      reader.readAsDataURL(file);
+      e.preventDefault();
+      return;
+    }
+  }
+});
+
+// Seed projects
+function seedProjects() {
+  if(S.projects && S.projects.length) return;
+  S.projects = [];
+  S.knowledgeBase = [];
+  const now = new Date().toISOString();
+
+  // Project 1: SM App Rebuild
+  const smApp = {
+    id: 'proj_sm_app', name: 'SM App Rebuild', icon: 'code', status: 'active', color: '#8b5cf6',
+    instructions: '<h1>SM App Rebuild - Developer Situation</h1><h2>Vision</h2><p>"Ableton of Movement" - a movement composition app that treats movement like music production.</p><h2>For Tomorrow\'s Developer Call</h2><p><b>Primary Objectives:</b></p><ol><li>Clarify codebase ownership</li><li>Understand current deployment pipeline</li><li>Define handoff requirements</li><li>Establish realistic timeline</li></ol><h2>Key Questions</h2><ol><li>Where does the current codebase live?</li><li>What\'s the deployment process?</li><li>What do we need from them to take over?</li><li>What\'s the minimum viable handoff?</li><li>Are there vendor lock-ins or proprietary dependencies?</li></ol><h2>Assets You OWN</h2><ul><li>Domain: saturnomovement.com (admin@saturnomovement.com, Cloudflare, 2FA)</li><li>Stripe: Verified owner, 2FA + authenticator, payouts to your bank</li><li>Vimeo: Company email + card, all videos accessible</li><li>iOS Developer Account: Transferred to admin@saturnomovement.com</li><li>GitHub: sm-app-copy-v1 (your clone of the codebase)</li><li>Cloudflare: Full admin access, 2-step auth</li><li>Backups: Database and code fully backed up and cloned</li></ul><h2>What Softzee Still Controls</h2><ul><li>Server hosting (AWS, his infrastructure)</li><li>Original GitHub repo (Shajeel/sm-website-app)</li><li>Deployment pipeline</li><li>Android Keystore (.jks)</li><li>Backend environment variables and secrets</li></ul><h2>Financial Dispute</h2><ul><li>Phase 1: $35K agreed, $31.8K paid - COMPLETED</li><li>Website: $5K paid - COMPLETED</li><li>Phase 2: $30K agreed, $12.6K paid - 65% complete (Softzee\'s claim)</li><li>Softzee claims: $15.7K remaining</li><li>Softzee demands: Payment before full handover</li></ul><h2>App Tech Stack</h2><ul><li>Frontend: Next.js (App Router) + React/TypeScript</li><li>Backend: Node.js (Next.js API routes on AWS)</li><li>Payments: Stripe ($33.49/mo or $329/yr)</li><li>Video: Vimeo (300+ hours)</li><li>Mobile: React Native or native iOS/Android</li><li>Auth: Email, Google, Apple Sign-In</li><li>Programs: CF1-CF4, Yoga, Rings, Home (6+ programs)</li></ul><h2>Rebuild Timeline</h2><table><tr><th>Layer</th><th>Gabo + Claude</th><th>Junior Dev</th><th>Senior Dev</th></tr><tr><td>Landing Page</td><td>1-2 weeks</td><td>2-3 weeks</td><td>3-5 days</td></tr><tr><td>Web App</td><td>2-3 months</td><td>3-5 months</td><td>4-6 weeks</td></tr><tr><td>Mobile (PWA)</td><td>+2 weeks</td><td>+4 weeks</td><td>+1 week</td></tr></table><p><b>Recommendation:</b> PWA first (no App Store drama), native later.</p><h2>Strategic Recommendations</h2><ol><li>Don\'t pay remaining $15.7K until full handover</li><li>Ship bonus.saturnomovement.com FIRST - revenue TODAY</li><li>Landing page can be rebuilt in a weekend</li><li>Study sm-app-copy-v1: map database schema</li><li>Web app on managed stack: Vercel + Supabase</li></ol><h2>Gabo\'s Statement</h2><blockquote>"1 month ago was one thing, today.... I am confident I can build saturno movement app in a week if I wanted to even if I didn\'t have the source code, which I do."</blockquote>',
+    created: now, updated: now
+  };
+  S.projects.push(smApp);
+
+  // KB items for SM App
+  S.knowledgeBase.push(
+    { id:'kb_dev_call', projectId:'proj_sm_app', name:'Developer Call Prep - TOMORROW', type:'md', storage:'inline',
+      content:'# Developer Call Prep Doc\nDate: Tomorrow\nWith: Softzee team\nGoal: Understand ownership, get access, define handoff\n\n## BEFORE THE CALL\n- [ ] Confirm repo access\n- [ ] List all services/APIs the app uses\n- [ ] Identify hosting/deployment setup\n- [ ] Review contracts\n\n## QUESTIONS TO ASK\n### Ownership & Access\n1. "What parts of the codebase are proprietary vs ours?"\n2. "Can we get full repo access today?"\n3. "Who has admin access to deployment platforms?"\n\n### Technical Architecture\n4. "What third-party services does this rely on?"\n5. "Walk me through how updates get pushed live"\n6. "What\'s the database situation?"\n\n### Handoff\n7. "What\'s the cleanest path to us taking over?"\n8. "What documentation exists?"\n9. "Can you do a recorded walkthrough of the codebase?"\n\n## RED FLAGS\n- Vague answers about ownership\n- Reluctance to share repo access\n- Hidden dependencies or vendor lock-in\n- No documentation\n- "It\'s complicated" without specifics\n\n## IDEAL OUTCOME\n- Full repo access granted\n- Clear list of all dependencies\n- Written handoff timeline with milestones\n- Recorded architecture walkthrough scheduled\n\n## NOTES DURING CALL\n(Fill in during the call)\n### What we learned:\n### Action items:\n### Follow-up needed:',
+      description:'Prep doc for developer call - questions, red flags, ideal outcomes', tags:['developer','call','prep','priority'], created:now, updated:now },
+    { id:'kb_app_vision', projectId:'proj_sm_app', name:'App Vision - Ableton of Movement', type:'md', storage:'inline',
+      content:'# Saturno Movement App Vision\n\n## The Concept\n"Ableton of Movement" - treat movement composition like music production.\n\n## Core Metaphor\n| Music (Ableton) | Movement (SM App) |\n|---|---|\n| Tracks | Movement sequences |\n| Clips | Individual exercises |\n| Arrangement | Workout flow |\n| Effects | Progressions/regressions |\n| Tempo | Pace/rest intervals |\n| Mix | Balance of modalities |\n\n## Key Features\n1. Drag-and-drop workout builder\n2. Movement library (video clips)\n3. Progression paths\n4. Templates\n5. Export (to PDF, video, calendar)\n\n## Differentiators\n- Not just "pick exercises" - COMPOSE movement\n- Visual timeline interface\n- Modular, remixable workouts',
+      description:'The Ableton of Movement vision for the app', tags:['vision','product','app'], created:now, updated:now },
+    { id:'kb_softzee', projectId:'proj_sm_app', name:'Softzee Situation Summary', type:'md', storage:'inline',
+      content:'# Softzee Situation\n\n## What We Need to Clarify\n1. Code ownership - Do we own the codebase?\n2. Data ownership - User data, content, analytics\n3. Deployment control - Can we deploy without them?\n4. Dependencies - What breaks if we part ways?\n\n## Possible Outcomes\n### Best Case\nFull handoff, clean break, documentation provided.\n### Acceptable Case\nTransition period, they support handoff.\n### Worst Case\nVendor lock-in, need full rebuild.\n\n## Decision Framework\nIf handoff cost > rebuild cost: REBUILD\nIf handoff time > 3 months: CONSIDER REBUILD\nIf trust is broken: REBUILD',
+      description:'Summary of the developer situation', tags:['softzee','developer','situation'], created:now, updated:now },
+    { id:'kb_rescue_docs', projectId:'proj_sm_app', name:'Rescue Docs (iCloud)', type:'pdf', storage:'reference',
+      content:null, filePath:'~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/\u{1F6A8}sm-app--rescue/', url:null,
+      description:'Security audit, action plan, final dossier, iOS rebuild checklist, conversation export, bug list - all in iCloud', tags:['legal','developer','security'], created:now, updated:now }
+  );
+
+  // Project 2: Saturno Bonus
+  const bonus = {
+    id: 'proj_saturno_bonus', name: 'Saturno Bonus', icon: 'gift', status: 'active', color: '#4ade80',
+    instructions: '<h1>Saturno Bonus - Customer Bonus Vault</h1><h2>Purpose</h2><p>Customer-facing bonus page with tools, music, and CF4 content for BF25 buyers.</p><h2>Deployment</h2><table><tr><th>Environment</th><th>URL</th><th>Status</th></tr><tr><td>Production</td><td>saturno-bonus.vercel.app</td><td>LIVE</td></tr><tr><td>Custom Domain</td><td>bonus.saturnomovement.com</td><td>PENDING (Cloudflare CNAME)</td></tr><tr><td>Repo</td><td>github.com/gabosaturno11/saturno-bonus</td><td>Private</td></tr></table><h2>Repository Structure</h2><pre>~/dev/saturno-bonus/\n  index.html          (main bonus page)\n  gate.html           (password gate)\n  experience.html     (8-zone scrolling journey)\n  admin.html          (SATURNO COMMAND dashboard)\n  api/                (config, admin-verify, brevo, verify)\n  bonuses/\n    tools/            (60 HTML tools)\n    pdfs/             (18 PDFs)\n    music/            (119 tracks - gitignored)\n  assets/             (logos, css, js)\n  video/              (app-promo.mov - gitignored)</pre><h2>Current Status</h2><ul><li>LIVE on Vercel (200 on gate.html)</li><li>60 tools, 18 PDFs, 119 tracks</li><li>All paths updated (bonuses/tools/, bonuses/music/, bonuses/pdfs/)</li><li>Auth redirect fixed</li></ul><h2>TOMORROW\'S PRIORITY</h2><p><b>Ship the bonus page.</b> Not ASTRA. Not the developer call. THE BONUS PAGE.</p><ul><li>Sample tool (quality bar template)</li><li>Sample PDF (conversion template)</li><li>Music source locations for album organization</li><li>100 tools + 100 PDFs + organized music</li><li>Brevo email capture (needs BREVO_API_KEY + BREVO_LIST_ID)</li></ul><h2>Domain Setup</h2><p>Gabo adds CNAME in Cloudflare: <code>bonus</code> -> <code>cname.vercel-dns.com</code></p><p>Then run: <code>vercel domains add bonus.saturnomovement.com</code></p>',
+    created: now, updated: now
+  };
+  S.projects.push(bonus);
+
+  S.knowledgeBase.push(
+    { id:'kb_bonus_deploy', projectId:'proj_saturno_bonus', name:'Deployment Status', type:'md', storage:'inline',
+      content:'# Deployment Status\nLive URL: saturno-bonus.vercel.app\nRepo: github.com/gabosaturno11/saturno-bonus\nCommit: 8a3f2da (initial)\n\n## Checklist\n- [x] Vercel deployed (200)\n- [x] GitHub repo (private)\n- [x] All paths remapped (150+ refs)\n- [ ] Custom domain (bonus.saturnomovement.com)\n- [ ] Brevo email capture\n- [ ] 100 tools audited\n- [ ] 100 PDFs created\n- [ ] Music organized into albums',
+      description:'Current deployment status and checklist', tags:['deployment','vercel','status'], created:now, updated:now },
+    { id:'kb_bonus_shipping', projectId:'proj_saturno_bonus', name:'Shipping Plan', type:'md', storage:'inline',
+      content:'# Shipping Plan\n\n## Phase 1: Sample Quality Bar\n- ONE sample tool (template for quality)\n- ONE sample PDF (conversion template)\n- Music source locations identified\n\n## Phase 2: Batch Production\n- 100 tools audited and fixed\n- 100 PDFs generated (transcript-to-PDF tool)\n- Music organized into album subfolders with artwork\n\n## Phase 3: Assembly\n- All content wired into bonus page\n- Brevo email capture connected\n- Video embedded\n- Final QA\n\n## Phase 4: Launch\n- Deploy to bonus.saturnomovement.com\n- Email BF25 customers\n- Monitor analytics',
+      description:'The shipping plan for bonus page launch', tags:['shipping','plan','priority'], created:now, updated:now }
+  );
+
+  // Project 3: Book (AOC)
+  S.projects.push({
+    id:'proj_book', name:'Book (AOC)', icon:'book', status:'active', color:'#f59e0b',
+    instructions:'<h1>The Art of Calisthenics - Book Submission</h1><h2>Publisher</h2><p>Victory Belt Publishing - $20K advance</p><h2>Status</h2><p>Approved, pending submission of final package.</p><h2>Submission Package</h2><ul><li>Introductory Letter</li><li>Expanded TOC</li><li>Sample Chapters (Ch 1, 2, 11)</li><li>Overview Document</li></ul><h2>Location</h2><p><code>~/Downloads/_ORGANIZED/aoc-book/</code></p><h2>Current Blocker</h2><p>Organization, not creation. Content EXISTS.</p>',
+    created:now, updated:now
+  });
+
+  // Project 4: HBS Program
+  S.projects.push({
+    id:'proj_hbs', name:'HBS Program', icon:'target', status:'paused', color:'#06b6d4',
+    instructions:'<h1>Handbalancing System (HBS)</h1><h2>Solar System Progression</h2><ul><li>SUN: Foundation (wrist, shoulder, core)</li><li>MERCURY: Wall Work</li><li>VENUS: Kick-Up</li><li>EARTH: Balance (freestanding)</li><li>MARS: Shapes</li><li>JUPITER: Press</li><li>SATURN: One-Arm (mastery)</li></ul><h2>Location</h2><p><code>/Volumes/SSK Drive/HBS/</code> (8.3GB)</p><h2>Status</h2><p>Filming mode. Content exists on SSK Drive.</p>',
+    created:now, updated:now
+  });
+
+  // Project 5: De Aqui a Saturno
+  S.projects.push({
+    id:'proj_karina', name:'De Aqui a Saturno', icon:'heart', status:'complete', color:'#ec4899',
+    instructions:'<h1>De Aqui a Saturno</h1><h2>Valentine\'s Day Experience for Karina</h2><p>Crystal cosmic scroll experience: gate -> 18 chapters -> epic end -> 11 love dimensions -> finale</p><h2>Deployment</h2><ul><li>Live: de-aqui-a-saturno.vercel.app</li><li>Repo: github.com/gabosaturno11/de-aqui-a-saturno (private)</li></ul><h2>Features</h2><ul><li>Real piano audio (dual-track crossfade)</li><li>Real couple videos</li><li>Glassmorphism, ambient orbs, star parallax</li><li>11 love dimensions with unique SVG icons</li><li>KS monogram in finale</li><li>Hidden alien Easter egg</li></ul><p><b>Gabo\'s reaction:</b> "dude wtf I am crying" / "the UI is INSANE"</p>',
+    created:now, updated:now
+  });
+}
+
+// Extend whiteboard for doc references
+const origWbCanvasDown = wbCanvasDown;
+function wbCanvasDownV2(e) {
+  origWbCanvasDown(e);
+}
+
+// Handle KB drop on whiteboard
+function handleWbDrop(e) {
+  const data = e.dataTransfer?.getData('text/plain');
+  if(data && data.startsWith('kb:')) {
+    e.preventDefault();
+    const kbId = data.replace('kb:','');
+    const k = (S.knowledgeBase||[]).find(x=>x.id===kbId);
+    if(!k) return;
+    const p = wbScreenToCanvas(e.clientX, e.clientY);
+    const typeColors = {md:'#3b82f6',pdf:'#ef4444',img:'#22c55e',url:'#8b5cf6',txt:'#6b7280',json:'#eab308',other:'#6b7280'};
+    const n = wbAddNode(p.x-80, p.y-40, '['+k.type.toUpperCase()+'] '+k.name, k.description||'', typeColors[k.type]||'#3b82f6', 200, 90);
+    n.docRef = kbId;
+    n.docType = k.type;
+    wbSaveState();
+    toast('Added to whiteboard');
+  }
+}
+
+// Patch: override link save to attach projectId when in project context
+const origSaveLink = saveLink;
+saveLink = function() {
+  const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim();
+  if(!title||!url){toast('Title and URL required');return;}
+  if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;}}
+  else { const l = {id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()}; if(activeProject) l.projectId=activeProject; S.links.push(l); }
+  save();closeLinkModal();renderLinks();
+  if(activeProject && activeProjTab==='proj-links') renderProjLinks();
+  toast(editingLinkId?'Updated':'Added');
+};
+
 // === GLOBAL ===
-function exportAll(){snapshotWriter();snapshotSpec();const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-hub-'+new Date().toISOString().split('T')[0]+'.json';a.click();toast('Exported');}
-function importAll(){const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const f=e.target.files[0],r=new FileReader();r.onload=ev=>{try{S={content:[],tasks:[],links:[],docs:[],specs:[],activeDoc:null,activeSpec:null,whiteboard:{},...JSON.parse(ev.target.result)};save();switchSection(currentSection,document.querySelector('.sidebar-item.active'));toast('Imported');}catch(e){toast('Invalid JSON');}};r.readAsText(f);};inp.click();}
+function exportAll(){snapshotWriter();snapshotSpec();if(activeProject){const p=getProject(activeProject);if(p){p.instructions=document.getElementById('proj-instructions-editor')?.innerHTML||p.instructions;}}const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-hub-'+new Date().toISOString().split('T')[0]+'.json';a.click();toast('Exported');}
+function importAll(){
+  // Auto-backup before import (UNDO safety net)
+  const backup = localStorage.getItem(SK);
+  if(backup) { localStorage.setItem(SK+'_backup', backup); localStorage.setItem(SK+'_backup_time', new Date().toISOString()); }
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const f=e.target.files[0],r=new FileReader();r.onload=ev=>{try{S={content:[],tasks:[],links:[],docs:[],specs:[],activeDoc:null,activeSpec:null,whiteboard:{},projects:[],knowledgeBase:[],...JSON.parse(ev.target.result)};if(!S.projects)S.projects=[];if(!S.knowledgeBase)S.knowledgeBase=[];save();renderProjectsSidebar();switchSection(currentSection||'content',document.querySelector('.sidebar-item.active'));toast('Imported (backup saved — click Undo Import to revert)');}catch(e){toast('Invalid JSON');}};r.readAsText(f);};inp.click();
+}
+function undoImport(){
+  const backup = localStorage.getItem(SK+'_backup');
+  if(!backup) { toast('No backup available'); return; }
+  const time = localStorage.getItem(SK+'_backup_time');
+  S = {content:[],tasks:[],links:[],docs:[],specs:[],activeDoc:null,activeSpec:null,whiteboard:{},projects:[],knowledgeBase:[],...JSON.parse(backup)};
+  if(!S.projects)S.projects=[];if(!S.knowledgeBase)S.knowledgeBase=[];
+  save();renderProjectsSidebar();switchSection('content',document.querySelector('.sidebar-item'));
+  toast('Reverted to backup from '+(time||'unknown'));
+}
 
 // === VOICE INPUT ===
 let voiceTarget = null, voiceRecog = null, voiceActive = false;
@@ -1179,6 +2051,12 @@ function seedLinks() {
       {id:2013,title:'ASTRA Command Center',url:'https://astra-command-center.vercel.app',category:'deployment',desc:'Endel-inspired 7-section command center',created:new Date().toISOString()},
       {id:2014,title:'GitHub: astra-command-center',url:'https://github.com/gabosaturno11/astra-command-center',category:'repo',desc:'ASTRA source repo',created:new Date().toISOString()},
       {id:2015,title:'Vimeo Developer',url:'https://developer.vimeo.com/apps',category:'tool',desc:'Vimeo API — app: ASTRA LLMs, account: admin@saturnomovement.com',created:new Date().toISOString()},
+      {id:2016,title:'Saturno Bonus (Vercel)',url:'https://saturno-bonus.vercel.app',category:'deployment',desc:'Customer bonus page — decoupled from titan-forge',created:new Date().toISOString()},
+      {id:2017,title:'GitHub: saturno-bonus',url:'https://github.com/gabosaturno11/saturno-bonus',category:'repo',desc:'Private repo — clean bonus-only repo with bonuses/ folder',created:new Date().toISOString()},
+      {id:2018,title:'SATURNO COMMAND',url:'https://titan-forge-sage.vercel.app/command',category:'deployment',desc:'Admin dashboard — tool toggles, config API (password: saturno-admin-2026)',created:new Date().toISOString()},
+      {id:2019,title:'Cloudflare Dashboard',url:'https://dash.cloudflare.com/',category:'tool',desc:'DNS management — admin@saturnomovement.com, 2FA enabled',created:new Date().toISOString()},
+      {id:2020,title:'Stripe Dashboard',url:'https://dashboard.stripe.com/',category:'tool',desc:'Payment management — 2FA + authenticator',created:new Date().toISOString()},
+      {id:2021,title:'GitHub: sm-app-copy-v1',url:'https://github.com/gabosaturno11/sm-app-copy-v1',category:'repo',desc:'Clone of Saturno Movement app codebase (from Softzee)',created:new Date().toISOString()},
     ];
   }
 }
@@ -1186,10 +2064,14 @@ function seedLinks() {
 // === INIT ===
 load();
 seedLinks();
+seedProjects();
 save();
 initVoice();
 wbLoadState();
-renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();renderLinks();updateStorage();
+renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();renderLinks();renderProjectsSidebar();updateStorage();
+// Whiteboard drop handler for KB items
+document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
+document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 window.addEventListener('beforeunload',()=>{snapshotWriter();snapshotSpec();wbPersist();save();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));});
