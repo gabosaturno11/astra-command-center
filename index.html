@@ -3407,6 +3407,8 @@ window.addEventListener('beforeunload',()=>{snapshotWriter();snapshotSpec();wbPe
 document.addEventListener('keydown',e=>{
   // Command Palette: Cmd+K
   if((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); openCommandPalette(); return; }
+  // Cmd+S: save workspace
+  if((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); snapshotWriter(); snapshotSpec(); wbPersist(); save(); toast('Saved'); return; }
   // Skip shortcuts when typing in inputs
   const inInput = e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true';
   if(e.key==='Escape'){
