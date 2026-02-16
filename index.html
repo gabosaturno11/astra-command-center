@@ -58,9 +58,9 @@ body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondar
 .project-resize-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:3px;height:32px;border-radius:2px;background:var(--text-muted);opacity:0}
 
 /* RESIZE HANDLES */
-.sidebar-resize{width:4px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0;margin-left:-2px}
+.sidebar-resize{width:4px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0}
 .sidebar-resize:hover,.sidebar-resize.dragging{background:var(--accent);opacity:0.3}
-.context-resize{width:4px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0;margin-right:-2px}
+.context-resize{width:4px;cursor:col-resize;background:transparent;position:relative;z-index:30;flex-shrink:0}
 .context-resize:hover,.context-resize.dragging{background:var(--accent);opacity:0.3}
 
 /* SIDEBAR */
@@ -1416,8 +1416,10 @@ function escA(s) { return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 // === SECTIONS ===
 function switchSection(sec, el) {
   currentSection=sec;
+  const sectionLabels={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
   document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
-  if(el)el.classList.add('active');
+  if(el) el.classList.add('active');
+  else { document.querySelectorAll('.sidebar-item').forEach(i => { if(i.textContent.trim().replace(/\d+$/,'').trim() === sectionLabels[sec]) i.classList.add('active'); }); }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+sec).classList.add('active');
   const titles={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
@@ -1728,8 +1730,10 @@ function openProject(id) {
   activeProjTab = 'instructions';
   const p = (S.projects||[]).find(x=>x.id===id);
   if(p) trackRecent('project', id, p.name);
-  // Open project as right panel — keep main content visible
-  document.querySelector('.app').classList.add('project-open');
+  const app = document.querySelector('.app');
+  // Close context panel — they share the right-side grid slot
+  app.classList.remove('context-open');
+  app.classList.add('project-open');
   renderProjectsSidebar();
   renderProjectView();
 }
@@ -3129,19 +3133,32 @@ function setMode(mode) {
   currentMode = mode;
   const app = document.querySelector('.app');
   app.classList.remove('mode-focus', 'mode-extended');
-  if(mode === 'focus') app.classList.add('mode-focus');
-  if(mode === 'extended') { app.classList.add('mode-extended'); if(!app.classList.contains('context-open')) app.classList.add('context-open'); }
-  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('mode-'+mode+'-btn').classList.add('active');
-  if(mode === 'default' && app.classList.contains('context-open') && !app.classList.contains('project-open')) {
+  // Close project panel in focus mode — no sidebar means no way to navigate
+  if(mode === 'focus') {
+    app.classList.add('mode-focus');
+    if(app.classList.contains('project-open')) closeProjectPanel();
     app.classList.remove('context-open');
   }
+  if(mode === 'extended') {
+    app.classList.add('mode-extended');
+    if(app.classList.contains('project-open')) closeProjectPanel();
+    if(!app.classList.contains('context-open')) app.classList.add('context-open');
+    updateContextStats();
+  }
+  if(mode === 'default') {
+    app.classList.remove('context-open');
+  }
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-'+mode+'-btn').classList.add('active');
 }
 
 // === CONTEXT PANEL ===
 function toggleContextPanel() {
   const app = document.querySelector('.app');
-  if(app.classList.contains('project-open')) return;
+  // Close project panel first — they share the right-side grid slot
+  if(app.classList.contains('project-open')) {
+    closeProjectPanel();
+  }
   app.classList.toggle('context-open');
   updateContextStats();
 }
