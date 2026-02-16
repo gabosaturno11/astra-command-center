@@ -1148,6 +1148,12 @@ let editingContentId = null, editingLinkId = null;
 let writerTimer = null, specTimer = null, writerPanelOpen = false;
 let calMonth = new Date().getMonth(), calYear = new Date().getFullYear();
 let calDragId = null;
+let recentItems = [];
+function trackRecent(type, id, title) {
+  recentItems = recentItems.filter(r => !(r.type===type && r.id===id));
+  recentItems.unshift({ type, id, title: title||'Untitled', time: Date.now() });
+  if(recentItems.length > 10) recentItems = recentItems.slice(0, 10);
+}
 
 function load() {
   try { const s = localStorage.getItem(SK); if(s) S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[], folders:[], ...JSON.parse(s) }; } catch(e){}
@@ -1357,7 +1363,7 @@ function getActiveDoc(){return S.docs.find(d=>d.id===S.activeDoc);}
 function renderWriter(){renderDocList();loadDoc();document.getElementById('writer-count').textContent=S.docs.length;}
 function renderDocList(){document.getElementById('writer-doc-list').innerHTML=S.docs.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div><div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span>${S.docs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
 function loadDoc(){const d=getActiveDoc();if(!d)return;document.getElementById('writer-title').value=d.title||'';document.getElementById('writer-editor').innerHTML=d.body||'';updateWS();renderVersions();}
-function switchDoc(id){snapshotWriter();S.activeDoc=id;save();renderWriter();}
+function switchDoc(id){snapshotWriter();S.activeDoc=id;save();renderWriter();const d=S.docs.find(x=>x.id===id);if(d)trackRecent('doc',id,d.title);}
 function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.getElementById('writer-title').focus();}
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
@@ -1383,7 +1389,7 @@ function getActiveSpec(){return S.specs.find(s=>s.id===S.activeSpec);}
 function renderSpecs(){renderSpecList();loadSpec();document.getElementById('specs-count').textContent=S.specs.length;}
 function renderSpecList(){document.getElementById('specs-doc-list').innerHTML=S.specs.map(s=>{const sc=s.sections?s.sections.length:0;const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="specs-doc-item ${s.id===S.activeSpec?'active':''}" onclick="switchSpec(${s.id})"><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div><div class="specs-doc-meta"><span>${sc} sections</span><span>${dt}</span>${S.specs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec(${s.id})">x</span>`:''}</div></div>`;}).join('');}
 function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';renderSpecSections();updateSpecStatus();}
-function switchSpec(id){snapshotSpec();S.activeSpec=id;save();renderSpecs();}
+function switchSpec(id){snapshotSpec();S.activeSpec=id;save();renderSpecs();const s=S.specs.find(x=>x.id===id);if(s)trackRecent('spec',id,s.title);}
 function newSpec(){snapshotSpec();const s={id:Date.now(),title:'',sections:[{id:Date.now()+1,title:'Overview',body:'',collapsed:false}],created:new Date().toISOString(),updated:new Date().toISOString()};S.specs.unshift(s);S.activeSpec=s.id;save();renderSpecs();document.getElementById('specs-title').focus();}
 function delSpec(id){if(S.specs.length<=1){toast('Cannot delete last spec');return;}S.specs=S.specs.filter(s=>s.id!==id);if(S.activeSpec===id)S.activeSpec=S.specs[0].id;save();renderSpecs();toast('Deleted');}
 function snapshotSpec(){const s=getActiveSpec();if(!s)return;const t=document.getElementById('specs-title');if(t)s.title=t.value;if(!s.sections)s.sections=[];s.sections.forEach(sec=>{const el=document.getElementById('spec-editor-'+sec.id);if(el)sec.body=el.innerHTML;const tEl=document.getElementById('spec-title-'+sec.id);if(tEl)sec.title=tEl.value;});s.updated=new Date().toISOString();}
@@ -1523,6 +1529,8 @@ function renderProjectsSidebar() {
 function openProject(id) {
   activeProject = id;
   activeProjTab = 'instructions';
+  const p = (S.projects||[]).find(x=>x.id===id);
+  if(p) trackRecent('project', id, p.name);
   // Open project as right panel — keep main content visible
   document.querySelector('.app').classList.add('project-open');
   renderProjectsSidebar();
@@ -2814,6 +2822,12 @@ function closeCommandPalette() {
 function cmdGetItems(q) {
   const items = [];
   const ql = (q || '').toLowerCase();
+  // Recent items (show when no query)
+  if(!ql && recentItems.length) {
+    recentItems.forEach(r => {
+      items.push({title:r.title, desc:'Recent - '+r.type, icon:'*', type:'recent', action:()=>navigateToItem(r.type, r.id)});
+    });
+  }
   // Sections
   const sections = [
     {title:'Content',desc:'Content vault',icon:'C',action:()=>switchSection('content',document.querySelector('.sidebar-item'))},
@@ -3116,11 +3130,39 @@ window.addEventListener('beforeunload',()=>{snapshotWriter();snapshotSpec();wbPe
 document.addEventListener('keydown',e=>{
   // Command Palette: Cmd+K
   if((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); openCommandPalette(); return; }
+  // Skip shortcuts when typing in inputs
+  const inInput = e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true';
   if(e.key==='Escape'){
     if(document.getElementById('cmd-overlay').classList.contains('open')) { closeCommandPalette(); return; }
     document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
     if(activeProject) closeProjectPanel();
   }
+  if(inInput) return;
+  // Cmd+number: switch sections
+  if((e.metaKey||e.ctrlKey) && e.key>='1' && e.key<='7') {
+    e.preventDefault();
+    const sections = ['content','tasks','calendar','writer','specs','links','whiteboard'];
+    const idx = parseInt(e.key)-1;
+    if(sections[idx]) {
+      const items = document.querySelectorAll('.sidebar-item');
+      switchSection(sections[idx], items[idx]||null);
+    }
+    return;
+  }
+  // Cmd+N: new item in current section
+  if((e.metaKey||e.ctrlKey) && e.key==='n' && !e.shiftKey) {
+    e.preventDefault();
+    if(currentSection==='content') openContentModal();
+    else if(currentSection==='tasks') addTask();
+    else if(currentSection==='writer') newDoc();
+    else if(currentSection==='specs') newSpec();
+    else if(currentSection==='links') openLinkModal();
+    return;
+  }
+  // Cmd+E: toggle context panel
+  if((e.metaKey||e.ctrlKey) && e.key==='e') { e.preventDefault(); toggleContextPanel(); return; }
+  // Cmd+\\: toggle focus mode
+  if((e.metaKey||e.ctrlKey) && e.key==='\\') { e.preventDefault(); setMode(currentMode==='focus'?'default':'focus'); return; }
 });
 
 // === RESIZE HANDLE FOR PROJECT PANEL ===
