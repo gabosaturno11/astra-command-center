@@ -543,6 +543,14 @@ textarea{resize:vertical;line-height:1.6}
       <div id="sidebar-projects"></div>
     </div>
     <div class="sidebar-divider"></div>
+    <div class="sidebar-section" id="sidebar-folders-section">
+      <div class="sidebar-label" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Folders</span>
+        <span onclick="addFolderFromSidebar()" style="padding:0;font-size:13px;font-weight:600;cursor:pointer;color:var(--text-muted)" title="New Folder">+</span>
+      </div>
+      <div class="folder-tree" id="sidebar-folder-tree"></div>
+    </div>
+    <div class="sidebar-divider"></div>
     <div class="sidebar-section" id="sidebar-context"></div>
     <div style="margin-top:auto;padding:12px">
       <button class="btn btn-sm" style="width:100%;margin-bottom:6px;justify-content:center;gap:6px" onclick="openCommandPalette()">
@@ -2515,6 +2523,72 @@ function moveToFolder(itemType, itemId, folderId) {
   if(item) { item.folderId = folderId; save(); toast('Moved to folder'); }
 }
 
+// === FOLDER TREE UI ===
+let activeFolderId = null;
+function renderFolderTree() {
+  const el = document.getElementById('sidebar-folder-tree');
+  if(!el) return;
+  const folders = getFolders();
+  if(!folders.length) {
+    el.innerHTML = '<div style="font-size:10px;color:var(--text-muted);padding:4px 8px">No folders yet</div>';
+    return;
+  }
+  const rootFolders = folders.filter(f => !f.parentId);
+  el.innerHTML = renderFolderLevel(rootFolders, folders, 0);
+}
+function renderFolderLevel(items, all, depth) {
+  return items.map(f => {
+    const children = all.filter(c => c.parentId === f.id);
+    const count = countFolderItems(f.id);
+    const isActive = activeFolderId === f.id;
+    const indent = depth * 12;
+    let html = `<div class="folder-item ${isActive ? 'active' : ''}" style="padding-left:${8 + indent}px" onclick="selectFolder('${f.id}')" oncontextmenu="event.preventDefault();folderContextMenu(event,'${f.id}')">`;
+    html += `<span class="folder-item-icon">${children.length ? (isActive ? 'v' : '>') : '-'}</span>`;
+    html += `<span class="folder-item-name">${esc(f.name)}</span>`;
+    if(count > 0) html += `<span class="folder-item-count">${count}</span>`;
+    html += '</div>';
+    if(children.length && isActive) {
+      html += renderFolderLevel(children, all, depth + 1);
+    }
+    return html;
+  }).join('');
+}
+function countFolderItems(folderId) {
+  let count = 0;
+  S.content.forEach(c => { if(c.folderId === folderId) count++; });
+  S.tasks.forEach(t => { if(t.folderId === folderId) count++; });
+  S.docs.forEach(d => { if(d.folderId === folderId) count++; });
+  S.specs.forEach(s => { if(s.folderId === folderId) count++; });
+  S.links.forEach(l => { if(l.folderId === folderId) count++; });
+  return count;
+}
+function selectFolder(id) {
+  activeFolderId = activeFolderId === id ? null : id;
+  renderFolderTree();
+}
+function addFolderFromSidebar() {
+  const name = prompt('Folder name:');
+  if(!name || !name.trim()) return;
+  addFolder(name.trim());
+  renderFolderTree();
+  toast('Folder created');
+}
+function folderContextMenu(event, id) {
+  const action = prompt('Folder action: (r)ename, (d)elete, (s)ub-folder');
+  if(!action) return;
+  const a = action.toLowerCase().trim();
+  if(a === 'r' || a === 'rename') {
+    const f = (S.folders||[]).find(x => x.id === id);
+    const name = prompt('New name:', f ? f.name : '');
+    if(name && name.trim()) { renameFolder(id, name.trim()); renderFolderTree(); toast('Renamed'); }
+  } else if(a === 'd' || a === 'delete') {
+    deleteFolder(id); activeFolderId = null; renderFolderTree(); toast('Folder deleted');
+  } else if(a === 's' || a === 'sub-folder') {
+    const name = prompt('Sub-folder name:');
+    if(name && name.trim()) { addFolder(name.trim(), id); renderFolderTree(); toast('Sub-folder created'); }
+  }
+}
+
 // === CROSS-LINKING [[wiki-links]] ===
 function parseWikiLinks(html) {
   if(!html) return html;
@@ -2835,7 +2909,7 @@ seedProjects();
 save();
 initVoice();
 wbLoadState();
-renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();renderLinks();renderProjectsSidebar();updateStorage();
+renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();renderLinks();renderProjectsSidebar();renderFolderTree();updateStorage();
 ftUpdateDisplay();updateContextStats();
 // Whiteboard drop handler for KB items
 document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
