@@ -961,6 +961,19 @@ function migrateV2() {
     );
     save();
   }
+  // Add asset catalog to Saturno Bonus if not present
+  if(S.projects && S.projects.find(p => p.id === 'proj_saturno_bonus') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_bonus_assets')) {
+    const now = new Date().toISOString();
+    S.knowledgeBase.push(
+      { id:'kb_bonus_assets', projectId:'proj_saturno_bonus', name:'Asset Catalog — TBV by Gabo', type:'md', storage:'inline',
+        content:'# Bonus Assets — To Be Verified by Gabo\n\n## PDFs (18 files, ~/dev/titan-forge/pdfs/)\n- Handstand Press Program (1.5MB)\n- Press to Handstand Full Program (1.8MB)\n- Calisthenics Skills Programming Ebook (14.2MB)\n- HBF Introduction (123KB)\n- HBF Phase 1 Weeks 1-6 (30MB each, 6 files)\n- 15min Front Lever Routine (5.6MB)\n- 15min HSPU Routine (451KB)\n- 15min Muscle-Up Routine (25.9MB)\n- 15min Planche Routine (19.8MB)\n- Mobility vs Flexibility (55KB)\n- Move List Database (465KB)\n- Saturno General Warmup (5.8MB)\n- Solar System Deployment HBS (230KB)\n\n## Tools (60 HTML files, ~/dev/titan-forge/tools/)\n- 49 referenced on bonus.html\n- 11 internal/unused (batch-generator, capture, ecosystem-guide, etc.)\n- CF4 Complete Program (flagship, 6 sub-pages)\n- Categories: Training, Wellness, Progress, Mindset, Visual, Fun, Creative\n\n## Music (36 MP3 files, ~/dev/titan-forge/audio/)\n- Manifest: audio/manifest.json\n- 8 categories per manifest\n- BLOCKED: Audio 404s on Vercel (gitignored)\n- Needs CDN solution or Vercel config change\n\n## Status\n- All 17 PDFs verified (exist, >0 bytes)\n- All 49 referenced tools verified (exist)\n- Music plays locally but 404s on Vercel\n- TBV: Gabo to verify quality, branding, completeness',
+        description:'Complete asset inventory for bonus vault — to be verified', tags:['assets','inventory','tbv'], created:now, updated:now },
+      { id:'kb_bonus_phases', projectId:'proj_saturno_bonus', name:'Build Phases — Completion Status', type:'md', storage:'inline',
+        content:'# Bonus Page Build Phases\n\n## Phase 0: Lock Public Surface\nStatus: DONE (no internal tools exposed on bonus.html)\n\n## Phase 1: Brand Overlay\nStatus: DONE (meta tags, favicon, title updated)\n\n## Phase 2: Mobile-First Hardening\nStatus: DONE (touch targets, responsive already solid)\n\n## Phase 3: Content Integrity\nStatus: DONE (17/17 PDFs, 49/49 tools verified)\n\n## Phase 4: Gate Polish\nStatus: DONE (shake animation, 7-day cookie, auto-redirect)\n\n## Phase 5: Analytics + Email\nStatus: DONE (Vercel Analytics + Brevo email form)\nBlocker: Needs BREVO_API_KEY + BREVO_LIST_ID in Vercel env\n\n## Phase 6: Community Launch\nStatus: WAITING (Gabo decides when)\n\n## Remaining for Gabo\n- Set domain (bonus.saturnomovement.com)\n- Add BREVO_API_KEY + BREVO_LIST_ID to Vercel\n- Organize PDFs (quality check)\n- Organize music into albums with artwork\n- Final mobile QA on his devices',
+        description:'Phase completion tracking', tags:['phases','status','progress'], created:now, updated:now }
+    );
+    save();
+  }
 }
 
 function seedKernel() {
