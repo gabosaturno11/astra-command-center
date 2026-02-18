@@ -41,11 +41,12 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    if (ADMIN_PASSWORD) {
-      const auth = req.headers.authorization;
-      if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) {
-        return res.status(401).json({ ok: false, error: 'Unauthorized' });
-      }
+    if (!ADMIN_PASSWORD) {
+      return res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' });
+    }
+    const auth = req.headers.authorization;
+    if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) {
+      return res.status(401).json({ ok: false, error: 'Unauthorized' });
     }
     if (!token) {
       return res.status(503).json({ ok: false, error: 'BLOB_READ_WRITE_TOKEN not configured' });
