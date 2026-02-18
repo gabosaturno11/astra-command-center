@@ -2576,36 +2576,44 @@ function copyProjectMD() {
 }
 
 // === VOICE INPUT ===
-let voiceTarget = null, voiceRecog = null, voiceActive = false;
-function initVoice() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR) return;
-  voiceRecog = new SR();
-  voiceRecog.continuous = true;
-  voiceRecog.interimResults = true;
-  voiceRecog.lang = 'en-US';
-  voiceRecog.onresult = e => {
-    let final = '', interim = '';
-    for(let i = e.resultIndex; i < e.results.length; i++) {
-      if(e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim += e.results[i][0].transcript;
-    }
-    if(final) {
-      const el = voiceTarget === 'writer' ? document.getElementById('writer-editor') : document.querySelector('.specs-section-editor:focus') || document.querySelector('.specs-section-editor');
-      if(el) { el.focus(); document.execCommand('insertText', false, final + ' '); if(voiceTarget==='writer') onWriterChange(); else onSpecChange(); }
-      logTranscript(final, 'astra-voice-' + (voiceTarget || 'unknown'));
-    }
-  };
-  voiceRecog.onerror = e => { if(e.error !== 'no-speech') { voiceActive = false; updateVoiceUI(); }};
-  voiceRecog.onend = () => { if(voiceActive) voiceRecog.start(); };
-}
-function toggleVoice(target) {
-  if(!voiceRecog) { toast('Voice not supported in this browser'); return; }
+let voiceTarget = null, voiceActive = false, voiceRecorder = null, voiceChunks = [];
+function initVoice() { /* MediaRecorder init happens on toggle */ }
+async function toggleVoice(target) {
   voiceTarget = target;
-  voiceActive = !voiceActive;
-  if(voiceActive) { try { voiceRecog.start(); } catch(e){} toast('Listening...'); }
-  else { voiceRecog.stop(); toast('Voice stopped'); }
-  updateVoiceUI();
+  if(voiceActive && voiceRecorder && voiceRecorder.state === 'recording') {
+    voiceRecorder.stop();
+    voiceActive = false;
+    updateVoiceUI();
+    toast('Processing with Whisper...');
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    voiceChunks = [];
+    voiceRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+    voiceRecorder.ondataavailable = e => { if(e.data.size > 0) voiceChunks.push(e.data); };
+    voiceRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      const blob = new Blob(voiceChunks, { type: 'audio/webm' });
+      if(blob.size < 100) { toast('Recording too short'); return; }
+      toast('Transcribing...');
+      try {
+        const fd = new FormData();
+        fd.append('audio', blob, 'recording.webm');
+        const res = await fetch(ASTRA_API + '/api/transcribe', { method: 'POST', body: fd });
+        const data = await res.json();
+        if(data.ok && data.text) {
+          const el = voiceTarget === 'writer' ? document.getElementById('writer-editor') : document.querySelector('.specs-section-editor:focus') || document.querySelector('.specs-section-editor');
+          if(el) { el.focus(); document.execCommand('insertText', false, data.text + ' '); if(voiceTarget==='writer') onWriterChange(); else onSpecChange(); }
+          toast('Whisper: ' + data.text.substring(0, 60) + (data.text.length > 60 ? '...' : ''));
+        } else { toast('Transcription failed: ' + (data.error || 'unknown')); }
+      } catch(e) { toast('Whisper error: ' + e.message); }
+    };
+    voiceRecorder.start();
+    voiceActive = true;
+    updateVoiceUI();
+    toast('Recording... click again to stop');
+  } catch(e) { toast('Mic access denied'); }
 }
 function updateVoiceUI() {
   const wb = document.getElementById('writer-voice-btn'), sb = document.getElementById('specs-voice-btn');
