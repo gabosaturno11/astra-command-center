@@ -20,6 +20,14 @@
 import { put, list } from '@vercel/blob';
 
 const PIPELINE_INDEX = 'pipeline-index.json';
+const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
+
+function checkAuth(req, res) {
+  if (!ADMIN_PASSWORD) { res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' }); return false; }
+  const auth = req.headers.authorization;
+  if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) { res.status(401).json({ ok: false, error: 'Unauthorized' }); return false; }
+  return true;
+}
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -145,6 +153,7 @@ async function getPipelineIndex(token) {
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
+  if (!checkAuth(req, res)) return;
 
   const openaiKey = process.env.OPENAI_API_KEY;
   if (!openaiKey) {

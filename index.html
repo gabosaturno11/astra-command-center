@@ -2950,7 +2950,7 @@ async function toggleVoice(target) {
       try {
         const fd = new FormData();
         fd.append('audio', blob, 'recording.webm');
-        const res = await fetch(ASTRA_API + '/api/transcribe', { method: 'POST', body: fd });
+        const res = await fetch(ASTRA_API + '/api/transcribe', { method: 'POST', headers: { 'Authorization': 'Bearer ' + ASTRA_ADMIN_PW }, body: fd });
         const data = await res.json();
         if(data.ok && data.text) {
           const el = voiceTarget === 'writer' ? document.getElementById('writer-editor') : document.querySelector('.specs-section-editor:focus') || document.querySelector('.specs-section-editor');
@@ -3966,7 +3966,7 @@ async function queryAstra(type, params) {
   try {
     const res = await fetch(ASTRA_API + '/api/query', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ASTRA_ADMIN_PW },
       body: JSON.stringify({ type, ...params })
     });
     return await res.json();
@@ -4148,9 +4148,9 @@ async function plProcess() {
       fd.append('audio',plAudioBlob,plAudioBlob.name||'recording.webm');
       fd.append('prompt',prompt);
       fd.append('source',source);
-      res=await fetch(ASTRA_API+'/api/pipeline',{method:'POST',body:fd});
+      res=await fetch(ASTRA_API+'/api/pipeline',{method:'POST',headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW},body:fd});
     } else {
-      res=await fetch(ASTRA_API+'/api/pipeline',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:plTranscriptText,prompt:prompt,source:source})});
+      res=await fetch(ASTRA_API+'/api/pipeline',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ASTRA_ADMIN_PW},body:JSON.stringify({text:plTranscriptText,prompt:prompt,source:source})});
     }
     const data=await res.json();
     if(data.ok) {
@@ -4198,7 +4198,7 @@ async function plLoadHistory() {
   if(histDiv.style.display==='none') return;
   listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Loading...</div>';
   try {
-    const res=await fetch(ASTRA_API+'/api/pipeline');
+    const res=await fetch(ASTRA_API+'/api/pipeline',{headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW}});
     const data=await res.json();
     if(data.ok && data.results && data.results.length>0) {
       listDiv.innerHTML=data.results.map(r=>'<div style="padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;margin-bottom:6px;cursor:pointer" onclick="plViewEntry(\''+r.id+'\')"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--accent)">'+r.inputType+'</span><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleString()+'</span></div><div style="font-size:10px;color:var(--text-muted)">'+esc(r.prompt||'')+'</div><div style="font-size:11px;margin-top:4px">'+esc((r.preview||'').substring(0,100))+'</div></div>').join('');
@@ -4212,7 +4212,7 @@ async function plLoadHistory() {
 
 async function plViewEntry(id) {
   try {
-    const res=await fetch(ASTRA_API+'/api/pipeline');
+    const res=await fetch(ASTRA_API+'/api/pipeline',{headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW}});
     const data=await res.json();
     const entry=(data.results||[]).find(r=>r.id===id);
     if(entry) {

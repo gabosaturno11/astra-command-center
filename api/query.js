@@ -15,6 +15,7 @@
 import { list } from '@vercel/blob';
 
 const STATE_FILENAME = 'astra-workspace-state.json';
+const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,6 +50,10 @@ export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'POST only' });
+
+  if (!ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' });
+  const auth = req.headers.authorization;
+  if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).json({ ok: false, error: 'Unauthorized' });
 
   const state = await getState();
   if (!state) {
