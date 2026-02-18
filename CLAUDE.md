@@ -42,7 +42,64 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-17 session)
+## CURRENT STATE (Updated: 2026-02-18 session)
+
+### PENDING: APPLE NOTES EXTRACTION (Feb 18)
+- Script READY at ~/dev/astra-command-center/scripts/extract-apple-notes.sh
+- Bash 3.2 compatible (no associative arrays)
+- BLOCKED: macOS automation permission denied (-1743)
+- TO UNBLOCK: System Settings > Privacy & Security > Automation > Terminal > toggle ON for Notes
+- OR run: `tccutil reset AppleEvents com.apple.Terminal` then retry `osascript -e 'tell application "Notes" to return name of folder 1'`
+- Once unblocked, run: `~/dev/astra-command-center/scripts/extract-apple-notes.sh`
+- Script does: READ-ONLY extraction of ALL notes, classifies by type (CAPTION/QUOTE/BOOK_DRAFT/POEM/IDEA/EMAIL/CONTENT), appends #claudewashere tag, outputs .md + .csv to Desktop
+- Handles duplicates (skips re-tagging notes that already have #claudewashere)
+- This is Gabo's 3rd extraction attempt — next step after extraction is organizing into Google Docs and deduplicating across all 3 runs
+- Log: /tmp/apple-notes-extraction.log
+
+### ASTRA FUNCTIONAL AUDIT (Feb 18) — "Still not a functional hub"
+
+Gabo confirmed: ASTRA is not usable for daily work yet. Full audit below.
+
+| Section | Usable | Verdict |
+|---------|--------|---------|
+| Tasks | 50% | Cards are 1-line (title only), no subtasks, no templates, no recurrence |
+| Calendar | 20% | Month-only, no week/day, no time blocks, no Google sync |
+| Content | 40% | Shallow list, no inline editing, no bulk ops |
+| Writer | 75% | BEST section — full editor, versions, export work |
+| Living Docs | 80% | Good structure, title-overwrite bug FIXED (d77eeb2) |
+| Links | 70% | Working directory, no previews or validation |
+| Whiteboard | 85% | Full canvas tools, solid |
+| Cmd+K | 95% | Excellent fuzzy search |
+| Pipeline | 40% | UI exists, Whisper backend not wired |
+| Repos | 5% | EMPTY SKELETON — reposRefresh() is blank |
+| Project Panel | 80% | Works well, missing stats |
+| Context Panel | 50% | Timer + stats but limited |
+| Cloud Save | 0% | API endpoints exist (api/state.js) but frontend NOT connected. NEEDS BLOB_READ_WRITE_TOKEN in Vercel |
+| Shortcuts | 60% | Some work, Cmd+Shift+N not wired |
+| Mobile | 40% | Responsive CSS exists but untested |
+
+PRIORITY FIXES TO MAKE ASTRA A REAL HUB:
+1. Tasks: show description in cards, add subtasks, add inline editing
+2. Cloud sync: wire cloudSave()/cloudLoad() to auto-sync, add BLOB_READ_WRITE_TOKEN to Vercel
+3. Calendar: add week view, task creation from date clicks
+4. Repos: wire GitHub API to show repo status
+5. Task board cards: show priority, due date, description preview, project badge
+
+### OVERNIGHT DEEP AUDIT RESULTS (Feb 18, completed 2:24 AM)
+- Script: ~/dev/astra-command-center/scripts/overnight-deep-audit.sh
+- Report: ~/dev/astra-command-center/logs/OVERNIGHT_DEEP_AUDIT_20260218_014133.md (32,735 lines)
+- Raw data: ~/dev/astra-command-center/logs/raw/
+- Findings: 107 git repos, 32 Vercel configs, 4,540 HTML apps, 26 node_modules, 360 package.json, 8,962 large files (>50MB)
+- All 15 phases completed successfully
+- GitHub Pages live check: 8 sites responding (AI-Hub, interactive-toc-editor, saturno-hub, saturno-newsletter, saturno-solar-system, victory-belt-cc, Saturno-Writing-hub, saturno-writting-hub)
+
+### saturno-legion (found at ~/saturno-legion/, NOT in ~/dev/)
+- Built Jan 20, 2026 by previous Claude session
+- 10-project architecture scaffold (kernel, linguistic, book, content, saas, bf25, research, automation, life-ops, archive)
+- 7 Notion templates, 3 n8n workflows, MCP server for Notion, Writing Hub Next.js scaffold
+- Prompts dir is EMPTY, nothing deployed, no API keys configured
+- NOT in canonical ~/dev/ location
+- Status: scaffold without substance — structure exists but nothing wired or running
 
 ### REPOS (all in ~/dev/)
 
