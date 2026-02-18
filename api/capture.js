@@ -66,7 +66,7 @@ export default async function handler(req, res) {
       if (captures.length > 2000) captures.length = 2000;
 
       await put(CAPTURES_FILE, JSON.stringify(captures, null, 2), {
-        access: 'public', addRandomSuffix: false, token
+        access: 'public', addRandomSuffix: false, allowOverwrite: true, token
       });
 
       return res.status(200).json({ ok: true, id: capture.id, capture });

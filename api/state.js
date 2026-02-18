@@ -45,6 +45,7 @@ async function saveState(state) {
   await put(STATE_FILENAME, JSON.stringify(state), {
     access: 'public',
     addRandomSuffix: false,
+    allowOverwrite: true,
     token
   });
 
