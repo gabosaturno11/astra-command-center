@@ -42,16 +42,43 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-16 session)
+## CURRENT STATE (Updated: 2026-02-17 session)
 
 ### REPOS (all in ~/dev/)
 
 | Repo | Path | Live URL | Latest Commit |
 |------|------|----------|---------------|
-| saturno-bonus | ~/dev/saturno-bonus/ | saturno-bonus-omega.vercel.app | `763d96c` |
-| titan-forge | ~/dev/titan-forge/ | titan-forge-ten.vercel.app | (check) |
-| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `804bfdd` |
-| de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno-jet.vercel.app | (check) |
+| saturno-bonus | ~/dev/saturno-bonus/ | saturno-bonus-omega.vercel.app | (check git log) |
+| titan-forge | ~/dev/titan-forge/ | titan-forge-ten.vercel.app | (check git log) |
+| astra-command-center | ~/dev/astra-command-center/ | astra-command-center-sigma.vercel.app | `7f7c435` |
+| de-aqui-a-saturno | ~/dev/de-aqui-a-saturno/ | de-aqui-a-saturno-jet.vercel.app | (check git log) |
+| nexus-capture | ~/dev/nexus-capture/ | github.com/gabosaturno11/nexus-capture | `9d639d0` |
+
+### ASTRA BACKEND (Feb 17 session)
+- Added backend API to ASTRA (was localStorage-only before)
+- package.json with @vercel/blob dependency
+- vercel.json with API rewrites
+- api/state.js: save/load workspace state to Vercel Blob
+- api/transcripts.js: log voice transcripts with index
+- api/query.js: query specs, bottlenecks, KB, tasks, projects, full-text search
+- api/capture.js: receive captures from extension/system-wide capture
+- api/health.js: health check for extension connectivity
+- Frontend: cloudSave(), cloudLoad(), Cmd+S now syncs to cloud
+- Voice input now logs transcripts to backend automatically
+- NEEDS: BLOB_READ_WRITE_TOKEN env var in Vercel to activate
+
+### NEXUS CAPTURE (Feb 17 session)
+- New repo: ~/dev/nexus-capture/ (moved from titan-forge/saturno-capture-extension/)
+- Chrome extension (Manifest V3) for universal highlight capture
+- 8 categories: idea, quote, code, insight, todo, book, research, thought
+- Routes to ASTRA backend (was beast-api, now astra-command-center-sigma)
+- Keyboard shortcut: Cmd+Shift+S
+- Fixed: double-click bug (selection now stored on mouseup, not on button click)
+- System-wide capture tools: capture-highlight.sh, whisper-transcribe.sh, record-and-transcribe.sh
+- whisper-api-transcribe.sh for cloud Whisper via OpenAI API
+- macOS Automator Quick Action installed (Services menu: "Nexus Capture")
+- faster-whisper installed locally in ~/dev/.whisper-env/ (Python venv)
+- OpenAI SDK also installed for API-based transcription
 
 ### ASTRA COMMAND CENTER — V2.0 UPGRADE (Feb 16 session)
 - Full v2.0 upgrade to "SATURNO HUB v2.0 - Command Center"
