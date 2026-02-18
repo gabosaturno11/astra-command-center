@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#050508" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="planet-grad" cx="38%" cy="32%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#d4d4d8"/>
+      <stop offset="100%" stop-color="#a1a1aa"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#050508"/>
+
+  <!-- Outer glow -->
+  <circle cx="256" cy="256" r="220" fill="url(#glow)"/>
+
+  <!-- Planet body - white -->
+  <circle cx="256" cy="256" r="140" fill="url(#planet-grad)"/>
+
+  <!-- Planet surface curves -->
+  <ellipse cx="256" cy="215" rx="115" ry="16" fill="none" stroke="#050508" stroke-width="1" stroke-opacity="0.08"/>
+  <ellipse cx="256" cy="260" rx="132" ry="20" fill="none" stroke="#050508" stroke-width="1" stroke-opacity="0.06"/>
+  <ellipse cx="256" cy="300" rx="110" ry="14" fill="none" stroke="#050508" stroke-width="1" stroke-opacity="0.05"/>
+
+  <!-- Ring behind planet -->
+  <ellipse cx="256" cy="256" rx="200" ry="48" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.7" transform="rotate(-18, 256, 256)"/>
+  <ellipse cx="256" cy="256" rx="215" ry="40" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.3" transform="rotate(-18, 256, 256)"/>
+
+  <!-- Center cosmic element - star nova -->
+  <g transform="translate(256, 256)">
+    <!-- Core -->
+    <circle cx="0" cy="0" r="6" fill="#050508"/>
+    <circle cx="0" cy="0" r="12" fill="#050508" opacity="0.4"/>
+
+    <!-- Cross rays -->
+    <line x1="0" y1="-18" x2="0" y2="-50" stroke="#050508" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <line x1="0" y1="18" x2="0" y2="50" stroke="#050508" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <line x1="-18" y1="0" x2="-50" y2="0" stroke="#050508" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+    <line x1="18" y1="0" x2="50" y2="0" stroke="#050508" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+
+    <!-- Diagonal rays -->
+    <line x1="-13" y1="-13" x2="-35" y2="-35" stroke="#050508" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <line x1="13" y1="-13" x2="35" y2="-35" stroke="#050508" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <line x1="-13" y1="13" x2="-35" y2="35" stroke="#050508" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+    <line x1="13" y1="13" x2="35" y2="35" stroke="#050508" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+
+    <!-- Orbiting dots -->
+    <circle cx="-40" cy="-22" r="3" fill="#050508" opacity="0.3"/>
+    <circle cx="45" cy="-12" r="2.5" fill="#050508" opacity="0.25"/>
+    <circle cx="-28" cy="40" r="2" fill="#050508" opacity="0.2"/>
+    <circle cx="38" cy="32" r="3" fill="#050508" opacity="0.25"/>
+  </g>
+
+  <!-- Small stars -->
+  <circle cx="75" cy="85" r="2" fill="#fff" opacity="0.4"/>
+  <circle cx="430" cy="70" r="1.5" fill="#fff" opacity="0.3"/>
+  <circle cx="55" cy="410" r="2" fill="#fff" opacity="0.25"/>
+  <circle cx="445" cy="430" r="1.5" fill="#fff" opacity="0.35"/>
+  <circle cx="125" cy="455" r="1" fill="#fff" opacity="0.2"/>
+  <circle cx="395" cy="145" r="2" fill="#fff" opacity="0.25"/>
+</svg>

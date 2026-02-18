@@ -1,5 +1,5 @@
-const CACHE_NAME = 'saturno-hub-v1';
-const ASSETS = ['/', '/index.html', '/planet-logo.png'];
+const CACHE_NAME = 'saturno-hub-v2';
+const ASSETS = ['/', '/index.html', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
