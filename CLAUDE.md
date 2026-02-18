@@ -132,6 +132,12 @@ The bonus page was moved from titan-forge to saturno-bonus. All future bonus wor
 
 ---
 
+## FIRST THING YOU DO — READ ASTRA KB
+
+Before ANY work, read the ASTRA Knowledge Base for ALL active projects. The KB is embedded in ~/dev/astra-command-center/index.html as seed data inside `seedProjects()` and `migrateV2()` functions. Search for all `kb_` items. Read EVERY KB entry — they contain deployment status, shipping plans, session logs, Gabo rules, messages backend state, asset catalogs, build summaries, and handoff blocks. This is your most current context across ALL projects.
+
+**How to read:** `grep -A 5 "id:'kb_" ~/dev/astra-command-center/index.html` — then read each item's full `body` field.
+
 ## FILES YOU NEED
 
 | File | Path | What It Is |
@@ -139,6 +145,7 @@ The bonus page was moved from titan-forge to saturno-bonus. All future bonus wor
 | Bonus page | ~/dev/saturno-bonus/index.html | THE main deliverable (1,546 lines) |
 | Gabo messages | ~/dev/saturno-bonus/logs/gabo-messages.json | 25+ messages with context — READ ALL |
 | Full convos | ~/dev/astra-command-center/logs/full convos gabo will save until claude solves this/ | READ THIS |
+| ASTRA KB | ~/dev/astra-command-center/index.html | Search `kb_` items in seedProjects()/migrateV2() — READ ALL KB entries |
 | ASTRA app | ~/dev/astra-command-center/index.html | Only if Gabo says "ASTRA" |
 
 ---
