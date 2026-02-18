@@ -35,6 +35,10 @@ export default async function handler(req, res) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
 
   if (req.method === 'GET') {
+    if (!ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' });
+    const auth = req.headers.authorization;
+    if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).json({ ok: false, error: 'Unauthorized' });
+
     if (!token) return res.status(200).json({ captures: [], _source: 'none' });
     const captures = await getCaptures(token);
     return res.status(200).json({ captures, count: captures.length, _source: 'blob' });
