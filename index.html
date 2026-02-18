@@ -276,6 +276,46 @@ textarea{resize:vertical;line-height:1.6}
 .writer-statusbar{display:flex;align-items:center;gap:16px;padding:4px 12px;border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--text-muted);flex-shrink:0}
 .writer-right-panel{width:240px;border-left:1px solid var(--border);display:flex;flex-direction:column;background:linear-gradient(180deg, #080810 0%, #060608 100%);flex-shrink:0;overflow-y:auto;padding:12px}
 .writer-right-panel.hidden{display:none}
+
+/* ZEN WRITER — Full-screen distraction-free writing overlay */
+.zen-writer{position:fixed;inset:0;z-index:2000;background:var(--bg-void);display:none;flex-direction:column;opacity:0;transition:opacity 0.3s cubic-bezier(0.4,0,0.2,1)}
+.zen-writer.open{display:flex;opacity:1}
+.zen-writer-topbar{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--border);flex-shrink:0;background:linear-gradient(180deg, rgba(10,10,14,0.95) 0%, rgba(5,5,8,0.95) 100%);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.zen-doc-picker{background:var(--bg-input);border:1px solid var(--border);color:var(--text);font-size:11px;padding:5px 10px;border-radius:var(--radius);cursor:pointer;max-width:220px}
+.zen-doc-picker:focus{outline:none;border-color:var(--accent)}
+.zen-toolbar{display:flex;align-items:center;gap:1px;flex:1;justify-content:center;flex-wrap:wrap}
+.zen-tb{width:30px;height:30px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;font-weight:600}
+.zen-tb:hover{background:var(--bg-hover);color:var(--text)}
+.zen-tb.active{background:var(--accent-glow);color:var(--accent)}
+.zen-tb-sep{width:1px;height:20px;background:var(--border);margin:0 6px}
+.zen-tb-select{background:var(--bg-input);border:1px solid var(--border);color:var(--text-secondary);font-size:11px;padding:4px 8px;border-radius:var(--radius);cursor:pointer}
+.zen-tb-select:focus{outline:none;border-color:var(--accent)}
+.zen-close-btn{width:30px;height:30px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;border-radius:6px;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.12s;margin-left:8px}
+.zen-close-btn:hover{background:rgba(248,113,113,0.15);color:var(--red)}
+.zen-body{flex:1;display:flex;flex-direction:column;overflow:hidden;max-width:780px;width:100%;margin:0 auto;padding:0 24px}
+.zen-title{background:transparent;border:none;color:var(--text);font-size:28px;font-weight:700;padding:32px 0 12px;width:100%;letter-spacing:-0.5px;line-height:1.2}
+.zen-title:focus{outline:none}
+.zen-title::placeholder{color:var(--text-muted)}
+.zen-editor{flex:1;overflow-y:auto;padding:0 0 80px;font-size:17px;line-height:2;color:rgba(255,255,255,0.78);outline:none;caret-color:var(--accent);letter-spacing:0.01em}
+.zen-editor:empty::before{content:attr(data-placeholder);color:var(--text-muted);font-style:italic}
+.zen-editor h1{font-size:28px;font-weight:700;color:var(--text);margin:28px 0 10px;line-height:1.3;letter-spacing:-0.3px}
+.zen-editor h2{font-size:22px;font-weight:600;color:var(--text);margin:24px 0 8px;letter-spacing:-0.2px}
+.zen-editor h3{font-size:17px;font-weight:600;color:var(--text);margin:20px 0 6px}
+.zen-editor p{margin-bottom:16px}
+.zen-editor blockquote{border-left:3px solid var(--accent);padding:4px 0 4px 20px;margin:16px 0;color:rgba(255,255,255,0.45);font-style:italic}
+.zen-editor ul,.zen-editor ol{margin:10px 0;padding-left:28px}
+.zen-editor li{margin-bottom:6px}
+.zen-editor code{background:rgba(74,222,160,0.08);padding:2px 6px;border-radius:4px;font-family:var(--mono);font-size:15px;color:var(--accent)}
+.zen-editor pre{background:var(--bg-surface);padding:16px;border-radius:var(--radius);font-family:var(--mono);font-size:13px;overflow-x:auto;margin:16px 0;border:1px solid var(--border);line-height:1.6}
+.zen-editor hr{border:none;border-top:1px solid var(--border);margin:28px 0}
+.zen-editor a{color:var(--accent-cyan);text-decoration:underline;text-underline-offset:2px}
+.zen-editor ::selection{background:rgba(74,222,160,0.2)}
+.zen-statusbar{display:flex;align-items:center;gap:20px;padding:8px 24px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--text-muted);flex-shrink:0;max-width:780px;width:100%;margin:0 auto}
+.zen-statusbar span{transition:color 0.2s}
+.zen-fab{position:fixed;bottom:20px;right:20px;z-index:900;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,rgba(74,222,160,0.15) 0%,rgba(34,211,238,0.1) 100%);border:1px solid rgba(74,222,160,0.25);color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:all 0.2s;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.zen-fab:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(74,222,160,0.2);border-color:var(--accent)}
+.zen-fab svg{opacity:0.8}
+.zen-fab:hover svg{opacity:1}
 .writer-version-item{padding:8px;border-radius:var(--radius);cursor:pointer;transition:all 0.15s;margin-bottom:4px;border:1px solid var(--border)}
 .writer-version-item:hover{background:var(--bg-hover);border-color:var(--border-hover)}
 .writer-version-title{font-size:10px;color:var(--text);font-weight:500}
@@ -1146,6 +1186,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Context Panel</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+E</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Focus Mode</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+\</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Save Version</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+S</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Zen Writer</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+W</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Close/Escape</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Esc</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Show Shortcuts</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+/</span></div>
         <div style="font-weight:600;color:var(--text);margin:12px 0 8px">Whiteboard</div>
@@ -1346,6 +1387,65 @@ textarea{resize:vertical;line-height:1.6}
     </div>
   </div>
 </div>
+
+<!-- ZEN WRITER — Full-screen writing environment (Cmd+Shift+W or FAB) -->
+<div class="zen-writer" id="zen-writer">
+  <div class="zen-writer-topbar">
+    <select class="zen-doc-picker" id="zen-doc-picker" onchange="zenPickDoc(this.value)"></select>
+    <button class="zen-tb" onclick="zenNewDoc()" title="New Document" style="font-size:11px;width:auto;padding:0 8px;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg> New</button>
+    <div class="zen-toolbar">
+      <select class="zen-tb-select" id="zen-block-type" onchange="zenExecBlock(this.value)">
+        <option value="p">Paragraph</option>
+        <option value="h1">Heading 1</option>
+        <option value="h2">Heading 2</option>
+        <option value="h3">Heading 3</option>
+        <option value="blockquote">Quote</option>
+        <option value="pre">Code Block</option>
+      </select>
+      <div class="zen-tb-sep"></div>
+      <button class="zen-tb" onclick="zenCmd('bold')" title="Bold (Cmd+B)"><b>B</b></button>
+      <button class="zen-tb" onclick="zenCmd('italic')" title="Italic (Cmd+I)"><i>I</i></button>
+      <button class="zen-tb" onclick="zenCmd('underline')" title="Underline (Cmd+U)"><u>U</u></button>
+      <button class="zen-tb" onclick="zenCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+      <div class="zen-tb-sep"></div>
+      <button class="zen-tb" onclick="zenCmd('insertUnorderedList')" title="Bullet List"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
+      <button class="zen-tb" onclick="zenCmd('insertOrderedList')" title="Numbered List"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6h11M10 12h11M10 18h11M3 5v3h2M4 8H3M5 18H3l2-3H3"/></svg></button>
+      <button class="zen-tb" onclick="zenCmd('indent')" title="Indent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8l4 4-4 4M12 4h9M12 12h9M12 20h9"/></svg></button>
+      <button class="zen-tb" onclick="zenCmd('outdent')" title="Outdent"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8L3 12l4 4M12 4h9M12 12h9M12 20h9"/></svg></button>
+      <div class="zen-tb-sep"></div>
+      <button class="zen-tb" onclick="zenInsertLink()" title="Insert Link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></button>
+      <button class="zen-tb" onclick="zenInsertHR()" title="Horizontal Rule"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg></button>
+      <button class="zen-tb" onclick="zenInsertCode()" title="Inline Code"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></button>
+      <div class="zen-tb-sep"></div>
+      <button class="zen-tb" onclick="zenClearFormat()" title="Clear Formatting"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg></button>
+    </div>
+    <button class="zen-tb" onclick="zenSaveVersion()" title="Save Version (Cmd+S)" style="font-size:10px;width:auto;padding:0 8px;gap:4px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg> Save</button>
+    <select class="zen-tb-select" id="zen-export-sel" onchange="zenExport(this.value);this.selectedIndex=0">
+      <option value="">Export</option>
+      <option value="md">Markdown</option>
+      <option value="html">HTML</option>
+      <option value="txt">Plain Text</option>
+      <option value="clipboard">Copy All</option>
+    </select>
+    <button class="zen-close-btn" onclick="zenClose()" title="Close (Esc)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+  </div>
+  <div class="zen-body">
+    <input type="text" class="zen-title" id="zen-title" placeholder="Untitled Document" oninput="zenOnChange()">
+    <div class="zen-editor" id="zen-editor" contenteditable="true" data-placeholder="Start writing..." oninput="zenOnChange()" onkeydown="zenKeydown(event)"></div>
+  </div>
+  <div class="zen-statusbar">
+    <span id="zen-words">0 words</span>
+    <span id="zen-chars">0 chars</span>
+    <span id="zen-reading">0 min read</span>
+    <span id="zen-goal" style="cursor:pointer" onclick="zenSetGoal()" title="Set word goal"></span>
+    <span id="zen-saved" style="margin-left:auto">Saved</span>
+  </div>
+</div>
+
+<!-- Floating Write Button -->
+<button class="zen-fab" id="zen-fab" onclick="zenOpen()" title="Open Writer (Cmd+Shift+W)">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+</button>
 
 <div class="toast" id="toast"></div>
 
@@ -1845,6 +1945,171 @@ function restoreVersion(i){const d=getActiveDoc();if(!d||!d.versions[i])return;c
 function toggleWriterPanel(){writerPanelOpen=!writerPanelOpen;document.getElementById('writer-right-panel').classList.toggle('hidden',!writerPanelOpen);}
 function writerExport(fmt){const d=getActiveDoc();if(!d||!fmt)return;const t=d.title||'untitled',e=document.getElementById('writer-editor');if(fmt==='clipboard'){navigator.clipboard.writeText(e.innerText);toast('Copied');return;}let c,m,x;if(fmt==='txt'){c=e.innerText;m='text/plain';x='txt';}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px}h2{font-size:22px}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow-x:auto}</style></head><body><h1>${esc(t)}</h1>${e.innerHTML}</body></html>`;m='text/html';x='html';}else if(fmt==='md'){c=htmlToMd(e.innerHTML,t);m='text/markdown';x='md';}const blob=new Blob([c],{type:m});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+x;a.click();toast('Exported .'+x);}
 function htmlToMd(html,title){let md='# '+(title||'Untitled')+'\n\n';const tmp=document.createElement('div');tmp.innerHTML=html;const walk=n=>{if(n.nodeType===3)return n.textContent;if(n.nodeType!==1)return'';const tag=n.tagName.toLowerCase(),ch=Array.from(n.childNodes).map(walk).join('');switch(tag){case'h1':return'\n# '+ch+'\n\n';case'h2':return'\n## '+ch+'\n\n';case'h3':return'\n### '+ch+'\n\n';case'p':return ch+'\n\n';case'br':return'\n';case'strong':case'b':return'**'+ch+'**';case'em':case'i':return'*'+ch+'*';case'code':return'`'+ch+'`';case'pre':return'\n```\n'+ch+'\n```\n\n';case'blockquote':return'\n> '+ch.replace(/\n/g,'\n> ')+'\n\n';case'ul':return'\n'+ch+'\n';case'ol':return'\n'+ch+'\n';case'li':return'- '+ch+'\n';case'a':return'['+ch+']('+n.href+')';case'hr':return'\n---\n\n';case'div':return ch+'\n';default:return ch;}};md+=Array.from(tmp.childNodes).map(walk).join('');return md.replace(/\n{3,}/g,'\n\n').trim()+'\n';}
+
+// === ZEN WRITER (full-screen distraction-free) ===
+let zenDocId = null;
+let zenTimer = null;
+let zenIsOpen = false;
+
+function zenOpen(docId) {
+  zenIsOpen = true;
+  const zw = document.getElementById('zen-writer');
+  // Snapshot current writer state if in writer section
+  if(currentSection === 'writer') snapshotWriter();
+  // Pick doc
+  if(docId) { zenDocId = docId; }
+  else if(!zenDocId) { zenDocId = S.activeDoc || (S.docs[0] && S.docs[0].id); }
+  zenRenderPicker();
+  zenLoadDoc();
+  zw.classList.add('open');
+  document.getElementById('zen-fab').style.display = 'none';
+  setTimeout(function(){ document.getElementById('zen-editor').focus(); }, 100);
+}
+
+function zenClose() {
+  zenSnapshot();
+  save();
+  zenIsOpen = false;
+  document.getElementById('zen-writer').classList.remove('open');
+  document.getElementById('zen-fab').style.display = '';
+  // Sync back to writer section if active
+  if(currentSection === 'writer') { renderWriter(); }
+}
+
+function zenRenderPicker() {
+  const sel = document.getElementById('zen-doc-picker');
+  sel.innerHTML = S.docs.map(function(d) {
+    return '<option value="' + d.id + '"' + (d.id === zenDocId ? ' selected' : '') + '>' + esc(d.title || 'Untitled') + ' (' + countW(d.body) + 'w)</option>';
+  }).join('');
+}
+
+function zenPickDoc(id) {
+  zenSnapshot();
+  save();
+  zenDocId = parseInt(id) || id;
+  zenLoadDoc();
+}
+
+function zenLoadDoc() {
+  var d = S.docs.find(function(x){ return x.id == zenDocId; });
+  if(!d && S.docs.length) { d = S.docs[0]; zenDocId = d.id; }
+  if(!d) return;
+  document.getElementById('zen-title').value = d.title || '';
+  document.getElementById('zen-editor').innerHTML = d.body || '';
+  zenUpdateStats();
+}
+
+function zenSnapshot() {
+  var d = S.docs.find(function(x){ return x.id == zenDocId; });
+  if(!d) return;
+  var t = document.getElementById('zen-title');
+  var e = document.getElementById('zen-editor');
+  if(!t || !e) return;
+  d.title = t.value;
+  d.body = e.innerHTML;
+  d.updated = new Date().toISOString();
+}
+
+function zenOnChange() {
+  clearTimeout(zenTimer);
+  document.getElementById('zen-saved').textContent = 'Unsaved';
+  document.getElementById('zen-saved').style.color = 'var(--yellow)';
+  zenTimer = setTimeout(function() {
+    zenSnapshot();
+    save();
+    zenRenderPicker();
+    document.getElementById('zen-saved').textContent = 'Saved';
+    document.getElementById('zen-saved').style.color = 'var(--green)';
+  }, 800);
+  zenUpdateStats();
+}
+
+function zenUpdateStats() {
+  var e = document.getElementById('zen-editor');
+  var t = e.innerText || '';
+  var w = t.trim().split(/\s+/).filter(function(x){ return x.length; }).length;
+  document.getElementById('zen-words').textContent = w + ' words';
+  document.getElementById('zen-chars').textContent = t.length + ' chars';
+  document.getElementById('zen-reading').textContent = Math.max(1, Math.ceil(w / 238)) + ' min read';
+  var d = S.docs.find(function(x){ return x.id == zenDocId; });
+  var goal = d && d.wordGoal ? d.wordGoal : 0;
+  var goalEl = document.getElementById('zen-goal');
+  if(goal > 0) {
+    var pct = Math.min(100, Math.round(w / goal * 100));
+    goalEl.textContent = pct + '% of ' + goal + 'w goal';
+    goalEl.style.color = pct >= 100 ? 'var(--green)' : 'var(--accent-cyan)';
+  } else {
+    goalEl.textContent = 'Set goal';
+    goalEl.style.color = 'var(--text-muted)';
+  }
+}
+
+function zenSetGoal() {
+  var d = S.docs.find(function(x){ return x.id == zenDocId; });
+  if(!d) return;
+  var g = prompt('Word count goal:', d.wordGoal || '');
+  if(g === null) return;
+  d.wordGoal = parseInt(g) || 0;
+  save();
+  zenUpdateStats();
+}
+
+function zenNewDoc() {
+  zenSnapshot();
+  var d = { id: Date.now(), title: '', body: '', versions: [], created: new Date().toISOString(), updated: new Date().toISOString() };
+  S.docs.unshift(d);
+  zenDocId = d.id;
+  S.activeDoc = d.id;
+  save();
+  zenRenderPicker();
+  zenLoadDoc();
+  document.getElementById('zen-title').focus();
+}
+
+function zenCmd(c) { document.execCommand(c, false, null); document.getElementById('zen-editor').focus(); }
+function zenExecBlock(tag) { document.execCommand('formatBlock', false, '<' + tag + '>'); document.getElementById('zen-editor').focus(); }
+function zenInsertLink() { var u = prompt('URL:'); if(u) document.execCommand('createLink', false, u); document.getElementById('zen-editor').focus(); }
+function zenInsertHR() { document.execCommand('insertHTML', false, '<hr>'); document.getElementById('zen-editor').focus(); }
+function zenInsertCode() { var s = window.getSelection(); if(s.rangeCount) document.execCommand('insertHTML', false, '<code>' + (esc(s.toString()) || 'code') + '</code>'); }
+function zenClearFormat() { document.execCommand('removeFormat', false, null); document.getElementById('zen-editor').focus(); }
+
+function zenKeydown(e) {
+  if(e.key === 'Tab') { e.preventDefault(); document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;'); }
+  if((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); zenSaveVersion(); }
+}
+
+function zenSaveVersion() {
+  zenSnapshot();
+  var d = S.docs.find(function(x){ return x.id == zenDocId; });
+  if(!d) return;
+  if(!d.versions) d.versions = [];
+  d.versions.unshift({ id: Date.now(), title: d.title, body: d.body, words: countW(d.body), date: new Date().toISOString() });
+  if(d.versions.length > 50) d.versions = d.versions.slice(0, 50);
+  save();
+  toast('Version saved');
+  document.getElementById('zen-saved').textContent = 'Version saved';
+  document.getElementById('zen-saved').style.color = 'var(--accent)';
+}
+
+function zenExport(fmt) {
+  var d = S.docs.find(function(x){ return x.id == zenDocId; });
+  if(!d || !fmt) return;
+  var t = d.title || 'untitled';
+  var e = document.getElementById('zen-editor');
+  if(fmt === 'clipboard') { navigator.clipboard.writeText(e.innerText); toast('Copied to clipboard'); return; }
+  var c, m, x;
+  if(fmt === 'txt') { c = e.innerText; m = 'text/plain'; x = 'txt'; }
+  else if(fmt === 'html') {
+    c = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + esc(t) + '</title><style>body{font-family:Georgia,"Times New Roman",serif;max-width:680px;margin:40px auto;padding:0 24px;line-height:1.9;color:#1a1a1a;font-size:18px}h1{font-size:32px;margin-bottom:8px}h2{font-size:24px;margin-top:32px}h3{font-size:20px}blockquote{border-left:3px solid #bbb;padding-left:16px;color:#666;font-style:italic}code{background:#f0f0f0;padding:2px 5px;border-radius:3px;font-size:15px}pre{background:#f5f5f5;padding:16px;border-radius:8px;overflow-x:auto;font-size:14px}a{color:#2563eb}</style></head><body><h1>' + esc(t) + '</h1>' + e.innerHTML + '</body></html>';
+    m = 'text/html'; x = 'html';
+  } else if(fmt === 'md') { c = htmlToMd(e.innerHTML, t); m = 'text/markdown'; x = 'md'; }
+  var blob = new Blob([c], { type: m });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = t.replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.' + x;
+  a.click();
+  toast('Exported .' + x);
+}
 
 // === LIVING DOCS ===
 function getActiveSpec(){return S.specs.find(s=>String(s.id)===String(S.activeSpec));}
@@ -3367,6 +3632,13 @@ function cmdGetItems(q) {
   if(!ql || 'quick capture'.includes(ql)) items.push({title:'Quick Capture', desc:'Add task/content instantly (Cmd+Shift+N)', icon:'+', type:'action', action:()=>{closeCommandPalette();qcOpen();}});
   if(!ql || 'today'.includes(ql)) items.push({title:'Today View', desc:'See tasks due today + overdue', icon:'*', type:'action', action:()=>{closeCommandPalette();showTodayView();}});
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
+  if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
+  // Open specific docs in Zen Writer
+  if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
+    S.docs.forEach(function(d) {
+      if(d.title) items.push({title:'Zen: ' + d.title, desc:'Open in Zen Writer', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:function(){ closeCommandPalette(); zenOpen(d.id); }});
+    });
+  }
   return items.slice(0, 20);
 }
 function cmdSearch() {
@@ -3700,15 +3972,18 @@ setTimeout(function(){ cloudSave(true); }, 3000);
 document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
 document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-window.addEventListener('beforeunload',()=>{snapshotWriter();snapshotSpec();wbPersist();save();});
+window.addEventListener('beforeunload',()=>{if(zenIsOpen)zenSnapshot();snapshotWriter();snapshotSpec();wbPersist();save();});
 document.addEventListener('keydown',e=>{
   // Command Palette: Cmd+K
   if((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); openCommandPalette(); return; }
-  // Cmd+S: save workspace
-  if((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); snapshotWriter(); snapshotSpec(); wbPersist(); save(); cloudSave(); return; }
+  // Cmd+Shift+W: toggle Zen Writer
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='w'||e.key==='W')) { e.preventDefault(); if(zenIsOpen) zenClose(); else zenOpen(); return; }
+  // Cmd+S: save (Zen Writer version save or workspace save)
+  if((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); if(zenIsOpen){ zenSaveVersion(); } else { snapshotWriter(); snapshotSpec(); wbPersist(); save(); cloudSave(); } return; }
   // Skip shortcuts when typing in inputs
   const inInput = e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true';
   if(e.key==='Escape'){
+    if(zenIsOpen) { zenClose(); return; }
     if(document.getElementById('cmd-overlay').classList.contains('open')) { closeCommandPalette(); return; }
     document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
     if(activeProject) closeProjectPanel();
