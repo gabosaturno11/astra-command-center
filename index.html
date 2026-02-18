@@ -3685,6 +3685,8 @@ document.addEventListener('keydown',e=>{
   });
 })();
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
+// ASTRA self-ping — registers itself in repo registry
+(function(){fetch(ASTRA_API+'/api/repos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repoId:'astra-command-center',status:'online',message:'ASTRA Hub loaded'})}).catch(function(){});})();
 </script>
 </body>
 </html>
