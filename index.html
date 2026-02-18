@@ -1477,6 +1477,16 @@ function migrateV2() {
     );
     save();
   }
+  // Voice Pipeline + Floating Bar (Feb 17 evening)
+  if(S.projects && S.projects.find(p => p.id === 'proj_claude_code') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_cc_voice_pipeline')) {
+    const now = new Date().toISOString();
+    S.knowledgeBase.push(
+      { id:'kb_cc_voice_pipeline', projectId:'proj_claude_code', name:'Voice Pipeline + Floating Bar — Feb 17 Evening', type:'md', storage:'inline',
+        content:'# Voice Pipeline + Floating Bar — Feb 17 Evening\n\n## /api/transcribe (NEW)\n- Receives audio blob via multipart POST\n- Sends to OpenAI Whisper API (whisper-1 model)\n- Returns { ok, text, duration, transcriptId }\n- Auto-logs to transcripts blob storage\n- Requires OPENAI_API_KEY env var (SET in .zshrc)\n- Commit: 74ddb86\n\n## ASTRA Voice Upgrade\n- Replaced Chrome SpeechRecognition with real MediaRecorder\n- Click voice btn to record mic, click again to stop\n- Audio sent to /api/transcribe (Whisper)\n- Text auto-inserts into Writer or Living Docs editor\n- Commit: 9bb30bb\n\n## Nexus Capture Extension Updates\n- Right-click > "Create Sound (TTS)" speaks selected text\n- Uses browser speechSynthesis (works offline)\n- Background handles transcribeAudio messages\n- Commit: 84a4b08\n\n## System-Wide Tools (macOS)\n- create-sound.sh: speaks clipboard text via macOS say command\n- --save flag saves .aiff audio file to ~/dev/nexus-capture/sounds/\n- "Create Sound" Quick Action installed in Services menu\n- Commit: 8228195\n\n## Floating NEXUS Bar\n- floating-bar.html: mini HTML panel with 4 buttons\n- Capture: grabs clipboard, sends to ASTRA /api/capture\n- Voice: records mic, transcribes via Whisper, copies result\n- Sound: speaks clipboard text via browser TTS\n- ASTRA: opens ASTRA hub\n- open-nexus-bar.sh: launches as Chrome app window\n- Commit: d8d8efc\n\n## PWA\n- ASTRA installable on phone (manifest.json + sw.js)\n- New planet icon with cosmic center (icon-192.png, icon-512.png)\n- Commit: c1aceea\n\n## Still Needs\n- BLOB_READ_WRITE_TOKEN in Vercel (Gabo setting up)\n- Keyboard shortcuts for Quick Actions (System Settings > Keyboard > Shortcuts > Services)\n- Test full pipeline end-to-end once blob token is set',
+        description:'Voice pipeline, Whisper integration, floating bar, TTS, PWA', tags:['voice','whisper','tts','floating-bar','pipeline'], created:now, updated:now }
+    );
+    save();
+  }
   // Add Backend + Nexus Capture session log (Feb 17)
   if(S.projects && S.projects.find(p => p.id === 'proj_claude_code') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_cc_backend_session')) {
     const now = new Date().toISOString();
