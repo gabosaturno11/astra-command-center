@@ -10,7 +10,7 @@
 import { put, list } from '@vercel/blob';
 
 const INDEX_FILE = 'transcripts-index.json';
-const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD || 'saturno-admin-2026';
+const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');

@@ -8,6 +8,7 @@
 import { put, list } from '@vercel/blob';
 
 const CAPTURES_FILE = 'captures-log.json';
+const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,6 +41,12 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    if (ADMIN_PASSWORD) {
+      const auth = req.headers.authorization;
+      if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) {
+        return res.status(401).json({ ok: false, error: 'Unauthorized' });
+      }
+    }
     if (!token) {
       return res.status(503).json({ ok: false, error: 'BLOB_READ_WRITE_TOKEN not configured' });
     }

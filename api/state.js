@@ -9,7 +9,7 @@
 import { put, list } from '@vercel/blob';
 
 const STATE_FILENAME = 'astra-workspace-state.json';
-const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD || 'saturno-admin-2026';
+const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -63,6 +63,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    if (!ADMIN_PASSWORD) {
+      return res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' });
+    }
     const auth = req.headers.authorization;
     if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) {
       return res.status(401).json({ ok: false, error: 'Unauthorized' });

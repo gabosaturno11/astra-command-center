@@ -3253,7 +3253,7 @@ function seedLinks() {
       {id:2015,title:'Vimeo Developer',url:'https://developer.vimeo.com/apps',category:'tool',desc:'Vimeo API — app: ASTRA LLMs, account: admin@saturnomovement.com',created:new Date().toISOString()},
       {id:2016,title:'Saturno Bonus (Vercel)',url:'https://saturno-bonus-omega.vercel.app',category:'deployment',desc:'Customer bonus page — decoupled from titan-forge',created:new Date().toISOString()},
       {id:2017,title:'GitHub: saturno-bonus',url:'https://github.com/gabosaturno11/saturno-bonus',category:'repo',desc:'Private repo — clean bonus-only repo with bonuses/ folder',created:new Date().toISOString()},
-      {id:2018,title:'SATURNO COMMAND',url:'https://saturno-bonus-omega.vercel.app/command',category:'deployment',desc:'Admin dashboard — tool toggles, config API (password: saturno-admin-2026)',created:new Date().toISOString()},
+      {id:2018,title:'SATURNO COMMAND',url:'https://saturno-bonus-omega.vercel.app/command',category:'deployment',desc:'Admin dashboard — tool toggles, config API',created:new Date().toISOString()},
       {id:2019,title:'Cloudflare Dashboard',url:'https://dash.cloudflare.com/',category:'tool',desc:'DNS management — admin@saturnomovement.com, 2FA enabled',created:new Date().toISOString()},
       {id:2020,title:'Stripe Dashboard',url:'https://dashboard.stripe.com/',category:'tool',desc:'Payment management — 2FA + authenticator',created:new Date().toISOString()},
       {id:2021,title:'GitHub: sm-app-copy-v1',url:'https://github.com/gabosaturno11/sm-app-copy-v1',category:'repo',desc:'Clone of Saturno Movement app codebase (from Softzee)',created:new Date().toISOString()},
@@ -3895,12 +3895,23 @@ function ftPlaySound() {
 
 // === CLOUD SYNC (Vercel Blob Backend) ===
 const ASTRA_API = window.location.origin;
-const ASTRA_ADMIN_PW = localStorage.getItem('astra_admin_pw') || 'saturno-admin-2026';
+let ASTRA_ADMIN_PW = localStorage.getItem('astra_admin_pw') || '';
 let cloudSyncTimer = null;
 let lastCloudSync = 0;
 const CLOUD_SYNC_INTERVAL = 30000;
 
+function ensureAdminPW() {
+  if (ASTRA_ADMIN_PW) return true;
+  var pw = prompt('Enter ASTRA admin password for cloud sync:');
+  if (!pw) return false;
+  ASTRA_ADMIN_PW = pw;
+  localStorage.setItem('astra_admin_pw', pw);
+  return true;
+}
+
 async function cloudSave(silent) {
+  if (!ASTRA_ADMIN_PW && silent) return { ok: false };
+  if (!ensureAdminPW()) return { ok: false };
   try {
     const state = JSON.parse(localStorage.getItem(SK) || '{}');
     const res = await fetch(ASTRA_API + '/api/state', {
@@ -3909,8 +3920,14 @@ async function cloudSave(silent) {
       body: JSON.stringify(state)
     });
     const data = await res.json();
-    lastCloudSync = Date.now();
-    if (data.ok && !silent) { toast('Synced to cloud (v' + data.version + ')'); }
+    if (data.ok) {
+      lastCloudSync = Date.now();
+      if (!silent) toast('Synced to cloud (v' + data.version + ')');
+    } else if (data.error === 'Unauthorized') {
+      localStorage.removeItem('astra_admin_pw');
+      ASTRA_ADMIN_PW = '';
+      if (!silent) toast('Wrong password. Try Cmd+S again.');
+    }
     return data;
   } catch(e) { if (!silent) toast('Cloud sync error: ' + e.message); return { ok: false }; }
 }
@@ -4166,7 +4183,7 @@ function plCopyResult() {
 }
 
 function plSaveCapture() {
-  fetch(ASTRA_API+'/api/capture',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+  fetch(ASTRA_API+'/api/capture',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ASTRA_ADMIN_PW},body:JSON.stringify({
     content:plSynthesisText,category:'pipeline',source:'pipeline-ui',sourceTitle:'Pipeline Result',type:'synthesis',tags:['pipeline','processed']
   })}).then(r=>r.json()).then(d=>{
     if(d.ok) toast('Saved to ASTRA!');
