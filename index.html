@@ -2574,6 +2574,7 @@ function initVoice() {
     if(final) {
       const el = voiceTarget === 'writer' ? document.getElementById('writer-editor') : document.querySelector('.specs-section-editor:focus') || document.querySelector('.specs-section-editor');
       if(el) { el.focus(); document.execCommand('insertText', false, final + ' '); if(voiceTarget==='writer') onWriterChange(); else onSpecChange(); }
+      logTranscript(final, 'astra-voice-' + (voiceTarget || 'unknown'));
     }
   };
   voiceRecog.onerror = e => { if(e.error !== 'no-speech') { voiceActive = false; updateVoiceUI(); }};
@@ -3506,6 +3507,57 @@ function ftPlaySound() {
   } catch(e) {}
 }
 
+// === CLOUD SYNC (Vercel Blob Backend) ===
+const ASTRA_API = window.location.origin;
+const ASTRA_ADMIN_PW = localStorage.getItem('astra_admin_pw') || 'saturno-admin-2026';
+
+async function cloudSave() {
+  try {
+    const state = JSON.parse(localStorage.getItem(SK) || '{}');
+    const res = await fetch(ASTRA_API + '/api/state', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ASTRA_ADMIN_PW },
+      body: JSON.stringify(state)
+    });
+    const data = await res.json();
+    if (data.ok) { toast('Synced to cloud (v' + data.version + ')'); }
+    else { toast('Cloud sync failed: ' + (data.error || 'unknown')); }
+    return data;
+  } catch(e) { toast('Cloud sync error: ' + e.message); return { ok: false }; }
+}
+
+async function cloudLoad() {
+  try {
+    const res = await fetch(ASTRA_API + '/api/state');
+    const data = await res.json();
+    if (data._source === 'blob' && data.items) {
+      localStorage.setItem(SK, JSON.stringify(data));
+      location.reload();
+    } else { toast('No cloud state found'); }
+  } catch(e) { toast('Cloud load error: ' + e.message); }
+}
+
+async function logTranscript(text, source) {
+  try {
+    await fetch(ASTRA_API + '/api/transcripts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + ASTRA_ADMIN_PW },
+      body: JSON.stringify({ text, source: source || 'astra-voice', tags: ['voice-input'] })
+    });
+  } catch(e) { /* silent fail for transcript logging */ }
+}
+
+async function queryAstra(type, params) {
+  try {
+    const res = await fetch(ASTRA_API + '/api/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, ...params })
+    });
+    return await res.json();
+  } catch(e) { return { ok: false, error: e.message }; }
+}
+
 // === INIT ===
 load();
 seedLinks();
@@ -3526,7 +3578,7 @@ document.addEventListener('keydown',e=>{
   // Command Palette: Cmd+K
   if((e.metaKey||e.ctrlKey) && e.key==='k') { e.preventDefault(); openCommandPalette(); return; }
   // Cmd+S: save workspace
-  if((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); snapshotWriter(); snapshotSpec(); wbPersist(); save(); toast('Saved'); return; }
+  if((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); snapshotWriter(); snapshotSpec(); wbPersist(); save(); cloudSave(); return; }
   // Skip shortcuts when typing in inputs
   const inInput = e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true';
   if(e.key==='Escape'){
