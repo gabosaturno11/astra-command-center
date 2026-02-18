@@ -1608,7 +1608,7 @@ function seedKernel() {
   S.activeSpec = kernel.id;
 }
 
-function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); }
+function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); scheduleCloudSync(); }
 function flashSave() { const el=document.getElementById('save-indicator'); if(!el) return; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0';},1500); }
 
 // === QUICK CAPTURE ===
@@ -3626,8 +3626,11 @@ function ftPlaySound() {
 // === CLOUD SYNC (Vercel Blob Backend) ===
 const ASTRA_API = window.location.origin;
 const ASTRA_ADMIN_PW = localStorage.getItem('astra_admin_pw') || 'saturno-admin-2026';
+let cloudSyncTimer = null;
+let lastCloudSync = 0;
+const CLOUD_SYNC_INTERVAL = 30000;
 
-async function cloudSave() {
+async function cloudSave(silent) {
   try {
     const state = JSON.parse(localStorage.getItem(SK) || '{}');
     const res = await fetch(ASTRA_API + '/api/state', {
@@ -3636,19 +3639,28 @@ async function cloudSave() {
       body: JSON.stringify(state)
     });
     const data = await res.json();
-    if (data.ok) { toast('Synced to cloud (v' + data.version + ')'); }
-    else { toast('Cloud sync failed: ' + (data.error || 'unknown')); }
+    lastCloudSync = Date.now();
+    if (data.ok && !silent) { toast('Synced to cloud (v' + data.version + ')'); }
     return data;
-  } catch(e) { toast('Cloud sync error: ' + e.message); return { ok: false }; }
+  } catch(e) { if (!silent) toast('Cloud sync error: ' + e.message); return { ok: false }; }
+}
+
+function scheduleCloudSync() {
+  if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(function() { cloudSave(true); }, CLOUD_SYNC_INTERVAL);
 }
 
 async function cloudLoad() {
   try {
     const res = await fetch(ASTRA_API + '/api/state');
     const data = await res.json();
-    if (data._source === 'blob' && data.items) {
+    if (data._source === 'blob' && (data.projects || data.tasks || data.docs || data.content)) {
+      delete data._source; delete data._savedAt; delete data._version;
       localStorage.setItem(SK, JSON.stringify(data));
       location.reload();
+    } else if (data._source === 'none' || data._source === 'empty') {
+      toast('No cloud state yet — saving current state');
+      cloudSave(false);
     } else { toast('No cloud state found'); }
   } catch(e) { toast('Cloud load error: ' + e.message); }
 }
@@ -3685,6 +3697,7 @@ initVoice();
 wbLoadState();
 renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();renderLinks();renderProjectsSidebar();renderFolderTree();updateStorage();
 ftUpdateDisplay();updateContextStats();
+setTimeout(function(){ cloudSave(true); }, 3000);
 // Whiteboard drop handler for KB items
 document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
 document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
