@@ -1,0 +1,17 @@
+{
+  "name": "SATURNO HUB",
+  "short_name": "SATURNO",
+  "description": "Command Center — Projects, Specs, Knowledge Base, Whiteboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050508",
+  "theme_color": "#050508",
+  "icons": [
+    {
+      "src": "planet-logo.png",
+      "sizes": "1620x826",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
