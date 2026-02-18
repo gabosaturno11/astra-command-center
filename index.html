@@ -1471,6 +1471,16 @@ function migrateV2() {
     );
     save();
   }
+  // Add Backend + Nexus Capture session log (Feb 17)
+  if(S.projects && S.projects.find(p => p.id === 'proj_claude_code') && !(S.knowledgeBase||[]).find(k => k.id === 'kb_cc_backend_session')) {
+    const now = new Date().toISOString();
+    S.knowledgeBase.push(
+      { id:'kb_cc_backend_session', projectId:'proj_claude_code', name:'Backend + Nexus Capture Setup — Feb 17, 2026', type:'md', storage:'inline',
+        content:'# ASTRA Backend + Nexus Capture — Feb 17, 2026\n\n## ASTRA Backend (NEW)\nASTRA was localStorage-only. Now has Vercel serverless API:\n- api/state.js: Save/load full workspace to Vercel Blob\n- api/transcripts.js: Log voice transcripts with searchable index\n- api/query.js: Query specs, bottlenecks, KB, tasks, projects, full-text search\n- api/capture.js: Receive captures from extension or system-wide tools\n- api/health.js: Health check endpoint\n- package.json: @vercel/blob dependency\n- vercel.json: API rewrites\n- Frontend: cloudSave(), cloudLoad(), Cmd+S syncs to cloud\n- Voice input now auto-logs transcripts to backend\n- NEEDS: BLOB_READ_WRITE_TOKEN in Vercel env vars to activate\n\n## Nexus Capture Extension (NEW REPO)\n- Repo: github.com/gabosaturno11/nexus-capture\n- Path: ~/dev/nexus-capture/\n- Chrome Manifest V3 extension\n- Highlight text on any webpage -> floating button -> categorize -> save\n- 8 categories with color coding\n- Visual highlights persist per page\n- Routes to ASTRA backend /api/capture\n- Optional Notion integration\n- Keyboard: Cmd+Shift+S\n- Right-click context menu: Capture as Idea/Quote/Code/Insight/To-Do\n- BUG FIXED: double-click issue (selection stored on mouseup now)\n\n## System-Wide Capture (macOS)\n- capture-highlight.sh: grabs clipboard/selected text, sends to ASTRA API\n- macOS Automator Quick Action: "Nexus Capture" in Services menu\n- Works from ANY app (Notes, Preview, Pages, etc.)\n- Shows macOS notification on success\n- Fallback: saves locally if API unreachable\n\n## Whisper Transcription\n- faster-whisper installed in ~/dev/.whisper-env/ (Python venv)\n- whisper-transcribe.sh: local transcription (base/small/medium/large models)\n- whisper-api-transcribe.sh: cloud transcription via OpenAI Whisper API\n- record-and-transcribe.sh: record from mic + auto-transcribe\n- All scripts can --log to ASTRA transcripts API\n- OpenAI SDK also installed for API fallback\n\n## Bonus Page\n- Password protection temporarily disabled (Gabo requested)\n- middleware.js returns next() immediately\n- index.html auth check commented out\n- Both marked TEMP for easy re-enable\n\n## Commits:\n- 5d18143: ASTRA backend (state, transcripts, query, capture APIs)\n- 7f7c435: Health check endpoint\n- b9acd53: CLAUDE.md update\n- 39743ac: nexus-capture init\n- cc81f79: Double-click bug fix\n- 9d639d0: faster-whisper, path fixes\n- 02587b3: Bonus auth disabled (temp)\n- (this commit): KB entry + final save',
+        description:'Full session log: ASTRA backend, Nexus Capture extension, Whisper setup, system-wide capture', tags:['backend','nexus-capture','whisper','session','infrastructure'], created:now, updated:now }
+    );
+    save();
+  }
 }
 
 function seedKernel() {
