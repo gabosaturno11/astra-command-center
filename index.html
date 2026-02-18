@@ -610,6 +610,12 @@ textarea{resize:vertical;line-height:1.6}
       <div class="sidebar-item" onclick="switchSection('whiteboard',this)">
         <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Whiteboard</span>
       </div>
+      <div class="sidebar-item" onclick="switchSection('pipeline',this)">
+        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span><span>Pipeline</span>
+      </div>
+      <div class="sidebar-item" onclick="switchSection('repos',this)">
+        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6"/><path d="M1 12h6m6 0h6"/></svg></span><span>Repos</span>
+      </div>
     </div>
     <div class="sidebar-divider"></div>
     <div class="sidebar-section">
@@ -905,6 +911,76 @@ textarea{resize:vertical;line-height:1.6}
         </div>
       </div>
       <div class="content-area"><div class="links-grid" id="links-grid"></div></div>
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="panel" id="panel-pipeline">
+      <div style="padding:16px 20px 0;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.02em">Pipeline</span>
+          <span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em">Audio / Text -> Whisper -> GPT -> ASTRA</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn btn-primary btn-sm" id="pl-record-btn" onclick="plToggleRecord()">Record Mic</button>
+          <label class="btn btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px">
+            Upload Audio
+            <input type="file" accept="audio/*" onchange="plUploadFile(this)" style="display:none">
+          </label>
+          <button class="btn btn-sm" onclick="plPasteText()">Paste Text</button>
+          <button class="btn btn-sm" onclick="plLoadHistory()">History</button>
+        </div>
+        <div id="pl-recording" style="display:none;padding:8px 12px;background:rgba(239,68,68,0.1);border:1px solid var(--red);border-radius:4px;margin-bottom:12px;display:none;align-items:center;gap:8px">
+          <div style="width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 1s infinite"></div>
+          <span id="pl-rec-time" style="font-size:10px;color:var(--red)">Recording... 0s</span>
+        </div>
+        <div id="pl-input-preview" style="display:none;padding:10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;margin-bottom:12px;max-height:120px;overflow-y:auto;font-size:11px;color:var(--text-muted)"></div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:4px;display:block">Custom Prompt</label>
+          <textarea id="pl-prompt" placeholder="What should the pipeline do with this input? e.g. 'Summarize key ideas', 'Extract action items', 'Rewrite for social media', 'Translate to Spanish'..." style="width:100%;min-height:60px;resize:vertical;font-size:11px;padding:8px 10px"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <button class="btn btn-primary" onclick="plProcess()" id="pl-process-btn" style="flex:1">Process Pipeline</button>
+          <select id="pl-source" style="font-size:10px;padding:4px 8px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text);border-radius:4px">
+            <option value="pipeline-manual">Manual</option>
+            <option value="pipeline-whatsapp">WhatsApp</option>
+            <option value="pipeline-voice">Voice Memo</option>
+            <option value="pipeline-capture">Capture</option>
+          </select>
+        </div>
+      </div>
+      <div class="content-area" style="padding:0 20px 20px">
+        <div id="pl-result" style="display:none;padding:16px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent)">Pipeline Result</span>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm" onclick="plCopyResult()">Copy</button>
+              <button class="btn btn-sm" onclick="plSaveCapture()">Save to ASTRA</button>
+            </div>
+          </div>
+          <div id="pl-transcript-box" style="display:none;padding:8px;background:var(--bg-primary);border:1px solid var(--border);border-radius:3px;margin-bottom:8px;font-size:10px;color:var(--text-muted);max-height:80px;overflow-y:auto">
+            <div style="font-size:8px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:4px">Transcript</div>
+            <div id="pl-transcript-text"></div>
+          </div>
+          <div id="pl-synthesis-text" style="font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
+        </div>
+        <div id="pl-history" style="display:none">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px">Pipeline History</div>
+          <div id="pl-history-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPOS -->
+    <div class="panel" id="panel-repos">
+      <div style="padding:16px 20px 0;flex-shrink:0">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <span style="font-size:13px;font-weight:600;letter-spacing:0.02em">Connected Repos</span>
+          <button class="btn btn-sm" onclick="reposRefresh()">Refresh</button>
+        </div>
+      </div>
+      <div class="content-area" style="padding:0 20px 20px">
+        <div id="repos-grid" style="display:grid;gap:8px"></div>
+      </div>
     </div>
   </main>
   <div class="project-resize-handle" id="project-resize-handle"></div>
@@ -1610,13 +1686,13 @@ function escA(s) { return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 // === SECTIONS ===
 function switchSection(sec, el) {
   currentSection=sec;
-  const sectionLabels={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
+  const sectionLabels={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard',pipeline:'Pipeline',repos:'Repos'};
   document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
   if(el) el.classList.add('active');
   else { document.querySelectorAll('.sidebar-item').forEach(i => { if(i.textContent.trim().replace(/\d+$/,'').trim() === sectionLabels[sec]) i.classList.add('active'); }); }
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+sec).classList.add('active');
-  const titles={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard'};
+  const titles={content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard',pipeline:'Pipeline',repos:'Repos'};
   document.getElementById('header-title').textContent=titles[sec]||sec;
   updateBreadcrumb();
   if(sec==='content')renderContent();
@@ -1626,6 +1702,7 @@ function switchSection(sec, el) {
   if(sec==='specs')renderSpecs();
   if(sec==='links')renderLinks();
   if(sec==='whiteboard')wbRender();
+  if(sec==='repos')reposRefresh();
   updateSidebarCtx();
 }
 function updateBreadcrumb() {
@@ -3246,6 +3323,8 @@ function cmdGetItems(q) {
     {title:'Living Docs',desc:'Structured documents',icon:'S',action:()=>switchSection('specs',null)},
     {title:'Links',desc:'Link directory',icon:'L',action:()=>switchSection('links',null)},
     {title:'Whiteboard',desc:'Visual canvas',icon:'B',action:()=>switchSection('whiteboard',null)},
+    {title:'Pipeline',desc:'Audio/text processing pipeline',icon:'P',action:()=>switchSection('pipeline',null)},
+    {title:'Repos',desc:'Connected repositories',icon:'R',action:()=>switchSection('repos',null)},
   ];
   sections.forEach(s => {
     if(!ql || s.title.toLowerCase().includes(ql) || s.desc.toLowerCase().includes(ql))
@@ -3627,7 +3706,7 @@ document.addEventListener('keydown',e=>{
   // Cmd+number: switch sections
   if((e.metaKey||e.ctrlKey) && e.key>='1' && e.key<='7') {
     e.preventDefault();
-    const sections = ['content','tasks','calendar','writer','specs','links','whiteboard'];
+    const sections = ['content','tasks','calendar','writer','specs','links','whiteboard','pipeline','repos'];
     const idx = parseInt(e.key)-1;
     if(sections[idx]) {
       const items = document.querySelectorAll('.sidebar-item');
@@ -3684,6 +3763,202 @@ document.addEventListener('keydown',e=>{
     document.body.style.userSelect = '';
   });
 })();
+
+// === PIPELINE ===
+let plRecorder=null, plChunks=[], plRecording=false, plRecStart=0, plRecTimer=null, plAudioBlob=null, plTranscriptText='', plSynthesisText='';
+
+function plToggleRecord() {
+  const btn=document.getElementById('pl-record-btn');
+  const indicator=document.getElementById('pl-recording');
+  if(plRecording && plRecorder && plRecorder.state==='recording') {
+    plRecorder.stop();
+    plRecording=false;
+    btn.textContent='Record Mic';
+    btn.classList.remove('active');
+    indicator.style.display='none';
+    clearInterval(plRecTimer);
+    toast('Processing audio...');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+    plChunks=[];
+    plRecorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
+    plRecorder.ondataavailable=e=>{if(e.data.size>0)plChunks.push(e.data);};
+    plRecorder.onstop=()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      plAudioBlob=new Blob(plChunks,{type:'audio/webm'});
+      const preview=document.getElementById('pl-input-preview');
+      preview.style.display='block';
+      preview.textContent='Audio recorded ('+Math.round(plAudioBlob.size/1024)+'KB). Ready to process.';
+      toast('Audio ready — set your prompt and hit Process');
+    };
+    plRecorder.start();
+    plRecording=true;
+    btn.textContent='Stop Recording';
+    btn.classList.add('active');
+    indicator.style.display='flex';
+    plRecStart=Date.now();
+    plRecTimer=setInterval(()=>{
+      document.getElementById('pl-rec-time').textContent='Recording... '+Math.floor((Date.now()-plRecStart)/1000)+'s';
+    },1000);
+    toast('Recording...');
+  }).catch(()=>toast('Mic access denied'));
+}
+
+function plUploadFile(input) {
+  const file=input.files[0];
+  if(!file) return;
+  plAudioBlob=file;
+  const preview=document.getElementById('pl-input-preview');
+  preview.style.display='block';
+  preview.textContent='File: '+file.name+' ('+Math.round(file.size/1024)+'KB). Ready to process.';
+  toast('Audio loaded — set your prompt and hit Process');
+  input.value='';
+}
+
+function plPasteText() {
+  navigator.clipboard.readText().then(text=>{
+    if(!text){toast('Clipboard empty');return;}
+    plAudioBlob=null;
+    plTranscriptText=text;
+    const preview=document.getElementById('pl-input-preview');
+    preview.style.display='block';
+    preview.textContent=text.length>300?text.substring(0,300)+'...':text;
+    toast('Text pasted — set your prompt and hit Process');
+  }).catch(()=>toast('Cannot read clipboard'));
+}
+
+async function plProcess() {
+  const prompt=document.getElementById('pl-prompt').value.trim();
+  if(!prompt){toast('Enter a prompt first');return;}
+  if(!plAudioBlob && !plTranscriptText){toast('Record, upload, or paste something first');return;}
+
+  const btn=document.getElementById('pl-process-btn');
+  btn.textContent='Processing...';
+  btn.disabled=true;
+
+  try {
+    const source=document.getElementById('pl-source').value;
+    let res;
+    if(plAudioBlob) {
+      const fd=new FormData();
+      fd.append('audio',plAudioBlob,plAudioBlob.name||'recording.webm');
+      fd.append('prompt',prompt);
+      fd.append('source',source);
+      res=await fetch(ASTRA_API+'/api/pipeline',{method:'POST',body:fd});
+    } else {
+      res=await fetch(ASTRA_API+'/api/pipeline',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:plTranscriptText,prompt:prompt,source:source})});
+    }
+    const data=await res.json();
+    if(data.ok) {
+      plTranscriptText=data.transcript||'';
+      plSynthesisText=data.synthesis||'';
+      const resultDiv=document.getElementById('pl-result');
+      resultDiv.style.display='block';
+      if(data.inputType==='audio'&&data.transcript) {
+        document.getElementById('pl-transcript-box').style.display='block';
+        document.getElementById('pl-transcript-text').textContent=data.transcript;
+      } else {
+        document.getElementById('pl-transcript-box').style.display='none';
+      }
+      document.getElementById('pl-synthesis-text').textContent=data.synthesis;
+      toast('Pipeline complete!');
+    } else {
+      toast('Error: '+(data.error||'unknown'));
+    }
+  } catch(e) {
+    toast('Pipeline error: '+e.message);
+  } finally {
+    btn.textContent='Process Pipeline';
+    btn.disabled=false;
+  }
+}
+
+function plCopyResult() {
+  const text=document.getElementById('pl-synthesis-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>toast('Copied!')).catch(()=>toast('Copy failed'));
+}
+
+function plSaveCapture() {
+  fetch(ASTRA_API+'/api/capture',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+    content:plSynthesisText,category:'pipeline',source:'pipeline-ui',sourceTitle:'Pipeline Result',type:'synthesis',tags:['pipeline','processed']
+  })}).then(r=>r.json()).then(d=>{
+    if(d.ok) toast('Saved to ASTRA!');
+    else toast('Save error');
+  }).catch(()=>toast('Save failed'));
+}
+
+async function plLoadHistory() {
+  const histDiv=document.getElementById('pl-history');
+  const listDiv=document.getElementById('pl-history-list');
+  histDiv.style.display=histDiv.style.display==='none'?'block':'none';
+  if(histDiv.style.display==='none') return;
+  listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Loading...</div>';
+  try {
+    const res=await fetch(ASTRA_API+'/api/pipeline');
+    const data=await res.json();
+    if(data.ok && data.results && data.results.length>0) {
+      listDiv.innerHTML=data.results.map(r=>'<div style="padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;margin-bottom:6px;cursor:pointer" onclick="plViewEntry(\''+r.id+'\')"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--accent)">'+r.inputType+'</span><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleString()+'</span></div><div style="font-size:10px;color:var(--text-muted)">'+esc(r.prompt||'')+'</div><div style="font-size:11px;margin-top:4px">'+esc((r.preview||'').substring(0,100))+'</div></div>').join('');
+    } else {
+      listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">No pipeline history yet. Process something first!</div>';
+    }
+  } catch(e) {
+    listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Could not load history</div>';
+  }
+}
+
+async function plViewEntry(id) {
+  try {
+    const res=await fetch(ASTRA_API+'/api/pipeline');
+    const data=await res.json();
+    const entry=(data.results||[]).find(r=>r.id===id);
+    if(entry) {
+      document.getElementById('pl-synthesis-text').textContent=entry.preview||'(load full entry)';
+      document.getElementById('pl-result').style.display='block';
+      toast('Loaded: '+id);
+    }
+  } catch(e) { toast('Error loading entry'); }
+}
+
+// === REPOS ===
+async function reposRefresh() {
+  const grid=document.getElementById('repos-grid');
+  if(!grid) return;
+  grid.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Loading repos...</div>';
+  try {
+    const res=await fetch(ASTRA_API+'/api/repos');
+    const data=await res.json();
+    if(data.ok && data.repos) {
+      grid.innerHTML=data.repos.map(r=>{
+        const statusColor=r.pingStatus==='online'?'var(--green)':r.pingStatus==='unknown'?'var(--text-muted)':'var(--red)';
+        const roleColors={
+          'backend-hub':'var(--accent)',
+          'customer-facing':'#22d3ee',
+          'internal-tools':'#a855f7',
+          'experience':'#f472b6',
+          'extension':'#fbbf24'
+        };
+        const roleColor=roleColors[r.role]||'var(--text-muted)';
+        return '<div style="padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px">'+
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
+            '<span style="font-size:12px;font-weight:600">'+esc(r.name)+'</span>'+
+            '<span style="width:8px;height:8px;border-radius:50%;background:'+statusColor+'"></span>'+
+          '</div>'+
+          '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:'+roleColor+';margin-bottom:4px">'+esc(r.role)+'</div>'+
+          '<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">'+esc(r.description)+'</div>'+
+          (r.liveUrl?'<a href="'+r.liveUrl+'" target="_blank" style="font-size:9px;color:var(--accent);text-decoration:none">'+r.liveUrl.replace('https://','')+'</a>':'<span style="font-size:9px;color:var(--text-muted)">Local only</span>')+
+          (r.hasApi?'<div style="margin-top:6px;font-size:9px;color:var(--text-muted)">Endpoints: '+r.apiEndpoints.join(', ')+'</div>':'')+
+          (r.lastPing?'<div style="margin-top:4px;font-size:8px;color:var(--text-muted)">Last ping: '+new Date(r.lastPing).toLocaleString()+'</div>':'')+
+        '</div>';
+      }).join('');
+    } else {
+      grid.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Could not load repos</div>';
+    }
+  } catch(e) {
+    grid.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Error: '+e.message+'</div>';
+  }
+}
+
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 // ASTRA self-ping — registers itself in repo registry
 (function(){fetch(ASTRA_API+'/api/repos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repoId:'astra-command-center',status:'online',message:'ASTRA Hub loaded'})}).catch(function(){});})();
