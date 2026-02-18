@@ -1709,6 +1709,8 @@ function updateBreadcrumb() {
   const bc = document.getElementById('header-breadcrumb');
   if(!bc) return;
   let parts = [];
+  const sectionNames = {content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard',pipeline:'Pipeline',repos:'Repos'};
+  parts.push(sectionNames[currentSection] || currentSection);
   if(currentSection === 'writer') {
     const d = getActiveDoc();
     if(d && d.title) parts.push(d.title);
@@ -1716,11 +1718,7 @@ function updateBreadcrumb() {
     const s = getActiveSpec();
     if(s && s.title) parts.push(s.title);
   }
-  if(activeProject) {
-    const p = (S.projects||[]).find(x=>x.id===activeProject);
-    if(p) parts.push(p.name);
-  }
-  bc.innerHTML = parts.length ? '<span style="opacity:0.4">/</span> ' + parts.map(p => '<span>'+esc(p)+'</span>').join(' <span style="opacity:0.4">/</span> ') : '';
+  bc.innerHTML = parts.length > 1 ? parts.map((p,i) => (i>0?'<span style="opacity:0.4"> / </span>':'') + '<span>'+esc(p)+'</span>').join('') : '';
 }
 
 function updateSidebarCtx() {
