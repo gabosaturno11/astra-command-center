@@ -848,6 +848,7 @@ textarea{resize:vertical;line-height:1.6}
           </select>
           <button class="btn btn-sm" onclick="exportTasks()" title="Copy tasks as markdown">Export</button>
           <button class="btn btn-sm" onclick="archiveCompletedTasks()" title="Archive all completed tasks">Archive Done</button>
+          <button class="btn btn-sm" id="task-filter-archived" onclick="showArchivedTasks()" title="View archived tasks">Archived<span id="archived-count" style="font-size:8px;color:var(--text-muted);margin-left:3px;font-family:var(--mono)"></span></button>
           <div class="task-toolbar-search">
             <input type="text" id="task-search" placeholder="Search tasks..." oninput="renderTasks()" style="font-size:10px;padding:5px 8px">
           </div>
@@ -1360,7 +1361,7 @@ textarea{resize:vertical;line-height:1.6}
   <div class="modal">
     <div class="modal-title" id="link-modal-title">Add Link</div>
     <div class="form-group"><label class="form-label">Title</label><input type="text" id="lm-title" placeholder="Saturno Vault"></div>
-    <div class="form-group"><label class="form-label">URL</label><input type="text" id="lm-url" placeholder="https://..."></div>
+    <div class="form-group"><label class="form-label">URL</label><input type="text" id="lm-url" placeholder="https://..." onblur="suggestLinkTitle()"></div>
     <div class="form-group"><label class="form-label">Category</label><input type="text" id="lm-category" placeholder="deployment, repo, tool"></div>
     <div class="form-group"><label class="form-label">Description</label><input type="text" id="lm-desc" placeholder="Short description"></div>
     <div class="form-group"><label class="form-label">Project (optional)</label><select id="lm-project"><option value="">None</option></select></div>
@@ -2234,6 +2235,7 @@ function renderTasks(){
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
   document.getElementById('tasks-count').textContent=activeTasks;
   document.getElementById('tasks-count').title=activeTasks+' active, '+doneTasks+' done ('+S.tasks.length+' total)';
+  const acEl=document.getElementById('archived-count');if(acEl)acEl.textContent=(S.archivedTasks||[]).length||'';
   if(!document.getElementById('pdl')){const dl=document.createElement('datalist');dl.id='pdl';document.body.appendChild(dl);}
   document.getElementById('pdl').innerHTML=projects.map(p=>`<option value="${p}">`).join('');
   updateSidebarCtx();
@@ -2254,6 +2256,22 @@ function archiveCompletedTasks(){
   if(S.archivedTasks.length>500)S.archivedTasks.length=500;
   S.tasks=S.tasks.filter(t=>t.status!=='done');
   save();renderTasks();toast('Archived '+done.length+' tasks');
+}
+function showArchivedTasks(){
+  const archived=S.archivedTasks||[];
+  if(!archived.length){toast('No archived tasks');return;}
+  const rows=document.getElementById('task-rows');
+  document.getElementById('task-list-view').style.display='block';
+  document.getElementById('task-board-view').classList.remove('active');
+  rows.innerHTML='<div style="padding:8px 0;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:8px"><span>Archived Tasks ('+archived.length+')</span><button class="btn btn-sm btn-ghost" onclick="renderTasks()" style="font-size:8px;padding:1px 6px">Back to active</button></div>'+archived.slice(0,50).map(t=>`<div class="task-row completed priority-${t.priority||'p2'}" style="opacity:0.6"><div class="task-checkbox checked"></div><div><span style="font-size:12px;color:var(--text-secondary);text-decoration:line-through">${esc(t.title||'Untitled')}</span></div><div><span style="font-size:10px;color:var(--text-muted)">${t.project||''}</span></div><div><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':'muted'}" style="font-size:8px">${t.priority||'p3'}</span></div><div><span style="font-size:9px;color:var(--text-muted)">${t.due||''}</span></div><div><span style="font-size:8px;color:var(--text-muted)">${t.created?new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'?'}</span></div><div class="task-actions" style="opacity:1"><button class="task-action-btn" onclick="restoreArchivedTask(${t.id})" title="Restore" style="font-size:10px;color:var(--accent)">+</button></div></div>`).join('')+(archived.length>50?'<div style="padding:8px;font-size:10px;color:var(--text-muted)">Showing first 50 of '+archived.length+'</div>':'');
+}
+function restoreArchivedTask(id){
+  const idx=(S.archivedTasks||[]).findIndex(t=>t.id===id);
+  if(idx<0)return;
+  const t=S.archivedTasks.splice(idx,1)[0];
+  t.status='todo';
+  S.tasks.unshift(t);
+  save();renderTasks();toast('Restored: '+(t.title||'task'));
 }
 
 function exportTasks(){
@@ -2718,6 +2736,16 @@ function openLinkModal(id){editingLinkId=id||null;document.getElementById('link-
   document.getElementById('lm-category').setAttribute('list','link-cat-dl');if(id){const l=S.links.find(x=>x.id===id);if(l){document.getElementById('lm-title').value=l.title;document.getElementById('lm-url').value=l.url;document.getElementById('lm-category').value=l.category||'';document.getElementById('lm-desc').value=l.desc||'';projSel.value=l.projectId||'';}}else{document.getElementById('lm-title').value='';document.getElementById('lm-url').value='';document.getElementById('lm-category').value='';document.getElementById('lm-desc').value='';projSel.value=activeProject||'';}document.getElementById('link-modal').classList.add('open');setTimeout(()=>document.getElementById('lm-title').focus(),100);}
 function closeLinkModal(){document.getElementById('link-modal').classList.remove('open');editingLinkId=null;}
 function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim(),projId=document.getElementById('lm-project').value;if(!title||!url){toast('Title and URL required');return;}try{new URL(url);}catch(e){toast('Invalid URL format');return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;l.projectId=projId||undefined;}}else{const link={id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()};if(projId)link.projectId=projId;else if(activeProject)link.projectId=activeProject;S.links.push(link);}save();closeLinkModal();renderLinks();if(activeProject)renderProjLinks();toast(editingLinkId?'Updated':'Added');}
+function suggestLinkTitle(){
+  const urlEl=document.getElementById('lm-url'),titleEl=document.getElementById('lm-title');
+  if(!urlEl||!titleEl||titleEl.value.trim())return;
+  const url=urlEl.value.trim();if(!url)return;
+  try{const u=new URL(url);const host=u.hostname.replace(/^www\./,'');const path=u.pathname.replace(/^\//,'').replace(/\/$/, '').split('/').filter(Boolean);
+  let title=host;
+  if(path.length)title=path[path.length-1].replace(/[-_]/g,' ').replace(/\.\w+$/,'');
+  titleEl.value=title.charAt(0).toUpperCase()+title.slice(1);
+  }catch(e){}
+}
 function delLink(id){S.links=S.links.filter(l=>l.id!==id);save();renderLinks();toast('Deleted');}
 function cpText(t){navigator.clipboard.writeText(t);toast('Copied');}
 
