@@ -1060,6 +1060,7 @@ textarea{resize:vertical;line-height:1.6}
           <select class="writer-toolbar-select" onchange="wbExport(this.value);this.selectedIndex=0" style="width:auto"><option value="">Export</option><option value="png">PNG</option><option value="svg">SVG</option><option value="json">JSON</option></select>
           <button class="btn btn-sm" onclick="wbImportJSON()" title="Import whiteboard JSON">Import</button>
           <button class="btn btn-sm" onclick="wbClearAll()">Clear</button>
+          <input type="text" id="wb-search" placeholder="Find node..." oninput="wbSearchNodes(this.value)" style="width:100px;padding:2px 6px;font-size:9px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono)">
         </div>
         <div class="wb-top-bar">
           <div class="wb-zoom"><button class="wb-tool" onclick="wbZoom(-0.1)" style="width:20px;height:20px;font-size:14px">-</button><span id="wb-zoom-level">100%</span><button class="wb-tool" onclick="wbZoom(0.1)" style="width:20px;height:20px;font-size:14px">+</button><button class="wb-tool" onclick="wbFitView()" style="width:20px;height:20px;font-size:9px">Fit</button></div>
@@ -3061,6 +3062,21 @@ function onSpecChange(){clearTimeout(specTimer);document.getElementById('specs-s
 function updateSpecStatus(){const s=getActiveSpec();if(!s)return;let total=0;(s.sections||[]).forEach(sec=>{total+=countW(sec.body);});document.getElementById('specs-word-count').textContent=total+' words';}
 function specExport(fmt){if(!fmt)return;snapshotSpec();const s=getActiveSpec();if(!s)return;const t=s.title||'spec';let c;if(fmt==='clipboard'){let txt=t+'\n'+'='.repeat(t.length)+'\n\n';(s.sections||[]).forEach(sec=>{txt+=sec.title+'\n'+'-'.repeat(sec.title.length)+'\n';const d=document.createElement('div');d.innerHTML=sec.body||'';txt+=(d.innerText||'')+'\n\n';});navigator.clipboard.writeText(txt);toast('Copied');return;}if(fmt==='md'){c='# '+t+'\n\n';(s.sections||[]).forEach(sec=>{c+='## '+sec.title+'\n\n';c+=htmlToMd(sec.body||'',null).replace(/^# .*\n\n/,'')+'\n';});}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px;border-bottom:2px solid #eee;padding-bottom:8px}h2{font-size:20px;margin-top:24px;color:#333}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}</style></head><body><h1>${esc(t)}</h1>`+(s.sections||[]).map(sec=>`<h2>${esc(sec.title)}</h2>${sec.body||''}`).join('')+'</body></html>';}const blob=new Blob([c],{type:fmt==='md'?'text/markdown':'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+(fmt==='md'?'md':'html');a.click();toast('Exported');}
 
+function exportAllSpecs(){
+  snapshotSpec();
+  let md='# Living Docs Export\nGenerated: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'\n'+S.specs.length+' specs total\n\n';
+  S.specs.forEach(s=>{
+    const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;
+    md+='---\n\n# '+(s.title||'Untitled Spec')+(proj?' ('+proj.name+')':'')+'\n\n';
+    (s.sections||[]).forEach(sec=>{
+      md+='## '+(sec.title||'Section')+'\n\n';
+      const d=document.createElement('div');d.innerHTML=sec.body||'';
+      md+=(d.innerText||'(empty)')+'\n\n';
+    });
+  });
+  navigator.clipboard.writeText(md).then(()=>toast('All '+S.specs.length+' specs copied as markdown'));
+}
+
 // === LINKS ===
 function renderLinks(){
   const cats=[...new Set(S.links.map(l=>l.category).filter(Boolean))].sort();
@@ -4153,7 +4169,7 @@ function wbRender() {
     const isSticky = n.type === 'sticky';
     const bg = isSticky ? n.color : 'var(--bg-surface)';
     const textColor = isSticky ? '#1a1a24' : 'var(--text)';
-    return `<div class="wb-node ${isSel?'selected':''}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;min-height:${n.h}px;background:${bg}${n.locked?';border-style:dashed;opacity:0.85':''}" onmousedown="wbNodeDown(event,${n.id})">
+    return `<div class="wb-node ${isSel?'selected':''}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;min-height:${n.h}px;background:${bg}${n.locked?';border-style:dashed;opacity:0.85':''}${n._highlight?';box-shadow:0 0 12px 3px var(--accent),0 0 0 2px var(--accent);z-index:100':''}" onmousedown="wbNodeDown(event,${n.id})">
       ${!isSticky?`<div class="wb-node-color" style="background:${n.color}"></div>`:''}
       <div class="wb-node-header" contenteditable="true" style="color:${textColor}" onblur="wbNodeEdit(${n.id},'title',this.textContent)" onclick="event.stopPropagation()">${esc(n.title)}</div>
       <div class="wb-node-body" contenteditable="true" style="color:${isSticky?'#333':'var(--text-secondary)'}" onblur="wbNodeEdit(${n.id},'body',this.textContent)" onclick="event.stopPropagation()">${esc(n.body)}</div>
@@ -4235,6 +4251,17 @@ function wbCanvasUp(e) {
 
 function wbResizeStart(e, id) { const n = wbNodes.find(x => x.id === id); if(n) wbResizing = { id, ox: e.clientX, oy: e.clientY, sw: n.w, sh: n.h }; }
 function wbNodeEdit(id, field, val) { const n = wbNodes.find(x => x.id === id); if(n) { n[field] = val; wbSaveState(); }}
+function wbSearchNodes(q){
+  const ql=q.toLowerCase().trim();
+  wbNodes.forEach(n=>{n._highlight=false;});
+  if(ql){
+    const matches=wbNodes.filter(n=>(n.title||'').toLowerCase().includes(ql)||(n.body||'').toLowerCase().includes(ql));
+    matches.forEach(n=>{n._highlight=true;});
+    if(matches.length===1){const n=matches[0];const wrap=document.getElementById('wb-canvas-wrap');wbPanX=-(n.x-wrap.clientWidth/2+n.w/2)*wbScale;wbPanY=-(n.y-wrap.clientHeight/2+n.h/2)*wbScale;wbUpdateTransform();}
+    toast(matches.length+' node'+(matches.length!==1?'s':'')+' found');
+  }
+  wbRender();
+}
 function wbPickColor(id){
   const n=wbNodes.find(x=>x.id===id);if(!n)return;
   const colors=['#4ade80','#22d3ee','#3b82f6','#a855f7','#f472b6','#f87171','#fbbf24','#fb923c','#6366f1','#14b8a6','#ef4444','#84cc16'];
@@ -4804,10 +4831,18 @@ function cmdGetItems(q) {
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'daily dashboard digest briefing morning'.includes(ql)) items.push({title:'Daily Dashboard', desc:'Full daily briefing copied to clipboard', icon:'*', type:'action', action:()=>{closeCommandPalette();dailyDashboard();}});
   if(!ql || 'import ics calendar'.includes(ql)) items.push({title:'Import ICS', desc:'Import .ics calendar file as tasks', icon:'C', type:'action', action:()=>{closeCommandPalette();importICS();}});
-  // Quick create task from Cmd+K
+  if(!ql || 'export all specs living docs'.includes(ql)) items.push({title:'Export All Specs', desc:'Combine all Living Docs into one markdown', icon:'S', type:'action', action:()=>{closeCommandPalette();exportAllSpecs();}});
+  // Quick create task from Cmd+K with @date and !priority
   if(ql && ql.startsWith('task:')) {
-    const taskTitle=q.substring(5).trim();
-    if(taskTitle){items.unshift({title:'Create task: '+taskTitle,desc:'Quick-create a new task',icon:'+',type:'action',action:()=>{closeCommandPalette();S.tasks.unshift({id:Date.now(),title:taskTitle,description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();if(currentSection==='tasks')renderTasks();toast('Task created: '+taskTitle);}});}
+    let taskRaw=q.substring(5).trim();
+    let taskDue=new Date().toISOString().split('T')[0];
+    let taskPri='p1';
+    const dateMatch=taskRaw.match(/@(\S+)/);
+    if(dateMatch){taskDue=parseNaturalDate(dateMatch[1])||taskDue;taskRaw=taskRaw.replace(/@\S+/,'').trim();}
+    const priMatch=taskRaw.match(/!(p[0-3])/i);
+    if(priMatch){taskPri=priMatch[1].toLowerCase();taskRaw=taskRaw.replace(/!p[0-3]/i,'').trim();}
+    const taskTitle=taskRaw;
+    if(taskTitle){items.unshift({title:'Create task: '+taskTitle,desc:'Due: '+taskDue+' | '+taskPri.toUpperCase()+(dateMatch?' (parsed @'+dateMatch[1]+')':''),icon:'+',type:'action',action:()=>{closeCommandPalette();S.tasks.unshift({id:Date.now(),title:taskTitle,description:'',subtasks:[],status:'todo',priority:taskPri,project:taskProjectFilter||'',due:taskDue,created:new Date().toISOString()});save();if(currentSection==='tasks')renderTasks();toast('Task created: '+taskTitle);}});}
   }
   // Quick add content from Cmd+K
   if(ql && ql.startsWith('note:')) {
