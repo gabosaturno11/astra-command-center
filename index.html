@@ -213,8 +213,31 @@ textarea{resize:vertical;line-height:1.6}
 .board-col-tasks{padding:6px;flex:1;overflow-y:auto}
 .board-card{background:linear-gradient(135deg, var(--bg-elevated) 0%, #1e1e22 100%);border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:6px;cursor:grab;transition:all 0.15s}
 .board-card:hover{border-color:var(--border-hover);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
-.board-card-title{font-size:12px;color:var(--text);margin-bottom:6px}
-.board-card-meta{display:flex;gap:4px;flex-wrap:wrap}
+.board-card-title{font-size:12px;color:var(--text);margin-bottom:4px}
+.board-card-desc{font-size:10px;color:var(--text-muted);margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.board-card-subtasks{font-size:9px;color:var(--text-muted);margin-bottom:4px;font-family:var(--mono)}
+.board-card-subtasks .done{color:var(--accent)}
+.board-card-meta{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.task-detail-modal{position:fixed;inset:0;z-index:1500;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px)}
+.task-detail-modal.open{display:flex}
+.task-detail-inner{background:var(--bg-deep);border:1px solid var(--border);border-radius:var(--radius-lg);width:540px;max-width:95vw;max-height:85vh;overflow-y:auto;padding:24px}
+.task-detail-inner h3{font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px}
+.td-field{margin-bottom:14px}
+.td-field label{display:block;font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+.td-field input,.td-field textarea,.td-field select{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:8px 10px;font-size:13px;font-family:var(--font)}
+.td-field textarea{min-height:80px;resize:vertical;line-height:1.6}
+.td-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.td-subtasks{margin-top:8px}
+.td-subtask{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.td-subtask input[type=checkbox]{accent-color:var(--accent)}
+.td-subtask input[type=text]{flex:1;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);padding:2px 0;font-size:12px;outline:none}
+.td-subtask input[type=text]:focus{border-color:var(--accent)}
+.td-subtask .del{opacity:0;cursor:pointer;color:var(--red);font-size:10px;transition:opacity 0.1s}
+.td-subtask:hover .del{opacity:1}
+.td-add-subtask{font-size:11px;color:var(--text-muted);cursor:pointer;padding:4px 0;margin-top:4px}
+.td-add-subtask:hover{color:var(--accent)}
+.td-footer{display:flex;gap:8px;margin-top:20px;justify-content:space-between}
+.td-created{font-size:9px;color:var(--text-muted);margin-top:12px}
 
 /* Calendar */
 .calendar-shell{display:flex;flex-direction:column;height:100%}
@@ -1448,6 +1471,33 @@ textarea{resize:vertical;line-height:1.6}
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
 </button>
 
+<!-- Task Detail Modal -->
+<div class="task-detail-modal" id="task-detail-modal" onclick="if(event.target===this)closeTaskDetail()">
+  <div class="task-detail-inner">
+    <h3 id="td-heading">Task Details</h3>
+    <div class="td-field"><label>Title</label><input type="text" id="td-title" placeholder="Task title..."></div>
+    <div class="td-field"><label>Description</label><textarea id="td-desc" placeholder="Add details, notes, context..."></textarea></div>
+    <div class="td-field-row">
+      <div class="td-field"><label>Status</label><select id="td-status"><option value="todo">To Do</option><option value="progress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select></div>
+      <div class="td-field"><label>Priority</label><select id="td-priority"><option value="p0">P0 Critical</option><option value="p1">P1 High</option><option value="p2">P2 Medium</option><option value="p3">P3 Low</option></select></div>
+    </div>
+    <div class="td-field-row">
+      <div class="td-field"><label>Project</label><input type="text" id="td-project" placeholder="Project name..." list="pdl"></div>
+      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"></div>
+    </div>
+    <div class="td-field">
+      <label>Subtasks</label>
+      <div class="td-subtasks" id="td-subtasks"></div>
+      <div class="td-add-subtask" onclick="addSubtaskInModal()">+ Add subtask</div>
+    </div>
+    <div class="td-created" id="td-created"></div>
+    <div class="td-footer">
+      <button class="btn btn-primary btn-sm" onclick="saveTaskDetail()">Save</button>
+      <button class="btn btn-sm" onclick="closeTaskDetail()">Cancel</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1872,12 +1922,12 @@ function renderTasks(){
   const items=getFilteredTasks();
   const projects=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
   const rows=document.getElementById('task-rows');
-  rows.innerHTML=items.map(t=>`<div class="task-row ${t.status==='done'?'completed':''}" data-id="${t.id}" draggable="true" ondragstart="taskDragStart(event,${t.id})" ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,${t.id})"><div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id})"></div><div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name..."></div><div><select class="task-select" onchange="updateTask(${t.id},'status',this.value)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div><div><select class="task-select" onchange="updateTask(${t.id},'priority',this.value)"><option value="p0" ${t.priority==='p0'?'selected':''}>P0 Critical</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1 High</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2 Medium</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3 Low</option></select></div><div><input type="text" class="task-select" style="border:1px solid transparent" value="${escA(t.project||'')}" onchange="updateTask(${t.id},'project',this.value)" placeholder="Project..." list="pdl"></div><div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)"></div><div class="task-actions"><button class="task-action-btn del" onclick="deleteTask(${t.id})">x</button></div></div>`).join('')+`<div class="add-task-row" onclick="addTask()">+ Add task</div>`;
+  rows.innerHTML=items.map(t=>`<div class="task-row ${t.status==='done'?'completed':''}" data-id="${t.id}" draggable="true" ondragstart="taskDragStart(event,${t.id})" ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,${t.id})"><div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id})"></div><div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name..."></div><div><select class="task-select" onchange="updateTask(${t.id},'status',this.value)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div><div><select class="task-select" onchange="updateTask(${t.id},'priority',this.value)"><option value="p0" ${t.priority==='p0'?'selected':''}>P0 Critical</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1 High</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2 Medium</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3 Low</option></select></div><div><input type="text" class="task-select" style="border:1px solid transparent" value="${escA(t.project||'')}" onchange="updateTask(${t.id},'project',this.value)" placeholder="Project..." list="pdl"></div><div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)"></div><div class="task-actions"><button class="task-action-btn" onclick="openTaskDetail(${t.id})" title="Details" style="font-size:10px">...</button><button class="task-action-btn del" onclick="deleteTask(${t.id})">x</button></div></div>`).join('')+`<div class="add-task-row" onclick="addTask()">+ Add task</div>`;
 
   ['todo','progress','done','blocked'].forEach(st=>{
     const col=document.getElementById('board-'+st),cnt=document.getElementById('bc-'+st),f=items.filter(t=>t.status===st);
     cnt.textContent=f.length;
-    col.innerHTML=f.map(t=>`<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div><div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:var(--text-muted);font-family:var(--mono)">${t.due}</span>`:''}</div></div>`).join('');
+    col.innerHTML=f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks</div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:var(--text-muted);font-family:var(--mono)">${t.due}</span>`:''}</div></div>`;}).join('');
   });
   document.getElementById('tasks-count').textContent=S.tasks.filter(t=>t.status!=='done').length;
   if(!document.getElementById('pdl')){const dl=document.createElement('datalist');dl.id='pdl';document.body.appendChild(dl);}
@@ -1885,7 +1935,7 @@ function renderTasks(){
   updateSidebarCtx();
 }
 
-function addTask(){S.tasks.unshift({id:Date.now(),title:'',status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
+function addTask(){S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
 function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){t[f]=v;save();renderTasks();}}
 function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){t.status=t.status==='done'?'todo':'done';save();renderTasks();}}
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
@@ -1901,6 +1951,79 @@ function taskDrop(e,targetId){e.preventDefault();e.currentTarget.classList.remov
 let boardDragId=null;
 function boardDragStart(e,id){boardDragId=id;e.dataTransfer.effectAllowed='move';}
 function boardDrop(e,status){e.preventDefault();if(boardDragId){const t=S.tasks.find(x=>x.id===boardDragId);if(t){t.status=status;save();renderTasks();}boardDragId=null;}}
+
+// Task Detail Modal
+let taskDetailId = null;
+function openTaskDetail(id) {
+  const t = S.tasks.find(x=>x.id===id);
+  if(!t) return;
+  taskDetailId = id;
+  document.getElementById('td-title').value = t.title || '';
+  document.getElementById('td-desc').value = t.description || '';
+  document.getElementById('td-status').value = t.status || 'todo';
+  document.getElementById('td-priority').value = t.priority || 'p2';
+  document.getElementById('td-project').value = t.project || '';
+  document.getElementById('td-due').value = t.due || '';
+  document.getElementById('td-created').textContent = t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  renderSubtasksInModal(t.subtasks || []);
+  document.getElementById('task-detail-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('td-title').focus(),100);
+}
+function closeTaskDetail() {
+  document.getElementById('task-detail-modal').classList.remove('open');
+  taskDetailId = null;
+}
+function renderSubtasksInModal(subtasks) {
+  const el = document.getElementById('td-subtasks');
+  el.innerHTML = (subtasks||[]).map((st,i) => `<div class="td-subtask">
+    <input type="checkbox" ${st.done?'checked':''} onchange="toggleSubtaskInModal(${i},this.checked)">
+    <input type="text" value="${escA(st.title)}" onchange="renameSubtaskInModal(${i},this.value)" placeholder="Subtask...">
+    <span class="del" onclick="removeSubtaskInModal(${i})">x</span>
+  </div>`).join('');
+}
+function addSubtaskInModal() {
+  const t = S.tasks.find(x=>x.id===taskDetailId);
+  if(!t) return;
+  if(!t.subtasks) t.subtasks = [];
+  t.subtasks.push({id:Date.now(), title:'', done:false});
+  renderSubtasksInModal(t.subtasks);
+  const inputs = document.querySelectorAll('#td-subtasks input[type=text]');
+  if(inputs.length) inputs[inputs.length-1].focus();
+}
+function toggleSubtaskInModal(i,done) {
+  const t = S.tasks.find(x=>x.id===taskDetailId);
+  if(t && t.subtasks && t.subtasks[i]) t.subtasks[i].done = done;
+}
+function renameSubtaskInModal(i,val) {
+  const t = S.tasks.find(x=>x.id===taskDetailId);
+  if(t && t.subtasks && t.subtasks[i]) t.subtasks[i].title = val;
+}
+function removeSubtaskInModal(i) {
+  const t = S.tasks.find(x=>x.id===taskDetailId);
+  if(t && t.subtasks) { t.subtasks.splice(i,1); renderSubtasksInModal(t.subtasks); }
+}
+function saveTaskDetail() {
+  const t = S.tasks.find(x=>x.id===taskDetailId);
+  if(!t) return;
+  t.title = document.getElementById('td-title').value.trim();
+  t.description = document.getElementById('td-desc').value.trim();
+  t.status = document.getElementById('td-status').value;
+  t.priority = document.getElementById('td-priority').value;
+  t.project = document.getElementById('td-project').value.trim();
+  t.due = document.getElementById('td-due').value;
+  // Link to project ID if name matches
+  if(t.project) { const p = (S.projects||[]).find(pr => pr.name === t.project); if(p) t.projectId = p.id; }
+  save(); closeTaskDetail(); renderTasks();
+  if(activeProject) renderProjTasks();
+  toast('Task saved');
+}
+function deleteTaskFromDetail() {
+  if(!taskDetailId) return;
+  S.tasks = S.tasks.filter(t=>t.id!==taskDetailId);
+  save(); closeTaskDetail(); renderTasks();
+  if(activeProject) renderProjTasks();
+  toast('Task deleted');
+}
 
 // === CALENDAR ===
 function renderCalendar(){
@@ -4033,6 +4156,7 @@ document.addEventListener('keydown',e=>{
   const inInput = e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true';
   if(e.key==='Escape'){
     if(zenIsOpen) { zenClose(); return; }
+    if(document.getElementById('task-detail-modal').classList.contains('open')) { closeTaskDetail(); return; }
     if(document.getElementById('cmd-overlay').classList.contains('open')) { closeCommandPalette(); return; }
     document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
     if(activeProject) closeProjectPanel();
