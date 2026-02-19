@@ -822,6 +822,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="randomContent()" title="Random content for inspiration">Random</button>
           <button class="btn btn-sm" onclick="exportContent()" title="Export all content as markdown">Export</button>
           <button class="btn btn-sm" onclick="contentManageTags()" title="Rename or delete tags">Tags</button>
+          <button class="btn btn-sm" onclick="batchImportContent()" title="Paste multiple items separated by ---">Batch</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -1700,7 +1701,7 @@ let contentType = 'all', contentTheme = 'all', contentTagFilter = null;
 let taskView = 'list', taskFilter = 'all', taskProjectFilter = null;
 let linkCategory = 'all';
 let editingContentId = null, editingLinkId = null;
-let writerTimer = null, specTimer = null, writerPanelOpen = false;
+let writerTimer = null, specTimer = null, writerPanelOpen = false, writerAutoBackupTimer = null;
 let calMonth = new Date().getMonth(), calYear = new Date().getFullYear();
 let calView = 'month'; // 'month' or 'week'
 let calWeekStart = null; // Date object for week view start (Monday)
@@ -2282,6 +2283,14 @@ function readContent(id){
   overlay.tabIndex=0;overlay.focus();
 }
 function starContent(id){const c=S.content.find(x=>x.id===id);if(c){c.starred=!c.starred;save();renderContent();toast(c.starred?'Starred':'Unstarred');}}
+function batchImportContent(){
+  const text=prompt('Paste content items separated by --- (three dashes):');
+  if(!text)return;
+  const items=text.split(/\n---\n|\n---$|^---\n/).map(s=>s.trim()).filter(Boolean);
+  if(!items.length){toast('No items found');return;}
+  items.forEach(body=>{S.content.unshift({id:Date.now()+Math.random()*1000,type:'caption',theme:'imported',body,tags:['batch-import'],created:new Date().toISOString()});});
+  save();renderContent();toast('Imported '+items.length+' content items');
+}
 function contentToDoc(id){const c=S.content.find(x=>x.id===id);if(!c)return;const title=(c.theme||'Untitled')+' — '+(c.body.substring(0,40).replace(/\n/g,' '));S.docs.push({id:Date.now(),title,body:c.body.replace(/\n/g,'<br>'),created:new Date().toISOString(),updated:new Date().toISOString(),versions:[]});save();toast('Created doc: '+title.substring(0,30));if(currentSection==='writer')renderWriter();}
 function contentToPipeline(id){const c=S.content.find(x=>x.id===id);if(!c)return;switchSection('pipeline',null);setTimeout(()=>{const ta=document.getElementById('pl-transcript-box');if(ta){ta.style.display='block';ta.value=c.body;plTranscriptText=c.body;const wc=document.getElementById('pl-text-stats');if(wc){const words=c.body.trim().split(/\s+/).filter(x=>x.length).length;wc.textContent=words+' words, '+c.body.length+' chars';}toast('Content loaded in pipeline');}},200);}
 function dupContent(id){const c=S.content.find(x=>x.id===id);if(!c)return;S.content.unshift({...c,id:Date.now(),pinned:false,created:new Date().toISOString()});save();renderContent();toast('Duplicated');}
@@ -2800,7 +2809,11 @@ function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versi
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
 function dupDoc(id){const d=S.docs.find(x=>x.id===id);if(!d)return;snapshotWriter();const dup={...d,id:Date.now(),title:(d.title||'Untitled')+' (copy)',created:new Date().toISOString(),updated:new Date().toISOString(),versions:[]};S.docs.unshift(dup);S.activeDoc=dup.id;save();renderWriter();toast('Duplicated');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
-function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},800);updateWS();}
+function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},800);updateWS();scheduleAutoBackup();}
+function scheduleAutoBackup(){
+  if(writerAutoBackupTimer)return;
+  writerAutoBackupTimer=setTimeout(()=>{writerAutoBackupTimer=null;const d=getActiveDoc();if(!d)return;snapshotWriter();if(!d.versions)d.versions=[];const last=d.versions[0];const now=Date.now();if(last&&now-new Date(last.date).getTime()<300000)return;d.versions.unshift({id:now,title:d.title+' (auto)',body:d.body,words:countW(d.body),date:new Date().toISOString()});if(d.versions.length>50)d.versions=d.versions.slice(0,50);save();renderVersions();},600000);
+}
 function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=t.length+' chars';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
   const d=getActiveDoc();const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
   if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
@@ -4791,6 +4804,16 @@ function cmdGetItems(q) {
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'daily dashboard digest briefing morning'.includes(ql)) items.push({title:'Daily Dashboard', desc:'Full daily briefing copied to clipboard', icon:'*', type:'action', action:()=>{closeCommandPalette();dailyDashboard();}});
   if(!ql || 'import ics calendar'.includes(ql)) items.push({title:'Import ICS', desc:'Import .ics calendar file as tasks', icon:'C', type:'action', action:()=>{closeCommandPalette();importICS();}});
+  // Quick create task from Cmd+K
+  if(ql && ql.startsWith('task:')) {
+    const taskTitle=q.substring(5).trim();
+    if(taskTitle){items.unshift({title:'Create task: '+taskTitle,desc:'Quick-create a new task',icon:'+',type:'action',action:()=>{closeCommandPalette();S.tasks.unshift({id:Date.now(),title:taskTitle,description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();if(currentSection==='tasks')renderTasks();toast('Task created: '+taskTitle);}});}
+  }
+  // Quick add content from Cmd+K
+  if(ql && ql.startsWith('note:')) {
+    const noteBody=q.substring(5).trim();
+    if(noteBody){items.unshift({title:'Save note: '+noteBody.substring(0,40),desc:'Quick-save as content item',icon:'+',type:'action',action:()=>{closeCommandPalette();S.content.unshift({id:Date.now(),type:'caption',theme:'quick-note',body:noteBody,tags:['quick'],created:new Date().toISOString()});save();if(currentSection==='content')renderContent();toast('Note saved');}});}
+  }
   // Open specific docs in Zen Writer
   if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
     S.docs.forEach(function(d) {
