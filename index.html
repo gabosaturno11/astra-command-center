@@ -431,6 +431,7 @@ textarea{resize:vertical;line-height:1.6}
 .wb-node-color{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
 .wb-node-del{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:20}
 .wb-node:hover .wb-node-del{display:flex}
+.wb-node:hover .wb-node-dup{display:flex}
 .wb-node:hover .wb-node-color-btn{opacity:0.7}
 .wb-node-resize{position:absolute;bottom:0;right:0;width:12px;height:12px;cursor:nwse-resize;z-index:15}
 .wb-node-port{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg-surface);cursor:crosshair;z-index:15;opacity:0;transition:opacity 0.15s}
@@ -1159,9 +1160,10 @@ textarea{resize:vertical;line-height:1.6}
           <div id="pl-synthesis-text" style="font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
         </div>
         <div id="pl-history" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px">
             <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Pipeline History</span>
-            <button class="btn btn-sm btn-ghost btn-danger" onclick="if(confirm('Clear all pipeline history?')){S.pipelineHistory=[];save();plLoadHistory();plLoadHistory();toast('Cleared');}" style="font-size:8px;padding:1px 6px">Clear all</button>
+            <input type="text" id="pl-history-search" placeholder="Search history..." oninput="plLoadHistory()" style="flex:1;max-width:200px;font-size:9px;padding:3px 6px">
+            <button class="btn btn-sm btn-ghost btn-danger" onclick="if(confirm('Clear all pipeline history?')){S.pipelineHistory=[];save();plLoadHistory();toast('Cleared');}" style="font-size:8px;padding:1px 6px">Clear all</button>
           </div>
           <div id="pl-history-list"></div>
         </div>
@@ -1491,6 +1493,7 @@ textarea{resize:vertical;line-height:1.6}
     <div class="form-group"><label class="form-label">Description</label><textarea id="rm-desc" rows="3" placeholder="What this repo does..."></textarea></div>
     <div class="form-group"><label class="form-label">Notes</label><input type="text" id="rm-notes" placeholder="Quick notes, reminders..."></div>
     <div class="form-group"><label class="form-label">Last Commit</label><input type="text" id="rm-lastcommit" placeholder="e.g. feat: added new feature"></div>
+    <div class="form-group"><label class="form-label">Tech Stack</label><input type="text" id="rm-stack" placeholder="HTML, JS, Vercel, Node (comma-separated)"></div>
     <div style="display:flex;gap:6px;justify-content:flex-end">
       <button class="btn" onclick="closeRepoModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveRepo()">Save</button>
@@ -4085,6 +4088,11 @@ function wbAddNode(x, y, title, body, color, w, h, type) {
   wbRender();
   return n;
 }
+function wbDuplicateNode(id){
+  const n=wbNodes.find(x=>x.id===id);if(!n)return;
+  wbAddNode(n.x+30,n.y+30,n.title+' (copy)',n.body,n.color,n.w,n.h,n.type);
+  toast('Node duplicated');
+}
 
 function wbRender() {
   const canvas = document.getElementById('wb-canvas');
@@ -4106,6 +4114,7 @@ function wbRender() {
       <div class="wb-node-header" contenteditable="true" style="color:${textColor}" onblur="wbNodeEdit(${n.id},'title',this.textContent)" onclick="event.stopPropagation()">${esc(n.title)}</div>
       <div class="wb-node-body" contenteditable="true" style="color:${isSticky?'#333':'var(--text-secondary)'}" onblur="wbNodeEdit(${n.id},'body',this.textContent)" onclick="event.stopPropagation()">${esc(n.body)}</div>
       <button class="wb-node-del" onclick="event.stopPropagation();wbDeleteNode(${n.id})">x</button>
+      <button class="wb-node-dup" onclick="event.stopPropagation();wbDuplicateNode(${n.id})" style="position:absolute;top:-8px;right:14px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#000;border:none;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:20" title="Duplicate">+</button>
       <button class="wb-node-color-btn" onclick="event.stopPropagation();wbPickColor(${n.id})" style="position:absolute;top:2px;right:20px;width:14px;height:14px;border:none;border-radius:50%;background:${n.color};cursor:pointer;opacity:0;transition:opacity 0.15s" title="Change color"></button>
       <div class="wb-node-resize" onmousedown="event.stopPropagation();wbResizeStart(event,${n.id})"></div>
       <div class="wb-node-port wb-port-right" onmousedown="event.stopPropagation();wbConnStartFn(event,${n.id},'right')"></div>
@@ -5447,6 +5456,8 @@ async function plLoadHistory() {
     }
   } catch(e){}
   if(!results.length && S.pipelineHistory && S.pipelineHistory.length){results=S.pipelineHistory;source='local';}
+  const hq=(document.getElementById('pl-history-search')?.value||'').toLowerCase();
+  if(hq)results=results.filter(r=>((r.preview||'')+(r.prompt||'')+(r.source||'')).toLowerCase().includes(hq));
   if(results.length>0){
     const srcColors={'pipeline-manual':'var(--accent)','pipeline-whatsapp':'#25d366','pipeline-voice':'#a855f7','pipeline-capture':'#fbbf24'};
     listDiv.innerHTML=(source==='local'?'<div style="font-size:9px;color:var(--text-muted);margin-bottom:8px;padding:4px 8px;background:var(--bg-elevated);border-radius:3px">Showing local history ('+results.length+' entries)</div>':'')+results.map((r,i)=>{const full=r.preview||'';const short=full.length>150?full.substring(0,150)+'...':full;const sc=srcColors[r.source]||'var(--text-muted)';const srcLabel=(r.source||'').replace('pipeline-','');return '<div style="padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="this.querySelector(\'.pl-full\').style.display=this.querySelector(\'.pl-full\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.pl-short\').style.display=this.querySelector(\'.pl-short\').style.display===\'none\'?\'block\':\'none\'"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px"><div style="display:flex;gap:4px;align-items:center"><span class="badge badge-blue" style="font-size:9px">'+esc(r.inputType||'text')+'</span><span style="font-size:8px;padding:2px 6px;border-radius:3px;border:1px solid '+sc+';color:'+sc+'">'+esc(srcLabel||'manual')+'</span></div><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div>'+(r.prompt?'<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;font-style:italic;border-left:2px solid var(--accent);padding-left:8px">'+esc(r.prompt)+'</div>':'')+'<div class="pl-short" style="font-size:11px;line-height:1.5;color:var(--text-secondary)">'+esc(short)+(full.length>150?' <span style="color:var(--accent);font-size:9px">[click to expand]</span>':'')+'</div><div class="pl-full" style="display:none;font-size:11px;line-height:1.6;color:var(--text);white-space:pre-wrap">'+esc(full)+'</div><div style="display:flex;gap:4px;margin-top:8px" onclick="event.stopPropagation()"><button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText('+JSON.stringify(full).replace(/'/g,"\\'")+');toast(\'Copied\')">Copy</button><button class="btn btn-sm btn-ghost btn-danger" onclick="plDeleteEntry('+i+');event.stopPropagation()">Delete</button></div></div>';}).join('');
@@ -5519,7 +5530,7 @@ function reposRefresh() {
         <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc}">${esc(r.role)}</span>
         ${r.updatedAt?'<span style="font-size:8px;color:var(--text-muted)">'+timeAgo(r.updatedAt)+'</span>':''}
       </div>
-      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:${r.notes||r.lastCommit?'4':'10'}px;line-height:1.5">${esc(r.desc)}</div>${r.lastCommit?`<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px;font-family:var(--mono);padding:3px 6px;background:var(--bg-deep);border-radius:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">last: ${esc(r.lastCommit)}</div>`:''}${r.notes?`<div style="font-size:10px;color:var(--accent);margin-bottom:10px;padding:4px 6px;background:rgba(74,222,128,0.04);border-radius:4px;border-left:2px solid var(--accent);line-height:1.4">${esc(r.notes)}</div>`:''}
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:${r.notes||r.lastCommit||r.stack?'4':'10'}px;line-height:1.5">${esc(r.desc)}</div>${r.stack?`<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px">${r.stack.split(',').map(t=>`<span style="font-size:7px;padding:1px 5px;border-radius:8px;border:1px solid rgba(74,222,128,0.2);color:var(--accent);letter-spacing:0.03em">${esc(t.trim())}</span>`).join('')}</div>`:''}${r.lastCommit?`<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px;font-family:var(--mono);padding:3px 6px;background:var(--bg-deep);border-radius:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">last: ${esc(r.lastCommit)}</div>`:''}${r.notes?`<div style="font-size:10px;color:var(--accent);margin-bottom:10px;padding:4px 6px;background:rgba(74,222,128,0.04);border-radius:4px;border-left:2px solid var(--accent);line-height:1.4">${esc(r.notes)}</div>`:''}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> repo</a>
         ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${r.lastCheck?(r.lastCheckOk?'var(--green)':'var(--red)'):'var(--green)'};display:inline-block"></span> live${r.lastCheck?' ('+timeAgo(r.lastCheck)+')':''}</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
@@ -5552,9 +5563,9 @@ function openRepoModal(name){
   document.getElementById('repo-modal-title').textContent=name?'Edit Repo':'Add Repo';
   if(name){
     const r=(S.repos||[]).find(x=>x.name===name);
-    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';document.getElementById('rm-notes').value=r.notes||'';document.getElementById('rm-lastcommit').value=r.lastCommit||'';}
+    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';document.getElementById('rm-notes').value=r.notes||'';document.getElementById('rm-lastcommit').value=r.lastCommit||'';document.getElementById('rm-stack').value=r.stack||'';}
   } else {
-    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';document.getElementById('rm-notes').value='';document.getElementById('rm-lastcommit').value='';
+    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';document.getElementById('rm-notes').value='';document.getElementById('rm-lastcommit').value='';document.getElementById('rm-stack').value='';
   }
   document.getElementById('repo-modal').classList.add('open');
   setTimeout(()=>document.getElementById('rm-name').focus(),100);
@@ -5565,7 +5576,8 @@ function saveRepo(){
   if(!name){toast('Name required');return;}
   const notes=document.getElementById('rm-notes').value.trim();
   const lastCommit=document.getElementById('rm-lastcommit').value.trim();
-  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),notes:notes||undefined,lastCommit:lastCommit||undefined,updatedAt:new Date().toISOString()};
+  const stack=document.getElementById('rm-stack').value.trim();
+  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),notes:notes||undefined,lastCommit:lastCommit||undefined,stack:stack||undefined,updatedAt:new Date().toISOString()};
   if(!S.repos)S.repos=[];
   if(editingRepoName){
     const idx=S.repos.findIndex(r=>r.name===editingRepoName);
