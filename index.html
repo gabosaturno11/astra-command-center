@@ -1107,6 +1107,7 @@ textarea{resize:vertical;line-height:1.6}
         <div class="proj-icon-lg" id="proj-header-icon"></div>
         <span class="project-header-name" id="proj-header-name"></span>
         <span class="badge" id="proj-header-status"></span>
+        <div id="proj-stats-bar" style="display:flex;gap:12px;margin-left:auto;margin-right:12px"></div>
         <div class="project-header-actions">
           <button class="btn btn-sm" onclick="editProject()">Edit</button>
           <button class="btn btn-sm" onclick="showExportMenu(event)" title="Export project">Export</button>
@@ -2030,7 +2031,17 @@ function updateSidebarCtx() {
   const el=document.getElementById('sidebar-context');
   if(currentSection==='tasks') {
     const ps=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
-    el.innerHTML=`<div class="sidebar-label">Projects</div>`+ps.map(p=>`<div class="sidebar-item" onclick="filterTaskProject('${p}')"><span class="sidebar-item-icon">.</span><span>${p}</span><span class="sidebar-item-count">${S.tasks.filter(t=>t.project===p).length}</span></div>`).join('');
+    const active=S.tasks.filter(t=>t.status!=='done');
+    const today=new Date().toISOString().split('T')[0];
+    const overdue=active.filter(t=>t.due&&t.due<today).length;
+    el.innerHTML=`<div class="sidebar-label">Quick Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${active.length} active${overdue?` <span style="color:var(--red)">(${overdue} overdue)</span>`:''} / ${S.tasks.filter(t=>t.status==='done').length} done</div><div class="sidebar-label" style="margin-top:8px">Projects</div>`+ps.map(p=>`<div class="sidebar-item" onclick="filterTaskProject('${p}')"><span class="sidebar-item-icon">.</span><span>${p}</span><span class="sidebar-item-count">${S.tasks.filter(t=>t.project===p&&t.status!=='done').length}</span></div>`).join('');
+  } else if(currentSection==='content') {
+    const types={};S.content.forEach(c=>{types[c.type]=(types[c.type]||0)+1;});
+    const totalWords=S.content.reduce((a,c)=>a+c.body.trim().split(/\s+/).filter(x=>x.length).length,0);
+    el.innerHTML=`<div class="sidebar-label">Content Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.content.length} items / ${totalWords.toLocaleString()} words</div>`+Object.entries(types).map(([t,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${t}: ${n}</div>`).join('');
+  } else if(currentSection==='writer') {
+    const totalWords=S.docs.reduce((a,d)=>a+(d.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
+    el.innerHTML=`<div class="sidebar-label">Writer Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.docs.length} docs / ${totalWords.toLocaleString()} words</div>`;
   } else el.innerHTML='';
 }
 
@@ -2492,13 +2503,13 @@ function renderLinks(){
   const q=(document.getElementById('link-search')?.value||'').toLowerCase();
   let items=S.links;if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
   const g=document.getElementById('links-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No links. Click + Add.</div>`:items.map(l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')"><div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div></div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;}).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No links. Click + Add.</div>`:items.map(l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')"><div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div></div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}${l.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(l.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('links-count').textContent=S.links.length;
 }
 function setLinkCat(c,el){linkCategory=c;document.querySelectorAll('#link-category-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderLinks();}
 function openLinkModal(id){editingLinkId=id||null;document.getElementById('link-modal-title').textContent=id?'Edit Link':'Add Link';if(id){const l=S.links.find(x=>x.id===id);if(l){document.getElementById('lm-title').value=l.title;document.getElementById('lm-url').value=l.url;document.getElementById('lm-category').value=l.category||'';document.getElementById('lm-desc').value=l.desc||'';}}else{document.getElementById('lm-title').value='';document.getElementById('lm-url').value='';document.getElementById('lm-category').value='';document.getElementById('lm-desc').value='';}document.getElementById('link-modal').classList.add('open');setTimeout(()=>document.getElementById('lm-title').focus(),100);}
 function closeLinkModal(){document.getElementById('link-modal').classList.remove('open');editingLinkId=null;}
-function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim();if(!title||!url){toast('Title and URL required');return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;}}else{const link={id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()};if(activeProject)link.projectId=activeProject;S.links.push(link);}save();closeLinkModal();renderLinks();if(activeProject)renderProjLinks();toast(editingLinkId?'Updated':'Added');}
+function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim();if(!title||!url){toast('Title and URL required');return;}try{new URL(url);}catch(e){toast('Invalid URL format');return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;}}else{const link={id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()};if(activeProject)link.projectId=activeProject;S.links.push(link);}save();closeLinkModal();renderLinks();if(activeProject)renderProjLinks();toast(editingLinkId?'Updated':'Added');}
 function delLink(id){S.links=S.links.filter(l=>l.id!==id);save();renderLinks();toast('Deleted');}
 function cpText(t){navigator.clipboard.writeText(t);toast('Copied');}
 
@@ -2645,6 +2656,15 @@ function renderProjectView() {
   const statusEl = document.getElementById('proj-header-status');
   statusEl.textContent = p.status;
   statusEl.className = 'badge badge-' + (p.status==='active'?'green':p.status==='paused'?'yellow':'blue');
+  // Project stats
+  const pTasks=S.tasks.filter(t=>t.project===p.name);
+  const pTasksDone=pTasks.filter(t=>t.status==='done').length;
+  const pDocs=S.specs.filter(s=>s.projectId===p.id);
+  const pLinks=S.links.filter(l=>l.projectId===p.id);
+  const pKB=(S.kb||[]).filter(k=>k.projectId===p.id);
+  const pContent=S.content.filter(c=>(c.tags||[]).includes(p.name.toLowerCase()));
+  const statsBar=document.getElementById('proj-stats-bar');
+  statsBar.innerHTML=`<span style="font-size:9px;color:var(--text-muted)" title="${pTasks.length} tasks (${pTasksDone} done)">T:${pTasksDone}/${pTasks.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pDocs.length} living docs">D:${pDocs.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pKB.length} KB items">KB:${pKB.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pLinks.length} links">L:${pLinks.length}</span>`;
   // Apply project color to tabs
   document.documentElement.style.setProperty('--proj-accent', p.color);
   setProjTab(activeProjTab);
