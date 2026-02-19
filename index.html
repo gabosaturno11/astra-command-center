@@ -1584,6 +1584,10 @@ textarea{resize:vertical;line-height:1.6}
       <div class="td-field"><label>Project</label><input type="text" id="td-project" placeholder="Project name..." list="pdl"></div>
       <div class="td-field"><label>Due Date</label><input type="date" id="td-due"></div>
     </div>
+    <div class="td-field-row">
+      <div class="td-field"><label>Recurrence</label><select id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekday">Weekdays</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
+      <div class="td-field"><label></label><span id="td-recur-info" style="font-size:9px;color:var(--text-muted);padding-top:8px;display:block"></span></div>
+    </div>
     <div class="td-field">
       <label>Subtasks</label>
       <div class="td-subtasks" id="td-subtasks"></div>
@@ -2150,7 +2154,7 @@ function renderTasks(){
   ['todo','progress','done','blocked'].forEach(st=>{
     const col=document.getElementById('board-'+st),cnt=document.getElementById('bc-'+st),f=items.filter(t=>t.status===st);
     cnt.textContent=f.length;
-    col.innerHTML=f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks</div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:var(--text-muted);font-family:var(--mono)">${t.due}</span>`:''}</div></div>`;}).join('');
+    col.innerHTML=f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks</div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:var(--text-muted);font-family:var(--mono)">${t.due}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}</div></div>`;}).join('');
   });
   document.getElementById('tasks-count').textContent=S.tasks.filter(t=>t.status!=='done').length;
   if(!document.getElementById('pdl')){const dl=document.createElement('datalist');dl.id='pdl';document.body.appendChild(dl);}
@@ -2160,7 +2164,8 @@ function renderTasks(){
 
 function addTask(){S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
 function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){t[f]=v;save();renderTasks();}}
-function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){t.status=t.status==='done'?'todo':'done';save();renderTasks();}}
+function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
+function getNextRecurDate(dateStr,recur){const d=new Date(dateStr+'T12:00:00');if(recur==='daily')d.setDate(d.getDate()+1);else if(recur==='weekday'){d.setDate(d.getDate()+1);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);}else if(recur==='weekly')d.setDate(d.getDate()+7);else if(recur==='biweekly')d.setDate(d.getDate()+14);else if(recur==='monthly')d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
 
 // Task drag reorder
@@ -2187,6 +2192,8 @@ function openTaskDetail(id) {
   document.getElementById('td-priority').value = t.priority || 'p2';
   document.getElementById('td-project').value = t.project || '';
   document.getElementById('td-due').value = t.due || '';
+  document.getElementById('td-recur').value = t.recurrence || '';
+  document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
   document.getElementById('td-created').textContent = t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
   renderSubtasksInModal(t.subtasks || []);
   document.getElementById('task-detail-modal').classList.add('open');
@@ -2234,6 +2241,7 @@ function saveTaskDetail() {
   t.priority = document.getElementById('td-priority').value;
   t.project = document.getElementById('td-project').value.trim();
   t.due = document.getElementById('td-due').value;
+  t.recurrence = document.getElementById('td-recur').value || '';
   // Link to project ID if name matches
   if(t.project) { const p = (S.projects||[]).find(pr => pr.name === t.project); if(p) t.projectId = p.id; }
   save(); closeTaskDetail(); renderTasks();
