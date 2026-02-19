@@ -805,6 +805,13 @@ textarea{resize:vertical;line-height:1.6}
         <div class="tab-bar" id="content-theme-tabs" style="margin-left:8px;border-left:1px solid var(--border);padding-left:8px"></div>
         <div style="margin-left:auto;display:flex;gap:6px">
           <input type="text" id="content-search" placeholder="Search..." oninput="renderContent()" style="width:140px;font-size:10px;padding:5px 8px">
+          <select id="content-sort" onchange="renderContent()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="longest">Longest</option>
+            <option value="shortest">Shortest</option>
+            <option value="alpha">A-Z</option>
+          </select>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -831,6 +838,13 @@ textarea{resize:vertical;line-height:1.6}
             <button class="tab-btn" id="task-filter-active" onclick="setTaskFilter('active')">Active</button>
             <button class="tab-btn" id="task-filter-done" onclick="setTaskFilter('done')">Done</button>
           </div>
+          <select id="task-sort" onchange="renderTasks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px">
+            <option value="manual">Manual</option>
+            <option value="priority">Priority</option>
+            <option value="due">Due Date</option>
+            <option value="newest">Newest</option>
+            <option value="alpha">A-Z</option>
+          </select>
           <div class="task-toolbar-search">
             <input type="text" id="task-search" placeholder="Search tasks..." oninput="renderTasks()" style="font-size:10px;padding:5px 8px">
           </div>
@@ -1487,6 +1501,7 @@ textarea{resize:vertical;line-height:1.6}
       <select id="qc-type" style="width:auto;font-size:9px;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary)">
         <option value="task">Task</option>
         <option value="content">Content</option>
+        <option value="link">Link</option>
         <option value="note">Quick Note</option>
       </select>
       <input type="text" id="qc-input" placeholder="Quick capture... (Cmd+Shift+N)" style="flex:1;font-size:12px;padding:8px 10px;border-radius:6px;background:var(--bg-input);border:1px solid var(--border)" onkeydown="if(event.key==='Enter'){qcSubmit();event.preventDefault();}if(event.key==='Escape')qcClose();">
@@ -1947,6 +1962,11 @@ function qcSubmit() {
     S.content.push({ id: Date.now(), type: 'caption', body: text, theme: '', source: 'Quick Capture', tags: [], created: new Date().toISOString(), updated: new Date().toISOString() });
     save(); renderContent();
     toast('Content added');
+  } else if(type === 'link') {
+    try{new URL(text);}catch(e){toast('Enter a valid URL');return;}
+    let domain='';try{domain=new URL(text).hostname;}catch(e){}
+    S.links.push({id:Date.now(),title:domain||text,url:text,category:'',desc:'',created:new Date().toISOString()});
+    save();renderLinks();toast('Link added: '+domain);
   } else if(type === 'note') {
     const d = getActiveDoc();
     if(d) { d.body = (d.body || '') + '<p>' + esc(text) + '</p>'; save(); renderWriter(); toast('Note added to doc'); }
@@ -2060,6 +2080,12 @@ function renderContent() {
   if(contentType!=='all')items=items.filter(c=>c.type===contentType);
   if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
   if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+c.source+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
+  const sortVal=(document.getElementById('content-sort')?.value)||'newest';
+  if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));
+  else if(sortVal==='oldest')items.sort((a,b)=>new Date(a.created||0)-new Date(b.created||0));
+  else if(sortVal==='longest')items.sort((a,b)=>b.body.length-a.body.length);
+  else if(sortVal==='shortest')items.sort((a,b)=>a.body.length-b.body.length);
+  else if(sortVal==='alpha')items.sort((a,b)=>a.body.localeCompare(b.body));
   const g=document.getElementById('content-grid');
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))">${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('content-count').textContent=S.content.length;
@@ -2113,7 +2139,7 @@ function contentInlineEdit(id,el,e){
 function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
 function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;document.getElementById('task-filter-all').classList.toggle('active',f==='all');document.getElementById('task-filter-active').classList.toggle('active',f==='active');document.getElementById('task-filter-done').classList.toggle('active',f==='done');renderTasks();}
 function filterTaskProject(p){taskProjectFilter=p;taskFilter='all';renderTasks();}
-function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));return items;}
+function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));return items;}
 
 function renderTasks(){
   const items=getFilteredTasks();
