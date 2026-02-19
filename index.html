@@ -2138,7 +2138,9 @@ function updateBreadcrumb() {
   if(!bc) return;
   let parts = [];
   const sectionNames = {content:'Content',tasks:'Tasks',calendar:'Calendar',writer:'Writing Hub',specs:'Living Docs',links:'Links',whiteboard:'Whiteboard',pipeline:'Pipeline',repos:'Repos'};
-  parts.push(sectionNames[currentSection] || currentSection);
+  const counts={content:S.content.length,tasks:S.tasks.filter(t=>t.status!=='done').length,writer:S.docs.length,specs:S.specs.length,links:S.links.length,repos:(S.repos||[]).length};
+  const countStr=counts[currentSection]!==undefined?' ('+counts[currentSection]+')':'';
+  parts.push((sectionNames[currentSection]||currentSection)+countStr);
   if(currentSection === 'writer') {
     const d = getActiveDoc();
     if(d && d.title) parts.push(d.title);
@@ -2146,7 +2148,7 @@ function updateBreadcrumb() {
     const s = getActiveSpec();
     if(s && s.title) parts.push(s.title);
   }
-  bc.innerHTML = parts.length > 1 ? parts.map((p,i) => (i>0?'<span style="opacity:0.4"> / </span>':'') + '<span>'+esc(p)+'</span>').join('') : '';
+  bc.innerHTML = parts.length > 1 ? parts.map((p,i) => (i>0?'<span style="opacity:0.4"> / </span>':'') + '<span>'+esc(p)+'</span>').join('') : parts[0] && countStr ? '<span style="opacity:0.5">'+esc(parts[0])+'</span>' : '';
 }
 
 function updateSidebarCtx() {
@@ -3649,6 +3651,19 @@ function exportSummary(){
     const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-summary-'+today+'.md';a.click();toast('Summary downloaded');
   });
 }
+function dataStats(){
+  const raw=localStorage.getItem(SK)||'';const bytes=new Blob([raw]).size;const kb=(bytes/1024).toFixed(1);
+  const taskBytes=new Blob([JSON.stringify(S.tasks)]).size;
+  const contentBytes=new Blob([JSON.stringify(S.content)]).size;
+  const docsBytes=new Blob([JSON.stringify(S.docs)]).size;
+  const specsBytes=new Blob([JSON.stringify(S.specs||[])]).size;
+  const linksBytes=new Blob([JSON.stringify(S.links)]).size;
+  const kbBytes=new Blob([JSON.stringify(S.knowledgeBase||[])]).size;
+  const format=b=>(b/1024).toFixed(1)+'KB';
+  const msg=`Storage: ${kb}KB total\n\nTasks: ${S.tasks.length} items (${format(taskBytes)})\nContent: ${S.content.length} items (${format(contentBytes)})\nDocs: ${(S.docs||[]).length} items (${format(docsBytes)})\nSpecs: ${(S.specs||[]).length} items (${format(specsBytes)})\nLinks: ${S.links.length} items (${format(linksBytes)})\nKB: ${(S.knowledgeBase||[]).length} items (${format(kbBytes)})\nRepos: ${(S.repos||[]).length}\nProjects: ${(S.projects||[]).length}\nArchived: ${(S.archivedTasks||[]).length} tasks`;
+  toast(msg.split('\n')[0]);
+  navigator.clipboard.writeText(msg).then(()=>toast('Stats copied to clipboard'));
+}
 function importAll(){
   // Auto-backup before import (UNDO safety net)
   const backup = localStorage.getItem(SK);
@@ -4507,6 +4522,7 @@ function cmdGetItems(q) {
   if(!ql || 'new document'.includes(ql)) items.push({title:'New Document', desc:'Create a new document', icon:'+', type:'action', action:newDoc});
   if(!ql || 'new project'.includes(ql)) items.push({title:'New Project', desc:'Create a new project', icon:'+', type:'action', action:openNewProjectModal});
   if(!ql || 'export'.includes(ql)) items.push({title:'Export All', desc:'Export all data as JSON', icon:'E', type:'action', action:exportAll});
+  if(!ql || 'stats storage data'.includes(ql)) items.push({title:'Data Stats', desc:'Show storage breakdown by section', icon:'#', type:'action', action:()=>{closeCommandPalette();dataStats();}});
   if(!ql || 'focus timer'.includes(ql)) items.push({title:'Focus Timer', desc:'Open focus timer in context panel', icon:'FT', type:'action', action:()=>{if(!document.querySelector('.app').classList.contains('context-open'))toggleContextPanel();}});
   if(!ql || 'quick capture'.includes(ql)) items.push({title:'Quick Capture', desc:'Add task/content instantly (Cmd+Shift+N)', icon:'+', type:'action', action:()=>{closeCommandPalette();qcOpen();}});
   if(!ql || 'today'.includes(ql)) items.push({title:'Today View', desc:'See tasks due today + overdue', icon:'*', type:'action', action:()=>{closeCommandPalette();showTodayView();}});
