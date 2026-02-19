@@ -1473,6 +1473,7 @@ textarea{resize:vertical;line-height:1.6}
       <select id="rm-status"><option value="active">Active</option><option value="complete">Complete</option><option value="archived">Archived</option></select>
     </div>
     <div class="form-group"><label class="form-label">Description</label><textarea id="rm-desc" rows="3" placeholder="What this repo does..."></textarea></div>
+    <div class="form-group"><label class="form-label">Notes</label><input type="text" id="rm-notes" placeholder="Quick notes, reminders..."></div>
     <div style="display:flex;gap:6px;justify-content:flex-end">
       <button class="btn" onclick="closeRepoModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveRepo()">Save</button>
@@ -1643,8 +1644,9 @@ textarea{resize:vertical;line-height:1.6}
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Recurrence</label><select id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekday">Weekdays</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
-      <div class="td-field"><label></label><span id="td-recur-info" style="font-size:9px;color:var(--text-muted);padding-top:8px;display:block"></span></div>
+      <div class="td-field"><label>Blocked By</label><input type="text" id="td-blocked-by" placeholder="Task name or ID..." style="font-size:10px"></div>
     </div>
+    <div id="td-recur-info" style="font-size:9px;color:var(--text-muted);padding:2px 0"></div>
     <div class="td-field">
       <label>Subtasks</label>
       <div class="td-subtasks" id="td-subtasks"></div>
@@ -2316,7 +2318,7 @@ function renderTasks(){
     cnt.textContent=f.length;
     const wipLimit=st==='progress'?5:0;
     if(wipLimit&&f.length>wipLimit){cnt.style.color='var(--red)';cnt.title='WIP limit: '+wipLimit;}else{cnt.style.color='';cnt.title='';};
-    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
+    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
   });
   const activeTasks=S.tasks.filter(t=>t.status!=='done').length;
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
@@ -2425,6 +2427,7 @@ function openTaskDetail(id) {
   document.getElementById('td-project').value = t.project || '';
   document.getElementById('td-due').value = t.due || '';
   document.getElementById('td-recur').value = t.recurrence || '';
+  document.getElementById('td-blocked-by').value = t.blockedBy || '';
   document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
   let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
   if(t.timeSpent)timeText+=' | Time: '+formatTimeSpent(t.timeSpent);
@@ -2481,6 +2484,7 @@ function saveTaskDetail() {
   t.project = document.getElementById('td-project').value.trim();
   t.due = document.getElementById('td-due').value;
   t.recurrence = document.getElementById('td-recur').value || '';
+  t.blockedBy = document.getElementById('td-blocked-by').value.trim() || '';
   // Link to project ID if name matches
   if(t.project) { const p = (S.projects||[]).find(pr => pr.name === t.project); if(p) t.projectId = p.id; }
   save(); closeTaskDetail(); renderTasks();
@@ -5243,7 +5247,7 @@ function reposRefresh() {
         <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc}">${esc(r.role)}</span>
         ${r.updatedAt?'<span style="font-size:8px;color:var(--text-muted)">'+timeAgo(r.updatedAt)+'</span>':''}
       </div>
-      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">${esc(r.desc)}</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:${r.notes?'4':'10'}px;line-height:1.5">${esc(r.desc)}</div>${r.notes?`<div style="font-size:10px;color:var(--accent);margin-bottom:10px;padding:4px 6px;background:rgba(74,222,128,0.04);border-radius:4px;border-left:2px solid var(--accent);line-height:1.4">${esc(r.notes)}</div>`:''}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> repo</a>
         ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${r.lastCheck?(r.lastCheckOk?'var(--green)':'var(--red)'):'var(--green)'};display:inline-block"></span> live${r.lastCheck?' ('+timeAgo(r.lastCheck)+')':''}</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
@@ -5262,9 +5266,9 @@ function openRepoModal(name){
   document.getElementById('repo-modal-title').textContent=name?'Edit Repo':'Add Repo';
   if(name){
     const r=(S.repos||[]).find(x=>x.name===name);
-    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';}
+    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';document.getElementById('rm-notes').value=r.notes||'';}
   } else {
-    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';
+    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';document.getElementById('rm-notes').value='';
   }
   document.getElementById('repo-modal').classList.add('open');
   setTimeout(()=>document.getElementById('rm-name').focus(),100);
@@ -5273,7 +5277,8 @@ function closeRepoModal(){document.getElementById('repo-modal').classList.remove
 function saveRepo(){
   const name=document.getElementById('rm-name').value.trim();
   if(!name){toast('Name required');return;}
-  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),updatedAt:new Date().toISOString()};
+  const notes=document.getElementById('rm-notes').value.trim();
+  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),notes:notes||undefined,updatedAt:new Date().toISOString()};
   if(!S.repos)S.repos=[];
   if(editingRepoName){
     const idx=S.repos.findIndex(r=>r.name===editingRepoName);
