@@ -1124,7 +1124,10 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Convert to bullet point list'" style="font-size:8px;padding:2px 6px">Bullets</button>
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Generate headline and title suggestions'" style="font-size:8px;padding:2px 6px">Headlines</button>
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Show detailed word count and text statistics'" style="font-size:8px;padding:2px 6px">Stats</button>
+            <span style="width:1px;height:12px;background:var(--border);margin:0 2px"></span>
+            <button class="btn btn-sm btn-ghost" onclick="plSaveTemplate()" style="font-size:8px;padding:2px 6px;color:var(--accent)">+ Save</button>
           </div>
+          <div id="pl-custom-templates" style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px"></div>
           <textarea id="pl-prompt" placeholder="What should the pipeline do with this input? e.g. 'Summarize key ideas', 'Extract action items', 'Rewrite for social media', 'Translate to Spanish'..." style="width:100%;min-height:60px;resize:vertical;font-size:11px;padding:8px 10px"></textarea>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:16px">
@@ -1486,6 +1489,7 @@ textarea{resize:vertical;line-height:1.6}
     </div>
     <div class="form-group"><label class="form-label">Description</label><textarea id="rm-desc" rows="3" placeholder="What this repo does..."></textarea></div>
     <div class="form-group"><label class="form-label">Notes</label><input type="text" id="rm-notes" placeholder="Quick notes, reminders..."></div>
+    <div class="form-group"><label class="form-label">Last Commit</label><input type="text" id="rm-lastcommit" placeholder="e.g. feat: added new feature"></div>
     <div style="display:flex;gap:6px;justify-content:flex-end">
       <button class="btn" onclick="closeRepoModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveRepo()">Save</button>
@@ -2143,7 +2147,7 @@ function switchSection(sec, el) {
   if(sec==='specs')renderSpecs();
   if(sec==='links')renderLinks();
   if(sec==='whiteboard')wbRender();
-  if(sec==='pipeline')plCheckApi();
+  if(sec==='pipeline'){plCheckApi();plRenderCustomTemplates();}
   if(sec==='repos')reposRefresh();
   updateSidebarCtx();
 }
@@ -5342,6 +5346,25 @@ function plLocalProcess(text,prompt){
   if(pl.includes('headline')||pl.includes('title')){const caps=sentences.slice(0,5).map(s=>{const w=s.split(/\s+/).slice(0,8).join(' ');return w.split(' ').map(x=>x.charAt(0).toUpperCase()+x.slice(1).toLowerCase()).join(' ');});return'Headline Suggestions (local):\n\n'+caps.map((h,i)=>(i+1)+'. '+h).join('\n');}
   return'Processed text (local - API unavailable):\n\nInput: '+words.length+' words, '+sentences.length+' sentences.\n\nKey sentences:\n'+sentences.slice(0,5).map(s=>'- '+s+'.').join('\n')+'\n\nNote: For advanced processing (AI summarization, translation, etc.), configure OPENAI_API_KEY in Vercel environment variables.';
 }
+function plSaveTemplate(){
+  const prompt=document.getElementById('pl-prompt').value.trim();
+  if(!prompt){toast('Write a prompt first');return;}
+  const name=window.prompt('Template name:',prompt.substring(0,30));
+  if(!name)return;
+  if(!S.pipelineTemplates)S.pipelineTemplates=[];
+  S.pipelineTemplates.push({name:name.trim(),prompt,created:new Date().toISOString()});
+  save();plRenderCustomTemplates();toast('Template saved: '+name.trim());
+}
+function plRenderCustomTemplates(){
+  const el=document.getElementById('pl-custom-templates');if(!el)return;
+  const tpls=S.pipelineTemplates||[];
+  if(!tpls.length){el.innerHTML='';return;}
+  el.innerHTML=tpls.map((t,i)=>`<button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='${escA(t.prompt)}'" style="font-size:8px;padding:2px 6px;border-color:rgba(74,222,128,0.15)" title="${escA(t.prompt)}">${esc(t.name)}</button><span style="font-size:7px;color:var(--text-muted);cursor:pointer;opacity:0.4" onclick="plDeleteTemplate(${i})" title="Delete template">x</span>`).join('');
+}
+function plDeleteTemplate(idx){
+  if(!S.pipelineTemplates||!S.pipelineTemplates[idx])return;
+  S.pipelineTemplates.splice(idx,1);save();plRenderCustomTemplates();toast('Template deleted');
+}
 
 function plCopyResult() {
   const text=document.getElementById('pl-synthesis-text').textContent;
@@ -5454,7 +5477,7 @@ function reposRefresh() {
         <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc}">${esc(r.role)}</span>
         ${r.updatedAt?'<span style="font-size:8px;color:var(--text-muted)">'+timeAgo(r.updatedAt)+'</span>':''}
       </div>
-      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:${r.notes?'4':'10'}px;line-height:1.5">${esc(r.desc)}</div>${r.notes?`<div style="font-size:10px;color:var(--accent);margin-bottom:10px;padding:4px 6px;background:rgba(74,222,128,0.04);border-radius:4px;border-left:2px solid var(--accent);line-height:1.4">${esc(r.notes)}</div>`:''}
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:${r.notes||r.lastCommit?'4':'10'}px;line-height:1.5">${esc(r.desc)}</div>${r.lastCommit?`<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px;font-family:var(--mono);padding:3px 6px;background:var(--bg-deep);border-radius:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">last: ${esc(r.lastCommit)}</div>`:''}${r.notes?`<div style="font-size:10px;color:var(--accent);margin-bottom:10px;padding:4px 6px;background:rgba(74,222,128,0.04);border-radius:4px;border-left:2px solid var(--accent);line-height:1.4">${esc(r.notes)}</div>`:''}
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> repo</a>
         ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${r.lastCheck?(r.lastCheckOk?'var(--green)':'var(--red)'):'var(--green)'};display:inline-block"></span> live${r.lastCheck?' ('+timeAgo(r.lastCheck)+')':''}</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
@@ -5487,9 +5510,9 @@ function openRepoModal(name){
   document.getElementById('repo-modal-title').textContent=name?'Edit Repo':'Add Repo';
   if(name){
     const r=(S.repos||[]).find(x=>x.name===name);
-    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';document.getElementById('rm-notes').value=r.notes||'';}
+    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';document.getElementById('rm-notes').value=r.notes||'';document.getElementById('rm-lastcommit').value=r.lastCommit||'';}
   } else {
-    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';document.getElementById('rm-notes').value='';
+    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';document.getElementById('rm-notes').value='';document.getElementById('rm-lastcommit').value='';
   }
   document.getElementById('repo-modal').classList.add('open');
   setTimeout(()=>document.getElementById('rm-name').focus(),100);
@@ -5499,7 +5522,8 @@ function saveRepo(){
   const name=document.getElementById('rm-name').value.trim();
   if(!name){toast('Name required');return;}
   const notes=document.getElementById('rm-notes').value.trim();
-  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),notes:notes||undefined,updatedAt:new Date().toISOString()};
+  const lastCommit=document.getElementById('rm-lastcommit').value.trim();
+  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),notes:notes||undefined,lastCommit:lastCommit||undefined,updatedAt:new Date().toISOString()};
   if(!S.repos)S.repos=[];
   if(editingRepoName){
     const idx=S.repos.findIndex(r=>r.name===editingRepoName);
