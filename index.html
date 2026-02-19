@@ -781,6 +781,7 @@ textarea{resize:vertical;line-height:1.6}
       <span class="header-title" id="header-title">Content</span>
       <span id="header-breadcrumb" style="font-size:10px;color:var(--text-muted);font-family:var(--mono);display:flex;align-items:center;gap:4px"></span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <span id="header-stats" style="font-size:8px;color:var(--text-muted);font-family:var(--mono);display:flex;gap:8px;align-items:center"></span>
         <span id="save-indicator" style="font-family:var(--mono);font-size:8px;color:var(--text-muted);opacity:0;transition:opacity 0.3s">Saved</span>
         <span id="cloud-sync-indicator" onclick="cloudSave()" title="Click to sync" style="cursor:pointer;font-size:12px;opacity:0.5;transition:all 0.3s">&#9729;</span>
         <div class="mode-switcher">
@@ -1639,6 +1640,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-primary btn-sm" onclick="saveTaskDetail()">Save</button>
       <button class="btn btn-sm" onclick="closeTaskDetail()">Cancel</button>
       <button class="btn btn-sm" onclick="duplicateTask()">Duplicate</button>
+      <button class="btn btn-sm" onclick="taskToContent()" title="Save task details as content">To Content</button>
       <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
     </div>
   </div>
@@ -1980,7 +1982,8 @@ function seedKernel() {
 }
 
 function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); scheduleCloudSync(); updateSidebarCounts(); }
-function updateSidebarCounts(){document.getElementById('content-count').textContent=S.content.length;const active=S.tasks.filter(t=>t.status!=='done');const today=new Date().toISOString().split('T')[0];const overdue=active.filter(t=>t.due&&t.due<today).length;const tc=document.getElementById('tasks-count');tc.textContent=active.length;tc.style.color=overdue>0?'var(--red)':'';tc.title=overdue?overdue+' overdue':'';document.getElementById('writer-count').textContent=S.docs.length;document.getElementById('specs-count').textContent=S.specs.length;document.getElementById('links-count').textContent=S.links.length;}
+function updateSidebarCounts(){document.getElementById('content-count').textContent=S.content.length;const active=S.tasks.filter(t=>t.status!=='done');const today=new Date().toISOString().split('T')[0];const overdue=active.filter(t=>t.due&&t.due<today).length;const tc=document.getElementById('tasks-count');tc.textContent=active.length;tc.style.color=overdue>0?'var(--red)':'';tc.title=overdue?overdue+' overdue':'';document.getElementById('writer-count').textContent=S.docs.length;document.getElementById('specs-count').textContent=S.specs.length;document.getElementById('links-count').textContent=S.links.length;updateHeaderStats();}
+function updateHeaderStats(){const el=document.getElementById('header-stats');if(!el)return;const today=new Date().toISOString().split('T')[0];const active=S.tasks.filter(t=>t.status!=='done').length;const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done').length;const todayDue=S.tasks.filter(t=>t.due===today&&t.status!=='done').length;let h='';if(overdue)h+=`<span style="color:var(--red)">${overdue} overdue</span>`;if(todayDue)h+=`<span style="color:var(--accent)">${todayDue} today</span>`;h+=`<span>${active} tasks</span>`;el.innerHTML=h;}
 function flashSave() { const el=document.getElementById('save-indicator'); if(!el) return; const now=new Date(); const bytes=localStorage.getItem(SK)?.length||0; const kb=Math.round(bytes/1024); el.textContent='Saved '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); el.title='State: '+kb+'KB in localStorage'; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0';},2000); }
 
 // === QUICK CAPTURE ===
@@ -2444,6 +2447,14 @@ function duplicateTask() {
   S.tasks.unshift(dup);
   save(); closeTaskDetail(); renderTasks();
   toast('Task duplicated');
+}
+function taskToContent(){
+  const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
+  let body=t.title||'Untitled Task';
+  if(t.description)body+='\n\n'+t.description;
+  if(t.subtasks&&t.subtasks.length)body+='\n\nSubtasks:\n'+t.subtasks.map(s=>(s.done?'[x] ':'[ ] ')+s.title).join('\n');
+  S.content.unshift({id:Date.now(),body,type:'caption',theme:t.project||'tasks',tags:['from-task',t.priority||'p2'].filter(Boolean),source:'task-convert',created:new Date().toISOString()});
+  save();closeTaskDetail();if(currentSection==='content')renderContent();toast('Saved to Content');
 }
 
 // === CALENDAR ===
