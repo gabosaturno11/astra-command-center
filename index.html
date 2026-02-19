@@ -2204,7 +2204,9 @@ function updateSidebarCtx() {
   } else if(currentSection==='content') {
     const types={};S.content.forEach(c=>{types[c.type]=(types[c.type]||0)+1;});
     const totalWords=S.content.reduce((a,c)=>a+c.body.trim().split(/\s+/).filter(x=>x.length).length,0);
-    el.innerHTML=`<div class="sidebar-label">Content Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.content.length} items / ${totalWords.toLocaleString()} words</div>`+Object.entries(types).map(([t,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${t}: ${n}</div>`).join('');
+    const starred=S.content.filter(c=>c.starred).length;
+    const pinned=S.content.filter(c=>c.pinned).length;
+    el.innerHTML=`<div class="sidebar-label">Content Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.content.length} items / ${totalWords.toLocaleString()} words</div>${starred?`<div style="padding:2px 12px;font-size:10px;color:var(--yellow)">${starred} starred</div>`:''}${pinned?`<div style="padding:2px 12px;font-size:10px;color:var(--accent)">${pinned} pinned</div>`:''}`+Object.entries(types).map(([t,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${t}: ${n}</div>`).join('');
   } else if(currentSection==='writer') {
     const totalWords=S.docs.reduce((a,d)=>a+(d.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
     el.innerHTML=`<div class="sidebar-label">Writer Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.docs.length} docs / ${totalWords.toLocaleString()} words</div>`;
@@ -2438,8 +2440,8 @@ function renderTasks(){
 
 function addTask(){S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
 function addTaskFromTemplate(title,priority,recurrence){S.tasks.unshift({id:Date.now(),title,description:'',subtasks:[],status:'todo',priority:priority||'p2',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],recurrence:recurrence||'',created:new Date().toISOString()});save();renderTasks();toast('Added: '+title);document.querySelectorAll('.btn-group div[style*="display: block"],.btn-group div[style*="display:block"]').forEach(d=>d.style.display='none');}
-function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){if(f==='status'&&v==='progress'&&!t.timeStarted)t.timeStarted=new Date().toISOString();if(f==='status'&&v!=='progress'&&t.timeStarted){t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);t.timeStarted=null;}if(f==='status'&&t.status!==v){if(!t.log)t.log=[];t.log.push({from:t.status,to:v,at:new Date().toISOString()});if(t.log.length>20)t.log=t.log.slice(-20);}t[f]=v;save();renderTasks();}}
-function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
+function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){if(f==='status'&&v==='progress'&&!t.timeStarted)t.timeStarted=new Date().toISOString();if(f==='status'&&v!=='progress'&&t.timeStarted){t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);t.timeStarted=null;}if(f==='status'&&t.status!==v){if(!t.log)t.log=[];t.log.push({from:t.status,to:v,at:new Date().toISOString()});if(t.log.length>20)t.log=t.log.slice(-20);if(v==='done')t.completedAt=new Date().toISOString();else if(t.status==='done')delete t.completedAt;}t[f]=v;save();renderTasks();}}
+function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone)t.completedAt=new Date().toISOString();else delete t.completedAt;if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
 function getNextRecurDate(dateStr,recur){const d=new Date(dateStr+'T12:00:00');if(recur==='daily')d.setDate(d.getDate()+1);else if(recur==='weekday'){d.setDate(d.getDate()+1);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);}else if(recur==='weekly')d.setDate(d.getDate()+7);else if(recur==='biweekly')d.setDate(d.getDate()+14);else if(recur==='monthly')d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
 function parseNaturalDate(text){
   if(!text||/^\d{4}-\d{2}-\d{2}$/.test(text))return text;
@@ -2569,6 +2571,7 @@ function openTaskDetail(id) {
   document.getElementById('td-estimate').value = t.estimate || '';
   document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
   let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  if(t.completedAt)timeText+=' | Done: '+new Date(t.completedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'});
   if(t.timeSpent)timeText+=' | Time: '+formatTimeSpent(t.timeSpent);
   if(t.timeStarted)timeText+=' | Started: '+timeAgo(t.timeStarted);
   document.getElementById('td-created').textContent = timeText;
@@ -4915,6 +4918,17 @@ function cmdGetItems(q) {
     if(linkUrl){
       const isUrl=linkUrl.startsWith('http')||linkUrl.includes('.');
       items.unshift({title:'Add link: '+linkUrl.substring(0,40),desc:isUrl?'Quick-save link to directory':'Not a valid URL — add anyway?',icon:'L',type:'action',action:()=>{closeCommandPalette();const url=linkUrl.startsWith('http')?linkUrl:'https://'+linkUrl;const title=url.replace(/https?:\/\/(www\.)?/,'').split('/')[0];S.links.unshift({id:Date.now(),title,url,category:'unsorted',desc:'',pinned:false,created:new Date().toISOString()});save();if(currentSection==='links')renderLinks();toast('Link saved: '+title);}});
+    }
+  }
+  // Quick tag search from Cmd+K
+  if(ql && ql.startsWith('tag:')) {
+    const tq=q.substring(4).trim().toLowerCase();
+    if(tq){
+      const allTags=[...new Set(S.content.flatMap(c=>c.tags||[]).filter(Boolean))].filter(t=>t.toLowerCase().includes(tq));
+      allTags.slice(0,5).forEach(tag=>{
+        const cnt=S.content.filter(c=>(c.tags||[]).includes(tag)).length;
+        items.unshift({title:'Tag: '+tag,desc:cnt+' content items',icon:'#',type:'action',action:()=>{closeCommandPalette();switchSection('content',null);contentTagFilter=tag;renderContent();toast('Filtered: '+tag);}});
+      });
     }
   }
   // Quick spec search from Cmd+K
