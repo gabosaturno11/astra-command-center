@@ -1058,6 +1058,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
           <input type="text" id="link-search" placeholder="Search links..." oninput="renderLinks()" style="width:140px;font-size:10px;padding:5px 8px">
           <select id="link-sort" onchange="renderLinks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="alpha">A-Z</option><option value="category">Category</option></select>
+          <button class="btn btn-sm" onclick="batchImportLinks()" title="Paste multiple URLs to import">Import</button>
           <button class="btn btn-primary btn-sm" onclick="openLinkModal()">+ Add</button>
         </div>
       </div>
@@ -2283,7 +2284,7 @@ function renderTasks(){
   ['todo','progress','done','blocked'].forEach(st=>{
     const col=document.getElementById('board-'+st),cnt=document.getElementById('bc-'+st),f=items.filter(t=>t.status===st);
     cnt.textContent=f.length;
-    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks</div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
+    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
   });
   const activeTasks=S.tasks.filter(t=>t.status!=='done').length;
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
@@ -2831,6 +2832,13 @@ function suggestLinkTitle(){
   if(path.length)title=path[path.length-1].replace(/[-_]/g,' ').replace(/\.\w+$/,'');
   titleEl.value=title.charAt(0).toUpperCase()+title.slice(1);
   }catch(e){}
+}
+function batchImportLinks(){
+  const text=prompt('Paste URLs (one per line):');if(!text)return;
+  const urls=text.split('\n').map(u=>u.trim()).filter(u=>{try{new URL(u);return true;}catch(e){return false;}});
+  if(!urls.length){toast('No valid URLs found');return;}
+  urls.forEach(url=>{try{const u=new URL(url);const host=u.hostname.replace(/^www\./,'');const path=u.pathname.replace(/^\//,'').replace(/\/$/,'').split('/').filter(Boolean);let title=host;if(path.length)title=path[path.length-1].replace(/[-_]/g,' ').replace(/\.\w+$/,'');title=title.charAt(0).toUpperCase()+title.slice(1);S.links.push({id:Date.now()+Math.random()*1000,title,url,category:'imported',desc:'',created:new Date().toISOString()});}catch(e){}});
+  save();renderLinks();toast('Imported '+urls.length+' links');
 }
 let lastDeletedLink=null;
 function delLink(id){const l=S.links.find(x=>x.id===id);if(l)lastDeletedLink={...l};S.links=S.links.filter(l=>l.id!==id);save();renderLinks();toast('Deleted — Cmd+Z to undo');}
