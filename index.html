@@ -846,6 +846,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="newest">Newest</option>
             <option value="alpha">A-Z</option>
           </select>
+          <button class="btn btn-sm" onclick="exportTasks()" title="Copy tasks as markdown">Export</button>
           <div class="task-toolbar-search">
             <input type="text" id="task-search" placeholder="Search tasks..." oninput="renderTasks()" style="font-size:10px;padding:5px 8px">
           </div>
@@ -1121,6 +1122,7 @@ textarea{resize:vertical;line-height:1.6}
           <span style="flex:1"></span>
           <input type="text" id="repo-search" placeholder="Filter repos..." oninput="reposRefresh()" style="width:120px;font-size:10px;padding:5px 8px">
           <button class="btn btn-primary btn-sm" onclick="openRepoModal()">+ Add</button>
+          <button class="btn btn-sm" onclick="(S.repos||[]).filter(r=>r.live).forEach(r=>window.open(r.live,'_blank'));toast('Opened '+((S.repos||[]).filter(r=>r.live).length)+' live sites')" title="Open all live URLs">Open All</button>
           <button class="btn btn-sm" onclick="reposRefresh()">Refresh</button>
         </div>
       </div>
@@ -2028,6 +2030,25 @@ function showTodayView() {
   }
   toast('Today view loaded');
 }
+function generateStandup(){
+  const today=new Date().toISOString().split('T')[0];
+  const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
+  const done=S.tasks.filter(t=>t.status==='done'&&t.created&&t.created.startsWith(yesterday)).concat(S.tasks.filter(t=>t.status==='done'&&t.created&&t.created.startsWith(today)));
+  const inProgress=S.tasks.filter(t=>t.status==='progress');
+  const todayTasks=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+  const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done');
+  const blocked=S.tasks.filter(t=>t.status==='blocked');
+  let md='## Daily Standup - '+new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})+'\n\n';
+  md+='### Done\n';
+  if(done.length)done.forEach(t=>{md+='- '+t.title+(t.project?' ('+t.project+')':'')+'\n';});else md+='- (nothing completed recently)\n';
+  md+='\n### In Progress\n';
+  if(inProgress.length)inProgress.forEach(t=>{md+='- '+t.title+(t.project?' ('+t.project+')':'')+'\n';});else md+='- (nothing in progress)\n';
+  md+='\n### Today\n';
+  if(todayTasks.length)todayTasks.forEach(t=>{md+='- '+t.title+' ['+t.priority+']'+(t.project?' ('+t.project+')':'')+'\n';});else md+='- (no tasks due today)\n';
+  if(overdue.length){md+='\n### Overdue (!)\n';overdue.forEach(t=>{md+='- '+t.title+' (due '+t.due+')\n';});}
+  if(blocked.length){md+='\n### Blocked\n';blocked.forEach(t=>{md+='- '+t.title+'\n';});}
+  navigator.clipboard.writeText(md).then(()=>toast('Standup copied to clipboard')).catch(()=>toast('Failed to copy'));
+}
 function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
 function highlight(text,q){if(!q)return esc(text);const e=esc(text);const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return e.replace(re,'<mark style="background:rgba(74,222,128,0.25);color:var(--text);border-radius:2px;padding:0 1px">$1</mark>');}
@@ -2187,6 +2208,28 @@ function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){t[f]=v;save
 function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
 function getNextRecurDate(dateStr,recur){const d=new Date(dateStr+'T12:00:00');if(recur==='daily')d.setDate(d.getDate()+1);else if(recur==='weekday'){d.setDate(d.getDate()+1);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);}else if(recur==='weekly')d.setDate(d.getDate()+7);else if(recur==='biweekly')d.setDate(d.getDate()+14);else if(recur==='monthly')d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
+
+function exportTasks(){
+  const items=getFilteredTasks();
+  const today=new Date().toISOString().split('T')[0];
+  let md='# Tasks Export\n';
+  md+='Generated: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'\n\n';
+  const groups={};
+  items.forEach(t=>{const g=t.project||'No Project';if(!groups[g])groups[g]=[];groups[g].push(t);});
+  Object.keys(groups).sort().forEach(g=>{
+    md+='## '+g+'\n';
+    groups[g].forEach(t=>{
+      const check=t.status==='done'?'x':' ';
+      md+='- ['+check+'] '+t.title+(t.priority==='p0'?' [CRITICAL]':t.priority==='p1'?' [HIGH]':'')+(t.due?' (due '+t.due+')':'')+(t.due&&t.due<today&&t.status!=='done'?' OVERDUE':'')+'\n';
+      if(t.description)md+='  '+t.description.substring(0,100)+'\n';
+      (t.subtasks||[]).forEach(s=>{md+='  - ['+(s.done?'x':' ')+'] '+s.title+'\n';});
+    });
+    md+='\n';
+  });
+  navigator.clipboard.writeText(md).then(()=>toast('Tasks copied as markdown')).catch(()=>{
+    const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tasks-'+today+'.md';a.click();toast('Tasks exported');
+  });
+}
 
 // Task drag reorder
 let taskDragId=null;
@@ -4138,6 +4181,7 @@ function cmdGetItems(q) {
   if(!ql || 'focus timer'.includes(ql)) items.push({title:'Focus Timer', desc:'Open focus timer in context panel', icon:'FT', type:'action', action:()=>{if(!document.querySelector('.app').classList.contains('context-open'))toggleContextPanel();}});
   if(!ql || 'quick capture'.includes(ql)) items.push({title:'Quick Capture', desc:'Add task/content instantly (Cmd+Shift+N)', icon:'+', type:'action', action:()=>{closeCommandPalette();qcOpen();}});
   if(!ql || 'today'.includes(ql)) items.push({title:'Today View', desc:'See tasks due today + overdue', icon:'*', type:'action', action:()=>{closeCommandPalette();showTodayView();}});
+  if(!ql || 'standup daily'.includes(ql)) items.push({title:'Daily Standup', desc:'Copy standup summary to clipboard', icon:'S', type:'action', action:()=>{closeCommandPalette();generateStandup();}});
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   // Open specific docs in Zen Writer
@@ -4660,6 +4704,21 @@ function plUploadFile(input) {
   input.value='';
 }
 
+// Pipeline drop zone for text/audio files
+(function(){
+  const panel=document.getElementById('panel-pipeline');
+  if(!panel)return;
+  panel.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='copy';panel.style.outline='2px dashed var(--accent)';});
+  panel.addEventListener('dragleave',()=>{panel.style.outline='none';});
+  panel.addEventListener('drop',e=>{
+    e.preventDefault();panel.style.outline='none';
+    const file=e.dataTransfer.files[0];if(!file)return;
+    if(file.type.startsWith('audio/')){plAudioBlob=file;const p=document.getElementById('pl-input-preview');p.style.display='block';p.textContent='Audio: '+file.name+' ('+Math.round(file.size/1024)+'KB)';toast('Audio loaded');}
+    else if(file.type.startsWith('text/')||file.name.endsWith('.txt')||file.name.endsWith('.md')){
+      const r=new FileReader();r.onload=()=>{plAudioBlob=null;plTranscriptText=r.result;const p=document.getElementById('pl-input-preview');p.style.display='block';p.textContent=plTranscriptText.length>300?plTranscriptText.substring(0,300)+'...':plTranscriptText;toast('Text loaded from '+file.name);};r.readAsText(file);
+    }else{toast('Drop audio or text files');}
+  });
+})();
 function plPasteText() {
   navigator.clipboard.readText().then(text=>{
     if(!text){toast('Clipboard empty');return;}
