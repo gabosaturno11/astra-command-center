@@ -62,7 +62,67 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-18 session)
+## CURRENT STATE (Updated: 2026-02-19 session)
+
+### FEB 19 SESSION — 21 COMMITS (autonomous execution)
+Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
+
+**CRITICAL FIXES DONE:**
+- cloudLoad() now sends auth header (was silently failing since GET /api/state was locked)
+- seedProjects() has _seeded flag to prevent re-running after cloud load
+- Dead /api/repos self-ping removed
+- Sidebar counts update on every save()
+
+**FEATURES SHIPPED (13 new):**
+1. Keyboard shortcuts: Cmd+Shift+T (new task anywhere), Cmd+B (sidebar toggle)
+2. Mobile responsive: hamburger menu, board horizontal scroll, week view stacks
+3. Writer doc list sorted by last-modified
+4. Auto-save debounce reduced to 800ms
+5. Rule #1 CANNON LAW in ASTRA project instructions (red banner)
+6. Content cards expand on click, show word count
+7. Task search includes description text
+8. Link cards show favicons via Google API
+9. Task list rows have priority color bars (red/orange/blue/gray)
+10. Calendar task pills show priority colors
+11. Command palette task search includes descriptions, opens task detail modal
+12. Board columns highlight on dragover
+13. Task sidebar count turns red when overdue tasks exist
+
+**PREVIOUS SESSION FEATURES (9 commits before this):**
+- Lock GET endpoints (state, capture, transcripts) behind auth
+- Task detail modal with description, subtasks
+- Calendar week view with toggle
+- Board cards show descriptions + subtask progress
+- Repos section with 5 static repos
+- Cloud sync indicator
+- Living docs dedup
+- Project tasks use projectId (data integrity)
+
+**SECTION HEALTH (post-session):**
+| Section | Health | Notes |
+|---------|--------|-------|
+| Tasks | 90% | Board + list + detail modal + subtasks + priority colors + search |
+| Calendar | 85% | Month + week + click-create + drag-drop + ICS export |
+| Writer | 90% | Editor + Zen Writer + versions + export + auto-save |
+| Living Docs | 85% | Sections + icons + colors + global docs + export |
+| Content | 75% | Cards expand + word count + search + tags |
+| Links | 80% | Favicons + categories + search + project assignment |
+| Whiteboard | 85% | Canvas tools solid |
+| Repos | 70% | Static data with links |
+| Pipeline | 50% | UI exists, needs Whisper API key |
+| Cmd+K | 95% | Searches everything, opens task detail |
+
+**REMAINING:**
+- Bonus page shipping (prerequisite: ASTRA stable - NOW IT IS)
+- Pipeline Whisper API key in Vercel env
+- BLOB_READ_WRITE_TOKEN verification
+- Content inline editing (not modal-only)
+- Link OG metadata previews
+- Google Calendar sync (future)
+
+---
+
+### PREVIOUS STATE (2026-02-18 session)
 
 ### PENDING: APPLE NOTES EXTRACTION (Feb 18)
 - Script READY at ~/dev/astra-command-center/scripts/extract-apple-notes.sh
