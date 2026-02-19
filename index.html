@@ -911,6 +911,7 @@ textarea{resize:vertical;line-height:1.6}
             <div style="margin-left:auto;display:flex;gap:6px">
               <button class="btn btn-sm" onclick="window.open('https://calendar.google.com','_blank')">Google Cal</button>
               <button class="btn btn-sm" onclick="exportICS()">Export .ics</button>
+              <button class="btn btn-sm" onclick="importICS()">Import .ics</button>
             </div>
           </div>
           <div id="cal-today-summary" style="padding:6px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);margin:0 0 8px 0;font-size:10px;color:var(--text-secondary);display:none"></div>
@@ -1076,6 +1077,7 @@ textarea{resize:vertical;line-height:1.6}
           <input type="text" id="link-search" placeholder="Search links..." oninput="renderLinks()" style="width:140px;font-size:10px;padding:5px 8px">
           <select id="link-sort" onchange="renderLinks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="alpha">A-Z</option><option value="category">Category</option></select>
           <button class="btn btn-sm" onclick="openFilteredLinks()" title="Open all visible links">Open All</button>
+          <button class="btn btn-sm" onclick="copyAllLinkURLs()" title="Copy all filtered URLs to clipboard">Copy URLs</button>
           <button class="btn btn-sm" onclick="batchImportLinks()" title="Paste multiple URLs to import">Import</button>
           <button class="btn btn-primary btn-sm" onclick="openLinkModal()">+ Add</button>
         </div>
@@ -2231,10 +2233,11 @@ function renderContent() {
   else if(sortVal==='shortest')items.sort((a,b)=>a.body.length-b.body.length);
   else if(sortVal==='alpha')items.sort((a,b)=>a.body.localeCompare(b.body));
   items.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
+  items.sort((a,b)=>(b.starred?1:0)-(a.starred?1:0));
   const maxShow=40;
   const g=document.getElementById('content-grid');
   const showing=contentShowAll?items:items.slice(0,maxShow);
-  const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w${wc>50?' / '+Math.max(1,Math.ceil(wc/238))+'m':''}</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost" onclick="dupContent(${c.id})">Dup</button><button class="btn btn-sm btn-ghost" onclick="contentToDoc(${c.id})">Doc</button><button class="btn btn-sm btn-ghost" onclick="contentToPipeline(${c.id})">Pipe</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
+  const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.starred?'<div style="font-size:8px;color:var(--yellow);padding:4px 10px 0">* Starred</div>':''}${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w${wc>50?' / '+Math.max(1,Math.ceil(wc/238))+'m':''}</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="starContent(${c.id})" style="${c.starred?'color:var(--yellow)':''}">*</button><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost" onclick="dupContent(${c.id})">Dup</button><button class="btn btn-sm btn-ghost" onclick="contentToDoc(${c.id})">Doc</button><button class="btn btn-sm btn-ghost" onclick="contentToPipeline(${c.id})">Pipe</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:showing.map(renderCard).join('')+(items.length>maxShow&&!contentShowAll?`<div style="grid-column:1/-1;text-align:center;padding:12px"><button class="btn btn-sm" onclick="contentShowAll=true;renderContent()">Show all ${items.length} items (${items.length-maxShow} more)</button></div>`:'');
   document.getElementById('content-count').textContent=S.content.length;
   const totalWords=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
@@ -2257,6 +2260,7 @@ function undoDeleteContent(){if(!lastDeletedContent)return;S.content.unshift(las
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
 function randomContent(){if(!S.content.length){toast('No content yet');return;}const r=S.content[Math.floor(Math.random()*S.content.length)];navigator.clipboard.writeText(r.body);toast('Random: '+(r.body.substring(0,50)+'...'));document.getElementById('content-search').value='';contentType='all';contentTheme='all';contentTagFilter=null;renderContent();setTimeout(()=>{const cards=document.querySelectorAll('.content-card');const idx=S.content.indexOf(r);if(cards[idx])cards[idx].scrollIntoView({behavior:'smooth',block:'center'});},100);}
 function pinContent(id){const c=S.content.find(x=>x.id===id);if(c){c.pinned=!c.pinned;save();renderContent();toast(c.pinned?'Pinned':'Unpinned');}}
+function starContent(id){const c=S.content.find(x=>x.id===id);if(c){c.starred=!c.starred;save();renderContent();toast(c.starred?'Starred':'Unstarred');}}
 function contentToDoc(id){const c=S.content.find(x=>x.id===id);if(!c)return;const title=(c.theme||'Untitled')+' — '+(c.body.substring(0,40).replace(/\n/g,' '));S.docs.push({id:Date.now(),title,body:c.body.replace(/\n/g,'<br>'),created:new Date().toISOString(),updated:new Date().toISOString(),versions:[]});save();toast('Created doc: '+title.substring(0,30));if(currentSection==='writer')renderWriter();}
 function contentToPipeline(id){const c=S.content.find(x=>x.id===id);if(!c)return;switchSection('pipeline',null);setTimeout(()=>{const ta=document.getElementById('pl-transcript-box');if(ta){ta.style.display='block';ta.value=c.body;plTranscriptText=c.body;const wc=document.getElementById('pl-text-stats');if(wc){const words=c.body.trim().split(/\s+/).filter(x=>x.length).length;wc.textContent=words+' words, '+c.body.length+' chars';}toast('Content loaded in pipeline');}},200);}
 function dupContent(id){const c=S.content.find(x=>x.id===id);if(!c)return;S.content.unshift({...c,id:Date.now(),pinned:false,created:new Date().toISOString()});save();renderContent();toast('Duplicated');}
@@ -2724,6 +2728,28 @@ function calAddTaskOnDay(dateStr){
 function calDragStart(e,id){calDragId=id;e.dataTransfer.effectAllowed='move';}
 function calDrop(e,dateStr){e.preventDefault();if(calDragId){const t=S.tasks.find(x=>x.id===calDragId);if(t){t.due=dateStr;save();renderCalendar();renderTasks();toast('Moved to '+dateStr);}calDragId=null;}}
 function exportICS(){let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SaturnoHub//EN\n';S.tasks.filter(t=>t.due).forEach(t=>{const d=t.due.replace(/-/g,'');ics+=`BEGIN:VEVENT\nDTSTART;VALUE=DATE:${d}\nSUMMARY:${t.title||'Task'}\nDESCRIPTION:Priority: ${t.priority||'p2'} | Status: ${t.status||'todo'}${t.project?' | Project: '+t.project:''}\nEND:VEVENT\n`;});ics+='END:VCALENDAR';const blob=new Blob([ics],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-tasks.ics';a.click();toast('ICS exported - import into Google Calendar');}
+function importICS(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.ics,.ical';
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{
+    const text=ev.target.result;const events=text.split('BEGIN:VEVENT').slice(1);
+    if(!events.length){toast('No events found in ICS file');return;}
+    let count=0;
+    events.forEach(block=>{
+      const sum=(block.match(/SUMMARY[;:]([^\r\n]+)/)||[])[1]||'';
+      const desc=(block.match(/DESCRIPTION[;:]([^\r\n]+)/)||[])[1]||'';
+      let dateStr='';
+      const dtMatch=block.match(/DTSTART[^:]*:(\d{4})(\d{2})(\d{2})/);
+      if(dtMatch)dateStr=dtMatch[1]+'-'+dtMatch[2]+'-'+dtMatch[3];
+      if(!sum.trim())return;
+      const title=sum.replace(/\\,/g,',').replace(/\\n/g,' ').trim();
+      const existing=S.tasks.find(t=>t.title===title&&t.due===dateStr);
+      if(existing)return;
+      S.tasks.unshift({id:Date.now()+count,title,description:desc.replace(/\\n/g,'\n').replace(/\\,/g,',').substring(0,500),subtasks:[],status:'todo',priority:'p2',project:'',due:dateStr,created:new Date().toISOString(),source:'ics-import'});
+      count++;
+    });
+    save();renderCalendar();renderTasks();toast('Imported '+count+' events from ICS');
+  };r.readAsText(f);};inp.click();
+}
 
 function exportWeek(){
   const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());weekStart.setHours(0,0,0,0);
@@ -3062,6 +3088,13 @@ function exportLinks(){
   const uncategorized=S.links.filter(l=>!l.category);
   if(uncategorized.length){md+='## Other\n';uncategorized.forEach(l=>{md+='- ['+l.title+']('+l.url+')'+(l.desc?' — '+l.desc:'')+'\n';});md+='\n';}
   navigator.clipboard.writeText(md).then(()=>toast('Links exported to clipboard'));
+}
+function copyAllLinkURLs(){
+  const q=(document.getElementById('link-search')?.value||'').toLowerCase();
+  let items=[...S.links];if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
+  if(!items.length){toast('No links to copy');return;}
+  const urls=items.map(l=>l.url).join('\n');
+  navigator.clipboard.writeText(urls).then(()=>toast('Copied '+items.length+' URLs'));
 }
 
 // === PROJECTS ===
