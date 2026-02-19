@@ -1029,6 +1029,8 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
           <span style="font-size:13px;font-weight:600;letter-spacing:0.02em">Pipeline</span>
           <span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em">Audio / Text -> Whisper -> GPT -> ASTRA</span>
+          <span style="flex:1"></span>
+          <span id="pl-status-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text-muted)" title="Not connected"></span>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
           <button class="btn btn-primary btn-sm" id="pl-record-btn" onclick="plToggleRecord()">Record Mic</button>
@@ -1038,6 +1040,10 @@ textarea{resize:vertical;line-height:1.6}
           </label>
           <button class="btn btn-sm" onclick="plPasteText()">Paste Text</button>
           <button class="btn btn-sm" onclick="plLoadHistory()">History</button>
+        </div>
+        <div id="pl-onboarding" style="padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px;margin-bottom:12px;font-size:10px;color:var(--text-muted);line-height:1.6;display:none">
+          <div style="font-weight:600;color:var(--accent);margin-bottom:4px">Text-only mode available</div>
+          Use "Paste Text" to paste any text, write a prompt (e.g. "Summarize key ideas", "Extract action items", "Translate to Spanish"), then hit Process. Audio requires OPENAI_API_KEY in Vercel env vars.
         </div>
         <div id="pl-recording" style="display:none;padding:8px 12px;background:rgba(239,68,68,0.1);border:1px solid var(--red);border-radius:4px;margin-bottom:12px;display:none;align-items:center;gap:8px">
           <div style="width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 1s infinite"></div>
@@ -1085,6 +1091,7 @@ textarea{resize:vertical;line-height:1.6}
       <div style="padding:16px 20px 0;flex-shrink:0">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
           <span style="font-size:13px;font-weight:600;letter-spacing:0.02em">Connected Repos</span>
+          <button class="btn btn-primary btn-sm" onclick="openRepoModal()">+ Add</button>
           <button class="btn btn-sm" onclick="reposRefresh()">Refresh</button>
         </div>
       </div>
@@ -1370,6 +1377,27 @@ textarea{resize:vertical;line-height:1.6}
     <div style="display:flex;gap:6px;justify-content:flex-end">
       <button class="btn" onclick="closeProjectModal()">Cancel</button>
       <button class="btn btn-primary" onclick="saveProject()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- REPO MODAL -->
+<div class="modal-overlay" id="repo-modal" onclick="if(event.target===this)closeRepoModal()">
+  <div class="modal" style="width:420px">
+    <div class="modal-title" id="repo-modal-title">Add Repo</div>
+    <div class="form-group"><label class="form-label">Name</label><input type="text" id="rm-name" placeholder="my-repo"></div>
+    <div class="form-group"><label class="form-label">GitHub URL</label><input type="text" id="rm-github" placeholder="https://github.com/user/repo"></div>
+    <div class="form-group"><label class="form-label">Live URL (optional)</label><input type="text" id="rm-live" placeholder="https://my-app.vercel.app"></div>
+    <div class="form-group"><label class="form-label">Role</label>
+      <select id="rm-role"><option value="backend-hub">Backend Hub</option><option value="customer-facing">Customer Facing</option><option value="internal-tools">Internal Tools</option><option value="experience">Experience</option><option value="extension">Extension</option><option value="library">Library</option><option value="other">Other</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Status</label>
+      <select id="rm-status"><option value="active">Active</option><option value="complete">Complete</option><option value="archived">Archived</option></select>
+    </div>
+    <div class="form-group"><label class="form-label">Description</label><textarea id="rm-desc" rows="3" placeholder="What this repo does..."></textarea></div>
+    <div style="display:flex;gap:6px;justify-content:flex-end">
+      <button class="btn" onclick="closeRepoModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRepo()">Save</button>
     </div>
   </div>
 </div>
@@ -1978,6 +2006,7 @@ function switchSection(sec, el) {
   if(sec==='specs')renderSpecs();
   if(sec==='links')renderLinks();
   if(sec==='whiteboard')wbRender();
+  if(sec==='pipeline')plCheckApi();
   if(sec==='repos')reposRefresh();
   updateSidebarCtx();
 }
@@ -2015,7 +2044,7 @@ function renderContent() {
   if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
   if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+c.source+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
   const g=document.getElementById('content-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))"><div class="content-card-body" onclick="this.classList.toggle('expanded')">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))"><div class="content-card-body" onclick="this.classList.toggle('expanded')" ondblclick="contentInlineEdit(${c.id},this,event)">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('content-count').textContent=S.content.length;
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -2025,6 +2054,18 @@ function closeContentModal(){document.getElementById('content-modal').classList.
 function saveContent(){const type=document.getElementById('cm-type').value,theme=document.getElementById('cm-theme').value.trim().toLowerCase(),body=document.getElementById('cm-body').value.trim(),source=document.getElementById('cm-source').value.trim(),tags=(document.getElementById('cm-tags').value||'').split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);if(!body){toast('Content cannot be empty');return;}if(editingContentId){const c=S.content.find(x=>x.id===editingContentId);if(c){c.type=type;c.theme=theme;c.body=body;c.source=source;c.tags=tags;c.updated=new Date().toISOString();}}else S.content.push({id:Date.now(),type,theme,body,source,tags,created:new Date().toISOString(),updated:new Date().toISOString()});save();closeContentModal();renderContent();toast(editingContentId?'Updated':'Added');}
 function delContent(id){S.content=S.content.filter(c=>c.id!==id);save();renderContent();toast('Deleted');}
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
+function contentInlineEdit(id,el,e){
+  e.stopPropagation();e.preventDefault();
+  const c=S.content.find(x=>x.id===id);if(!c)return;
+  el.classList.add('expanded');
+  const ta=document.createElement('textarea');
+  ta.value=c.body;ta.style.cssText='width:100%;min-height:120px;resize:vertical;font-size:11px;line-height:1.6;padding:8px;background:var(--bg-input);color:var(--text);border:1px solid var(--accent);border-radius:4px;font-family:var(--font);outline:none';
+  el.innerHTML='';el.appendChild(ta);ta.focus();
+  let saved=false;
+  function finishEdit(){if(saved)return;saved=true;const v=ta.value.trim();if(v&&v!==c.body){c.body=v;c.updated=new Date().toISOString();save();toast('Saved');}renderContent();}
+  ta.addEventListener('blur',finishEdit);
+  ta.addEventListener('keydown',ev=>{if(ev.key==='Escape'){saved=true;renderContent();}if((ev.metaKey||ev.ctrlKey)&&ev.key==='Enter')finishEdit();});
+}
 
 // === TASKS ===
 function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
@@ -4424,7 +4465,16 @@ document.addEventListener('keydown',e=>{
 })();
 
 // === PIPELINE ===
-let plRecorder=null, plChunks=[], plRecording=false, plRecStart=0, plRecTimer=null, plAudioBlob=null, plTranscriptText='', plSynthesisText='';
+let plRecorder=null, plChunks=[], plRecording=false, plRecStart=0, plRecTimer=null, plAudioBlob=null, plTranscriptText='', plSynthesisText='', plApiOk=null;
+function plCheckApi(){
+  if(!ASTRA_ADMIN_PW){document.getElementById('pl-status-dot').style.background='var(--text-muted)';document.getElementById('pl-status-dot').title='No password set';document.getElementById('pl-onboarding').style.display='block';return;}
+  fetch(ASTRA_API+'/api/health',{headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW}}).then(r=>r.json()).then(d=>{
+    plApiOk=true;document.getElementById('pl-status-dot').style.background='var(--green)';document.getElementById('pl-status-dot').title='API connected';document.getElementById('pl-onboarding').style.display='none';
+  }).catch(()=>{
+    plApiOk=false;document.getElementById('pl-status-dot').style.background='var(--orange)';document.getElementById('pl-status-dot').title='API unreachable';document.getElementById('pl-onboarding').style.display='block';
+  });
+}
+function plSaveLocal(entry){if(!S.pipelineHistory)S.pipelineHistory=[];S.pipelineHistory.unshift(entry);if(S.pipelineHistory.length>50)S.pipelineHistory.length=50;save();}
 
 function plToggleRecord() {
   const btn=document.getElementById('pl-record-btn');
@@ -4521,6 +4571,7 @@ async function plProcess() {
         document.getElementById('pl-transcript-box').style.display='none';
       }
       document.getElementById('pl-synthesis-text').textContent=data.synthesis;
+      plSaveLocal({id:data.pipelineId||('p_'+Date.now()),inputType:data.inputType||'text',prompt:prompt,preview:(data.synthesis||'').substring(0,200),source:source,createdAt:new Date().toISOString()});
       toast('Pipeline complete!');
     } else {
       toast('Error: '+(data.error||'unknown'));
@@ -4553,16 +4604,20 @@ async function plLoadHistory() {
   histDiv.style.display=histDiv.style.display==='none'?'block':'none';
   if(histDiv.style.display==='none') return;
   listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Loading...</div>';
+  let results=[];
+  let source='none';
   try {
-    const res=await fetch(ASTRA_API+'/api/pipeline',{headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW}});
-    const data=await res.json();
-    if(data.ok && data.results && data.results.length>0) {
-      listDiv.innerHTML=data.results.map(r=>'<div style="padding:10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span class="badge badge-blue" style="font-size:9px">'+esc(r.inputType||'text')+'</span><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div>'+(r.prompt?'<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;font-style:italic">'+esc(r.prompt)+'</div>':'')+'<div style="font-size:11px;line-height:1.5;color:var(--text-secondary);cursor:pointer" onclick="plViewEntry(\''+r.id+'\')">'+esc((r.preview||'').substring(0,150))+(r.preview&&r.preview.length>150?'...':'')+'</div><div style="display:flex;gap:4px;margin-top:6px"><button class="btn btn-sm btn-ghost" onclick="plViewEntry(\''+r.id+'\')">View</button><button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText(\''+escA(r.preview||'')+'\');toast(\'Copied\')">Copy</button></div></div>').join('');
-    } else {
-      listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">No pipeline history yet. Process something first!</div>';
+    if(ASTRA_ADMIN_PW){
+      const res=await fetch(ASTRA_API+'/api/pipeline',{headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW}});
+      const data=await res.json();
+      if(data.ok && data.results && data.results.length>0){results=data.results;source='cloud';}
     }
-  } catch(e) {
-    listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Could not load history</div>';
+  } catch(e){}
+  if(!results.length && S.pipelineHistory && S.pipelineHistory.length){results=S.pipelineHistory;source='local';}
+  if(results.length>0){
+    listDiv.innerHTML=(source==='local'?'<div style="font-size:9px;color:var(--text-muted);margin-bottom:8px;padding:4px 8px;background:var(--bg-elevated);border-radius:3px">Showing local history</div>':'')+results.map(r=>'<div style="padding:10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span class="badge badge-blue" style="font-size:9px">'+esc(r.inputType||'text')+'</span><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div>'+(r.prompt?'<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;font-style:italic">'+esc(r.prompt)+'</div>':'')+'<div style="font-size:11px;line-height:1.5;color:var(--text-secondary)">'+esc((r.preview||'').substring(0,150))+(r.preview&&r.preview.length>150?'...':'')+'</div><div style="display:flex;gap:4px;margin-top:6px"><button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText(\''+escA(r.preview||'')+'\');toast(\'Copied\')">Copy</button></div></div>').join('');
+  } else {
+    listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">No pipeline history yet. Paste text, write a prompt, and hit Process.</div>';
   }
 }
 
@@ -4604,12 +4659,51 @@ function reposRefresh() {
       </div>
       <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc};margin-bottom:6px">${esc(r.role)}</div>
       <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">${esc(r.desc)}</div>
-      <div style="display:flex;gap:10px;align-items:center">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none">GitHub</a>
         ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none">${r.live.replace('https://','')}</a>`:'<span style="font-size:10px;color:var(--text-muted)">Local only</span>'}
+        <span style="flex:1"></span>
+        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openRepoModal('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Edit</button>
+        <button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();deleteRepo('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Del</button>
       </div>
     </div>`;
   }).join('');
+}
+
+// === REPO MODAL ===
+let editingRepoName=null;
+function openRepoModal(name){
+  editingRepoName=name||null;
+  document.getElementById('repo-modal-title').textContent=name?'Edit Repo':'Add Repo';
+  if(name){
+    const r=(S.repos||[]).find(x=>x.name===name);
+    if(r){document.getElementById('rm-name').value=r.name;document.getElementById('rm-github').value=r.github||'';document.getElementById('rm-live').value=r.live||'';document.getElementById('rm-role').value=r.role||'other';document.getElementById('rm-status').value=r.status||'active';document.getElementById('rm-desc').value=r.desc||'';}
+  } else {
+    document.getElementById('rm-name').value='';document.getElementById('rm-github').value='';document.getElementById('rm-live').value='';document.getElementById('rm-role').value='other';document.getElementById('rm-status').value='active';document.getElementById('rm-desc').value='';
+  }
+  document.getElementById('repo-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('rm-name').focus(),100);
+}
+function closeRepoModal(){document.getElementById('repo-modal').classList.remove('open');editingRepoName=null;}
+function saveRepo(){
+  const name=document.getElementById('rm-name').value.trim();
+  if(!name){toast('Name required');return;}
+  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim()};
+  if(!S.repos)S.repos=[];
+  if(editingRepoName){
+    const idx=S.repos.findIndex(r=>r.name===editingRepoName);
+    if(idx>=0)S.repos[idx]=data;
+    else S.repos.push(data);
+  } else {
+    if(S.repos.find(r=>r.name===name)){toast('Repo already exists');return;}
+    S.repos.push(data);
+  }
+  save();closeRepoModal();reposRefresh();toast(editingRepoName?'Updated':'Added');
+}
+function deleteRepo(name){
+  if(!confirm('Delete repo "'+name+'"?'))return;
+  S.repos=(S.repos||[]).filter(r=>r.name!==name);
+  save();reposRefresh();toast('Deleted');
 }
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
