@@ -2561,7 +2561,9 @@ function renderProjDocs() {
     html = docs.map(d => {
       const sc = d.sections ? d.sections.length : 0;
       const dt = d.updated ? new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
-      const preview = d.sections && d.sections[0] ? d.sections[0].title : '';
+      const previewSec = d.sections && d.sections.find(s=>s.body);
+      const previewRaw = previewSec ? previewSec.body.replace(/<[^>]+>/g,'').substring(0,100) : (d.sections && d.sections[0] ? d.sections[0].title : '');
+      const preview = previewRaw;
       const ic = d.icon||'file'; const c = d.color||'#8b8b8b'; const path = specSectionIcon(ic);
       return `<div class="proj-doc-card" onclick="goToLivingDoc('${d.id}')">
         <div style="display:flex;align-items:center;gap:6px"><span style="color:${c};display:flex"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><div class="proj-doc-card-title">${esc(d.title||'Untitled')}</div></div>
@@ -4462,42 +4464,36 @@ async function plViewEntry(id) {
 }
 
 // === REPOS ===
-async function reposRefresh() {
+function reposRefresh() {
+  if(!S.repos || !S.repos.length) {
+    S.repos = [
+      { name:'astra-command-center', github:'https://github.com/gabosaturno11/astra-command-center', live:'https://astra-command-center-sigma.vercel.app', role:'backend-hub', status:'active', desc:'ASTRA V2 command center, project hub, KB, whiteboard, API backend' },
+      { name:'saturno-bonus', github:'https://github.com/gabosaturno11/saturno-bonus', live:'https://saturno-bonus-omega.vercel.app', role:'customer-facing', status:'active', desc:'Bonus vault for SM Academy customers. 60 tools, 15 PDFs, music player.' },
+      { name:'titan-forge', github:'https://github.com/gabosaturno11/titan-forge', live:'https://titan-forge-ten.vercel.app', role:'internal-tools', status:'active', desc:'Internal tools collection. Bonus page moved out to saturno-bonus.' },
+      { name:'de-aqui-a-saturno', github:'https://github.com/gabosaturno11/de-aqui-a-saturno', live:'https://de-aqui-a-saturno-jet.vercel.app', role:'experience', status:'complete', desc:'Valentine crystal cosmic scroll. Gate, 18 chapters, 11 love dimensions.' },
+      { name:'nexus-capture', github:'https://github.com/gabosaturno11/nexus-capture', live:null, role:'extension', status:'active', desc:'Chrome extension for universal highlight capture. Routes to ASTRA API.' },
+    ];
+    save();
+  }
   const grid=document.getElementById('repos-grid');
   if(!grid) return;
-  grid.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Loading repos...</div>';
-  try {
-    const res=await fetch(ASTRA_API+'/api/repos');
-    const data=await res.json();
-    if(data.ok && data.repos) {
-      grid.innerHTML=data.repos.map(r=>{
-        const statusColor=r.pingStatus==='online'?'var(--green)':r.pingStatus==='unknown'?'var(--text-muted)':'var(--red)';
-        const roleColors={
-          'backend-hub':'var(--accent)',
-          'customer-facing':'#22d3ee',
-          'internal-tools':'#a855f7',
-          'experience':'#f472b6',
-          'extension':'#fbbf24'
-        };
-        const roleColor=roleColors[r.role]||'var(--text-muted)';
-        return '<div style="padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:4px">'+
-          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'+
-            '<span style="font-size:12px;font-weight:600">'+esc(r.name)+'</span>'+
-            '<span style="width:8px;height:8px;border-radius:50%;background:'+statusColor+'"></span>'+
-          '</div>'+
-          '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:'+roleColor+';margin-bottom:4px">'+esc(r.role)+'</div>'+
-          '<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">'+esc(r.description)+'</div>'+
-          (r.liveUrl?'<a href="'+r.liveUrl+'" target="_blank" style="font-size:9px;color:var(--accent);text-decoration:none">'+r.liveUrl.replace('https://','')+'</a>':'<span style="font-size:9px;color:var(--text-muted)">Local only</span>')+
-          (r.hasApi?'<div style="margin-top:6px;font-size:9px;color:var(--text-muted)">Endpoints: '+r.apiEndpoints.join(', ')+'</div>':'')+
-          (r.lastPing?'<div style="margin-top:4px;font-size:8px;color:var(--text-muted)">Last ping: '+new Date(r.lastPing).toLocaleString()+'</div>':'')+
-        '</div>';
-      }).join('');
-    } else {
-      grid.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Could not load repos</div>';
-    }
-  } catch(e) {
-    grid.innerHTML='<div style="font-size:10px;color:var(--text-muted)">Error: '+e.message+'</div>';
-  }
+  const roleColors={'backend-hub':'var(--accent)','customer-facing':'#22d3ee','internal-tools':'#a855f7','experience':'#f472b6','extension':'#fbbf24'};
+  grid.innerHTML=S.repos.map(r=>{
+    const rc=roleColors[r.role]||'var(--text-muted)';
+    const sc=r.status==='active'?'var(--green)':r.status==='complete'?'var(--accent-cyan)':'var(--text-muted)';
+    return `<div style="padding:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);transition:all 0.15s">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${esc(r.name)}</span>
+        <span style="width:8px;height:8px;border-radius:50%;background:${sc}" title="${r.status}"></span>
+      </div>
+      <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc};margin-bottom:6px">${esc(r.role)}</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">${esc(r.desc)}</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none">GitHub</a>
+        ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none">${r.live.replace('https://','')}</a>`:'<span style="font-size:10px;color:var(--text-muted)">Local only</span>'}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
