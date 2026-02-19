@@ -821,6 +821,7 @@ textarea{resize:vertical;line-height:1.6}
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
             <button class="btn btn-sm" onclick="contentBulkTag()">Tag Selected</button>
+            <button class="btn btn-sm" onclick="mergeContent()">Merge Selected</button>
             <button class="btn btn-sm" onclick="toggleContentBulk()">Cancel</button>
           </div>
           <button class="btn btn-primary btn-sm" onclick="openContentModal()">+ Add</button>
@@ -1640,6 +1641,7 @@ textarea{resize:vertical;line-height:1.6}
       <div class="td-add-subtask" onclick="addSubtaskInModal()">+ Add subtask</div>
     </div>
     <div class="td-created" id="td-created"></div>
+    <div id="td-log" style="margin-top:8px"></div>
     <div class="td-footer">
       <button class="btn btn-primary btn-sm" onclick="saveTaskDetail()">Save</button>
       <button class="btn btn-sm" onclick="closeTaskDetail()">Cancel</button>
@@ -2191,7 +2193,7 @@ function renderContent() {
   const maxShow=40;
   const g=document.getElementById('content-grid');
   const showing=contentShowAll?items:items.slice(0,maxShow);
-  const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
+  const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost" onclick="dupContent(${c.id})">Dup</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:showing.map(renderCard).join('')+(items.length>maxShow&&!contentShowAll?`<div style="grid-column:1/-1;text-align:center;padding:12px"><button class="btn btn-sm" onclick="contentShowAll=true;renderContent()">Show all ${items.length} items (${items.length-maxShow} more)</button></div>`:'');
   document.getElementById('content-count').textContent=S.content.length;
   const totalWords=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
@@ -2214,6 +2216,8 @@ function undoDeleteContent(){if(!lastDeletedContent)return;S.content.unshift(las
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
 function randomContent(){if(!S.content.length){toast('No content yet');return;}const r=S.content[Math.floor(Math.random()*S.content.length)];navigator.clipboard.writeText(r.body);toast('Random: '+(r.body.substring(0,50)+'...'));document.getElementById('content-search').value='';contentType='all';contentTheme='all';contentTagFilter=null;renderContent();setTimeout(()=>{const cards=document.querySelectorAll('.content-card');const idx=S.content.indexOf(r);if(cards[idx])cards[idx].scrollIntoView({behavior:'smooth',block:'center'});},100);}
 function pinContent(id){const c=S.content.find(x=>x.id===id);if(c){c.pinned=!c.pinned;save();renderContent();toast(c.pinned?'Pinned':'Unpinned');}}
+function dupContent(id){const c=S.content.find(x=>x.id===id);if(!c)return;S.content.unshift({...c,id:Date.now(),pinned:false,created:new Date().toISOString()});save();renderContent();toast('Duplicated');}
+function mergeContent(){if(contentSelected.size<2){toast('Select 2+ items to merge');return;}const items=[...contentSelected].map(id=>S.content.find(c=>c.id===id)).filter(Boolean);const merged=items.map(c=>c.body).join('\n\n---\n\n');const tags=[...new Set(items.flatMap(c=>c.tags||[]))];S.content.unshift({id:Date.now(),type:items[0].type||'caption',theme:items[0].theme||'',body:merged,tags,source:'merged',created:new Date().toISOString()});save();contentSelected.clear();contentBulkMode=false;renderContent();toast('Merged '+items.length+' items');}
 function exportContent(){
   const items=S.content;
   const groups={};
@@ -2303,7 +2307,7 @@ function renderTasks(){
 
 function addTask(){S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
 function addTaskFromTemplate(title,priority,recurrence){S.tasks.unshift({id:Date.now(),title,description:'',subtasks:[],status:'todo',priority:priority||'p2',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],recurrence:recurrence||'',created:new Date().toISOString()});save();renderTasks();toast('Added: '+title);document.querySelectorAll('.btn-group div[style*="display: block"],.btn-group div[style*="display:block"]').forEach(d=>d.style.display='none');}
-function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){if(f==='status'&&v==='progress'&&!t.timeStarted)t.timeStarted=new Date().toISOString();if(f==='status'&&v!=='progress'&&t.timeStarted){t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);t.timeStarted=null;}t[f]=v;save();renderTasks();}}
+function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){if(f==='status'&&v==='progress'&&!t.timeStarted)t.timeStarted=new Date().toISOString();if(f==='status'&&v!=='progress'&&t.timeStarted){t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);t.timeStarted=null;}if(f==='status'&&t.status!==v){if(!t.log)t.log=[];t.log.push({from:t.status,to:v,at:new Date().toISOString()});if(t.log.length>20)t.log=t.log.slice(-20);}t[f]=v;save();renderTasks();}}
 function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
 function getNextRecurDate(dateStr,recur){const d=new Date(dateStr+'T12:00:00');if(recur==='daily')d.setDate(d.getDate()+1);else if(recur==='weekday'){d.setDate(d.getDate()+1);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);}else if(recur==='weekly')d.setDate(d.getDate()+7);else if(recur==='biweekly')d.setDate(d.getDate()+14);else if(recur==='monthly')d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
@@ -2386,6 +2390,8 @@ function openTaskDetail(id) {
   if(t.timeSpent)timeText+=' | Time: '+formatTimeSpent(t.timeSpent);
   if(t.timeStarted)timeText+=' | Started: '+timeAgo(t.timeStarted);
   document.getElementById('td-created').textContent = timeText;
+  const logEl=document.getElementById('td-log');
+  if(logEl&&t.log&&t.log.length){logEl.innerHTML='<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Activity</div>'+t.log.slice(-5).reverse().map(e=>`<div style="font-size:8px;color:var(--text-muted);padding:1px 0;font-family:var(--mono)">${e.from} -> ${e.to} <span style="opacity:0.5">${timeAgo(e.at)}</span></div>`).join('');}else if(logEl){logEl.innerHTML='';}
   renderSubtasksInModal(t.subtasks || []);
   document.getElementById('task-detail-modal').classList.add('open');
   setTimeout(()=>document.getElementById('td-title').focus(),100);
@@ -3511,6 +3517,45 @@ function handleWbDrop(e) {
 
 // === GLOBAL ===
 function exportAll(){snapshotWriter();snapshotSpec();if(activeProject){const p=getProject(activeProject);if(p){p.instructions=document.getElementById('proj-instructions-editor')?.innerHTML||p.instructions;}}const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-hub-'+new Date().toISOString().split('T')[0]+'.json';a.click();toast('Exported');}
+function exportSummary(){
+  snapshotWriter();snapshotSpec();
+  const today=new Date().toISOString().split('T')[0];
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const done=S.tasks.filter(t=>t.status==='done');
+  const overdue=active.filter(t=>t.due&&t.due<today);
+  const priorities={p0:active.filter(t=>t.priority==='p0').length,p1:active.filter(t=>t.priority==='p1').length,p2:active.filter(t=>t.priority==='p2').length,p3:active.filter(t=>t.priority==='p3').length};
+  let md='# SATURNO HUB Summary\n';
+  md+=`**Generated:** ${new Date().toLocaleString()}\n\n`;
+  md+='---\n\n## Tasks\n';
+  md+=`- **Active:** ${active.length} | **Done:** ${done.length} | **Overdue:** ${overdue.length}\n`;
+  md+=`- **By Priority:** P0=${priorities.p0} P1=${priorities.p1} P2=${priorities.p2} P3=${priorities.p3}\n\n`;
+  if(overdue.length){md+='### Overdue\n';overdue.forEach(t=>{md+=`- [${t.priority||'p2'}] ${t.title} (due ${t.due})\n`;});md+='\n';}
+  const todayTasks=active.filter(t=>t.due===today);
+  if(todayTasks.length){md+='### Due Today\n';todayTasks.forEach(t=>{md+=`- [${t.priority||'p2'}] ${t.title}\n`;});md+='\n';}
+  md+='## Content\n';
+  md+=`- **Items:** ${S.content.length}\n`;
+  const totalW=S.content.reduce((s,c)=>(c.body||'').trim().split(/\s+/).filter(x=>x.length).length+s,0);
+  md+=`- **Total words:** ${totalW.toLocaleString()}\n\n`;
+  md+='## Documents\n';
+  md+=`- **Writer docs:** ${(S.docs||[]).length}\n`;
+  md+=`- **Living Docs:** ${(S.specs||[]).length}\n\n`;
+  md+='## Links\n';
+  md+=`- **Total:** ${(S.links||[]).length}\n`;
+  const cats=[...new Set((S.links||[]).map(l=>l.category).filter(Boolean))];
+  if(cats.length)md+=`- **Categories:** ${cats.join(', ')}\n`;
+  md+='\n## Projects\n';
+  (S.projects||[]).forEach(p=>{
+    const pt=S.tasks.filter(t=>(t.projectId||t.project)===p.id);
+    const pa=pt.filter(t=>t.status!=='done').length;
+    md+=`- **${p.name}** (${p.status||'active'}) — ${pa} active tasks\n`;
+  });
+  md+='\n## Repos\n';
+  (S.repos||[]).forEach(r=>{md+=`- ${r.name} — ${r.live||'no live URL'} (${r.status||'unknown'})\n`;});
+  md+='\n---\n*Exported from SATURNO HUB*\n';
+  navigator.clipboard.writeText(md).then(()=>toast('Summary copied to clipboard')).catch(()=>{
+    const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-summary-'+today+'.md';a.click();toast('Summary downloaded');
+  });
+}
 function importAll(){
   // Auto-backup before import (UNDO safety net)
   const backup = localStorage.getItem(SK);
@@ -4381,6 +4426,7 @@ function cmdGetItems(q) {
   if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
   if(!ql || 'ics calendar export'.includes(ql)) items.push({title:'Export Calendar', desc:'Export tasks as .ics for Google Calendar', icon:'C', type:'action', action:()=>{closeCommandPalette();exportICS();}});
   if(!ql || 'random inspiration content'.includes(ql)) items.push({title:'Random Content', desc:'Pick a random content item for inspiration', icon:'?', type:'action', action:()=>{closeCommandPalette();switchSection('content',null);setTimeout(randomContent,100);}});
+  if(!ql || 'export summary markdown report'.includes(ql)) items.push({title:'Export Summary', desc:'Copy hub summary as Markdown', icon:'S', type:'action', action:()=>{closeCommandPalette();exportSummary();}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   // Open specific docs in Zen Writer
   if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
