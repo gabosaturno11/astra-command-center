@@ -1066,6 +1066,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="wbImportJSON()" title="Import whiteboard JSON">Import</button>
           <button class="btn btn-sm" onclick="wbClearAll()">Clear</button>
           <input type="text" id="wb-search" placeholder="Find node..." oninput="wbSearchNodes(this.value)" style="width:100px;padding:2px 6px;font-size:9px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono)">
+          <span id="wb-stats" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
         </div>
         <div class="wb-top-bar">
           <div class="wb-zoom"><button class="wb-tool" onclick="wbZoom(-0.1)" style="width:20px;height:20px;font-size:14px">-</button><span id="wb-zoom-level">100%</span><button class="wb-tool" onclick="wbZoom(0.1)" style="width:20px;height:20px;font-size:14px">+</button><button class="wb-tool" onclick="wbFitView()" style="width:20px;height:20px;font-size:9px">Fit</button></div>
@@ -2734,7 +2735,8 @@ function renderWeekView() {
   const ws = new Date(calWeekStart);
   const we = new Date(ws); we.setDate(we.getDate()+6);
   const label = ws.getMonth()===we.getMonth() ? months[ws.getMonth()]+' '+ws.getFullYear() : months[ws.getMonth()].substring(0,3)+' - '+months[we.getMonth()]+' '+we.getFullYear();
-  document.getElementById('cal-month-label').textContent=label;
+  const oneJan=new Date(ws.getFullYear(),0,1);const weekNum=Math.ceil(((ws-oneJan)/86400000+oneJan.getDay()+1)/7);
+  document.getElementById('cal-month-label').innerHTML=label+' <span style="font-size:9px;color:var(--text-muted);font-family:var(--mono)">W'+weekNum+'</span>';
   const today=new Date().toISOString().split('T')[0];
   const dayNames=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   let h='';
@@ -4231,6 +4233,7 @@ function wbRender() {
   canvas.innerHTML = `<div class="wb-grid">${gridHtml}</div><svg class="wb-svg" style="width:5000px;height:5000px">${svgContent}</svg>${nodesHtml}`;
   wbUpdateTransform();
   wbUpdateMinimap();
+  const wbStatsEl=document.getElementById('wb-stats');if(wbStatsEl)wbStatsEl.textContent=wbNodes.length+'n / '+wbConns.length+'c';
 }
 
 function wbUpdateMinimap() {
