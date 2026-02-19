@@ -4222,8 +4222,11 @@ function scheduleCloudSync() {
 }
 
 async function cloudLoad() {
+  if (!ensureAdminPW()) return;
   try {
-    const res = await fetch(ASTRA_API + '/api/state');
+    const res = await fetch(ASTRA_API + '/api/state', {
+      headers: { 'Authorization': 'Bearer ' + ASTRA_ADMIN_PW }
+    });
     const data = await res.json();
     if (data._source === 'blob' && (data.projects || data.tasks || data.docs || data.content)) {
       delete data._source; delete data._savedAt; delete data._version;
@@ -4542,8 +4545,6 @@ function reposRefresh() {
 }
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
-// ASTRA self-ping — registers itself in repo registry
-(function(){fetch(ASTRA_API+'/api/repos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({repoId:'astra-command-center',status:'online',message:'ASTRA Hub loaded'})}).catch(function(){});})();
 </script>
 </body>
 </html>
