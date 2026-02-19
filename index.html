@@ -2623,7 +2623,7 @@ function renderWeekView() {
       <div class="week-day-header">${dayNames[i]}<span class="day-num">${d.getDate()}</span>${dt.length?`<span style="font-size:8px;color:var(--accent);font-family:var(--mono);margin-left:4px;opacity:0.7">${dt.length}</span>`:''}</div>
       ${dt.map(t=>`<div class="week-task-card" draggable="true" ondragstart="calDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})">
         <div class="wt-title">${esc(t.title||'Untitled')}</div>
-        <div class="wt-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" style="font-size:8px;padding:1px 4px">${t.priority||'p3'}</span>${t.project?`<span style="font-size:8px;color:var(--text-muted)">${esc(t.project)}</span>`:''}</div>
+        <div class="wt-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" style="font-size:8px;padding:1px 4px">${t.priority||'p3'}</span>${t.project?`<span style="font-size:8px;color:var(--text-muted)">${esc(t.project)}</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)">${esc(t.estimate)}</span>`:''}</div>
       </div>`).join('')}
       <div class="week-add" onclick="calClickDay('${ds}')">+ task</div>
     </div>`;
