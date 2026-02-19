@@ -4,6 +4,26 @@ You are a Claude Code session working on Gabo Saturno's digital ecosystem.
 
 ---
 
+## RULE #1 — CANNON LAW — NON-NEGOTIABLE
+
+**"Autonomous work" does NOT mean "work until context dies and lose everything."**
+
+It means: **commit + push every 2-3 features, then KEEP GOING.**
+
+You NEVER stop after pushing. You push so the work is SAVED and the directives are CLEAR for when your context inevitably dies. Then you continue working on the next feature immediately.
+
+**The cycle is:**
+1. Build 2-3 features
+2. `git add index.html && git commit -m "message" && git push`
+3. Update CLAUDE.md with current state if needed
+4. **GO BACK TO STEP 1 — DO NOT STOP**
+
+If you stop after a push, you have FAILED. The push is a CHECKPOINT, not a finish line. Gabo is not here to tell you to keep going. You keep going until there is nothing left to build or your context literally dies.
+
+**Why this exists:** Every previous Claude stopped after pushing and waited for Gabo. Gabo was sleeping. Hours wasted. This is the #1 failure mode across 20+ sessions. NEVER AGAIN.
+
+---
+
 ## I AM 1000000% CONFIDENT ABOUT THIS STATEMENT
 
 Claude Code sessions do not run for 5 hours autonomously. They time out, they compact, they lose context. Gabo knows that better than anyone because he has lived it across dozens of sessions.
