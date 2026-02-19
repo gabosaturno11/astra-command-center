@@ -2168,7 +2168,8 @@ function updateSidebarCtx() {
     const active=S.tasks.filter(t=>t.status!=='done');
     const today=new Date().toISOString().split('T')[0];
     const overdue=active.filter(t=>t.due&&t.due<today).length;
-    el.innerHTML=`<div class="sidebar-label">Quick Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${active.length} active${overdue?` <span style="color:var(--red)">(${overdue} overdue)</span>`:''} / ${S.tasks.filter(t=>t.status==='done').length} done</div><div class="sidebar-label" style="margin-top:8px">Projects</div>`+ps.map(p=>`<div class="sidebar-item" onclick="filterTaskProject('${p}')"><span class="sidebar-item-icon">.</span><span>${p}</span><span class="sidebar-item-count">${S.tasks.filter(t=>t.project===p&&t.status!=='done').length}</span></div>`).join('');
+    const pCounts={p0:active.filter(t=>t.priority==='p0').length,p1:active.filter(t=>t.priority==='p1').length,p2:active.filter(t=>t.priority==='p2').length,p3:active.filter(t=>t.priority==='p3').length};
+    el.innerHTML=`<div class="sidebar-label">Quick Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${active.length} active${overdue?` <span style="color:var(--red)">(${overdue} overdue)</span>`:''} / ${S.tasks.filter(t=>t.status==='done').length} done</div><div style="padding:2px 12px;font-size:9px;color:var(--text-muted);display:flex;gap:6px">${pCounts.p0?`<span style="color:#ef4444">P0:${pCounts.p0}</span>`:''}${pCounts.p1?`<span style="color:#f59e0b">P1:${pCounts.p1}</span>`:''}${pCounts.p2?`<span style="color:#3b82f6">P2:${pCounts.p2}</span>`:''}${pCounts.p3?`<span style="color:var(--text-muted)">P3:${pCounts.p3}</span>`:''}</div><div class="sidebar-label" style="margin-top:8px">Projects</div>`+ps.map(p=>`<div class="sidebar-item" onclick="filterTaskProject('${p}')"><span class="sidebar-item-icon">.</span><span>${p}</span><span class="sidebar-item-count">${S.tasks.filter(t=>t.project===p&&t.status!=='done').length}</span></div>`).join('');
   } else if(currentSection==='content') {
     const types={};S.content.forEach(c=>{types[c.type]=(types[c.type]||0)+1;});
     const totalWords=S.content.reduce((a,c)=>a+c.body.trim().split(/\s+/).filter(x=>x.length).length,0);
@@ -2713,14 +2714,31 @@ function calDragStart(e,id){calDragId=id;e.dataTransfer.effectAllowed='move';}
 function calDrop(e,dateStr){e.preventDefault();if(calDragId){const t=S.tasks.find(x=>x.id===calDragId);if(t){t.due=dateStr;save();renderCalendar();renderTasks();toast('Moved to '+dateStr);}calDragId=null;}}
 function exportICS(){let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SaturnoHub//EN\n';S.tasks.filter(t=>t.due).forEach(t=>{const d=t.due.replace(/-/g,'');ics+=`BEGIN:VEVENT\nDTSTART;VALUE=DATE:${d}\nSUMMARY:${t.title||'Task'}\nDESCRIPTION:Priority: ${t.priority||'p2'} | Status: ${t.status||'todo'}${t.project?' | Project: '+t.project:''}\nEND:VEVENT\n`;});ics+='END:VCALENDAR';const blob=new Blob([ics],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-tasks.ics';a.click();toast('ICS exported - import into Google Calendar');}
 
+function exportWeek(){
+  const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());weekStart.setHours(0,0,0,0);
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+6);
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  let md='# Week of '+weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric'})+' - '+weekEnd.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'\n\n';
+  for(let i=0;i<7;i++){
+    const d=new Date(weekStart);d.setDate(d.getDate()+i);
+    const ds=d.toISOString().split('T')[0];
+    const tasks=S.tasks.filter(t=>t.due===ds);
+    if(tasks.length){md+='## '+days[d.getDay()]+' ('+ds+')\n';tasks.forEach(t=>{md+='- ['+t.status+'] '+t.title+(t.priority?' ('+t.priority+')':'')+(t.project?' ['+t.project+']':'')+'\n';});md+='\n';}
+  }
+  const doneThisWeek=S.tasks.filter(t=>t.status==='done'&&t.log&&t.log.some(e=>e.to==='done'&&e.at>=weekStart.toISOString()));
+  if(doneThisWeek.length){md+='## Completed This Week\n';doneThisWeek.forEach(t=>{md+='- '+t.title+(t.project?' ['+t.project+']':'')+'\n';});md+='\n';}
+  navigator.clipboard.writeText(md).then(()=>toast('Week summary copied to clipboard'));
+}
+
 // === WRITING HUB ===
 function getActiveDoc(){return S.docs.find(d=>d.id===S.activeDoc);}
 function renderWriter(){renderDocList();loadDoc();document.getElementById('writer-count').textContent=S.docs.length;}
-function renderDocList(){const sorted=[...S.docs].sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));document.getElementById('writer-doc-list').innerHTML=sorted.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div><div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span>${S.docs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
+function renderDocList(){const sorted=[...S.docs].sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));document.getElementById('writer-doc-list').innerHTML=sorted.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div><div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span><span style="margin-left:auto;cursor:pointer;opacity:0.4;font-size:8px" onclick="event.stopPropagation();dupDoc(${d.id})" title="Duplicate">D</span>${S.docs.length>1?`<span style="cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
 function loadDoc(){const d=getActiveDoc();if(!d)return;document.getElementById('writer-title').value=d.title||'';document.getElementById('writer-editor').innerHTML=d.body||'';updateWS();renderVersions();}
 function switchDoc(id){if(S.activeDoc===id)return;snapshotWriter();save();S.activeDoc=id;renderWriter();const d=S.docs.find(x=>x.id===id);if(d)trackRecent('doc',id,d.title);save();updateBreadcrumb();}
 function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.getElementById('writer-title').focus();}
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
+function dupDoc(id){const d=S.docs.find(x=>x.id===id);if(!d)return;snapshotWriter();const dup={...d,id:Date.now(),title:(d.title||'Untitled')+' (copy)',created:new Date().toISOString(),updated:new Date().toISOString(),versions:[]};S.docs.unshift(dup);S.activeDoc=dup.id;save();renderWriter();toast('Duplicated');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
 function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},800);updateWS();}
 function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=t.length+' chars';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
@@ -4630,6 +4648,7 @@ function cmdGetItems(q) {
   if(!ql || 'export content'.includes(ql)) items.push({title:'Export Content', desc:'Copy all content as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportContent();}});
   if(!ql || 'export tasks'.includes(ql)) items.push({title:'Export Tasks', desc:'Copy filtered tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportTasks();}});
   if(!ql || 'export links bookmarks'.includes(ql)) items.push({title:'Export Links', desc:'Copy all links as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportLinks();}});
+  if(!ql || 'export week calendar summary'.includes(ql)) items.push({title:'Export Week', desc:'Copy this weeks tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportWeek();}});
   if(!ql || 'archive'.includes(ql)) items.push({title:'Archive Completed', desc:'Move done tasks to archive', icon:'A', type:'action', action:()=>{closeCommandPalette();archiveCompletedTasks();}});
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
