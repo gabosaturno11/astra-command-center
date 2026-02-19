@@ -1973,6 +1973,12 @@ function qcOpen() {
   el.style.display = 'block';
   requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)'; });
   document.getElementById('qc-input').focus();
+  // Auto-detect clipboard URL
+  navigator.clipboard.readText().then(text=>{
+    if(text&&text.startsWith('http')&&!text.includes('\n')){
+      try{new URL(text);document.getElementById('qc-type').value='link';document.getElementById('qc-input').value=text;document.getElementById('qc-input').select();}catch(e){}
+    }
+  }).catch(()=>{});
 }
 function qcClose() {
   const el = document.getElementById('quick-capture');
@@ -2462,7 +2468,7 @@ function renderCalendar(){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday=ds===today;
     const dt=S.tasks.filter(t=>t.due===ds);
-    h+=`<div class="calendar-day ${isToday?'today':''}" onclick="calClickDay('${ds}')" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')"><div class="calendar-day-num">${d}</div>${dt.slice(0,4).map(t=>`<div class="calendar-task-pill pill-${t.priority||'p2'}" draggable="true" ondragstart="calDragStart(event,${t.id})" onclick="event.stopPropagation();openTaskDetail(${t.id})" title="${escA(t.title)}">${esc(t.title||'...')}</div>`).join('')}${dt.length>4?`<div style="font-size:8px;color:var(--text-muted)">+${dt.length-4} more</div>`:''}</div>`;
+    h+=`<div class="calendar-day ${isToday?'today':''}" onclick="calClickDay('${ds}')" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')"><div class="calendar-day-num">${d}${dt.length?`<span style="font-size:7px;color:var(--accent);font-family:var(--mono);margin-left:3px">${dt.length}</span>`:''}</div>${dt.slice(0,4).map(t=>`<div class="calendar-task-pill pill-${t.priority||'p2'}" draggable="true" ondragstart="calDragStart(event,${t.id})" onclick="event.stopPropagation();openTaskDetail(${t.id})" title="${escA(t.title)}">${esc(t.title||'...')}</div>`).join('')}${dt.length>4?`<div style="font-size:8px;color:var(--text-muted)">+${dt.length-4} more</div>`:''}</div>`;
   }
   const rem=42-(first+days);
   for(let d=1;d<=rem;d++)h+=`<div class="calendar-day other"><div class="calendar-day-num">${d}</div></div>`;
