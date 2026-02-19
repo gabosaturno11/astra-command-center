@@ -1674,6 +1674,17 @@ function migrateV2() {
     );
     save();
   }
+  // Migrate tasks: link tasks with project name to projectId
+  if(S.tasks && S.projects) {
+    let migrated = 0;
+    S.tasks.forEach(t => {
+      if(t.project && !t.projectId) {
+        const p = S.projects.find(pr => pr.name === t.project);
+        if(p) { t.projectId = p.id; migrated++; }
+      }
+    });
+    if(migrated > 0) save();
+  }
 }
 
 function seedKernel() {
@@ -2252,7 +2263,7 @@ function renderProjectsSidebar() {
   el.innerHTML = projects.map(p => {
     const statusClass = p.status === 'active' ? 'active-s' : p.status === 'paused' ? 'paused-s' : 'complete-s';
     const isActive = activeProject === p.id;
-    const projTasks = S.tasks.filter(t => t.project === p.name);
+    const projTasks = getProjectTasks(p.id);
     const doneTasks = projTasks.filter(t => t.status === 'done').length;
     const totalTasks = projTasks.length;
     const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
@@ -2527,11 +2538,16 @@ function kbDragStart(e, id) {
   e.dataTransfer.effectAllowed = 'copy';
 }
 
-// Project Tasks
+// Project Tasks — uses projectId (preferred) or falls back to project name match
+function getProjectTasks(projId) {
+  const p = getProject(projId);
+  if(!p) return [];
+  return S.tasks.filter(t => t.projectId === projId || (!t.projectId && t.project === p.name));
+}
 function renderProjTasks() {
   const p = getProject(activeProject);
   if(!p) return;
-  const tasks = S.tasks.filter(t => t.project === p.name);
+  const tasks = getProjectTasks(activeProject);
   const el = document.getElementById('proj-task-rows');
   el.innerHTML = tasks.map(t => `<div class="task-row ${t.status==='done'?'completed':''}" style="grid-template-columns:36px 1fr 110px 100px 50px">
     <div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id});setTimeout(()=>renderProjTasks(),50)"></div>
@@ -2544,7 +2560,7 @@ function renderProjTasks() {
 function addProjTask() {
   const p = getProject(activeProject);
   if(!p) return;
-  S.tasks.unshift({id:Date.now(), title:'', status:'todo', priority:'p1', project:p.name, due:new Date().toISOString().split('T')[0], created:new Date().toISOString()});
+  S.tasks.unshift({id:Date.now(), title:'', status:'todo', priority:'p1', project:p.name, projectId:activeProject, due:new Date().toISOString().split('T')[0], created:new Date().toISOString()});
   save(); renderProjTasks(); renderTasks();
   setTimeout(()=>{const i=document.querySelector('#proj-task-rows .task-title-input');if(i)i.focus();},50);
 }
@@ -2845,7 +2861,7 @@ function buildProjectMD() {
   if(!p) return '';
   const kbItems = (S.knowledgeBase||[]).filter(k => k.projectId === activeProject);
   const docs = (S.specs||[]).filter(s => s.projectId === activeProject);
-  const tasks = (S.tasks||[]).filter(t => t.project === p.name);
+  const tasks = getProjectTasks(activeProject);
   const links = (S.links||[]).filter(l => l.projectId === activeProject);
   // Convert HTML instructions to readable text
   const div = document.createElement('div');
@@ -2917,7 +2933,7 @@ function exportProjectJSON() {
     project: p,
     knowledgeBase: (S.knowledgeBase||[]).filter(k => k.projectId === activeProject),
     livingDocs: (S.specs||[]).filter(s => s.projectId === activeProject),
-    tasks: (S.tasks||[]).filter(t => t.project === p.name),
+    tasks: getProjectTasks(activeProject),
     links: (S.links||[]).filter(l => l.projectId === activeProject),
     exportedAt: new Date().toISOString(),
     exportedFrom: 'ASTRA Command Center'
