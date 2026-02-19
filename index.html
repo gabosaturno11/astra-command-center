@@ -956,6 +956,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="writer-toolbar-btn" onclick="clearFormatting()">Tx</button>
             <div style="margin-left:auto;display:flex;gap:2px">
               <button class="voice-btn" id="writer-voice-btn" onclick="toggleVoice('writer')" title="Voice Input">M</button>
+              <button class="writer-toolbar-btn" onclick="writerTOC()" title="Insert Table of Contents">TOC</button>
               <button class="writer-toolbar-btn" onclick="saveVersion()" title="Save Version">v+</button>
               <button class="writer-toolbar-btn" onclick="toggleWriterPanel()" title="History">H</button>
               <select class="writer-toolbar-select" id="writer-export-sel" onchange="writerExport(this.value);this.selectedIndex=0">
@@ -2172,8 +2173,19 @@ function updateSidebarCtx() {
       `<div>${S.links.length} links</div>`+
       `<div>${(S.repos||[]).length} repos</div>`+
       `<div style="margin-top:4px;color:var(--accent)">${totalWords.toLocaleString()} total words</div>`+
+      weeklyProductivity()+
       `</div>`;
   }
+}
+
+function weeklyProductivity(){
+  const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());weekStart.setHours(0,0,0,0);
+  const days=[];for(let i=0;i<7;i++){const d=new Date(weekStart);d.setDate(d.getDate()+i);days.push(d.toISOString().split('T')[0]);}
+  const doneThisWeek=S.tasks.filter(t=>t.status==='done'&&t.log&&t.log.some(e=>e.to==='done'&&e.at>=weekStart.toISOString())).length;
+  const createdThisWeek=S.tasks.filter(t=>t.created&&t.created>=weekStart.toISOString()).length;
+  const contentThisWeek=S.content.filter(c=>c.created&&c.created>=weekStart.toISOString()).length;
+  if(!doneThisWeek&&!createdThisWeek&&!contentThisWeek)return'';
+  return `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">This Week</div>${doneThisWeek?`<div style="font-size:10px;color:var(--accent)">${doneThisWeek} tasks completed</div>`:''}<div style="font-size:10px;color:var(--text-muted)">${createdThisWeek} tasks created</div>${contentThisWeek?`<div style="font-size:10px;color:var(--text-muted)">${contentThisWeek} content added</div>`:''}</div>`;
 }
 
 // === CONTENT ===
@@ -2602,9 +2614,25 @@ function calToday(){
   renderCalendar();
 }
 function calClickDay(dateStr){
+  const dt=S.tasks.filter(t=>t.due===dateStr);
+  if(dt.length>0){calDayPopup(dateStr,dt);return;}
   S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p2',project:'',due:dateStr,created:new Date().toISOString()});
   save();renderCalendar();renderTasks();
   toast('New task on '+dateStr);
+}
+function calDayPopup(dateStr,tasks){
+  let existing=document.getElementById('cal-day-popup');if(existing)existing.remove();
+  const d=new Date(dateStr+'T12:00:00');
+  const label=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const popup=document.createElement('div');popup.id='cal-day-popup';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:16px;z-index:9999;max-width:350px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.5)';
+  popup.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:13px;font-weight:600;color:var(--text-primary)">${label}</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">x</button></div><div style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto">${tasks.map(t=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg-secondary);border-radius:4px;cursor:pointer;border-left:3px solid var(${t.priority==='p0'?'--red':t.priority==='p1'?'--orange':'--accent'})" onclick="this.parentElement.parentElement.remove();openTaskDetail(${t.id})"><div style="flex:1"><div style="font-size:11px;color:var(--text-primary)">${esc(t.title||'Untitled')}</div><div style="font-size:9px;color:var(--text-muted)">${t.status} | ${t.priority||'p2'}${t.project?' | '+esc(t.project):''}</div></div></div>`).join('')}</div><button onclick="this.parentElement.remove();calAddTaskOnDay('${dateStr}')" class="btn btn-primary btn-sm" style="width:100%;margin-top:10px">+ Add task on this day</button>`;
+  document.body.appendChild(popup);
+  popup.addEventListener('click',e=>{if(e.target===popup)popup.remove();});
+}
+function calAddTaskOnDay(dateStr){
+  S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p2',project:'',due:dateStr,created:new Date().toISOString()});
+  save();renderCalendar();renderTasks();toast('New task on '+dateStr);
 }
 function calDragStart(e,id){calDragId=id;e.dataTransfer.effectAllowed='move';}
 function calDrop(e,dateStr){e.preventDefault();if(calDragId){const t=S.tasks.find(x=>x.id===calDragId);if(t){t.due=dateStr;save();renderCalendar();renderTasks();toast('Moved to '+dateStr);}calDragId=null;}}
@@ -2632,6 +2660,21 @@ function insertHR(){document.execCommand('insertHTML',false,'<hr>');document.get
 function insertCodeInline(){const s=window.getSelection();if(s.rangeCount)document.execCommand('insertHTML',false,'<code>'+(esc(s.toString())||'code')+'</code>');}
 function clearFormatting(){document.execCommand('removeFormat',false,null);document.getElementById('writer-editor').focus();}
 function writerKeydown(e){if(e.key==='Tab'){e.preventDefault();document.execCommand('insertHTML',false,'&nbsp;&nbsp;&nbsp;&nbsp;');}if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();saveVersion();}if((e.ctrlKey||e.metaKey)&&(e.key==='h'||e.key==='f')&&currentSection==='writer'){e.preventDefault();writerFindOpen();}}
+function writerTOC(){
+  const editor=document.getElementById('writer-editor');if(!editor)return;
+  const headings=editor.querySelectorAll('h1,h2,h3');
+  if(!headings.length){toast('No headings found');return;}
+  let toc='<div style="border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin:8px 0;background:var(--bg-secondary)"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Table of Contents</div>';
+  headings.forEach(h=>{
+    const level=parseInt(h.tagName[1]);const indent=(level-1)*16;
+    toc+=`<div style="padding:2px 0 2px ${indent}px;font-size:${level===1?'12':'11'}px;color:var(--text-${level===1?'primary':'secondary'})">${h.textContent}</div>`;
+  });
+  toc+='</div>';
+  const range=document.createRange();range.selectNodeContents(editor);range.collapse(true);
+  const frag=range.createContextualFragment(toc);
+  editor.insertBefore(frag,editor.firstChild);
+  onWriterChange();toast('TOC inserted at top');
+}
 function writerFindOpen(){const bar=document.getElementById('writer-find-bar');bar.style.display='flex';document.getElementById('writer-find-input').focus();const sel=window.getSelection();if(sel.toString())document.getElementById('writer-find-input').value=sel.toString();}
 function writerFindClose(){document.getElementById('writer-find-bar').style.display='none';document.getElementById('writer-find-count').textContent='';window.getSelection().removeAllRanges();}
 function writerFindNext(){const q=document.getElementById('writer-find-input').value;if(!q){document.getElementById('writer-find-count').textContent='';return;}const ed=document.getElementById('writer-editor');const text=ed.innerText;const matches=text.match(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'));document.getElementById('writer-find-count').textContent=matches?matches.length+' found':'0 found';if(window.find)window.find(q,false,false,true);}
