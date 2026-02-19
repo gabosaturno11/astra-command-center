@@ -891,6 +891,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="btn btn-sm" onclick="exportICS()">Export .ics</button>
             </div>
           </div>
+          <div id="cal-today-summary" style="padding:6px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);margin:0 0 8px 0;font-size:10px;color:var(--text-secondary);display:none"></div>
           <div class="calendar-grid" id="cal-grid"></div>
           <div class="week-grid" id="cal-week-grid" style="display:none"></div>
         </div>
@@ -2285,7 +2286,22 @@ function setCalView(v) {
   }
   renderCalendar();
 }
+function renderCalTodaySummary(){
+  const el=document.getElementById('cal-today-summary');
+  const today=new Date().toISOString().split('T')[0];
+  const todayTasks=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+  const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done');
+  if(!todayTasks.length&&!overdue.length){el.style.display='none';return;}
+  el.style.display='block';
+  let h='';
+  if(overdue.length)h+=`<span style="color:var(--red)">${overdue.length} overdue</span> `;
+  if(todayTasks.length)h+=`<span style="color:var(--accent)">${todayTasks.length} today:</span> `;
+  h+=todayTasks.slice(0,5).map(t=>`<span style="cursor:pointer;text-decoration:underline dotted;margin:0 4px" onclick="openTaskDetail(${t.id})">${esc(t.title||'Untitled')}</span>`).join(' ');
+  if(todayTasks.length>5)h+=` <span style="color:var(--text-muted)">+${todayTasks.length-5} more</span>`;
+  el.innerHTML=h;
+}
 function renderCalendar(){
+  renderCalTodaySummary();
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   if(calView === 'week') {
     renderWeekView();
