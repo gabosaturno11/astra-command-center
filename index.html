@@ -756,6 +756,7 @@ textarea{resize:vertical;line-height:1.6}
       <span id="header-breadcrumb" style="font-size:10px;color:var(--text-muted);font-family:var(--mono);display:flex;align-items:center;gap:4px"></span>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
         <span id="save-indicator" style="font-family:var(--mono);font-size:8px;color:var(--text-muted);opacity:0;transition:opacity 0.3s">Saved</span>
+        <span id="cloud-sync-indicator" onclick="cloudSave()" title="Click to sync" style="cursor:pointer;font-size:12px;opacity:0.5;transition:all 0.3s">&#9729;</span>
         <div class="mode-switcher">
           <button class="mode-btn" onclick="setMode('focus')" id="mode-focus-btn" title="Focus: Primary only">F</button>
           <button class="mode-btn active" onclick="setMode('default')" id="mode-default-btn" title="Default">D</button>
@@ -4148,9 +4149,18 @@ function ensureAdminPW() {
   return true;
 }
 
+function setCloudIndicator(state) {
+  const el = document.getElementById('cloud-sync-indicator');
+  if(!el) return;
+  if(state==='syncing') { el.style.opacity='1'; el.style.color='var(--accent-cyan)'; el.title='Syncing...'; }
+  else if(state==='synced') { el.style.opacity='0.7'; el.style.color='var(--green)'; el.title='Synced '+(new Date().toLocaleTimeString())+' — click to sync'; }
+  else if(state==='error') { el.style.opacity='0.8'; el.style.color='var(--red)'; el.title='Sync failed — click to retry'; }
+  else { el.style.opacity='0.4'; el.style.color='var(--text-muted)'; el.title='Not synced — click to sync'; }
+}
 async function cloudSave(silent) {
   if (!ASTRA_ADMIN_PW && silent) return { ok: false };
   if (!ensureAdminPW()) return { ok: false };
+  setCloudIndicator('syncing');
   try {
     const state = JSON.parse(localStorage.getItem(SK) || '{}');
     const res = await fetch(ASTRA_API + '/api/state', {
@@ -4161,14 +4171,18 @@ async function cloudSave(silent) {
     const data = await res.json();
     if (data.ok) {
       lastCloudSync = Date.now();
+      setCloudIndicator('synced');
       if (!silent) toast('Synced to cloud (v' + data.version + ')');
     } else if (data.error === 'Unauthorized') {
       localStorage.removeItem('astra_admin_pw');
       ASTRA_ADMIN_PW = '';
+      setCloudIndicator('error');
       if (!silent) toast('Wrong password. Try Cmd+S again.');
+    } else {
+      setCloudIndicator('error');
     }
     return data;
-  } catch(e) { if (!silent) toast('Cloud sync error: ' + e.message); return { ok: false }; }
+  } catch(e) { setCloudIndicator('error'); if (!silent) toast('Cloud sync error: ' + e.message); return { ok: false }; }
 }
 
 function scheduleCloudSync() {
