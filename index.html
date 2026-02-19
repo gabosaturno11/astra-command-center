@@ -2188,13 +2188,13 @@ function exportICS(){let ics='BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//SaturnoHub
 // === WRITING HUB ===
 function getActiveDoc(){return S.docs.find(d=>d.id===S.activeDoc);}
 function renderWriter(){renderDocList();loadDoc();document.getElementById('writer-count').textContent=S.docs.length;}
-function renderDocList(){document.getElementById('writer-doc-list').innerHTML=S.docs.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div><div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span>${S.docs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
+function renderDocList(){const sorted=[...S.docs].sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));document.getElementById('writer-doc-list').innerHTML=sorted.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div><div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span>${S.docs.length>1?`<span style="margin-left:auto;cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
 function loadDoc(){const d=getActiveDoc();if(!d)return;document.getElementById('writer-title').value=d.title||'';document.getElementById('writer-editor').innerHTML=d.body||'';updateWS();renderVersions();}
 function switchDoc(id){if(S.activeDoc===id)return;snapshotWriter();save();S.activeDoc=id;renderWriter();const d=S.docs.find(x=>x.id===id);if(d)trackRecent('doc',id,d.title);save();updateBreadcrumb();}
 function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.getElementById('writer-title').focus();}
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
-function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},1000);updateWS();}
+function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},800);updateWS();}
 function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=t.length+' chars';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
   const d=getActiveDoc();const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
   if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
@@ -2938,7 +2938,8 @@ document.addEventListener('paste', e => {
 
 // Seed projects
 function seedProjects() {
-  if(S.projects && S.projects.length) return;
+  if(S._seeded) return;
+  if(S.projects && S.projects.length) { S._seeded = true; return; }
   S.projects = [];
   S.knowledgeBase = [];
   const now = new Date().toISOString();
@@ -3042,6 +3043,7 @@ function seedProjects() {
       content:'# Next Claude Handoff\n\nPaste this into a new Claude Code session:\n\n```\nRead ~/dev/saturno-bonus/CLAUDE.md and ~/dev/astra-command-center/CLAUDE.md, then ~/dev/saturno-bonus/logs/gabo-messages.json. ASTRA live: astra-command-center-sigma.vercel.app — Bonus live: saturno-bonus-omega.vercel.app. Don\'t ask where we are.\n```\n\n## Live URLs\n- **ASTRA:** https://astra-command-center-sigma.vercel.app\n- **Bonus (gate):** https://saturno-bonus-omega.vercel.app/gate.html\n- **Bonus password:** saturno2025\n\n## Local Paths\n- `~/dev/saturno-bonus/` — THE bonus page repo\n- `~/dev/astra-command-center/` — ASTRA command center\n- `~/dev/titan-forge/` — internal tools (bonus MOVED OUT)\n- `~/dev/de-aqui-a-saturno/` — Valentine\'s experience\n\n## Files Next Claude MUST Read\n1. `~/.claude/CLAUDE.md` — global kernel (auto-loaded)\n2. `~/.claude/projects/-Users-Gabosaturno/memory/MEMORY.md` — session state (auto-loaded)\n3. `~/dev/saturno-bonus/CLAUDE.md` — bonus project state\n4. `~/dev/saturno-bonus/logs/gabo-messages.json` — 31 messages, real context\n5. `~/dev/astra-command-center/CLAUDE.md` — ASTRA project state\n\n## GitHub\n- Account: gabosaturno11\n- All repos private\n- Deploy: git push main -> Vercel auto-deploys\n\n## Git Email\ngabo@saturnomovement.com (all repos)',
       description:'Copy-paste handoff block for next Claude Code session', tags:['handoff','next-claude','code','copy-paste'], created:now, updated:now }
   );
+  S._seeded = true;
 }
 
 // Handle KB drop on whiteboard
