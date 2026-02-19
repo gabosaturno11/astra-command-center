@@ -433,6 +433,7 @@ textarea{resize:vertical;line-height:1.6}
 .wb-node:hover .wb-node-del{display:flex}
 .wb-node:hover .wb-node-dup{display:flex}
 .wb-node:hover .wb-node-color-btn{opacity:0.7}
+.wb-node:hover .wb-lock-btn{opacity:0.6!important}
 .wb-node-resize{position:absolute;bottom:0;right:0;width:12px;height:12px;cursor:nwse-resize;z-index:15}
 .wb-node-port{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg-surface);cursor:crosshair;z-index:15;opacity:0;transition:opacity 0.15s}
 .wb-node:hover .wb-node-port{opacity:1}
@@ -4119,6 +4120,10 @@ function wbDuplicateNode(id){
   wbAddNode(n.x+30,n.y+30,n.title+' (copy)',n.body,n.color,n.w,n.h,n.type);
   toast('Node duplicated');
 }
+function wbToggleLock(id){
+  const n=wbNodes.find(x=>x.id===id);if(!n)return;
+  n.locked=!n.locked;wbSaveState();wbRender();toast(n.locked?'Node locked':'Node unlocked');
+}
 
 function wbRender() {
   const canvas = document.getElementById('wb-canvas');
@@ -4135,12 +4140,13 @@ function wbRender() {
     const isSticky = n.type === 'sticky';
     const bg = isSticky ? n.color : 'var(--bg-surface)';
     const textColor = isSticky ? '#1a1a24' : 'var(--text)';
-    return `<div class="wb-node ${isSel?'selected':''}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;min-height:${n.h}px;background:${bg}" onmousedown="wbNodeDown(event,${n.id})">
+    return `<div class="wb-node ${isSel?'selected':''}" data-id="${n.id}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;min-height:${n.h}px;background:${bg}${n.locked?';border-style:dashed;opacity:0.85':''}" onmousedown="wbNodeDown(event,${n.id})">
       ${!isSticky?`<div class="wb-node-color" style="background:${n.color}"></div>`:''}
       <div class="wb-node-header" contenteditable="true" style="color:${textColor}" onblur="wbNodeEdit(${n.id},'title',this.textContent)" onclick="event.stopPropagation()">${esc(n.title)}</div>
       <div class="wb-node-body" contenteditable="true" style="color:${isSticky?'#333':'var(--text-secondary)'}" onblur="wbNodeEdit(${n.id},'body',this.textContent)" onclick="event.stopPropagation()">${esc(n.body)}</div>
       <button class="wb-node-del" onclick="event.stopPropagation();wbDeleteNode(${n.id})">x</button>
       <button class="wb-node-dup" onclick="event.stopPropagation();wbDuplicateNode(${n.id})" style="position:absolute;top:-8px;right:14px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#000;border:none;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:20" title="Duplicate">+</button>
+      <button onclick="event.stopPropagation();wbToggleLock(${n.id})" style="position:absolute;bottom:2px;left:2px;width:14px;height:14px;border:none;background:none;color:${n.locked?'var(--yellow)':'var(--text-muted)'};cursor:pointer;font-size:8px;opacity:${n.locked?'0.8':'0'};transition:opacity 0.15s;z-index:20" class="wb-lock-btn" title="${n.locked?'Unlock':'Lock'}">${n.locked?'L':'L'}</button>
       <button class="wb-node-color-btn" onclick="event.stopPropagation();wbPickColor(${n.id})" style="position:absolute;top:2px;right:20px;width:14px;height:14px;border:none;border-radius:50%;background:${n.color};cursor:pointer;opacity:0;transition:opacity 0.15s" title="Change color"></button>
       <div class="wb-node-resize" onmousedown="event.stopPropagation();wbResizeStart(event,${n.id})"></div>
       <div class="wb-node-port wb-port-right" onmousedown="event.stopPropagation();wbConnStartFn(event,${n.id},'right')"></div>
@@ -4187,6 +4193,7 @@ function wbNodeDown(e, id) {
   wbSelected = id;
   const n = wbNodes.find(x => x.id === id);
   if(!n) return;
+  if(n.locked){toast('Node is locked');return;}
   wbDrag = { id, ox: e.clientX, oy: e.clientY, sx: n.x, sy: n.y };
   wbRender();
 }
@@ -5561,6 +5568,7 @@ function reposRefresh() {
         <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> repo</a>
         ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${r.lastCheck?(r.lastCheckOk?'var(--green)':'var(--red)'):'var(--green)'};display:inline-block"></span> live${r.lastCheck?' ('+timeAgo(r.lastCheck)+')':''}</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
         <span style="flex:1"></span>
+        <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(r.github)}')" style="font-size:9px;padding:2px 6px" title="Copy GitHub URL">URL</button>
         <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openRepoModal('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Edit</button>
         <button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();deleteRepo('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Del</button>
       </div>
