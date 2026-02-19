@@ -1164,7 +1164,7 @@ textarea{resize:vertical;line-height:1.6}
           <input type="text" id="repo-search" placeholder="Filter repos..." oninput="reposRefresh()" style="width:120px;font-size:10px;padding:5px 8px">
           <button class="btn btn-primary btn-sm" onclick="openRepoModal()">+ Add</button>
           <button class="btn btn-sm" onclick="(S.repos||[]).filter(r=>r.live).forEach(r=>window.open(r.live,'_blank'));toast('Opened '+((S.repos||[]).filter(r=>r.live).length)+' live sites')" title="Open all live URLs">Open All</button>
-          <button class="btn btn-sm" onclick="reposHealthCheck()" title="Ping all live URLs">Health Check</button>
+          <button class="btn btn-sm" onclick="repoHealthCheck()" title="Ping all live URLs">Health Check</button>
           <button class="btn btn-sm" onclick="reposRefresh()">Refresh</button>
         </div>
       </div>
@@ -1663,6 +1663,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm" onclick="closeTaskDetail()">Cancel</button>
       <button class="btn btn-sm" onclick="duplicateTask()">Duplicate</button>
       <button class="btn btn-sm" onclick="taskToContent()" title="Save task details as content">To Content</button>
+      <button class="btn btn-sm" id="td-timer-btn" onclick="toggleTaskTimer()" title="Start/stop time tracking"></button>
       <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
     </div>
   </div>
@@ -2222,7 +2223,7 @@ function renderContent() {
   const maxShow=40;
   const g=document.getElementById('content-grid');
   const showing=contentShowAll?items:items.slice(0,maxShow);
-  const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w${wc>50?' / '+Math.max(1,Math.ceil(wc/238))+'m':''}</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost" onclick="dupContent(${c.id})">Dup</button><button class="btn btn-sm btn-ghost" onclick="contentToDoc(${c.id})">Doc</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
+  const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w${wc>50?' / '+Math.max(1,Math.ceil(wc/238))+'m':''}</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost" onclick="dupContent(${c.id})">Dup</button><button class="btn btn-sm btn-ghost" onclick="contentToDoc(${c.id})">Doc</button><button class="btn btn-sm btn-ghost" onclick="contentToPipeline(${c.id})">Pipe</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:showing.map(renderCard).join('')+(items.length>maxShow&&!contentShowAll?`<div style="grid-column:1/-1;text-align:center;padding:12px"><button class="btn btn-sm" onclick="contentShowAll=true;renderContent()">Show all ${items.length} items (${items.length-maxShow} more)</button></div>`:'');
   document.getElementById('content-count').textContent=S.content.length;
   const totalWords=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
@@ -2246,6 +2247,7 @@ function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.cl
 function randomContent(){if(!S.content.length){toast('No content yet');return;}const r=S.content[Math.floor(Math.random()*S.content.length)];navigator.clipboard.writeText(r.body);toast('Random: '+(r.body.substring(0,50)+'...'));document.getElementById('content-search').value='';contentType='all';contentTheme='all';contentTagFilter=null;renderContent();setTimeout(()=>{const cards=document.querySelectorAll('.content-card');const idx=S.content.indexOf(r);if(cards[idx])cards[idx].scrollIntoView({behavior:'smooth',block:'center'});},100);}
 function pinContent(id){const c=S.content.find(x=>x.id===id);if(c){c.pinned=!c.pinned;save();renderContent();toast(c.pinned?'Pinned':'Unpinned');}}
 function contentToDoc(id){const c=S.content.find(x=>x.id===id);if(!c)return;const title=(c.theme||'Untitled')+' — '+(c.body.substring(0,40).replace(/\n/g,' '));S.docs.push({id:Date.now(),title,body:c.body.replace(/\n/g,'<br>'),created:new Date().toISOString(),updated:new Date().toISOString(),versions:[]});save();toast('Created doc: '+title.substring(0,30));if(currentSection==='writer')renderWriter();}
+function contentToPipeline(id){const c=S.content.find(x=>x.id===id);if(!c)return;switchSection('pipeline',null);setTimeout(()=>{const ta=document.getElementById('pl-transcript-box');if(ta){ta.style.display='block';ta.value=c.body;plTranscriptText=c.body;const wc=document.getElementById('pl-text-stats');if(wc){const words=c.body.trim().split(/\s+/).filter(x=>x.length).length;wc.textContent=words+' words, '+c.body.length+' chars';}toast('Content loaded in pipeline');}},200);}
 function dupContent(id){const c=S.content.find(x=>x.id===id);if(!c)return;S.content.unshift({...c,id:Date.now(),pinned:false,created:new Date().toISOString()});save();renderContent();toast('Duplicated');}
 function mergeContent(){if(contentSelected.size<2){toast('Select 2+ items to merge');return;}const items=[...contentSelected].map(id=>S.content.find(c=>c.id===id)).filter(Boolean);const merged=items.map(c=>c.body).join('\n\n---\n\n');const tags=[...new Set(items.flatMap(c=>c.tags||[]))];S.content.unshift({id:Date.now(),type:items[0].type||'caption',theme:items[0].theme||'',body:merged,tags,source:'merged',created:new Date().toISOString()});save();contentSelected.clear();contentBulkMode=false;renderContent();toast('Merged '+items.length+' items');}
 function exportContent(){
@@ -2457,6 +2459,7 @@ function openTaskDetail(id) {
   const logEl=document.getElementById('td-log');
   if(logEl&&t.log&&t.log.length){logEl.innerHTML='<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Activity</div>'+t.log.slice(-5).reverse().map(e=>`<div style="font-size:8px;color:var(--text-muted);padding:1px 0;font-family:var(--mono)">${e.from} -> ${e.to} <span style="opacity:0.5">${timeAgo(e.at)}</span></div>`).join('');}else if(logEl){logEl.innerHTML='';}
   renderSubtasksInModal(t.subtasks || []);
+  updateTimerBtn(t);
   document.getElementById('task-detail-modal').classList.add('open');
   setTimeout(()=>document.getElementById('td-title').focus(),100);
 }
@@ -2536,6 +2539,24 @@ function taskToContent(){
   if(t.subtasks&&t.subtasks.length)body+='\n\nSubtasks:\n'+t.subtasks.map(s=>(s.done?'[x] ':'[ ] ')+s.title).join('\n');
   S.content.unshift({id:Date.now(),body,type:'caption',theme:t.project||'tasks',tags:['from-task',t.priority||'p2'].filter(Boolean),source:'task-convert',created:new Date().toISOString()});
   save();closeTaskDetail();if(currentSection==='content')renderContent();toast('Saved to Content');
+}
+function toggleTaskTimer(){
+  const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
+  if(t.timeStarted){
+    t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);
+    t.timeStarted=null;
+    save();toast('Timer stopped — '+formatTimeSpent(t.timeSpent)+' total');
+  }else{
+    t.timeStarted=new Date().toISOString();
+    if(t.status==='todo'){t.status='progress';if(!t.log)t.log=[];t.log.push({from:'todo',to:'progress',at:t.timeStarted});}
+    save();toast('Timer started');
+  }
+  updateTimerBtn(t);
+}
+function updateTimerBtn(t){
+  const btn=document.getElementById('td-timer-btn');if(!btn)return;
+  if(t.timeStarted){btn.textContent='Stop Timer';btn.style.color='var(--red)';btn.title='Stop time tracking (running since '+timeAgo(t.timeStarted)+')';}
+  else{btn.textContent='Start Timer';btn.style.color='';btn.title='Start time tracking'+(t.timeSpent?' ('+formatTimeSpent(t.timeSpent)+' logged)':'');}
 }
 
 // === CALENDAR ===
@@ -3687,6 +3708,21 @@ function dataStats(){
   toast(msg.split('\n')[0]);
   navigator.clipboard.writeText(msg).then(()=>toast('Stats copied to clipboard'));
 }
+function timeReport(){
+  const tracked=S.tasks.filter(t=>t.timeSpent||t.timeStarted);
+  if(!tracked.length){toast('No tasks with tracked time');return;}
+  let total=0;
+  let md='# Time Report\n'+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'\n\n';
+  tracked.sort((a,b)=>(b.timeSpent||0)-(a.timeSpent||0));
+  tracked.forEach(t=>{
+    let mins=t.timeSpent||0;
+    if(t.timeStarted)mins+=Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);
+    total+=mins;
+    md+=`- **${t.title||'Untitled'}** (${t.status}) — ${formatTimeSpent(mins)}${t.project?' ['+t.project+']':''}\n`;
+  });
+  md+=`\n**Total tracked: ${formatTimeSpent(total)}** across ${tracked.length} tasks`;
+  navigator.clipboard.writeText(md).then(()=>toast('Time report copied — '+formatTimeSpent(total)+' total'));
+}
 function importAll(){
   // Auto-backup before import (UNDO safety net)
   const backup = localStorage.getItem(SK);
@@ -4559,6 +4595,8 @@ function cmdGetItems(q) {
   if(!ql || 'ics calendar export'.includes(ql)) items.push({title:'Export Calendar', desc:'Export tasks as .ics for Google Calendar', icon:'C', type:'action', action:()=>{closeCommandPalette();exportICS();}});
   if(!ql || 'random inspiration content'.includes(ql)) items.push({title:'Random Content', desc:'Pick a random content item for inspiration', icon:'?', type:'action', action:()=>{closeCommandPalette();switchSection('content',null);setTimeout(randomContent,100);}});
   if(!ql || 'export summary markdown report'.includes(ql)) items.push({title:'Export Summary', desc:'Copy hub summary as Markdown', icon:'S', type:'action', action:()=>{closeCommandPalette();exportSummary();}});
+  if(!ql || 'repo health check ping'.includes(ql)) items.push({title:'Repo Health Check', desc:'Ping all live repo URLs', icon:'R', type:'action', action:()=>{closeCommandPalette();repoHealthCheck();}});
+  if(!ql || 'time report hours tracked'.includes(ql)) items.push({title:'Time Report', desc:'Show time tracked per task', icon:'T', type:'action', action:()=>{closeCommandPalette();timeReport();}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   // Open specific docs in Zen Writer
   if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
@@ -5301,6 +5339,20 @@ function reposRefresh() {
       </div>
     </div>`;
   }).join('');
+}
+
+async function repoHealthCheck(){
+  const repos=(S.repos||[]).filter(r=>r.live);
+  if(!repos.length){toast('No repos with live URLs');return;}
+  toast('Checking '+repos.length+' live URLs...');
+  let ok=0,fail=0;
+  for(const r of repos){
+    try{
+      const res=await fetch(r.live,{mode:'no-cors',signal:AbortSignal.timeout(5000)});
+      r.lastCheck=new Date().toISOString();r.lastCheckOk=true;ok++;
+    }catch(e){r.lastCheck=new Date().toISOString();r.lastCheckOk=false;fail++;}
+  }
+  save();reposRefresh();toast(ok+' up, '+fail+' down');
 }
 
 // === REPO MODAL ===
