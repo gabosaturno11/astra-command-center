@@ -805,6 +805,12 @@ textarea{resize:vertical;line-height:1.6}
         <div class="tab-bar" id="content-theme-tabs" style="margin-left:8px;border-left:1px solid var(--border);padding-left:8px"></div>
         <div style="margin-left:auto;display:flex;gap:6px">
           <input type="text" id="content-search" placeholder="Search..." oninput="renderContent()" style="width:140px;font-size:10px;padding:5px 8px">
+          <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
+          <div id="content-bulk-actions" style="display:none;gap:4px">
+            <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
+            <button class="btn btn-sm" onclick="contentBulkTag()">Tag Selected</button>
+            <button class="btn btn-sm" onclick="toggleContentBulk()">Cancel</button>
+          </div>
           <button class="btn btn-primary btn-sm" onclick="openContentModal()">+ Add</button>
         </div>
       </div>
@@ -2055,7 +2061,7 @@ function renderContent() {
   if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
   if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+c.source+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
   const g=document.getElementById('content-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))"><div class="content-card-body" onclick="this.classList.toggle('expanded')" ondblclick="contentInlineEdit(${c.id},this,event)">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))">${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('content-count').textContent=S.content.length;
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -2065,6 +2071,31 @@ function closeContentModal(){document.getElementById('content-modal').classList.
 function saveContent(){const type=document.getElementById('cm-type').value,theme=document.getElementById('cm-theme').value.trim().toLowerCase(),body=document.getElementById('cm-body').value.trim(),source=document.getElementById('cm-source').value.trim(),tags=(document.getElementById('cm-tags').value||'').split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);if(!body){toast('Content cannot be empty');return;}if(editingContentId){const c=S.content.find(x=>x.id===editingContentId);if(c){c.type=type;c.theme=theme;c.body=body;c.source=source;c.tags=tags;c.updated=new Date().toISOString();}}else S.content.push({id:Date.now(),type,theme,body,source,tags,created:new Date().toISOString(),updated:new Date().toISOString()});save();closeContentModal();renderContent();toast(editingContentId?'Updated':'Added');}
 function delContent(id){S.content=S.content.filter(c=>c.id!==id);save();renderContent();toast('Deleted');}
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
+let contentBulkMode=false, contentSelected=new Set();
+function toggleContentBulk(){
+  contentBulkMode=!contentBulkMode;contentSelected.clear();
+  document.getElementById('content-bulk-btn').style.display=contentBulkMode?'none':'';
+  document.getElementById('content-bulk-actions').style.display=contentBulkMode?'flex':'none';
+  renderContent();
+}
+function toggleContentSelect(id,el){
+  if(contentSelected.has(id))contentSelected.delete(id);else contentSelected.add(id);
+  el.closest('.content-card').style.outline=contentSelected.has(id)?'2px solid var(--accent)':'none';
+}
+function contentBulkDelete(){
+  if(!contentSelected.size){toast('Select items first');return;}
+  if(!confirm('Delete '+contentSelected.size+' items?'))return;
+  S.content=S.content.filter(c=>!contentSelected.has(c.id));
+  save();contentSelected.clear();renderContent();toast('Deleted');
+}
+function contentBulkTag(){
+  if(!contentSelected.size){toast('Select items first');return;}
+  const tag=prompt('Enter tag to add:');
+  if(!tag)return;
+  const t=tag.trim().toLowerCase();
+  S.content.forEach(c=>{if(contentSelected.has(c.id)){if(!c.tags)c.tags=[];if(!c.tags.includes(t))c.tags.push(t);}});
+  save();contentSelected.clear();renderContent();toast('Tagged');
+}
 function contentInlineEdit(id,el,e){
   e.stopPropagation();e.preventDefault();
   const c=S.content.find(x=>x.id===id);if(!c)return;
