@@ -855,6 +855,14 @@ textarea{resize:vertical;line-height:1.6}
             <option value="alpha">A-Z</option>
           </select>
           <button class="btn btn-sm" onclick="exportTasks()" title="Copy tasks as markdown">Export</button>
+          <button class="btn btn-sm" onclick="toggleTaskBulk()" id="task-bulk-btn">Bulk</button>
+          <div id="task-bulk-actions" style="display:none;gap:4px;align-items:center">
+            <select id="task-bulk-status" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Status</option><option value="todo">To Do</option><option value="progress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select>
+            <select id="task-bulk-priority" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Priority</option><option value="p0">P0</option><option value="p1">P1</option><option value="p2">P2</option><option value="p3">P3</option></select>
+            <button class="btn btn-sm btn-danger" onclick="taskBulkDelete()">Delete</button>
+            <button class="btn btn-sm" onclick="taskBulkApply()">Apply</button>
+            <button class="btn btn-sm" onclick="toggleTaskBulk()">Cancel</button>
+          </div>
           <button class="btn btn-sm" onclick="archiveCompletedTasks()" title="Archive all completed tasks">Archive Done</button>
           <button class="btn btn-sm" id="task-filter-archived" onclick="showArchivedTasks()" title="View archived tasks">Archived<span id="archived-count" style="font-size:8px;color:var(--text-muted);margin-left:3px;font-family:var(--mono)"></span></button>
           <div class="task-toolbar-search">
@@ -1384,7 +1392,7 @@ textarea{resize:vertical;line-height:1.6}
   <div class="modal">
     <div class="modal-title" id="link-modal-title">Add Link</div>
     <div class="form-group"><label class="form-label">Title</label><input type="text" id="lm-title" placeholder="Saturno Vault"></div>
-    <div class="form-group"><label class="form-label">URL</label><input type="text" id="lm-url" placeholder="https://..." onblur="suggestLinkTitle()"></div>
+    <div class="form-group"><label class="form-label">URL</label><div style="display:flex;gap:4px"><input type="text" id="lm-url" placeholder="https://..." onblur="suggestLinkTitle()" style="flex:1"><button class="btn btn-sm btn-ghost" onclick="fetchLinkTitle()" style="font-size:9px;white-space:nowrap" type="button">Fetch Title</button></div></div>
     <div class="form-group"><label class="form-label">Category</label><input type="text" id="lm-category" placeholder="deployment, repo, tool"></div>
     <div class="form-group"><label class="form-label">Description</label><input type="text" id="lm-desc" placeholder="Short description"></div>
     <div class="form-group"><label class="form-label">Project (optional)</label><select id="lm-project"><option value="">None</option></select></div>
@@ -2287,7 +2295,7 @@ function renderTasks(){
   const today=new Date().toISOString().split('T')[0];
   const projects=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
   const rows=document.getElementById('task-rows');
-  rows.innerHTML=items.map(t=>`<div class="task-row ${t.status==='done'?'completed':''} priority-${t.priority||'p2'}${t.due&&t.due<today&&t.status!=='done'?' overdue':''}" data-id="${t.id}" draggable="true" ondragstart="taskDragStart(event,${t.id})" ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,${t.id})"><div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id})"></div><div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name..."></div><div><select class="task-select" onchange="updateTask(${t.id},'status',this.value)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div><div><select class="task-select" onchange="updateTask(${t.id},'priority',this.value)"><option value="p0" ${t.priority==='p0'?'selected':''}>P0 Critical</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1 High</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2 Medium</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3 Low</option></select></div><div><input type="text" class="task-select" style="border:1px solid transparent" value="${escA(t.project||'')}" onchange="updateTask(${t.id},'project',this.value)" placeholder="Project..." list="pdl"></div><div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)"></div><div class="task-actions"><button class="task-action-btn" onclick="openTaskDetail(${t.id})" title="Details" style="font-size:10px">...</button><button class="task-action-btn del" onclick="deleteTask(${t.id})">x</button></div></div>`).join('')+`<div class="add-task-row" onclick="addTask()">+ Add task</div>`;
+  rows.innerHTML=items.map(t=>`<div class="task-row ${t.status==='done'?'completed':''} priority-${t.priority||'p2'}${t.due&&t.due<today&&t.status!=='done'?' overdue':''}" data-id="${t.id}" draggable="true" ondragstart="taskDragStart(event,${t.id})" ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,${t.id})">${taskBulkMode?`<div style="padding:0 4px;cursor:pointer" onclick="toggleTaskSelect(${t.id});this.querySelector('input').checked=taskSelected.has(${t.id})"><input type="checkbox" ${taskSelected.has(t.id)?'checked':''} style="pointer-events:none;cursor:pointer"></div>`:''}<div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id})"></div><div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name..."></div><div><select class="task-select" onchange="updateTask(${t.id},'status',this.value)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div><div><select class="task-select" onchange="updateTask(${t.id},'priority',this.value)"><option value="p0" ${t.priority==='p0'?'selected':''}>P0 Critical</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1 High</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2 Medium</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3 Low</option></select></div><div><input type="text" class="task-select" style="border:1px solid transparent" value="${escA(t.project||'')}" onchange="updateTask(${t.id},'project',this.value)" placeholder="Project..." list="pdl"></div><div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)"></div><div class="task-actions"><button class="task-action-btn" onclick="openTaskDetail(${t.id})" title="Details" style="font-size:10px">...</button><button class="task-action-btn del" onclick="deleteTask(${t.id})">x</button></div></div>`).join('')+`<div class="add-task-row" onclick="addTask()">+ Add task</div>`;
 
   ['todo','progress','done','blocked'].forEach(st=>{
     const col=document.getElementById('board-'+st),cnt=document.getElementById('bc-'+st),f=items.filter(t=>t.status===st);
@@ -2338,6 +2346,22 @@ function restoreArchivedTask(id){
   save();renderTasks();toast('Restored: '+(t.title||'task'));
 }
 
+let taskBulkMode=false,taskSelected=new Set();
+function toggleTaskBulk(){taskBulkMode=!taskBulkMode;taskSelected.clear();document.getElementById('task-bulk-btn').style.display=taskBulkMode?'none':'';document.getElementById('task-bulk-actions').style.display=taskBulkMode?'flex':'none';renderTasks();}
+function toggleTaskSelect(id){if(taskSelected.has(id))taskSelected.delete(id);else taskSelected.add(id);}
+function taskBulkApply(){
+  const status=document.getElementById('task-bulk-status').value;
+  const priority=document.getElementById('task-bulk-priority').value;
+  if(!status&&!priority){toast('Select a status or priority to apply');return;}
+  let count=0;
+  taskSelected.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t){if(status)t.status=status;if(priority)t.priority=priority;count++;}});
+  save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Updated '+count+' tasks');
+}
+function taskBulkDelete(){
+  if(!taskSelected.size){toast('No tasks selected');return;}
+  if(!confirm('Delete '+taskSelected.size+' tasks?'))return;
+  S.tasks=S.tasks.filter(t=>!taskSelected.has(t.id));save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Deleted');
+}
 function exportTasks(){
   const items=getFilteredTasks();
   const today=new Date().toISOString().split('T')[0];
@@ -2847,6 +2871,19 @@ function suggestLinkTitle(){
   if(path.length)title=path[path.length-1].replace(/[-_]/g,' ').replace(/\.\w+$/,'');
   titleEl.value=title.charAt(0).toUpperCase()+title.slice(1);
   }catch(e){}
+}
+async function fetchLinkTitle(){
+  const urlEl=document.getElementById('lm-url'),titleEl=document.getElementById('lm-title');
+  const url=urlEl?.value.trim();if(!url)return;
+  try{new URL(url);}catch(e){toast('Invalid URL');return;}
+  titleEl.value='Fetching...';
+  try{
+    const resp=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(5000)});
+    const data=await resp.json();
+    const match=(data.contents||'').match(/<title[^>]*>([^<]+)<\/title>/i);
+    if(match&&match[1]){titleEl.value=match[1].trim().substring(0,120);toast('Title fetched');}
+    else{suggestLinkTitle();toast('No title found, using URL-based name');}
+  }catch(e){suggestLinkTitle();toast('Fetch failed, using URL-based name');}
 }
 function batchImportLinks(){
   const text=prompt('Paste URLs (one per line):');if(!text)return;
