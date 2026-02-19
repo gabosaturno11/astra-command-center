@@ -1071,6 +1071,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
           <input type="text" id="link-search" placeholder="Search links..." oninput="renderLinks()" style="width:140px;font-size:10px;padding:5px 8px">
           <select id="link-sort" onchange="renderLinks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="alpha">A-Z</option><option value="category">Category</option></select>
+          <button class="btn btn-sm" onclick="openFilteredLinks()" title="Open all visible links">Open All</button>
           <button class="btn btn-sm" onclick="batchImportLinks()" title="Paste multiple URLs to import">Import</button>
           <button class="btn btn-primary btn-sm" onclick="openLinkModal()">+ Add</button>
         </div>
@@ -1640,7 +1641,7 @@ textarea{resize:vertical;line-height:1.6}
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Project</label><input type="text" id="td-project" placeholder="Project name..." list="pdl"></div>
-      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"><div style="display:flex;gap:3px;margin-top:3px"><button class="btn btn-sm btn-ghost" onclick="tdSetDue(0)" style="font-size:8px;padding:1px 5px">Today</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(1)" style="font-size:8px;padding:1px 5px">Tmrw</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(7)" style="font-size:8px;padding:1px 5px">+1W</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(30)" style="font-size:8px;padding:1px 5px">+1M</button></div></div>
+      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"><div style="display:flex;gap:3px;margin-top:3px"><button class="btn btn-sm btn-ghost" onclick="tdSetDue(0)" style="font-size:8px;padding:1px 5px">Today</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(1)" style="font-size:8px;padding:1px 5px">Tmrw</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(7)" style="font-size:8px;padding:1px 5px">+1W</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(30)" style="font-size:8px;padding:1px 5px">+1M</button></div><input type="text" id="td-due-natural" placeholder="or type: friday, 3d, next week..." style="font-size:9px;padding:3px 6px;margin-top:3px;width:100%;border:1px solid var(--border);border-radius:4px;background:var(--bg-input);color:var(--text-secondary)" onkeydown="if(event.key==='Enter'){const v=parseNaturalDate(this.value);if(v&&v!==this.value){document.getElementById('td-due').value=v;this.value='';toast('Due: '+v);}event.preventDefault();}"></div>
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Recurrence</label><select id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekday">Weekdays</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
@@ -2341,6 +2342,20 @@ function addTaskFromTemplate(title,priority,recurrence){S.tasks.unshift({id:Date
 function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){if(f==='status'&&v==='progress'&&!t.timeStarted)t.timeStarted=new Date().toISOString();if(f==='status'&&v!=='progress'&&t.timeStarted){t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);t.timeStarted=null;}if(f==='status'&&t.status!==v){if(!t.log)t.log=[];t.log.push({from:t.status,to:v,at:new Date().toISOString()});if(t.log.length>20)t.log=t.log.slice(-20);}t[f]=v;save();renderTasks();}}
 function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
 function getNextRecurDate(dateStr,recur){const d=new Date(dateStr+'T12:00:00');if(recur==='daily')d.setDate(d.getDate()+1);else if(recur==='weekday'){d.setDate(d.getDate()+1);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);}else if(recur==='weekly')d.setDate(d.getDate()+7);else if(recur==='biweekly')d.setDate(d.getDate()+14);else if(recur==='monthly')d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
+function parseNaturalDate(text){
+  if(!text||/^\d{4}-\d{2}-\d{2}$/.test(text))return text;
+  const t=text.toLowerCase().trim();const now=new Date();
+  if(t==='today')return now.toISOString().split('T')[0];
+  if(t==='tomorrow'||t==='tmrw'||t==='tom'){now.setDate(now.getDate()+1);return now.toISOString().split('T')[0];}
+  if(t==='next week'){now.setDate(now.getDate()+7);return now.toISOString().split('T')[0];}
+  if(t==='next month'){now.setMonth(now.getMonth()+1);return now.toISOString().split('T')[0];}
+  const days=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  const dIdx=days.findIndex(d=>t.startsWith(d.substring(0,3)));
+  if(dIdx>=0){const curr=now.getDay();let diff=dIdx-curr;if(diff<=0)diff+=7;now.setDate(now.getDate()+diff);return now.toISOString().split('T')[0];}
+  const match=t.match(/^(\d+)\s*(d|day|w|week|m|month)/);
+  if(match){const n=parseInt(match[1]);const unit=match[2][0];if(unit==='d')now.setDate(now.getDate()+n);else if(unit==='w')now.setDate(now.getDate()+n*7);else if(unit==='m')now.setMonth(now.getMonth()+n);return now.toISOString().split('T')[0];}
+  return text;
+}
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
 function archiveCompletedTasks(){
   const done=S.tasks.filter(t=>t.status==='done');
@@ -2953,6 +2968,14 @@ function batchImportLinks(){
 let lastDeletedLink=null;
 function delLink(id){const l=S.links.find(x=>x.id===id);if(l)lastDeletedLink={...l};S.links=S.links.filter(l=>l.id!==id);save();renderLinks();toast('Deleted — Cmd+Z to undo');}
 function undoDeleteLink(){if(!lastDeletedLink)return;S.links.unshift(lastDeletedLink);lastDeletedLink=null;save();renderLinks();toast('Link restored');}
+function openFilteredLinks(){
+  const q=(document.getElementById('link-search')?.value||'').toLowerCase();
+  let items=[...S.links];if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
+  const urls=items.filter(l=>l.url).slice(0,10);
+  if(!urls.length){toast('No links to open');return;}
+  if(urls.length>5&&!confirm('Open '+urls.length+' links in new tabs?'))return;
+  urls.forEach(l=>window.open(l.url,'_blank'));toast('Opened '+urls.length+' links');
+}
 function cpText(t){navigator.clipboard.writeText(t);toast('Copied');}
 
 // === PROJECTS ===
