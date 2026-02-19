@@ -825,6 +825,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="exportFilteredContent()" title="Export currently filtered content">Export View</button>
           <button class="btn btn-sm" onclick="contentManageTags()" title="Rename or delete tags">Tags</button>
           <button class="btn btn-sm" onclick="batchImportContent()" title="Paste multiple items separated by ---">Batch</button>
+          <button class="btn btn-sm" onclick="toggleAllContentCards()" title="Expand/collapse all cards">Exp/Col</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -2323,6 +2324,12 @@ function exportContent(){
   navigator.clipboard.writeText(md).then(()=>toast('Content copied as markdown')).catch(()=>{
     const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='content-export.md';a.click();toast('Content exported');
   });
+}
+function toggleAllContentCards(){
+  const cards=document.querySelectorAll('.content-card-body');
+  const anyExpanded=[...cards].some(c=>c.classList.contains('expanded'));
+  cards.forEach(c=>{if(anyExpanded)c.classList.remove('expanded');else c.classList.add('expanded');});
+  toast(anyExpanded?'All collapsed':'All expanded');
 }
 function exportFilteredContent(){
   const q=(document.getElementById('content-search')?.value||'').toLowerCase();
@@ -4883,6 +4890,15 @@ function cmdGetItems(q) {
   if(ql && ql.startsWith('note:')) {
     const noteBody=q.substring(5).trim();
     if(noteBody){items.unshift({title:'Save note: '+noteBody.substring(0,40),desc:'Quick-save as content item',icon:'+',type:'action',action:()=>{closeCommandPalette();S.content.unshift({id:Date.now(),type:'caption',theme:'quick-note',body:noteBody,tags:['quick'],created:new Date().toISOString()});save();if(currentSection==='content')renderContent();toast('Note saved');}});}
+  }
+  // Quick filter by project from Cmd+K
+  if(ql && ql.startsWith('project:')) {
+    const pq=q.substring(8).trim().toLowerCase();
+    const matchingProjects=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].filter(p=>p.toLowerCase().includes(pq));
+    matchingProjects.forEach(p=>{
+      const cnt=S.tasks.filter(t=>t.project===p&&t.status!=='done').length;
+      items.unshift({title:'Project: '+p,desc:cnt+' active tasks',icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p;renderTasks();toast('Filtered: '+p);}});
+    });
   }
   // Quick add link from Cmd+K
   if(ql && ql.startsWith('link:')) {
