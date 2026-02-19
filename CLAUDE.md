@@ -62,12 +62,45 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-19 session 5)
+## CURRENT STATE (Updated: 2026-02-19 session 6)
+
+### FEB 19 SESSION 6 — CONTINUATION (batches 49-57)
+Latest commit: `2c73572` — all pushed to main, Vercel auto-deployed.
+File: 5638 lines, 366K chars of JS.
+
+**NEW FEATURES (Session 6, batches 49-57):**
+111. Keyboard: Cmd+Shift+W opens Zen Writer from anywhere
+112. Keyboard: Cmd+Shift+E exports current section
+113. Content: tag management (rename/delete tags across all items)
+114. Calendar: ICS file import (parse VEVENT, dedup by title+date)
+115. Links: "Copy URLs" button copies all filtered URLs
+116. Content: star/favorite items (yellow indicator, sort to top)
+117. Repos: last commit message shown on cards, editable in modal
+118. Pipeline: save custom prompt templates (+ Save button)
+119. Pipeline: custom templates render as clickable buttons
+120. Whiteboard: color picker popup (12 colors) on node hover
+121. Daily Dashboard: Cmd+K command generates full daily briefing
+122. Import ICS: added to Cmd+K palette
+123. Whiteboard: duplicate node button (green +)
+124. Pipeline: search/filter history entries
+125. Repos: tech stack tags shown as pills on cards
+126. Content: "Read" button opens full-screen reading overlay
+127. Living Docs: "C" button copies individual section as markdown
+128. Calendar: month view header shows task count
+129. Board cards: click priority badge to cycle p0-p3
+130. Writer: version list shows word count diff vs current
+131. Writer: version preview overlay before restoring
+132. Whiteboard: lock/unlock nodes (dashed border, prevents dragging)
+133. Repos: "URL" copy button on each card
+134. Cmd+K: "task: ..." quick-creates task inline
+135. Cmd+K: "note: ..." quick-saves content inline
+136. Content: batch import (paste items separated by ---)
+137. Writer: auto-backup saves version every 10min of editing
 
 ### FEB 19 SESSION 5 — CONTINUATION (batches 43-48)
-Latest commit: `448a65d` — all pushed to main, Vercel auto-deployed.
+Latest commit: `448a65d`
 
-**NEW FEATURES (Session 5, batches 43-48):**
+**FEATURES (Session 5, batches 43-48):**
 92. Content: "Pipe" button sends content to pipeline section
 93. Task: Start/Stop Timer button in detail modal (explicit time tracking)
 94. Task: time tracked shown inline on list rows + board cards
