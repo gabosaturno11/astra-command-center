@@ -2108,7 +2108,23 @@ function updateSidebarCtx() {
   } else if(currentSection==='writer') {
     const totalWords=S.docs.reduce((a,d)=>a+(d.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
     el.innerHTML=`<div class="sidebar-label">Writer Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.docs.length} docs / ${totalWords.toLocaleString()} words</div>`;
-  } else el.innerHTML='';
+  } else {
+    const today=new Date().toISOString().split('T')[0];
+    const active=S.tasks.filter(t=>t.status!=='done');
+    const overdue=active.filter(t=>t.due&&t.due<today);
+    const todayTasks=active.filter(t=>t.due===today);
+    const totalWords=S.docs.reduce((a,d)=>a+(d.body||'').trim().split(/\s+/).filter(x=>x.length).length,0)+S.content.reduce((a,c)=>a+c.body.trim().split(/\s+/).filter(x=>x.length).length,0);
+    el.innerHTML=`<div class="sidebar-label">Overview</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:2">`+
+      `<div>${S.tasks.length} tasks <span style="color:var(--accent)">(${active.length} active)</span></div>`+
+      (overdue.length?`<div style="color:var(--red)">${overdue.length} overdue</div>`:'')+
+      (todayTasks.length?`<div>${todayTasks.length} due today</div>`:'')+
+      `<div>${S.content.length} content items</div>`+
+      `<div>${S.docs.length} documents</div>`+
+      `<div>${S.links.length} links</div>`+
+      `<div>${(S.repos||[]).length} repos</div>`+
+      `<div style="margin-top:4px;color:var(--accent)">${totalWords.toLocaleString()} total words</div>`+
+      `</div>`;
+  }
 }
 
 // === CONTENT ===
@@ -2126,8 +2142,9 @@ function renderContent() {
   else if(sortVal==='longest')items.sort((a,b)=>b.body.length-a.body.length);
   else if(sortVal==='shortest')items.sort((a,b)=>a.body.length-b.body.length);
   else if(sortVal==='alpha')items.sort((a,b)=>a.body.localeCompare(b.body));
+  items.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
   const g=document.getElementById('content-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))">${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('content-count').textContent=S.content.length;
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -2137,6 +2154,7 @@ function closeContentModal(){document.getElementById('content-modal').classList.
 function saveContent(){const type=document.getElementById('cm-type').value,theme=document.getElementById('cm-theme').value.trim().toLowerCase(),body=document.getElementById('cm-body').value.trim(),source=document.getElementById('cm-source').value.trim(),tags=(document.getElementById('cm-tags').value||'').split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);if(!body){toast('Content cannot be empty');return;}if(editingContentId){const c=S.content.find(x=>x.id===editingContentId);if(c){c.type=type;c.theme=theme;c.body=body;c.source=source;c.tags=tags;c.updated=new Date().toISOString();}}else S.content.push({id:Date.now(),type,theme,body,source,tags,created:new Date().toISOString(),updated:new Date().toISOString()});save();closeContentModal();renderContent();toast(editingContentId?'Updated':'Added');}
 function delContent(id){S.content=S.content.filter(c=>c.id!==id);save();renderContent();toast('Deleted');}
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
+function pinContent(id){const c=S.content.find(x=>x.id===id);if(c){c.pinned=!c.pinned;save();renderContent();toast(c.pinned?'Pinned':'Unpinned');}}
 let contentBulkMode=false, contentSelected=new Set();
 function toggleContentBulk(){
   contentBulkMode=!contentBulkMode;contentSelected.clear();
