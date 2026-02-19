@@ -62,12 +62,36 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-19 session 4)
+## CURRENT STATE (Updated: 2026-02-19 session 5)
 
-### FEB 19 SESSION 4 — CONTINUATION (8 more batches: 33-40)
-Latest commit: `fab8352` — all pushed to main, Vercel auto-deployed.
+### FEB 19 SESSION 5 — CONTINUATION (batches 43-48)
+Latest commit: `448a65d` — all pushed to main, Vercel auto-deployed.
 
-**NEW FEATURES (Session 4, batches 33-40):**
+**NEW FEATURES (Session 5, batches 43-48):**
+92. Content: "Pipe" button sends content to pipeline section
+93. Task: Start/Stop Timer button in detail modal (explicit time tracking)
+94. Task: time tracked shown inline on list rows + board cards
+95. Repos: health check pings all live URLs (green/red status dots)
+96. Time Report: Cmd+K command shows per-task time summary
+97. Writer: "C+" button exports current doc to content section
+98. Link: "MD" button copies markdown-formatted link
+99. Content: "Export Selected" in bulk actions bar
+100. Board columns: right-click count to move all tasks to another status
+101. Links: export all as categorized markdown (Cmd+K)
+102. Pipeline: keywords, bullets, questions, headlines local processing
+103. Pipeline: 4 new prompt template buttons
+104. Whiteboard: JSON import (complements export)
+105. Task: "Focus" button starts 25min Pomodoro timer + time tracking
+106. Links: pin/unpin with green border + sort-to-top
+107. Living Docs: duplicate spec button
+108. Writer: duplicate doc button
+109. Calendar: exportWeek() copies weekly summary as markdown
+110. Task sidebar: P0/P1/P2/P3 priority breakdown with colors
+
+### FEB 19 SESSION 4 — CONTINUATION (batches 33-42)
+Latest commit: `853df81` — all pushed to main, Vercel auto-deployed.
+
+**NEW FEATURES (Session 4, batches 33-42):**
 73. Export summary as markdown (exportSummary(), copies to clipboard)
 74. Content: duplicate items (dupContent), merge selected items (mergeContent)
 75. Task: activity log tracks status changes, shown in detail modal
@@ -187,26 +211,25 @@ Latest commit: `7273e60`
 71. Links: batch import (paste multiple URLs)
 72. Board cards: subtask progress bar (visual)
 
-**SECTION HEALTH (updated 2026-02-19 session 4):**
+**SECTION HEALTH (updated 2026-02-19 session 5):**
 | Section | Health | Notes |
 |---------|--------|-------|
-| Tasks | 99% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup + project filter + progress bar + to-content + bulk actions + activity log + estimate + blocked-by + WIP limits |
-| Calendar | 95% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary + upcoming list + day badges + day detail popup |
-| Writer | 96% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list + find/replace + TOC generator |
-| Living Docs | 92% | Sections + icons + colors + global docs + export + drag-drop reorder + word count per section |
-| Content | 97% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete + tag filter pills + word count + reading time + duplicate + merge + to-doc |
-| Links | 95% | Favicons + categories + search + project + URL validation + dates + auto-suggest + sort + undo delete + batch import + fetch title + duplicate detection + category counts |
-| Whiteboard | 85% | Canvas tools solid |
-| Repos | 90% | CRUD modal + role icons + timestamps + search + open-all + empty state + notes field + health check |
-| Pipeline | 88% | UI + local history + expand/collapse + prompt templates + file drop + source badges + stats + save-to-content + local processing |
-| Cmd+K | 99% | Searches everything + standup + today view + Zen docs + focus mode + calendar export + data stats + export summary |
+| Tasks | 99% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup + project filter + progress bar + to-content + bulk actions + activity log + estimate + blocked-by + WIP limits + timer + focus mode + priority stats |
+| Calendar | 97% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary + upcoming list + day badges + day detail popup + week export |
+| Writer | 98% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list + find/replace + TOC generator + duplicate doc + to-content |
+| Living Docs | 94% | Sections + icons + colors + global docs + export + drag-drop reorder + word count per section + duplicate spec |
+| Content | 98% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete + tag filter pills + word count + reading time + duplicate + merge + to-doc + to-pipeline + bulk export |
+| Links | 97% | Favicons + categories + search + project + URL validation + dates + auto-suggest + sort + undo delete + batch import + fetch title + duplicate detection + category counts + pin + markdown copy + export all |
+| Whiteboard | 92% | Canvas tools + undo/redo + 20 templates + export PNG/SVG/JSON + import JSON + minimap + zoom/fit + grid + auto-layout |
+| Repos | 93% | CRUD modal + role icons + timestamps + search + open-all + empty state + notes field + health check ping |
+| Pipeline | 93% | UI + local history + expand/collapse + 9 prompt templates + file drop + source badges + stats + save-to-content + 7 local processing modes (summarize/actions/clean/stats/keywords/bullets/headlines/questions) |
+| Cmd+K | 99% | Searches everything + standup + today view + Zen docs + focus mode + calendar export + data stats + export summary + time report + repo health + export links + export week |
 
 **REMAINING:**
 - Bonus page shipping (prerequisite: ASTRA stable - NOW IT IS)
 - Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env (to unlock API mode)
 - Google Calendar sync (future)
 - Content: drag to reorder
-- Whiteboard improvements (undo/redo, export, templates)
 
 ---
 
