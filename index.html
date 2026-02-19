@@ -1610,7 +1610,7 @@ textarea{resize:vertical;line-height:1.6}
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Project</label><input type="text" id="td-project" placeholder="Project name..." list="pdl"></div>
-      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"></div>
+      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"><div style="display:flex;gap:3px;margin-top:3px"><button class="btn btn-sm btn-ghost" onclick="tdSetDue(0)" style="font-size:8px;padding:1px 5px">Today</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(1)" style="font-size:8px;padding:1px 5px">Tmrw</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(7)" style="font-size:8px;padding:1px 5px">+1W</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(30)" style="font-size:8px;padding:1px 5px">+1M</button></div></div>
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Recurrence</label><select id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekday">Weekdays</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
@@ -2359,6 +2359,7 @@ function openTaskDetail(id) {
   document.getElementById('task-detail-modal').classList.add('open');
   setTimeout(()=>document.getElementById('td-title').focus(),100);
 }
+function tdSetDue(days){const d=new Date();d.setDate(d.getDate()+days);document.getElementById('td-due').value=d.toISOString().split('T')[0];}
 function closeTaskDetail() {
   document.getElementById('task-detail-modal').classList.remove('open');
   taskDetailId = null;
@@ -4909,11 +4910,32 @@ async function plProcess() {
       toast('Error: '+(data.error||'unknown'));
     }
   } catch(e) {
-    toast('Pipeline error: '+e.message);
+    // Fallback: local text processing if API unavailable
+    if(plTranscriptText){
+      const result=plLocalProcess(plTranscriptText,prompt);
+      plSynthesisText=result;
+      document.getElementById('pl-result').style.display='block';
+      document.getElementById('pl-transcript-box').style.display='none';
+      document.getElementById('pl-synthesis-text').textContent=result;
+      plSaveLocal({id:'p_'+Date.now(),inputType:'text',prompt:prompt,preview:result.substring(0,200),source:document.getElementById('pl-source').value,createdAt:new Date().toISOString()});
+      toast('Processed locally (API unavailable)');
+    } else {
+      toast('Pipeline error: '+e.message);
+    }
   } finally {
     btn.textContent='Process Pipeline';
     btn.disabled=false;
   }
+}
+function plLocalProcess(text,prompt){
+  const words=text.trim().split(/\s+/).filter(x=>x.length);
+  const sentences=text.split(/[.!?]+/).map(s=>s.trim()).filter(Boolean);
+  const pl=prompt.toLowerCase();
+  if(pl.includes('summar')){return'Summary (local):\n\n'+sentences.slice(0,Math.min(5,Math.ceil(sentences.length/3))).map(s=>'- '+s+'.').join('\n')+'\n\nStats: '+words.length+' words, '+sentences.length+' sentences.';}
+  if(pl.includes('action')||pl.includes('task')||pl.includes('checklist')){const actions=sentences.filter(s=>/\b(need|must|should|will|todo|action|fix|add|create|build|update|check|review|send|schedule)\b/i.test(s));return'Action Items (local):\n\n'+(actions.length?actions.map(a=>'[ ] '+a+'.').join('\n'):'No explicit action items found.\n\nAll sentences:\n'+sentences.map(s=>'[ ] '+s+'.').join('\n'));}
+  if(pl.includes('clean')||pl.includes('grammar')){return text.replace(/\s+/g,' ').replace(/\s([,.!?;:])/g,'$1').replace(/([.!?])\s*/g,'$1 ').trim();}
+  if(pl.includes('count')||pl.includes('stat')){const chars=text.length;const paras=text.split(/\n\s*\n/).filter(Boolean).length;const uniq=[...new Set(words.map(w=>w.toLowerCase()))].length;return'Text Statistics:\n\nWords: '+words.length+'\nCharacters: '+chars+'\nSentences: '+sentences.length+'\nParagraphs: '+paras+'\nUnique words: '+uniq+'\nAvg words/sentence: '+Math.round(words.length/Math.max(1,sentences.length))+'\nReading time: '+Math.max(1,Math.ceil(words.length/238))+' min';}
+  return'Processed text (local - API unavailable):\n\nInput: '+words.length+' words, '+sentences.length+' sentences.\n\nKey sentences:\n'+sentences.slice(0,5).map(s=>'- '+s+'.').join('\n')+'\n\nNote: For advanced processing (AI summarization, translation, etc.), configure OPENAI_API_KEY in Vercel environment variables.';
 }
 
 function plCopyResult() {
