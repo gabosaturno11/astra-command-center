@@ -1228,9 +1228,12 @@ textarea{resize:vertical;line-height:1.6}
       <div>
         <div style="font-weight:600;color:var(--text);margin-bottom:8px">Actions</div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>New Item</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+N</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>New Task (anywhere)</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+T</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Quick Capture</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+N</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Toggle Sidebar</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+B</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Context Panel</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+E</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Focus Mode</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+\</span></div>
-        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Save Version</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+S</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Save / Sync</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+S</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Zen Writer</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+W</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Close/Escape</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Esc</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Show Shortcuts</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+/</span></div>
@@ -1824,7 +1827,8 @@ function seedKernel() {
   S.activeSpec = kernel.id;
 }
 
-function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); scheduleCloudSync(); }
+function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); scheduleCloudSync(); updateSidebarCounts(); }
+function updateSidebarCounts(){document.getElementById('content-count').textContent=S.content.length;document.getElementById('tasks-count').textContent=S.tasks.filter(t=>t.status!=='done').length;document.getElementById('writer-count').textContent=S.docs.length;document.getElementById('specs-count').textContent=S.specs.length;document.getElementById('links-count').textContent=S.links.length;}
 function flashSave() { const el=document.getElementById('save-indicator'); if(!el) return; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0';},1500); }
 
 // === QUICK CAPTURE ===
@@ -4307,6 +4311,10 @@ document.addEventListener('keydown',e=>{
   }
   // Cmd+Shift+N: quick capture
   if((e.metaKey||e.ctrlKey) && e.shiftKey && e.key==='n') { e.preventDefault(); qcOpen(); return; }
+  // Cmd+Shift+T: new task from anywhere
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='t'||e.key==='T')) { e.preventDefault(); switchSection('tasks',document.querySelectorAll('.sidebar-item')[1]||null); setTimeout(()=>addTask(),100); return; }
+  // Cmd+B: toggle sidebar
+  if((e.metaKey||e.ctrlKey) && e.key==='b' && !e.shiftKey) { e.preventDefault(); toggleSidebar(); return; }
   // Cmd+N: new item in current section
   if((e.metaKey||e.ctrlKey) && e.key==='n' && !e.shiftKey) {
     e.preventDefault();
