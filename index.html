@@ -853,6 +853,9 @@ textarea{resize:vertical;line-height:1.6}
           <div class="tab-bar" style="margin-left:8px">
             <button class="tab-btn active" id="task-filter-all" onclick="setTaskFilter('all')">All</button>
             <button class="tab-btn" id="task-filter-active" onclick="setTaskFilter('active')">Active</button>
+            <button class="tab-btn" id="task-filter-todo" onclick="setTaskFilter('todo')">Todo</button>
+            <button class="tab-btn" id="task-filter-progress" onclick="setTaskFilter('progress')">WIP</button>
+            <button class="tab-btn" id="task-filter-blocked" onclick="setTaskFilter('blocked')">Blocked</button>
             <button class="tab-btn" id="task-filter-done" onclick="setTaskFilter('done')">Done</button>
           </div>
           <select id="task-project-filter" onchange="filterTaskProject(this.value||null)" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;max-width:100px"><option value="">All Projects</option></select>
@@ -2387,9 +2390,9 @@ function contentInlineEdit(id,el,e){
 
 // === TASKS ===
 function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
-function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;document.getElementById('task-filter-all').classList.toggle('active',f==='all');document.getElementById('task-filter-active').classList.toggle('active',f==='active');document.getElementById('task-filter-done').classList.toggle('active',f==='done');renderTasks();}
+function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;['all','active','todo','progress','blocked','done'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',f===k);});renderTasks();}
 function filterTaskProject(p){taskProjectFilter=p;taskFilter='all';renderTasks();}
-function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));return items;}
+function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');else if(taskFilter==='todo')items=items.filter(t=>t.status==='todo');else if(taskFilter==='progress')items=items.filter(t=>t.status==='progress');else if(taskFilter==='blocked')items=items.filter(t=>t.status==='blocked');else if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));return items;}
 
 function renderTasks(){
   const items=getFilteredTasks();
