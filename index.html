@@ -1758,6 +1758,37 @@ function migrateV2() {
     });
     if(migrated > 0) save();
   }
+  // Deduplicate specs: keep the one with more content when titles match
+  if(S.specs && S.specs.length > 1) {
+    const seen = {};
+    const dupes = [];
+    S.specs.forEach(s => {
+      const key = (s.title||'').toLowerCase().trim() + '|' + (s.projectId||'');
+      if(seen[key]) {
+        // Keep whichever has more section body content
+        const existBody = (seen[key].sections||[]).reduce((a,sec) => a + (sec.body||'').length, 0);
+        const thisBody = (s.sections||[]).reduce((a,sec) => a + (sec.body||'').length, 0);
+        if(thisBody > existBody) { dupes.push(seen[key].id); seen[key] = s; }
+        else { dupes.push(s.id); }
+      } else { seen[key] = s; }
+    });
+    if(dupes.length) {
+      S.specs = S.specs.filter(s => !dupes.includes(s.id));
+      save();
+    }
+  }
+  // Remove "Untitled" specs that have no content
+  if(S.specs) {
+    const before = S.specs.length;
+    S.specs = S.specs.filter(s => {
+      if((s.title||'').toLowerCase().trim() === 'untitled' || !s.title) {
+        const hasContent = (s.sections||[]).some(sec => (sec.body||'').trim().length > 0);
+        return hasContent; // keep only if it has actual content
+      }
+      return true;
+    });
+    if(S.specs.length < before) save();
+  }
 }
 
 function seedKernel() {
