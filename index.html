@@ -824,6 +824,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-primary btn-sm" onclick="openContentModal()">+ Add</button>
         </div>
       </div>
+      <div id="content-tag-pills" style="padding:0 20px;display:flex;gap:4px;flex-wrap:wrap;flex-shrink:0"></div>
       <div class="content-area"><div class="content-grid" id="content-grid"></div></div>
     </div>
 
@@ -1641,7 +1642,7 @@ textarea{resize:vertical;line-height:1.6}
 const SK = 'saturno-private-hub';
 let S = { content:[], tasks:[], links:[], docs:[], specs:[], activeDoc:null, activeSpec:null, whiteboard:{}, projects:[], knowledgeBase:[], folders:[] };
 let currentSection = 'content';
-let contentType = 'all', contentTheme = 'all';
+let contentType = 'all', contentTheme = 'all', contentTagFilter = null;
 let taskView = 'list', taskFilter = 'all', taskProjectFilter = null;
 let linkCategory = 'all';
 let editingContentId = null, editingLinkId = null;
@@ -2158,7 +2159,13 @@ function renderContent() {
   let items=S.content;
   if(contentType!=='all')items=items.filter(c=>c.type===contentType);
   if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
+  if(contentTagFilter)items=items.filter(c=>(c.tags||[]).includes(contentTagFilter));
   if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+c.source+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
+  // Tag pills
+  const allTags=[...new Set(S.content.flatMap(c=>c.tags||[]).filter(Boolean))].sort();
+  const tagArea=document.getElementById('content-tag-pills');
+  if(tagArea&&allTags.length)tagArea.innerHTML=allTags.slice(0,12).map(t=>`<span style="font-size:8px;padding:2px 6px;border-radius:10px;cursor:pointer;border:1px solid ${contentTagFilter===t?'var(--accent)':'var(--border)'};color:${contentTagFilter===t?'var(--accent)':'var(--text-muted)'};background:${contentTagFilter===t?'rgba(74,222,128,0.08)':'transparent'}" onclick="contentTagFilter=contentTagFilter==='${escA(t)}'?null:'${escA(t)}';renderContent()">${esc(t)}</span>`).join('')+(contentTagFilter?`<span style="font-size:8px;color:var(--red);cursor:pointer;padding:2px 4px" onclick="contentTagFilter=null;renderContent()">x clear</span>`:'');
+  else if(tagArea)tagArea.innerHTML='';
   const sortVal=(document.getElementById('content-sort')?.value)||'newest';
   if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));
   else if(sortVal==='oldest')items.sort((a,b)=>new Date(a.created||0)-new Date(b.created||0));
@@ -4329,6 +4336,9 @@ function cmdGetItems(q) {
   if(!ql || 'export tasks'.includes(ql)) items.push({title:'Export Tasks', desc:'Copy filtered tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportTasks();}});
   if(!ql || 'archive'.includes(ql)) items.push({title:'Archive Completed', desc:'Move done tasks to archive', icon:'A', type:'action', action:()=>{closeCommandPalette();archiveCompletedTasks();}});
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
+  if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
+  if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
+  if(!ql || 'ics calendar export'.includes(ql)) items.push({title:'Export Calendar', desc:'Export tasks as .ics for Google Calendar', icon:'C', type:'action', action:()=>{closeCommandPalette();exportICS();}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   // Open specific docs in Zen Writer
   if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
