@@ -1115,8 +1115,11 @@ textarea{resize:vertical;line-height:1.6}
     <!-- REPOS -->
     <div class="panel" id="panel-repos">
       <div style="padding:16px 20px 0;flex-shrink:0">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap">
           <span style="font-size:13px;font-weight:600;letter-spacing:0.02em">Connected Repos</span>
+          <span id="repos-count" style="font-size:9px;color:var(--text-muted);font-family:var(--mono)">0</span>
+          <span style="flex:1"></span>
+          <input type="text" id="repo-search" placeholder="Filter repos..." oninput="reposRefresh()" style="width:120px;font-size:10px;padding:5px 8px">
           <button class="btn btn-primary btn-sm" onclick="openRepoModal()">+ Add</button>
           <button class="btn btn-sm" onclick="reposRefresh()">Refresh</button>
         </div>
@@ -1283,6 +1286,8 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Living Docs</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+5</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Links</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+6</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Whiteboard</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+7</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Pipeline</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+8</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Repos</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+9</span></div>
       </div>
       <div>
         <div style="font-weight:600;color:var(--text);margin-bottom:8px">Actions</div>
@@ -1294,6 +1299,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Focus Mode</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+\</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Save / Sync</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+S</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Zen Writer</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+W</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Today View</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+D</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Close/Escape</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Esc</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Show Shortcuts</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+/</span></div>
         <div style="font-weight:600;color:var(--text);margin:12px 0 8px">Whiteboard</div>
@@ -4524,7 +4530,7 @@ document.addEventListener('keydown',e=>{
   }
   if(inInput) return;
   // Cmd+number: switch sections
-  if((e.metaKey||e.ctrlKey) && e.key>='1' && e.key<='7') {
+  if((e.metaKey||e.ctrlKey) && e.key>='1' && e.key<='9') {
     e.preventDefault();
     const sections = ['content','tasks','calendar','writer','specs','links','whiteboard','pipeline','repos'];
     const idx = parseInt(e.key)-1;
@@ -4540,6 +4546,8 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='t'||e.key==='T')) { e.preventDefault(); switchSection('tasks',document.querySelectorAll('.sidebar-item')[1]||null); setTimeout(()=>addTask(),100); return; }
   // Cmd+B: toggle sidebar
   if((e.metaKey||e.ctrlKey) && e.key==='b' && !e.shiftKey) { e.preventDefault(); toggleSidebar(); return; }
+  // Cmd+Shift+D: today view
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='d'||e.key==='D')) { e.preventDefault(); showTodayView(); return; }
   // Cmd+N: new item in current section
   if((e.metaKey||e.ctrlKey) && e.key==='n' && !e.shiftKey) {
     e.preventDefault();
@@ -4789,9 +4797,14 @@ function reposRefresh() {
   }
   const grid=document.getElementById('repos-grid');
   if(!grid) return;
+  const rq=(document.getElementById('repo-search')?.value||'').toLowerCase();
+  let repos=S.repos||[];
+  if(rq)repos=repos.filter(r=>(r.name+' '+r.role+' '+r.desc+' '+r.status).toLowerCase().includes(rq));
+  const cntEl=document.getElementById('repos-count');if(cntEl)cntEl.textContent=(S.repos||[]).length;
   const roleColors={'backend-hub':'var(--accent)','customer-facing':'#22d3ee','internal-tools':'#a855f7','experience':'#f472b6','extension':'#fbbf24'};
   const roleIcons={'backend-hub':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>','customer-facing':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>','internal-tools':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>','experience':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>','extension':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>'};
-  grid.innerHTML=S.repos.map(r=>{
+  if(!repos.length){grid.innerHTML=`<div style="text-align:center;padding:30px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">R</div><div style="font-size:12px">${rq?'No matching repos':'No repos connected'}</div><div style="font-size:10px;margin-top:4px">${rq?'Try a different filter':'Click + Add to connect a repository'}</div></div>`;return;}
+  grid.innerHTML=repos.map(r=>{
     const rc=roleColors[r.role]||'var(--text-muted)';
     const sc=r.status==='active'?'var(--green)':r.status==='complete'?'var(--accent-cyan)':'var(--text-muted)';
     const icon=roleIcons[r.role]||'';
