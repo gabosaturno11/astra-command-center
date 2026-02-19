@@ -1166,6 +1166,7 @@ textarea{resize:vertical;line-height:1.6}
             <div id="pl-transcript-text"></div>
           </div>
           <div id="pl-synthesis-text" style="font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
+          <div id="pl-result-stats" style="margin-top:8px;font-size:9px;color:var(--text-muted);font-family:var(--mono)"></div>
         </div>
         <div id="pl-history" style="display:none">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:6px">
@@ -2407,7 +2408,7 @@ function renderTasks(){
     cnt.textContent=f.length;
     const wipLimit=st==='progress'?5:0;
     if(wipLimit&&f.length>wipLimit){cnt.style.color='var(--red)';cnt.title='WIP limit: '+wipLimit;}else{cnt.style.color='';cnt.title='';};
-    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" onclick="event.stopPropagation();cyclePriority(${t.id})" style="cursor:pointer" title="Click to cycle priority">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}${t.timeSpent?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)" title="Time tracked">${formatTimeSpent(t.timeSpent)}</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
+    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" onclick="event.stopPropagation();cyclePriority(${t.id})" style="cursor:pointer" title="Click to cycle priority">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'};font-family:var(--mono)" title="${t.due}">${relativeDate(t.due)}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}${t.timeSpent?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)" title="Time tracked">${formatTimeSpent(t.timeSpent)}</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
   });
   const activeTasks=S.tasks.filter(t=>t.status!=='done').length;
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
@@ -2438,6 +2439,15 @@ function parseNaturalDate(text){
   const match=t.match(/^(\d+)\s*(d|day|w|week|m|month)/);
   if(match){const n=parseInt(match[1]);const unit=match[2][0];if(unit==='d')now.setDate(now.getDate()+n);else if(unit==='w')now.setDate(now.getDate()+n*7);else if(unit==='m')now.setMonth(now.getMonth()+n);return now.toISOString().split('T')[0];}
   return text;
+}
+function relativeDate(dateStr){
+  if(!dateStr)return '';
+  const today=new Date();today.setHours(0,0,0,0);
+  const d=new Date(dateStr+'T12:00:00');d.setHours(0,0,0,0);
+  const diff=Math.round((d-today)/(86400000));
+  if(diff===0)return 'today';if(diff===1)return 'tmrw';if(diff===-1)return 'yday';
+  if(diff>1&&diff<=7)return diff+'d';if(diff>7)return dateStr.substring(5);
+  return Math.abs(diff)+'d ago';
 }
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
 function cyclePriority(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;const order=['p0','p1','p2','p3'];const cur=order.indexOf(t.priority||'p2');t.priority=order[(cur+1)%order.length];save();renderTasks();toast(t.priority.toUpperCase());}
@@ -5473,6 +5483,7 @@ async function plProcess() {
         document.getElementById('pl-transcript-box').style.display='none';
       }
       document.getElementById('pl-synthesis-text').textContent=data.synthesis;
+      plUpdateResultStats(data.synthesis);
       plSaveLocal({id:data.pipelineId||('p_'+Date.now()),inputType:data.inputType||'text',prompt:prompt,preview:(data.synthesis||'').substring(0,200),source:source,createdAt:new Date().toISOString()});
       toast('Pipeline complete!');
     } else {
@@ -5486,6 +5497,7 @@ async function plProcess() {
       document.getElementById('pl-result').style.display='block';
       document.getElementById('pl-transcript-box').style.display='none';
       document.getElementById('pl-synthesis-text').textContent=result;
+      plUpdateResultStats(result);
       plSaveLocal({id:'p_'+Date.now(),inputType:'text',prompt:prompt,preview:result.substring(0,200),source:document.getElementById('pl-source').value,createdAt:new Date().toISOString()});
       toast('Processed locally (API unavailable)');
     } else {
@@ -5582,6 +5594,14 @@ async function plLoadHistory() {
 function plDeleteEntry(idx){
   if(!confirm('Delete this pipeline entry?'))return;
   if(S.pipelineHistory&&S.pipelineHistory[idx]){S.pipelineHistory.splice(idx,1);save();plLoadHistory();plLoadHistory();toast('Deleted');}
+}
+function plUpdateResultStats(text){
+  const el=document.getElementById('pl-result-stats');if(!el||!text)return;
+  const words=text.trim().split(/\s+/).filter(x=>x.length).length;
+  const chars=text.length;
+  const lines=text.split('\n').length;
+  const sents=text.split(/[.!?]+/).filter(s=>s.trim().length).length;
+  el.textContent=words+' words / '+chars+' chars / '+lines+' lines / '+sents+' sentences';
 }
 function plClearResult(){
   document.getElementById('pl-result').style.display='none';
