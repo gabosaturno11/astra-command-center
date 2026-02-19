@@ -1052,6 +1052,7 @@ textarea{resize:vertical;line-height:1.6}
         <div class="wb-actions">
           <button class="btn btn-sm" onclick="openTplModal()">Templates</button>
           <select class="writer-toolbar-select" onchange="wbExport(this.value);this.selectedIndex=0" style="width:auto"><option value="">Export</option><option value="png">PNG</option><option value="svg">SVG</option><option value="json">JSON</option></select>
+          <button class="btn btn-sm" onclick="wbImportJSON()" title="Import whiteboard JSON">Import</button>
           <button class="btn btn-sm" onclick="wbClearAll()">Clear</button>
         </div>
         <div class="wb-top-bar">
@@ -1116,6 +1117,10 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Rewrite this as a polished social media post (Twitter/X length)'" style="font-size:8px;padding:2px 6px">Social Post</button>
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Translate to Spanish, maintaining the original tone'" style="font-size:8px;padding:2px 6px">Translate ES</button>
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Clean up grammar and punctuation, keep the original voice'" style="font-size:8px;padding:2px 6px">Clean Up</button>
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Extract the top keywords and most frequent terms'" style="font-size:8px;padding:2px 6px">Keywords</button>
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Convert to bullet point list'" style="font-size:8px;padding:2px 6px">Bullets</button>
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Generate headline and title suggestions'" style="font-size:8px;padding:2px 6px">Headlines</button>
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Show detailed word count and text statistics'" style="font-size:8px;padding:2px 6px">Stats</button>
           </div>
           <textarea id="pl-prompt" placeholder="What should the pipeline do with this input? e.g. 'Summarize key ideas', 'Extract action items', 'Rewrite for social media', 'Translate to Spanish'..." style="width:100%;min-height:60px;resize:vertical;font-size:11px;padding:8px 10px"></textarea>
         </div>
@@ -4140,6 +4145,11 @@ function wbExport(fmt) {
   }
 }
 
+function wbImportJSON(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='.json';inp.onchange=e=>{const f=e.target.files[0],r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.nodes&&Array.isArray(d.nodes)){wbNodes=d.nodes;wbConns=d.conns||[];wbNodeId=Math.max(...wbNodes.map(n=>n.id||0),100)+1;wbSaveState();wbRender();wbFitView();toast('Imported '+wbNodes.length+' nodes');}else{toast('Invalid whiteboard JSON');}}catch(e){toast('Parse error: '+e.message);}};r.readAsText(f);};inp.click();
+}
+function wbNodeCount(){return wbNodes.length+' nodes, '+wbConns.length+' connections';}
+
 // === TEMPLATES ===
 const WB_TEMPLATES = [
   { name: 'Blank Canvas', icon: '+', desc: 'Start from scratch', nodes: [] },
@@ -5243,6 +5253,10 @@ function plLocalProcess(text,prompt){
   if(pl.includes('action')||pl.includes('task')||pl.includes('checklist')){const actions=sentences.filter(s=>/\b(need|must|should|will|todo|action|fix|add|create|build|update|check|review|send|schedule)\b/i.test(s));return'Action Items (local):\n\n'+(actions.length?actions.map(a=>'[ ] '+a+'.').join('\n'):'No explicit action items found.\n\nAll sentences:\n'+sentences.map(s=>'[ ] '+s+'.').join('\n'));}
   if(pl.includes('clean')||pl.includes('grammar')){return text.replace(/\s+/g,' ').replace(/\s([,.!?;:])/g,'$1').replace(/([.!?])\s*/g,'$1 ').trim();}
   if(pl.includes('count')||pl.includes('stat')){const chars=text.length;const paras=text.split(/\n\s*\n/).filter(Boolean).length;const uniq=[...new Set(words.map(w=>w.toLowerCase()))].length;return'Text Statistics:\n\nWords: '+words.length+'\nCharacters: '+chars+'\nSentences: '+sentences.length+'\nParagraphs: '+paras+'\nUnique words: '+uniq+'\nAvg words/sentence: '+Math.round(words.length/Math.max(1,sentences.length))+'\nReading time: '+Math.max(1,Math.ceil(words.length/238))+' min';}
+  if(pl.includes('keyword')||pl.includes('frequent')||pl.includes('top word')){const freq={};words.forEach(w=>{const lw=w.toLowerCase().replace(/[^a-z0-9]/g,'');if(lw.length>3){freq[lw]=(freq[lw]||0)+1;}});const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,20);return'Top Keywords (local):\n\n'+sorted.map(([w,c])=>w+': '+c+' times').join('\n');}
+  if(pl.includes('bullet')||pl.includes('list')){return'Bullet Points (local):\n\n'+sentences.map(s=>'- '+s.charAt(0).toUpperCase()+s.slice(1)+'.').join('\n');}
+  if(pl.includes('question')||pl.includes('faq')){const qs=sentences.filter(s=>/\?|who|what|when|where|why|how|which|can|could|should|would|is|are|do|does/i.test(s));return'Questions Found (local):\n\n'+(qs.length?qs.map(q=>'Q: '+q+(q.endsWith('?')?'':'?')).join('\n\n'):'No explicit questions found in the text.');}
+  if(pl.includes('headline')||pl.includes('title')){const caps=sentences.slice(0,5).map(s=>{const w=s.split(/\s+/).slice(0,8).join(' ');return w.split(' ').map(x=>x.charAt(0).toUpperCase()+x.slice(1).toLowerCase()).join(' ');});return'Headline Suggestions (local):\n\n'+caps.map((h,i)=>(i+1)+'. '+h).join('\n');}
   return'Processed text (local - API unavailable):\n\nInput: '+words.length+' words, '+sentences.length+' sentences.\n\nKey sentences:\n'+sentences.slice(0,5).map(s=>'- '+s+'.').join('\n')+'\n\nNote: For advanced processing (AI summarization, translation, etc.), configure OPENAI_API_KEY in Vercel environment variables.';
 }
 
