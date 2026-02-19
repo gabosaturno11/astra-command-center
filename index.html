@@ -812,6 +812,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="shortest">Shortest</option>
             <option value="alpha">A-Z</option>
           </select>
+          <button class="btn btn-sm" onclick="exportContent()" title="Export all content as markdown">Export</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -2175,6 +2176,26 @@ function delContent(id){const c=S.content.find(x=>x.id===id);if(c)lastDeletedCon
 function undoDeleteContent(){if(!lastDeletedContent)return;S.content.unshift(lastDeletedContent);lastDeletedContent=null;save();renderContent();toast('Restored');}
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
 function pinContent(id){const c=S.content.find(x=>x.id===id);if(c){c.pinned=!c.pinned;save();renderContent();toast(c.pinned?'Pinned':'Unpinned');}}
+function exportContent(){
+  const items=S.content;
+  const groups={};
+  items.forEach(c=>{const g=c.theme||'Unthemed';if(!groups[g])groups[g]=[];groups[g].push(c);});
+  let md='# Content Export\n';
+  md+='Generated: '+new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'\n';
+  md+=items.length+' items total\n\n';
+  Object.keys(groups).sort().forEach(g=>{
+    md+='## '+g+'\n\n';
+    groups[g].forEach(c=>{
+      md+='### '+c.type+(c.source?' ('+c.source+')':'')+'\n';
+      md+=c.body+'\n';
+      if(c.tags&&c.tags.length)md+='Tags: '+c.tags.join(', ')+'\n';
+      md+='\n---\n\n';
+    });
+  });
+  navigator.clipboard.writeText(md).then(()=>toast('Content copied as markdown')).catch(()=>{
+    const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='content-export.md';a.click();toast('Content exported');
+  });
+}
 let contentBulkMode=false, contentSelected=new Set(), contentShowAll=false;
 function toggleContentBulk(){
   contentBulkMode=!contentBulkMode;contentSelected.clear();
@@ -4248,6 +4269,12 @@ function cmdGetItems(q) {
     if(k.name && (!ql || k.name.toLowerCase().includes(ql)))
       items.push({title:k.name, desc:'KB - '+k.type, icon:'K', type:'kb', action:()=>{const proj = (S.projects||[]).find(p=>p.id===k.projectId); if(proj){openProject(proj.id);setProjTab('kb');} openKBViewer(k.id);}});
   });
+  // Content (search body text)
+  if(ql) {
+    S.content.filter(c=>c.body.toLowerCase().includes(ql)).slice(0,5).forEach(c => {
+      items.push({title:c.body.substring(0,60)+(c.body.length>60?'...':''), desc:'Content - '+c.type+(c.theme?' / '+c.theme:''), icon:'C', type:'content', action:()=>{switchSection('content',null);document.getElementById('content-search').value=ql;renderContent();}});
+    });
+  }
   // Links
   S.links.forEach(l => {
     if(l.title && (!ql || l.title.toLowerCase().includes(ql) || l.url.toLowerCase().includes(ql)))
@@ -4262,6 +4289,9 @@ function cmdGetItems(q) {
   if(!ql || 'quick capture'.includes(ql)) items.push({title:'Quick Capture', desc:'Add task/content instantly (Cmd+Shift+N)', icon:'+', type:'action', action:()=>{closeCommandPalette();qcOpen();}});
   if(!ql || 'today'.includes(ql)) items.push({title:'Today View', desc:'See tasks due today + overdue', icon:'*', type:'action', action:()=>{closeCommandPalette();showTodayView();}});
   if(!ql || 'standup daily'.includes(ql)) items.push({title:'Daily Standup', desc:'Copy standup summary to clipboard', icon:'S', type:'action', action:()=>{closeCommandPalette();generateStandup();}});
+  if(!ql || 'export content'.includes(ql)) items.push({title:'Export Content', desc:'Copy all content as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportContent();}});
+  if(!ql || 'export tasks'.includes(ql)) items.push({title:'Export Tasks', desc:'Copy filtered tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportTasks();}});
+  if(!ql || 'archive'.includes(ql)) items.push({title:'Archive Completed', desc:'Move done tasks to archive', icon:'A', type:'action', action:()=>{closeCommandPalette();archiveCompletedTasks();}});
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   // Open specific docs in Zen Writer
