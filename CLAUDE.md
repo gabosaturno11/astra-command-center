@@ -62,10 +62,34 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-19 session)
+## CURRENT STATE (Updated: 2026-02-19 session 4)
 
-### FEB 19 SESSION — 21 COMMITS (autonomous execution)
-Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
+### FEB 19 SESSION 4 — CONTINUATION (8 more batches: 33-40)
+Latest commit: `fab8352` — all pushed to main, Vercel auto-deployed.
+
+**NEW FEATURES (Session 4, batches 33-40):**
+73. Export summary as markdown (exportSummary(), copies to clipboard)
+74. Content: duplicate items (dupContent), merge selected items (mergeContent)
+75. Task: activity log tracks status changes, shown in detail modal
+76. Link: fetch page title from URL (fetchLinkTitle via allorigins proxy)
+77. Task: bulk select mode (select multiple, set status/priority, delete)
+78. Calendar: day detail popup shows all tasks, click-to-open-detail
+79. Writer: TOC generator from headings (writerTOC)
+80. Sidebar: weekly productivity stats (tasks done/created this week)
+81. Link: category counts in tabs
+82. Header: mini search bar opens Cmd+K
+83. Content: reading time estimate on cards (>50 words)
+84. Content: "Doc" button converts content to writer document
+85. Kanban: WIP limit warning (In Progress > 5 turns red)
+86. Repos: notes field per repo (green accent strip on card)
+87. Task: blocked-by dependency field ("B" badge on board)
+88. Task: estimate field (e.g. "30m", "2h", shown in cyan on board)
+89. Link: duplicate URL detection (warns before adding)
+90. Breadcrumb: shows item count per section
+91. Data Stats command (storage breakdown by section, in Cmd+K)
+
+### FEB 19 SESSION 3 — 13 COMMITS (autonomous execution)
+Latest commit: `7273e60`
 
 **CRITICAL FIXES DONE:**
 - cloudLoad() now sends auth header (was silently failing since GET /api/state was locked)
@@ -163,24 +187,23 @@ Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
 71. Links: batch import (paste multiple URLs)
 72. Board cards: subtask progress bar (visual)
 
-**SECTION HEALTH (updated 2026-02-19 session 3):**
+**SECTION HEALTH (updated 2026-02-19 session 4):**
 | Section | Health | Notes |
 |---------|--------|-------|
-| Tasks | 98% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup + project filter + progress bar + to-content |
-| Calendar | 92% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary + upcoming list + day badges |
-| Writer | 95% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list + find/replace |
+| Tasks | 99% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup + project filter + progress bar + to-content + bulk actions + activity log + estimate + blocked-by + WIP limits |
+| Calendar | 95% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary + upcoming list + day badges + day detail popup |
+| Writer | 96% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list + find/replace + TOC generator |
 | Living Docs | 92% | Sections + icons + colors + global docs + export + drag-drop reorder + word count per section |
-| Content | 95% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete + tag filter pills + word count |
-| Links | 92% | Favicons + categories + search + project + URL validation + dates + auto-suggest + sort + undo delete + batch import |
+| Content | 97% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete + tag filter pills + word count + reading time + duplicate + merge + to-doc |
+| Links | 95% | Favicons + categories + search + project + URL validation + dates + auto-suggest + sort + undo delete + batch import + fetch title + duplicate detection + category counts |
 | Whiteboard | 85% | Canvas tools solid |
-| Repos | 88% | CRUD modal + role icons + timestamps + search + open-all + empty state |
-| Pipeline | 85% | UI + local history + expand/collapse + prompt templates + file drop + source badges + stats + save-to-content + local processing |
-| Cmd+K | 98% | Searches everything + standup + today view + Zen docs + focus mode + calendar export |
+| Repos | 90% | CRUD modal + role icons + timestamps + search + open-all + empty state + notes field + health check |
+| Pipeline | 88% | UI + local history + expand/collapse + prompt templates + file drop + source badges + stats + save-to-content + local processing |
+| Cmd+K | 99% | Searches everything + standup + today view + Zen docs + focus mode + calendar export + data stats + export summary |
 
 **REMAINING:**
 - Bonus page shipping (prerequisite: ASTRA stable - NOW IT IS)
 - Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env (to unlock API mode)
-- Link OG metadata previews (fetch page titles automatically)
 - Google Calendar sync (future)
 - Content: drag to reorder
 - Whiteboard improvements (undo/redo, export, templates)
