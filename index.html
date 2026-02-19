@@ -841,6 +841,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="tab-btn" id="task-filter-active" onclick="setTaskFilter('active')">Active</button>
             <button class="tab-btn" id="task-filter-done" onclick="setTaskFilter('done')">Done</button>
           </div>
+          <select id="task-project-filter" onchange="filterTaskProject(this.value||null)" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;max-width:100px"><option value="">All Projects</option></select>
           <select id="task-sort" onchange="renderTasks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px">
             <option value="manual">Manual</option>
             <option value="priority">Priority</option>
@@ -1043,8 +1044,9 @@ textarea{resize:vertical;line-height:1.6}
     <div class="panel" id="panel-links">
       <div style="padding:16px 20px 0;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap">
         <div class="tab-bar" id="link-category-tabs"></div>
-        <div style="margin-left:auto;display:flex;gap:6px">
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
           <input type="text" id="link-search" placeholder="Search links..." oninput="renderLinks()" style="width:140px;font-size:10px;padding:5px 8px">
+          <select id="link-sort" onchange="renderLinks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="alpha">A-Z</option><option value="category">Category</option></select>
           <button class="btn btn-primary btn-sm" onclick="openLinkModal()">+ Add</button>
         </div>
       </div>
@@ -2270,6 +2272,7 @@ function renderTasks(){
   const acEl=document.getElementById('archived-count');if(acEl)acEl.textContent=(S.archivedTasks||[]).length||'';
   if(!document.getElementById('pdl')){const dl=document.createElement('datalist');dl.id='pdl';document.body.appendChild(dl);}
   document.getElementById('pdl').innerHTML=projects.map(p=>`<option value="${p}">`).join('');
+  const tpf=document.getElementById('task-project-filter');if(tpf){tpf.innerHTML='<option value="">All Projects</option>'+projects.map(p=>`<option value="${escA(p)}" ${taskProjectFilter===p?'selected':''}>${esc(p)}</option>`).join('');}
   updateSidebarCtx();
 }
 
@@ -2767,7 +2770,12 @@ function renderLinks(){
   const cats=[...new Set(S.links.map(l=>l.category).filter(Boolean))].sort();
   document.getElementById('link-category-tabs').innerHTML=`<button class="tab-btn ${linkCategory==='all'?'active':''}" onclick="setLinkCat('all',this)">All</button>`+cats.map(c=>`<button class="tab-btn ${linkCategory===c?'active':''}" onclick="setLinkCat('${escA(c)}',this)">${esc(c)}</button>`).join('');
   const q=(document.getElementById('link-search')?.value||'').toLowerCase();
-  let items=S.links;if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
+  let items=[...S.links];if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
+  const ls=(document.getElementById('link-sort')?.value)||'newest';
+  if(ls==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));
+  else if(ls==='oldest')items.sort((a,b)=>new Date(a.created||0)-new Date(b.created||0));
+  else if(ls==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  else if(ls==='category')items.sort((a,b)=>(a.category||'zzz').localeCompare(b.category||'zzz'));
   const g=document.getElementById('links-grid');
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">L</div><div style="font-size:12px">${q?'No matching links':'No links saved'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search':'Click + Add to save bookmarks and resources'}</div></div>`:items.map(l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')"><div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div></div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}${l.projectId?(()=>{const p=(S.projects||[]).find(x=>x.id===l.projectId);return p?`<span class="badge badge-muted" style="font-size:7px">${esc(p.name)}</span>`:''})():''}${l.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(l.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('links-count').textContent=S.links.length;
