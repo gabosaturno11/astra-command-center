@@ -815,6 +815,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="alpha">A-Z</option>
           </select>
           <span id="content-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
+          <button class="btn btn-sm" onclick="randomContent()" title="Random content for inspiration">Random</button>
           <button class="btn btn-sm" onclick="exportContent()" title="Export all content as markdown">Export</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
@@ -1151,6 +1152,7 @@ textarea{resize:vertical;line-height:1.6}
           <input type="text" id="repo-search" placeholder="Filter repos..." oninput="reposRefresh()" style="width:120px;font-size:10px;padding:5px 8px">
           <button class="btn btn-primary btn-sm" onclick="openRepoModal()">+ Add</button>
           <button class="btn btn-sm" onclick="(S.repos||[]).filter(r=>r.live).forEach(r=>window.open(r.live,'_blank'));toast('Opened '+((S.repos||[]).filter(r=>r.live).length)+' live sites')" title="Open all live URLs">Open All</button>
+          <button class="btn btn-sm" onclick="reposHealthCheck()" title="Ping all live URLs">Health Check</button>
           <button class="btn btn-sm" onclick="reposRefresh()">Refresh</button>
         </div>
       </div>
@@ -2210,6 +2212,7 @@ let lastDeletedContent=null;
 function delContent(id){const c=S.content.find(x=>x.id===id);if(c)lastDeletedContent={...c};S.content=S.content.filter(c=>c.id!==id);save();renderContent();toast('Deleted — Cmd+Z to undo');}
 function undoDeleteContent(){if(!lastDeletedContent)return;S.content.unshift(lastDeletedContent);lastDeletedContent=null;save();renderContent();toast('Restored');}
 function copyContent(id){const c=S.content.find(x=>x.id===id);if(c){navigator.clipboard.writeText(c.body);toast('Copied');}}
+function randomContent(){if(!S.content.length){toast('No content yet');return;}const r=S.content[Math.floor(Math.random()*S.content.length)];navigator.clipboard.writeText(r.body);toast('Random: '+(r.body.substring(0,50)+'...'));document.getElementById('content-search').value='';contentType='all';contentTheme='all';contentTagFilter=null;renderContent();setTimeout(()=>{const cards=document.querySelectorAll('.content-card');const idx=S.content.indexOf(r);if(cards[idx])cards[idx].scrollIntoView({behavior:'smooth',block:'center'});},100);}
 function pinContent(id){const c=S.content.find(x=>x.id===id);if(c){c.pinned=!c.pinned;save();renderContent();toast(c.pinned?'Pinned':'Unpinned');}}
 function exportContent(){
   const items=S.content;
@@ -4377,6 +4380,7 @@ function cmdGetItems(q) {
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
   if(!ql || 'ics calendar export'.includes(ql)) items.push({title:'Export Calendar', desc:'Export tasks as .ics for Google Calendar', icon:'C', type:'action', action:()=>{closeCommandPalette();exportICS();}});
+  if(!ql || 'random inspiration content'.includes(ql)) items.push({title:'Random Content', desc:'Pick a random content item for inspiration', icon:'?', type:'action', action:()=>{closeCommandPalette();switchSection('content',null);setTimeout(randomContent,100);}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   // Open specific docs in Zen Writer
   if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
@@ -5112,7 +5116,7 @@ function reposRefresh() {
       <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">${esc(r.desc)}</div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> repo</a>
-        ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span> live</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
+        ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:${r.lastCheck?(r.lastCheckOk?'var(--green)':'var(--red)'):'var(--green)'};display:inline-block"></span> live${r.lastCheck?' ('+timeAgo(r.lastCheck)+')':''}</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
         <span style="flex:1"></span>
         <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openRepoModal('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Edit</button>
         <button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();deleteRepo('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Del</button>
@@ -5155,6 +5159,17 @@ function deleteRepo(name){
   if(!confirm('Delete repo "'+name+'"?'))return;
   S.repos=(S.repos||[]).filter(r=>r.name!==name);
   save();reposRefresh();toast('Deleted');
+}
+async function reposHealthCheck(){
+  const repos=(S.repos||[]).filter(r=>r.live);
+  if(!repos.length){toast('No live URLs to check');return;}
+  toast('Checking '+repos.length+' live URLs...');
+  const results=await Promise.allSettled(repos.map(r=>fetch(r.live,{mode:'no-cors',cache:'no-cache'}).then(()=>({name:r.name,ok:true})).catch(()=>({name:r.name,ok:false}))));
+  const summary=results.map(r=>r.value||r.reason);
+  const up=summary.filter(s=>s&&s.ok).length;
+  toast(up+'/'+repos.length+' repos responding');
+  summary.forEach(s=>{if(s){const repo=(S.repos||[]).find(r=>r.name===s.name);if(repo){repo.lastCheck=new Date().toISOString();repo.lastCheckOk=s.ok;}}});
+  save();reposRefresh();
 }
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
