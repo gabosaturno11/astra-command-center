@@ -1004,6 +1004,7 @@ textarea{resize:vertical;line-height:1.6}
             <input type="text" class="specs-title-input" id="specs-title" placeholder="Project Name..." oninput="onSpecChange()">
             <button class="voice-btn" id="specs-voice-btn" onclick="toggleVoice('specs')" title="Voice Input">M</button>
             <button class="btn btn-sm" onclick="addSpecSection()">+ Section</button>
+            <input type="text" id="spec-search" placeholder="Search sections..." oninput="specSearch()" style="width:120px;font-size:10px;padding:4px 8px">
             <button class="btn btn-sm" onclick="collapseAllSections()" title="Collapse all">Collapse</button>
             <button class="btn btn-sm" onclick="expandAllSections()" title="Expand all">Expand</button>
           </div>
@@ -2299,7 +2300,7 @@ function renderTasks(){
 
 function addTask(){S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
 function addTaskFromTemplate(title,priority,recurrence){S.tasks.unshift({id:Date.now(),title,description:'',subtasks:[],status:'todo',priority:priority||'p2',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],recurrence:recurrence||'',created:new Date().toISOString()});save();renderTasks();toast('Added: '+title);document.querySelectorAll('.btn-group div[style*="display: block"],.btn-group div[style*="display:block"]').forEach(d=>d.style.display='none');}
-function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){t[f]=v;save();renderTasks();}}
+function updateTask(id,f,v){const t=S.tasks.find(x=>x.id===id);if(t){if(f==='status'&&v==='progress'&&!t.timeStarted)t.timeStarted=new Date().toISOString();if(f==='status'&&v!=='progress'&&t.timeStarted){t.timeSpent=(t.timeSpent||0)+Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);t.timeStarted=null;}t[f]=v;save();renderTasks();}}
 function toggleTask(id){const t=S.tasks.find(x=>x.id===id);if(t){const wasDone=t.status==='done';t.status=wasDone?'todo':'done';if(!wasDone&&t.recurrence&&t.due){const nd=getNextRecurDate(t.due,t.recurrence);S.tasks.unshift({id:Date.now(),title:t.title,description:t.description||'',subtasks:(t.subtasks||[]).map(s=>({...s,done:false})),status:'todo',priority:t.priority,project:t.project,due:nd,recurrence:t.recurrence,created:new Date().toISOString()});t.lastRecurred=new Date().toISOString().split('T')[0];toast('Recurring task created for '+nd);}save();renderTasks();}}
 function getNextRecurDate(dateStr,recur){const d=new Date(dateStr+'T12:00:00');if(recur==='daily')d.setDate(d.getDate()+1);else if(recur==='weekday'){d.setDate(d.getDate()+1);while(d.getDay()===0||d.getDay()===6)d.setDate(d.getDate()+1);}else if(recur==='weekly')d.setDate(d.getDate()+7);else if(recur==='biweekly')d.setDate(d.getDate()+14);else if(recur==='monthly')d.setMonth(d.getMonth()+1);return d.toISOString().split('T')[0];}
 function deleteTask(id){S.tasks=S.tasks.filter(t=>t.id!==id);save();renderTasks();toast('Deleted');}
@@ -2378,11 +2379,15 @@ function openTaskDetail(id) {
   document.getElementById('td-due').value = t.due || '';
   document.getElementById('td-recur').value = t.recurrence || '';
   document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
-  document.getElementById('td-created').textContent = t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+  if(t.timeSpent)timeText+=' | Time: '+formatTimeSpent(t.timeSpent);
+  if(t.timeStarted)timeText+=' | Started: '+timeAgo(t.timeStarted);
+  document.getElementById('td-created').textContent = timeText;
   renderSubtasksInModal(t.subtasks || []);
   document.getElementById('task-detail-modal').classList.add('open');
   setTimeout(()=>document.getElementById('td-title').focus(),100);
 }
+function formatTimeSpent(mins){if(mins<60)return mins+'m';const h=Math.floor(mins/60);const m=mins%60;return h+'h'+(m?' '+m+'m':'');}
 function tdSetDue(days){const d=new Date();d.setDate(d.getDate()+days);document.getElementById('td-due').value=d.toISOString().split('T')[0];}
 function closeTaskDetail() {
   document.getElementById('task-detail-modal').classList.remove('open');
@@ -2795,6 +2800,7 @@ const specColorList=['#4ade80','#22d3ee','#8b5cf6','#f59e0b','#ef4444','#a78bfa'
 function cycleSecIcon(id){const s=getActiveSpec();if(!s)return;const sec=s.sections.find(x=>String(x.id)===String(id));if(!sec)return;const cur=specIconList.indexOf(sec.icon||'file');sec.icon=specIconList[(cur+1)%specIconList.length];const ci=specColorList.indexOf(sec.color||'#8b8b8b');sec.color=specColorList[(ci+1)%specColorList.length];save();renderSpecSections();}
 function collapseAllSections(){const s=getActiveSpec();if(!s)return;snapshotSpec();s.sections.forEach(x=>x.collapsed=true);save();renderSpecSections();}
 function expandAllSections(){const s=getActiveSpec();if(!s)return;snapshotSpec();s.sections.forEach(x=>x.collapsed=false);save();renderSpecSections();}
+function specSearch(){const q=(document.getElementById('spec-search')?.value||'').toLowerCase();const s=getActiveSpec();if(!s)return;if(!q){s.sections.forEach(x=>x.collapsed=false);renderSpecSections();return;}s.sections.forEach(sec=>{const title=(sec.title||'').toLowerCase();const d=document.createElement('div');d.innerHTML=sec.body||'';const body=(d.innerText||'').toLowerCase();sec.collapsed=!(title.includes(q)||body.includes(q));});renderSpecSections();}
 function onSpecChange(){clearTimeout(specTimer);document.getElementById('specs-status').textContent='Unsaved';document.getElementById('specs-status').style.color='var(--yellow)';specTimer=setTimeout(()=>{snapshotSpec();save();renderSpecList();document.getElementById('specs-status').textContent='Saved';document.getElementById('specs-status').style.color='var(--green)';updateSpecStatus();},1000);}
 function updateSpecStatus(){const s=getActiveSpec();if(!s)return;let total=0;(s.sections||[]).forEach(sec=>{total+=countW(sec.body);});document.getElementById('specs-word-count').textContent=total+' words';}
 function specExport(fmt){if(!fmt)return;snapshotSpec();const s=getActiveSpec();if(!s)return;const t=s.title||'spec';let c;if(fmt==='clipboard'){let txt=t+'\n'+'='.repeat(t.length)+'\n\n';(s.sections||[]).forEach(sec=>{txt+=sec.title+'\n'+'-'.repeat(sec.title.length)+'\n';const d=document.createElement('div');d.innerHTML=sec.body||'';txt+=(d.innerText||'')+'\n\n';});navigator.clipboard.writeText(txt);toast('Copied');return;}if(fmt==='md'){c='# '+t+'\n\n';(s.sections||[]).forEach(sec=>{c+='## '+sec.title+'\n\n';c+=htmlToMd(sec.body||'',null).replace(/^# .*\n\n/,'')+'\n';});}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px;border-bottom:2px solid #eee;padding-bottom:8px}h2{font-size:20px;margin-top:24px;color:#333}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}</style></head><body><h1>${esc(t)}</h1>`+(s.sections||[]).map(sec=>`<h2>${esc(sec.title)}</h2>${sec.body||''}`).join('')+'</body></html>';}const blob=new Blob([c],{type:fmt==='md'?'text/markdown':'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+(fmt==='md'?'md':'html');a.click();toast('Exported');}
