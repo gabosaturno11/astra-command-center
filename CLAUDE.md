@@ -98,27 +98,43 @@ Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
 - Living docs dedup
 - Project tasks use projectId (data integrity)
 
-**SECTION HEALTH (post-session):**
+**CONTINUED SESSION FEATURES (8 more commits, 28+ total):**
+14. Repos: Add/Edit/Delete modal with role/status/desc fields
+15. Pipeline: API status indicator, text-only guidance, local history fallback
+16. Content: double-click inline editing, bulk select/delete/tag, sort by 5 criteria
+17. Project header: stats bar (task/doc/KB/link counts per project)
+18. Sidebar context: section-specific stats (tasks overdue, content word count, writer stats)
+19. Links: URL validation, creation dates shown
+20. Spec sections: drag-and-drop reorder with drag handles
+21. Save indicator shows timestamp
+22. Quick Capture: "Link" type with URL validation
+23. Task: sort by manual/priority/due/newest/alpha
+24. Task: recurrence (daily/weekday/weekly/biweekly/monthly) auto-creates next on complete
+25. Task: duplicate button in detail modal, delete requires confirm
+26. Board cards: overdue dates shown in red with "!" indicator
+27. Task templates: dropdown with 5 recurring presets
+
+**SECTION HEALTH (updated):**
 | Section | Health | Notes |
 |---------|--------|-------|
-| Tasks | 90% | Board + list + detail modal + subtasks + priority colors + search |
-| Calendar | 85% | Month + week + click-create + drag-drop + ICS export |
-| Writer | 90% | Editor + Zen Writer + versions + export + auto-save |
-| Living Docs | 85% | Sections + icons + colors + global docs + export |
-| Content | 75% | Cards expand + word count + search + tags |
-| Links | 80% | Favicons + categories + search + project assignment |
+| Tasks | 95% | Board + list + detail + subtasks + priority colors + search + sort + recurrence + templates + duplicate + overdue |
+| Calendar | 85% | Month + week + click-create + drag-drop + ICS export + priority colors |
+| Writer | 92% | Editor + Zen Writer + versions + export + auto-save + word goals + sorted doc list |
+| Living Docs | 90% | Sections + icons + colors + global docs + export + drag-drop reorder |
+| Content | 88% | Cards expand + inline edit + bulk ops + sort + search + tags + word count |
+| Links | 85% | Favicons + categories + search + project assignment + URL validation + dates |
 | Whiteboard | 85% | Canvas tools solid |
-| Repos | 70% | Static data with links |
-| Pipeline | 50% | UI exists, needs Whisper API key |
+| Repos | 82% | Static data + CRUD modal + role/status badges |
+| Pipeline | 65% | UI + local history + API status + text-only guidance |
 | Cmd+K | 95% | Searches everything, opens task detail |
 
 **REMAINING:**
 - Bonus page shipping (prerequisite: ASTRA stable - NOW IT IS)
-- Pipeline Whisper API key in Vercel env
-- BLOB_READ_WRITE_TOKEN verification
-- Content inline editing (not modal-only)
+- Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
 - Link OG metadata previews
 - Google Calendar sync (future)
+- Task: custom template creation
+- Content: drag to reorder
 
 ---
 
