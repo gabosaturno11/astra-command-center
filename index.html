@@ -1093,6 +1093,7 @@ textarea{resize:vertical;line-height:1.6}
             <div style="display:flex;gap:6px">
               <button class="btn btn-sm" onclick="plCopyResult()">Copy</button>
               <button class="btn btn-sm" onclick="plSaveCapture()">Save to ASTRA</button>
+              <button class="btn btn-sm" onclick="plClearResult()">New</button>
             </div>
           </div>
           <div id="pl-transcript-box" style="display:none;padding:8px;background:var(--bg-primary);border:1px solid var(--border);border-radius:3px;margin-bottom:8px;font-size:10px;color:var(--text-muted);max-height:80px;overflow-y:auto">
@@ -1102,7 +1103,10 @@ textarea{resize:vertical;line-height:1.6}
           <div id="pl-synthesis-text" style="font-size:12px;line-height:1.6;white-space:pre-wrap"></div>
         </div>
         <div id="pl-history" style="display:none">
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px">Pipeline History</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">Pipeline History</span>
+            <button class="btn btn-sm btn-ghost btn-danger" onclick="if(confirm('Clear all pipeline history?')){S.pipelineHistory=[];save();plLoadHistory();plLoadHistory();toast('Cleared');}" style="font-size:8px;padding:1px 6px">Clear all</button>
+          </div>
           <div id="pl-history-list"></div>
         </div>
       </div>
@@ -2020,6 +2024,7 @@ function showTodayView() {
 }
 function toast(m) { const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2000); }
 function esc(s) { const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+function highlight(text,q){if(!q)return esc(text);const e=esc(text);const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return e.replace(re,'<mark style="background:rgba(74,222,128,0.25);color:var(--text);border-radius:2px;padding:0 1px">$1</mark>');}
 function escA(s) { return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
 // === SECTIONS ===
@@ -2095,7 +2100,7 @@ function renderContent() {
   else if(sortVal==='shortest')items.sort((a,b)=>a.body.length-b.body.length);
   else if(sortVal==='alpha')items.sort((a,b)=>a.body.localeCompare(b.body));
   const g=document.getElementById('content-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No content yet. Click + Add to paste from Apple Notes.</div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))">${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${parseWikiLinks(esc(c.body))}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:items.map(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))">${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('content-count').textContent=S.content.length;
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -2602,7 +2607,7 @@ function renderLinks(){
   const q=(document.getElementById('link-search')?.value||'').toLowerCase();
   let items=S.links;if(linkCategory!=='all')items=items.filter(l=>l.category===linkCategory);if(q)items=items.filter(l=>(l.title+' '+l.url+' '+l.desc).toLowerCase().includes(q));
   const g=document.getElementById('links-grid');
-  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:12px">No links. Click + Add.</div>`:items.map(l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')"><div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div></div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}${l.projectId?(()=>{const p=(S.projects||[]).find(x=>x.id===l.projectId);return p?`<span class="badge badge-muted" style="font-size:7px">${esc(p.name)}</span>`:''})():''}${l.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(l.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;}).join('');
+  g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">L</div><div style="font-size:12px">${q?'No matching links':'No links saved'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search':'Click + Add to save bookmarks and resources'}</div></div>`:items.map(l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')"><div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div></div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue">${esc(l.category)}</span>`:''}${l.projectId?(()=>{const p=(S.projects||[]).find(x=>x.id===l.projectId);return p?`<span class="badge badge-muted" style="font-size:7px">${esc(p.name)}</span>`:''})():''}${l.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(l.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;}).join('');
   document.getElementById('links-count').textContent=S.links.length;
 }
 function setLinkCat(c,el){linkCategory=c;document.querySelectorAll('#link-category-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderLinks();}
@@ -4734,12 +4739,23 @@ async function plLoadHistory() {
   } catch(e){}
   if(!results.length && S.pipelineHistory && S.pipelineHistory.length){results=S.pipelineHistory;source='local';}
   if(results.length>0){
-    listDiv.innerHTML=(source==='local'?'<div style="font-size:9px;color:var(--text-muted);margin-bottom:8px;padding:4px 8px;background:var(--bg-elevated);border-radius:3px">Showing local history</div>':'')+results.map(r=>'<div style="padding:10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span class="badge badge-blue" style="font-size:9px">'+esc(r.inputType||'text')+'</span><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div>'+(r.prompt?'<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;font-style:italic">'+esc(r.prompt)+'</div>':'')+'<div style="font-size:11px;line-height:1.5;color:var(--text-secondary)">'+esc((r.preview||'').substring(0,150))+(r.preview&&r.preview.length>150?'...':'')+'</div><div style="display:flex;gap:4px;margin-top:6px"><button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText(\''+escA(r.preview||'')+'\');toast(\'Copied\')">Copy</button></div></div>').join('');
+    const srcColors={'pipeline-manual':'var(--accent)','pipeline-whatsapp':'#25d366','pipeline-voice':'#a855f7','pipeline-capture':'#fbbf24'};
+    listDiv.innerHTML=(source==='local'?'<div style="font-size:9px;color:var(--text-muted);margin-bottom:8px;padding:4px 8px;background:var(--bg-elevated);border-radius:3px">Showing local history ('+results.length+' entries)</div>':'')+results.map((r,i)=>{const full=r.preview||'';const short=full.length>150?full.substring(0,150)+'...':full;const sc=srcColors[r.source]||'var(--text-muted)';const srcLabel=(r.source||'').replace('pipeline-','');return '<div style="padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="this.querySelector(\'.pl-full\').style.display=this.querySelector(\'.pl-full\').style.display===\'none\'?\'block\':\'none\';this.querySelector(\'.pl-short\').style.display=this.querySelector(\'.pl-short\').style.display===\'none\'?\'block\':\'none\'"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px"><div style="display:flex;gap:4px;align-items:center"><span class="badge badge-blue" style="font-size:9px">'+esc(r.inputType||'text')+'</span><span style="font-size:8px;padding:2px 6px;border-radius:3px;border:1px solid '+sc+';color:'+sc+'">'+esc(srcLabel||'manual')+'</span></div><span style="font-size:9px;color:var(--text-muted)">'+new Date(r.createdAt).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+'</span></div>'+(r.prompt?'<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;font-style:italic;border-left:2px solid var(--accent);padding-left:8px">'+esc(r.prompt)+'</div>':'')+'<div class="pl-short" style="font-size:11px;line-height:1.5;color:var(--text-secondary)">'+esc(short)+(full.length>150?' <span style="color:var(--accent);font-size:9px">[click to expand]</span>':'')+'</div><div class="pl-full" style="display:none;font-size:11px;line-height:1.6;color:var(--text);white-space:pre-wrap">'+esc(full)+'</div><div style="display:flex;gap:4px;margin-top:8px" onclick="event.stopPropagation()"><button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText('+JSON.stringify(full).replace(/'/g,"\\'")+');toast(\'Copied\')">Copy</button><button class="btn btn-sm btn-ghost btn-danger" onclick="plDeleteEntry('+i+');event.stopPropagation()">Delete</button></div></div>';}).join('');
   } else {
-    listDiv.innerHTML='<div style="font-size:10px;color:var(--text-muted)">No pipeline history yet. Paste text, write a prompt, and hit Process.</div>';
+    listDiv.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">P</div><div style="font-size:11px">No pipeline history yet</div><div style="font-size:10px;margin-top:4px">Paste text, write a prompt, and hit Process</div></div>';
   }
 }
 
+function plDeleteEntry(idx){
+  if(!confirm('Delete this pipeline entry?'))return;
+  if(S.pipelineHistory&&S.pipelineHistory[idx]){S.pipelineHistory.splice(idx,1);save();plLoadHistory();plLoadHistory();toast('Deleted');}
+}
+function plClearResult(){
+  document.getElementById('pl-result').style.display='none';
+  document.getElementById('pl-input-preview').style.display='none';
+  plAudioBlob=null;plTranscriptText='';plSynthesisText='';
+  document.getElementById('pl-prompt').value='';
+}
 async function plViewEntry(id) {
   try {
     const res=await fetch(ASTRA_API+'/api/pipeline',{headers:{'Authorization':'Bearer '+ASTRA_ADMIN_PW}});
@@ -4754,33 +4770,45 @@ async function plViewEntry(id) {
 }
 
 // === REPOS ===
+function timeAgo(dateStr){
+  if(!dateStr)return '';
+  const d=new Date(dateStr),now=new Date(),ms=now-d,s=Math.floor(ms/1000),m=Math.floor(s/60),h=Math.floor(m/60),dy=Math.floor(h/24);
+  if(dy>30)return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  if(dy>0)return dy+'d ago';if(h>0)return h+'h ago';if(m>0)return m+'m ago';return 'just now';
+}
 function reposRefresh() {
   if(!S.repos || !S.repos.length) {
     S.repos = [
-      { name:'astra-command-center', github:'https://github.com/gabosaturno11/astra-command-center', live:'https://astra-command-center-sigma.vercel.app', role:'backend-hub', status:'active', desc:'ASTRA V2 command center, project hub, KB, whiteboard, API backend' },
-      { name:'saturno-bonus', github:'https://github.com/gabosaturno11/saturno-bonus', live:'https://saturno-bonus-omega.vercel.app', role:'customer-facing', status:'active', desc:'Bonus vault for SM Academy customers. 60 tools, 15 PDFs, music player.' },
-      { name:'titan-forge', github:'https://github.com/gabosaturno11/titan-forge', live:'https://titan-forge-ten.vercel.app', role:'internal-tools', status:'active', desc:'Internal tools collection. Bonus page moved out to saturno-bonus.' },
-      { name:'de-aqui-a-saturno', github:'https://github.com/gabosaturno11/de-aqui-a-saturno', live:'https://de-aqui-a-saturno-jet.vercel.app', role:'experience', status:'complete', desc:'Valentine crystal cosmic scroll. Gate, 18 chapters, 11 love dimensions.' },
-      { name:'nexus-capture', github:'https://github.com/gabosaturno11/nexus-capture', live:null, role:'extension', status:'active', desc:'Chrome extension for universal highlight capture. Routes to ASTRA API.' },
+      { name:'astra-command-center', github:'https://github.com/gabosaturno11/astra-command-center', live:'https://astra-command-center-sigma.vercel.app', role:'backend-hub', status:'active', desc:'ASTRA V2 command center, project hub, KB, whiteboard, API backend', updatedAt:new Date().toISOString() },
+      { name:'saturno-bonus', github:'https://github.com/gabosaturno11/saturno-bonus', live:'https://saturno-bonus-omega.vercel.app', role:'customer-facing', status:'active', desc:'Bonus vault for SM Academy customers. 60 tools, 15 PDFs, music player.', updatedAt:new Date().toISOString() },
+      { name:'titan-forge', github:'https://github.com/gabosaturno11/titan-forge', live:'https://titan-forge-ten.vercel.app', role:'internal-tools', status:'active', desc:'Internal tools collection. Bonus page moved out to saturno-bonus.', updatedAt:new Date().toISOString() },
+      { name:'de-aqui-a-saturno', github:'https://github.com/gabosaturno11/de-aqui-a-saturno', live:'https://de-aqui-a-saturno-jet.vercel.app', role:'experience', status:'complete', desc:'Valentine crystal cosmic scroll. Gate, 18 chapters, 11 love dimensions.', updatedAt:'2026-02-14T00:00:00Z' },
+      { name:'nexus-capture', github:'https://github.com/gabosaturno11/nexus-capture', live:null, role:'extension', status:'active', desc:'Chrome extension for universal highlight capture. Routes to ASTRA API.', updatedAt:new Date().toISOString() },
     ];
     save();
   }
   const grid=document.getElementById('repos-grid');
   if(!grid) return;
   const roleColors={'backend-hub':'var(--accent)','customer-facing':'#22d3ee','internal-tools':'#a855f7','experience':'#f472b6','extension':'#fbbf24'};
+  const roleIcons={'backend-hub':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>','customer-facing':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>','internal-tools':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>','experience':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>','extension':'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>'};
   grid.innerHTML=S.repos.map(r=>{
     const rc=roleColors[r.role]||'var(--text-muted)';
     const sc=r.status==='active'?'var(--green)':r.status==='complete'?'var(--accent-cyan)':'var(--text-muted)';
-    return `<div style="padding:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);transition:all 0.15s">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px;font-weight:600;color:var(--text)">${esc(r.name)}</span>
+    const icon=roleIcons[r.role]||'';
+    return `<div style="padding:14px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);transition:all 0.15s" onmouseenter="this.style.borderColor='rgba(255,255,255,0.08)'" onmouseleave="this.style.borderColor='var(--border)'">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="color:${rc};flex-shrink:0">${icon}</span>
+        <span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${esc(r.name)}</span>
         <span style="width:8px;height:8px;border-radius:50%;background:${sc}" title="${r.status}"></span>
       </div>
-      <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc};margin-bottom:6px">${esc(r.role)}</div>
-      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">${esc(r.desc)}</div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-        <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none">GitHub</a>
-        ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none">${r.live.replace('https://','')}</a>`:'<span style="font-size:10px;color:var(--text-muted)">Local only</span>'}
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc}">${esc(r.role)}</span>
+        ${r.updatedAt?'<span style="font-size:8px;color:var(--text-muted)">'+timeAgo(r.updatedAt)+'</span>':''}
+      </div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">${esc(r.desc)}</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <a href="${escA(r.github)}" target="_blank" style="font-size:10px;color:var(--text-muted);text-decoration:none;display:flex;align-items:center;gap:3px"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg> repo</a>
+        ${r.live?`<a href="${escA(r.live)}" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block"></span> live</a>`:'<span style="font-size:10px;color:var(--text-muted)">local only</span>'}
         <span style="flex:1"></span>
         <button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openRepoModal('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Edit</button>
         <button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();deleteRepo('${escA(r.name)}')" style="font-size:9px;padding:2px 6px">Del</button>
@@ -4807,7 +4835,7 @@ function closeRepoModal(){document.getElementById('repo-modal').classList.remove
 function saveRepo(){
   const name=document.getElementById('rm-name').value.trim();
   if(!name){toast('Name required');return;}
-  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim()};
+  const data={name,github:document.getElementById('rm-github').value.trim(),live:document.getElementById('rm-live').value.trim()||null,role:document.getElementById('rm-role').value,status:document.getElementById('rm-status').value,desc:document.getElementById('rm-desc').value.trim(),updatedAt:new Date().toISOString()};
   if(!S.repos)S.repos=[];
   if(editingRepoName){
     const idx=S.repos.findIndex(r=>r.name===editingRepoName);
