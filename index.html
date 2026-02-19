@@ -431,6 +431,7 @@ textarea{resize:vertical;line-height:1.6}
 .wb-node-color{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
 .wb-node-del{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;border:none;font-size:10px;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:20}
 .wb-node:hover .wb-node-del{display:flex}
+.wb-node:hover .wb-node-color-btn{opacity:0.7}
 .wb-node-resize{position:absolute;bottom:0;right:0;width:12px;height:12px;cursor:nwse-resize;z-index:15}
 .wb-node-port{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg-surface);cursor:crosshair;z-index:15;opacity:0;transition:opacity 0.15s}
 .wb-node:hover .wb-node-port{opacity:1}
@@ -3797,6 +3798,33 @@ function exportSummary(){
     const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-summary-'+today+'.md';a.click();toast('Summary downloaded');
   });
 }
+function dailyDashboard(){
+  const today=new Date().toISOString().split('T')[0];
+  const todayLabel=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const overdue=active.filter(t=>t.due&&t.due<today);
+  const dueToday=active.filter(t=>t.due===today);
+  const inProgress=active.filter(t=>t.status==='progress');
+  const blocked=active.filter(t=>t.status==='blocked');
+  const doneToday=S.tasks.filter(t=>t.status==='done'&&t.log&&t.log.some(e=>e.to==='done'&&e.at&&e.at.startsWith(today)));
+  const weekStart=new Date();weekStart.setDate(weekStart.getDate()-weekStart.getDay());
+  const doneThisWeek=S.tasks.filter(t=>t.status==='done'&&t.log&&t.log.some(e=>e.to==='done'&&e.at>=weekStart.toISOString()));
+  let md='# Daily Dashboard: '+todayLabel+'\n\n';
+  md+='## Priority Focus\n';
+  if(overdue.length){md+='### OVERDUE ('+overdue.length+')\n';overdue.forEach(t=>md+='- ['+t.priority+'] '+t.title+' (due '+t.due+')\n');md+='\n';}
+  if(dueToday.length){md+='### Due Today ('+dueToday.length+')\n';dueToday.forEach(t=>md+='- ['+t.priority+'] '+t.title+(t.project?' ['+t.project+']':'')+'\n');md+='\n';}
+  if(inProgress.length){md+='### In Progress ('+inProgress.length+')\n';inProgress.forEach(t=>md+='- '+t.title+(t.timeStarted?' (timer running)':'')+(t.estimate?' ~'+t.estimate:'')+'\n');md+='\n';}
+  if(blocked.length){md+='### Blocked ('+blocked.length+')\n';blocked.forEach(t=>md+='- '+t.title+(t.blockedBy?' (by: '+t.blockedBy+')':'')+'\n');md+='\n';}
+  md+='## Stats\n';
+  md+='- Tasks: '+active.length+' active, '+doneToday.length+' done today, '+doneThisWeek.length+' done this week\n';
+  md+='- Content: '+S.content.length+' items\n';
+  md+='- Documents: '+S.docs.length+' docs, '+S.specs.length+' living docs\n';
+  md+='- Links: '+S.links.length+'\n';
+  const tracked=S.tasks.filter(t=>t.timeSpent||t.timeStarted);
+  if(tracked.length){let total=0;tracked.forEach(t=>{let m=t.timeSpent||0;if(t.timeStarted)m+=Math.round((Date.now()-new Date(t.timeStarted).getTime())/60000);total+=m;});md+='- Time tracked: '+formatTimeSpent(total)+' across '+tracked.length+' tasks\n';}
+  md+='\n---\n*Generated from SATURNO HUB*\n';
+  navigator.clipboard.writeText(md).then(()=>toast('Daily dashboard copied to clipboard'));
+}
 function dataStats(){
   const raw=localStorage.getItem(SK)||'';const bytes=new Blob([raw]).size;const kb=(bytes/1024).toFixed(1);
   const taskBytes=new Blob([JSON.stringify(S.tasks)]).size;
@@ -4078,6 +4106,7 @@ function wbRender() {
       <div class="wb-node-header" contenteditable="true" style="color:${textColor}" onblur="wbNodeEdit(${n.id},'title',this.textContent)" onclick="event.stopPropagation()">${esc(n.title)}</div>
       <div class="wb-node-body" contenteditable="true" style="color:${isSticky?'#333':'var(--text-secondary)'}" onblur="wbNodeEdit(${n.id},'body',this.textContent)" onclick="event.stopPropagation()">${esc(n.body)}</div>
       <button class="wb-node-del" onclick="event.stopPropagation();wbDeleteNode(${n.id})">x</button>
+      <button class="wb-node-color-btn" onclick="event.stopPropagation();wbPickColor(${n.id})" style="position:absolute;top:2px;right:20px;width:14px;height:14px;border:none;border-radius:50%;background:${n.color};cursor:pointer;opacity:0;transition:opacity 0.15s" title="Change color"></button>
       <div class="wb-node-resize" onmousedown="event.stopPropagation();wbResizeStart(event,${n.id})"></div>
       <div class="wb-node-port wb-port-right" onmousedown="event.stopPropagation();wbConnStartFn(event,${n.id},'right')"></div>
       <div class="wb-node-port wb-port-bottom" onmousedown="event.stopPropagation();wbConnStartFn(event,${n.id},'bottom')"></div>
@@ -4151,6 +4180,17 @@ function wbCanvasUp(e) {
 
 function wbResizeStart(e, id) { const n = wbNodes.find(x => x.id === id); if(n) wbResizing = { id, ox: e.clientX, oy: e.clientY, sw: n.w, sh: n.h }; }
 function wbNodeEdit(id, field, val) { const n = wbNodes.find(x => x.id === id); if(n) { n[field] = val; wbSaveState(); }}
+function wbPickColor(id){
+  const n=wbNodes.find(x=>x.id===id);if(!n)return;
+  const colors=['#4ade80','#22d3ee','#3b82f6','#a855f7','#f472b6','#f87171','#fbbf24','#fb923c','#6366f1','#14b8a6','#ef4444','#84cc16'];
+  const el=document.createElement('div');
+  el.style.cssText='position:fixed;z-index:9999;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:8px;display:grid;grid-template-columns:repeat(4,24px);gap:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5)';
+  el.style.left=(event.clientX-40)+'px';el.style.top=(event.clientY+10)+'px';
+  colors.forEach(c=>{const b=document.createElement('div');b.style.cssText='width:24px;height:24px;border-radius:50%;cursor:pointer;border:2px solid '+(n.color===c?'white':'transparent');b.style.background=c;b.onclick=()=>{n.color=c;wbSaveState();wbRender();el.remove();};el.appendChild(b);});
+  document.body.appendChild(el);
+  const close=e=>{if(!el.contains(e.target)){el.remove();document.removeEventListener('mousedown',close);}};
+  setTimeout(()=>document.addEventListener('mousedown',close),10);
+}
 function wbDeleteNode(id) { wbNodes = wbNodes.filter(n => n.id !== id); wbConns = wbConns.filter(c => c.from !== id && c.to !== id); if(wbSelected === id) wbSelected = null; wbSaveState(); wbRender(); toast('Deleted'); }
 function wbConnStartFn(e, id, port) { wbConnStart = { id, port }; wbTool = 'connect'; document.getElementById('wb-canvas-wrap').style.cursor = 'crosshair'; document.addEventListener('mouseup', wbConnEnd, { once: true }); }
 function wbConnEnd(e) {
@@ -4707,6 +4747,8 @@ function cmdGetItems(q) {
   if(!ql || 'repo health check ping'.includes(ql)) items.push({title:'Repo Health Check', desc:'Ping all live repo URLs', icon:'R', type:'action', action:()=>{closeCommandPalette();repoHealthCheck();}});
   if(!ql || 'time report hours tracked'.includes(ql)) items.push({title:'Time Report', desc:'Show time tracked per task', icon:'T', type:'action', action:()=>{closeCommandPalette();timeReport();}});
   if(!ql || 'zen writer write focus'.includes(ql)) items.push({title:'Zen Writer', desc:'Full-screen distraction-free writing (Cmd+Shift+W)', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
+  if(!ql || 'daily dashboard digest briefing morning'.includes(ql)) items.push({title:'Daily Dashboard', desc:'Full daily briefing copied to clipboard', icon:'*', type:'action', action:()=>{closeCommandPalette();dailyDashboard();}});
+  if(!ql || 'import ics calendar'.includes(ql)) items.push({title:'Import ICS', desc:'Import .ics calendar file as tasks', icon:'C', type:'action', action:()=>{closeCommandPalette();importICS();}});
   // Open specific docs in Zen Writer
   if(ql && ('zen '.includes(ql.substring(0,4)) || ql.startsWith('zen '))) {
     S.docs.forEach(function(d) {
