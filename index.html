@@ -823,6 +823,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
             <button class="btn btn-sm" onclick="contentBulkTag()">Tag Selected</button>
             <button class="btn btn-sm" onclick="mergeContent()">Merge Selected</button>
+            <button class="btn btn-sm" onclick="contentBulkExport()">Export Selected</button>
             <button class="btn btn-sm" onclick="toggleContentBulk()">Cancel</button>
           </div>
           <button class="btn btn-primary btn-sm" onclick="openContentModal()">+ Add</button>
@@ -885,10 +886,10 @@ textarea{resize:vertical;line-height:1.6}
           <div id="task-rows"></div>
         </div>
         <div class="board-view" id="task-board-view">
-          <div class="board-col"><div class="board-col-header"><span class="board-col-title">To Do</span><span class="board-col-count" id="bc-todo">0</span></div><div class="board-col-tasks" id="board-todo" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'todo')"></div></div>
-          <div class="board-col"><div class="board-col-header"><span class="board-col-title">In Progress</span><span class="board-col-count" id="bc-progress">0</span></div><div class="board-col-tasks" id="board-progress" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'progress')"></div></div>
-          <div class="board-col"><div class="board-col-header"><span class="board-col-title">Done</span><span class="board-col-count" id="bc-done">0</span></div><div class="board-col-tasks" id="board-done" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'done')"></div></div>
-          <div class="board-col"><div class="board-col-header"><span class="board-col-title">Blocked</span><span class="board-col-count" id="bc-blocked">0</span></div><div class="board-col-tasks" id="board-blocked" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'blocked')"></div></div>
+          <div class="board-col"><div class="board-col-header"><span class="board-col-title">To Do</span><span class="board-col-count" id="bc-todo" oncontextmenu="event.preventDefault();boardMoveAll('todo')">0</span></div><div class="board-col-tasks" id="board-todo" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'todo')"></div></div>
+          <div class="board-col"><div class="board-col-header"><span class="board-col-title">In Progress</span><span class="board-col-count" id="bc-progress" oncontextmenu="event.preventDefault();boardMoveAll('progress')">0</span></div><div class="board-col-tasks" id="board-progress" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'progress')"></div></div>
+          <div class="board-col"><div class="board-col-header"><span class="board-col-title">Done</span><span class="board-col-count" id="bc-done" oncontextmenu="event.preventDefault();boardMoveAll('done')">0</span></div><div class="board-col-tasks" id="board-done" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'done')"></div></div>
+          <div class="board-col"><div class="board-col-header"><span class="board-col-title">Blocked</span><span class="board-col-count" id="bc-blocked" oncontextmenu="event.preventDefault();boardMoveAll('blocked')">0</span></div><div class="board-col-tasks" id="board-blocked" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'blocked')"></div></div>
         </div>
       </div>
     </div>
@@ -2296,6 +2297,13 @@ function contentBulkTag(){
   S.content.forEach(c=>{if(contentSelected.has(c.id)){if(!c.tags)c.tags=[];if(!c.tags.includes(t))c.tags.push(t);}});
   save();contentSelected.clear();renderContent();toast('Tagged');
 }
+function contentBulkExport(){
+  if(!contentSelected.size){toast('Select items first');return;}
+  const items=[...contentSelected].map(id=>S.content.find(c=>c.id===id)).filter(Boolean);
+  let md='# Selected Content Export\n'+items.length+' items\n\n';
+  items.forEach(c=>{md+=`## ${c.theme||c.type||'Content'}\n${c.body}\n`;if(c.tags&&c.tags.length)md+='Tags: '+c.tags.join(', ')+'\n';md+='\n---\n\n';});
+  navigator.clipboard.writeText(md).then(()=>toast('Exported '+items.length+' items to clipboard'));
+}
 function contentInlineEdit(id,el,e){
   e.stopPropagation();e.preventDefault();
   const c=S.content.find(x=>x.id===id);if(!c)return;
@@ -2436,6 +2444,15 @@ function taskDrop(e,targetId){e.preventDefault();e.currentTarget.classList.remov
 let boardDragId=null;
 function boardDragStart(e,id){boardDragId=id;e.dataTransfer.effectAllowed='move';}
 function boardDrop(e,status){e.preventDefault();if(boardDragId){const t=S.tasks.find(x=>x.id===boardDragId);if(t){t.status=status;save();renderTasks();}boardDragId=null;}}
+function boardMoveAll(fromStatus){
+  const targets=['todo','progress','done','blocked'].filter(s=>s!==fromStatus);
+  const to=prompt('Move all "'+fromStatus+'" tasks to:\n'+targets.join(', '));
+  if(!to||!targets.includes(to))return;
+  const items=getFilteredTasks().filter(t=>t.status===fromStatus);
+  if(!items.length){toast('No tasks to move');return;}
+  items.forEach(t=>{if(!t.log)t.log=[];t.log.push({from:t.status,to,at:new Date().toISOString()});t.status=to;});
+  save();renderTasks();toast('Moved '+items.length+' tasks to '+to);
+}
 
 // Task Detail Modal
 let taskDetailId = null;
@@ -3000,6 +3017,14 @@ function openFilteredLinks(){
   urls.forEach(l=>window.open(l.url,'_blank'));toast('Opened '+urls.length+' links');
 }
 function cpText(t){navigator.clipboard.writeText(t);toast('Copied');}
+function exportLinks(){
+  const cats=[...new Set(S.links.map(l=>l.category).filter(Boolean))].sort();
+  let md='# Links Export\n'+S.links.length+' links | '+new Date().toLocaleDateString()+'\n\n';
+  cats.forEach(c=>{md+='## '+c+'\n';S.links.filter(l=>l.category===c).forEach(l=>{md+='- ['+l.title+']('+l.url+')'+(l.desc?' — '+l.desc:'')+'\n';});md+='\n';});
+  const uncategorized=S.links.filter(l=>!l.category);
+  if(uncategorized.length){md+='## Other\n';uncategorized.forEach(l=>{md+='- ['+l.title+']('+l.url+')'+(l.desc?' — '+l.desc:'')+'\n';});md+='\n';}
+  navigator.clipboard.writeText(md).then(()=>toast('Links exported to clipboard'));
+}
 
 // === PROJECTS ===
 let activeProject = null;
@@ -4590,6 +4615,7 @@ function cmdGetItems(q) {
   if(!ql || 'standup daily'.includes(ql)) items.push({title:'Daily Standup', desc:'Copy standup summary to clipboard', icon:'S', type:'action', action:()=>{closeCommandPalette();generateStandup();}});
   if(!ql || 'export content'.includes(ql)) items.push({title:'Export Content', desc:'Copy all content as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportContent();}});
   if(!ql || 'export tasks'.includes(ql)) items.push({title:'Export Tasks', desc:'Copy filtered tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportTasks();}});
+  if(!ql || 'export links bookmarks'.includes(ql)) items.push({title:'Export Links', desc:'Copy all links as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportLinks();}});
   if(!ql || 'archive'.includes(ql)) items.push({title:'Archive Completed', desc:'Move done tasks to archive', icon:'A', type:'action', action:()=>{closeCommandPalette();archiveCompletedTasks();}});
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
