@@ -1644,9 +1644,12 @@ textarea{resize:vertical;line-height:1.6}
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Recurrence</label><select id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekday">Weekdays</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
-      <div class="td-field"><label>Blocked By</label><input type="text" id="td-blocked-by" placeholder="Task name or ID..." style="font-size:10px"></div>
+      <div class="td-field"><label>Estimate</label><input type="text" id="td-estimate" placeholder="e.g. 30m, 2h, 1d" style="font-size:10px"></div>
     </div>
-    <div id="td-recur-info" style="font-size:9px;color:var(--text-muted);padding:2px 0"></div>
+    <div style="display:flex;gap:8px;font-size:9px;color:var(--text-muted);padding:2px 0"><span id="td-recur-info"></span></div>
+    <div class="td-field-row">
+      <div class="td-field"><label>Blocked By</label><input type="text" id="td-blocked-by" placeholder="Task name..." style="font-size:10px"></div>
+    </div>
     <div class="td-field">
       <label>Subtasks</label>
       <div class="td-subtasks" id="td-subtasks"></div>
@@ -2318,7 +2321,7 @@ function renderTasks(){
     cnt.textContent=f.length;
     const wipLimit=st==='progress'?5:0;
     if(wipLimit&&f.length>wipLimit){cnt.style.color='var(--red)';cnt.title='WIP limit: '+wipLimit;}else{cnt.style.color='';cnt.title='';};
-    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
+    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':'var(--text-muted)'};font-family:var(--mono)">${t.due}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}</div></div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
   });
   const activeTasks=S.tasks.filter(t=>t.status!=='done').length;
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
@@ -2428,6 +2431,7 @@ function openTaskDetail(id) {
   document.getElementById('td-due').value = t.due || '';
   document.getElementById('td-recur').value = t.recurrence || '';
   document.getElementById('td-blocked-by').value = t.blockedBy || '';
+  document.getElementById('td-estimate').value = t.estimate || '';
   document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
   let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
   if(t.timeSpent)timeText+=' | Time: '+formatTimeSpent(t.timeSpent);
@@ -2485,6 +2489,7 @@ function saveTaskDetail() {
   t.due = document.getElementById('td-due').value;
   t.recurrence = document.getElementById('td-recur').value || '';
   t.blockedBy = document.getElementById('td-blocked-by').value.trim() || '';
+  t.estimate = document.getElementById('td-estimate').value.trim() || '';
   // Link to project ID if name matches
   if(t.project) { const p = (S.projects||[]).find(pr => pr.name === t.project); if(p) t.projectId = p.id; }
   save(); closeTaskDetail(); renderTasks();
@@ -2912,7 +2917,7 @@ function openLinkModal(id){editingLinkId=id||null;document.getElementById('link-
   cdl.innerHTML=cats.map(c=>`<option value="${esc(c)}">`).join('');
   document.getElementById('lm-category').setAttribute('list','link-cat-dl');if(id){const l=S.links.find(x=>x.id===id);if(l){document.getElementById('lm-title').value=l.title;document.getElementById('lm-url').value=l.url;document.getElementById('lm-category').value=l.category||'';document.getElementById('lm-desc').value=l.desc||'';projSel.value=l.projectId||'';}}else{document.getElementById('lm-title').value='';document.getElementById('lm-url').value='';document.getElementById('lm-category').value='';document.getElementById('lm-desc').value='';projSel.value=activeProject||'';}document.getElementById('link-modal').classList.add('open');setTimeout(()=>document.getElementById('lm-title').focus(),100);}
 function closeLinkModal(){document.getElementById('link-modal').classList.remove('open');editingLinkId=null;}
-function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim(),projId=document.getElementById('lm-project').value;if(!title||!url){toast('Title and URL required');return;}try{new URL(url);}catch(e){toast('Invalid URL format');return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;l.projectId=projId||undefined;}}else{const link={id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()};if(projId)link.projectId=projId;else if(activeProject)link.projectId=activeProject;S.links.push(link);}save();closeLinkModal();renderLinks();if(activeProject)renderProjLinks();toast(editingLinkId?'Updated':'Added');}
+function saveLink(){const title=document.getElementById('lm-title').value.trim(),url=document.getElementById('lm-url').value.trim(),cat=document.getElementById('lm-category').value.trim().toLowerCase(),desc=document.getElementById('lm-desc').value.trim(),projId=document.getElementById('lm-project').value;if(!title||!url){toast('Title and URL required');return;}try{new URL(url);}catch(e){toast('Invalid URL format');return;}if(!editingLinkId){const dup=S.links.find(l=>l.url===url);if(dup&&!confirm('URL already exists as "'+dup.title+'". Add anyway?'))return;}if(editingLinkId){const l=S.links.find(x=>x.id===editingLinkId);if(l){l.title=title;l.url=url;l.category=cat;l.desc=desc;l.projectId=projId||undefined;}}else{const link={id:Date.now(),title,url,category:cat,desc,created:new Date().toISOString()};if(projId)link.projectId=projId;else if(activeProject)link.projectId=activeProject;S.links.push(link);}save();closeLinkModal();renderLinks();if(activeProject)renderProjLinks();toast(editingLinkId?'Updated':'Added');}
 function suggestLinkTitle(){
   const urlEl=document.getElementById('lm-url'),titleEl=document.getElementById('lm-title');
   if(!urlEl||!titleEl||titleEl.value.trim())return;
