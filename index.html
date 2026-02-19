@@ -818,6 +818,7 @@ textarea{resize:vertical;line-height:1.6}
           <span id="content-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
           <button class="btn btn-sm" onclick="randomContent()" title="Random content for inspiration">Random</button>
           <button class="btn btn-sm" onclick="exportContent()" title="Export all content as markdown">Export</button>
+          <button class="btn btn-sm" onclick="contentManageTags()" title="Rename or delete tags">Tags</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -1353,6 +1354,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Today View</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+D</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Focus Mode</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+F</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Close/Escape</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Esc</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Export Section</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+E</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Show Shortcuts</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+/</span></div>
         <div style="font-weight:600;color:var(--text);margin:12px 0 8px">Whiteboard</div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Select</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">V</span></div>
@@ -2310,6 +2312,15 @@ function contentBulkExport(){
   let md='# Selected Content Export\n'+items.length+' items\n\n';
   items.forEach(c=>{md+=`## ${c.theme||c.type||'Content'}\n${c.body}\n`;if(c.tags&&c.tags.length)md+='Tags: '+c.tags.join(', ')+'\n';md+='\n---\n\n';});
   navigator.clipboard.writeText(md).then(()=>toast('Exported '+items.length+' items to clipboard'));
+}
+function contentManageTags(){
+  const allTags=[...new Set(S.content.flatMap(c=>c.tags||[]).filter(Boolean))].sort();
+  if(!allTags.length){toast('No tags to manage');return;}
+  const action=prompt('Tag Management\n\nTags: '+allTags.join(', ')+'\n\nType:\n- rename:oldtag:newtag\n- delete:tagname');
+  if(!action)return;
+  if(action.startsWith('rename:')){const parts=action.split(':');if(parts.length===3){const old=parts[1].trim(),nw=parts[2].trim();let count=0;S.content.forEach(c=>{if(c.tags){const i=c.tags.indexOf(old);if(i>=0){c.tags[i]=nw;count++;}}});save();renderContent();toast('Renamed "'+old+'" to "'+nw+'" in '+count+' items');}}
+  else if(action.startsWith('delete:')){const tag=action.substring(7).trim();let count=0;S.content.forEach(c=>{if(c.tags){const i=c.tags.indexOf(tag);if(i>=0){c.tags.splice(i,1);count++;}}});save();renderContent();toast('Removed "'+tag+'" from '+count+' items');}
+  else{toast('Use rename:old:new or delete:tagname');}
 }
 function contentInlineEdit(id,el,e){
   e.stopPropagation();e.preventDefault();
@@ -5084,6 +5095,10 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='d'||e.key==='D')) { e.preventDefault(); showTodayView(); return; }
   // Cmd+Shift+F: toggle focus mode
   if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='f'||e.key==='F')) { e.preventDefault(); const app=document.querySelector('.app');const isFocus=app.classList.contains('mode-focus');setMode(isFocus?'default':'focus'); return; }
+  // Cmd+Shift+W: open Zen Writer
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='w'||e.key==='W')) { e.preventDefault(); zenOpen(); return; }
+  // Cmd+Shift+E: export current section
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='e'||e.key==='E')) { e.preventDefault(); if(currentSection==='tasks')exportTasks();else if(currentSection==='content')exportContent();else if(currentSection==='links')exportLinks();else if(currentSection==='calendar')exportWeek();else if(currentSection==='writer'){writerExport('clipboard');}else toast('No export for this section'); return; }
   // Cmd+N: new item in current section
   if((e.metaKey||e.ctrlKey) && e.key==='n' && !e.shiftKey) {
     e.preventDefault();
