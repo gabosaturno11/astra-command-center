@@ -139,28 +139,51 @@ Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
 49. Pipeline: prompt template buttons (Summarize, Action Items, Social Post, etc.)
 50. Card hover effects: subtle lift + deeper shadows
 
-**SECTION HEALTH (updated 2026-02-19 session 2):**
+**CONTINUED SESSION 3 FEATURES (commits 51+, session starting from e826e1e):**
+51. Quick capture: auto-detects clipboard URLs on open
+52. Calendar: task count badges next to day numbers (month + week view)
+53. Pipeline: "Save to Content" button saves result to content section
+54. Week view: task count badges in day headers
+55. Links: Cmd+Z undo delete (parity with content)
+56. Calendar: upcoming tasks list below calendar grid (overdue + upcoming)
+57. Content: total word count in toolbar
+58. Task detail: quick-set due date buttons (Today, Tmrw, +1W, +1M)
+59. Pipeline: local text processing fallback (summarize, action items, clean up, stats)
+60. Links: sort by newest/oldest/alpha/category
+61. Task: project filter dropdown in toolbar
+62. Task: overdue rows highlighted red in list view
+63. Keyboard: Cmd+Shift+F toggles focus mode
+64. Shortcuts modal: focus mode shortcut added
+65. Content: tag filter pills (clickable tag filtering)
+66. Cmd+K: Zen Writer, Focus Mode, Export Calendar actions
+67. Writer: find and replace bar (Cmd+H/Cmd+F in writer)
+68. Living Docs: word count per section in headers
+69. Header: stats bar showing overdue/today/total task counts
+70. Task detail: "To Content" button converts task to content item
+71. Links: batch import (paste multiple URLs)
+72. Board cards: subtask progress bar (visual)
+
+**SECTION HEALTH (updated 2026-02-19 session 3):**
 | Section | Health | Notes |
 |---------|--------|-------|
-| Tasks | 97% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup |
-| Calendar | 88% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary |
-| Writer | 92% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list |
-| Living Docs | 90% | Sections + icons + colors + global docs + export + drag-drop reorder |
-| Content | 93% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete |
-| Links | 88% | Favicons + categories + search + project assignment + URL validation + dates + auto-suggest |
+| Tasks | 98% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup + project filter + progress bar + to-content |
+| Calendar | 92% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary + upcoming list + day badges |
+| Writer | 95% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list + find/replace |
+| Living Docs | 92% | Sections + icons + colors + global docs + export + drag-drop reorder + word count per section |
+| Content | 95% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete + tag filter pills + word count |
+| Links | 92% | Favicons + categories + search + project + URL validation + dates + auto-suggest + sort + undo delete + batch import |
 | Whiteboard | 85% | Canvas tools solid |
 | Repos | 88% | CRUD modal + role icons + timestamps + search + open-all + empty state |
-| Pipeline | 78% | UI + local history + expand/collapse + prompt templates + file drop + source badges + stats |
-| Cmd+K | 96% | Searches everything + standup + today view + Zen docs |
+| Pipeline | 85% | UI + local history + expand/collapse + prompt templates + file drop + source badges + stats + save-to-content + local processing |
+| Cmd+K | 98% | Searches everything + standup + today view + Zen docs + focus mode + calendar export |
 
 **REMAINING:**
 - Bonus page shipping (prerequisite: ASTRA stable - NOW IT IS)
 - Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env (to unlock API mode)
-- Link OG metadata previews
+- Link OG metadata previews (fetch page titles automatically)
 - Google Calendar sync (future)
-- Task: custom template creation
 - Content: drag to reorder
-- Archived tasks view/restore
+- Whiteboard improvements (undo/redo, export, templates)
 
 ---
 
