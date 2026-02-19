@@ -257,6 +257,7 @@ textarea{resize:vertical;line-height:1.6}
 .calendar-day:hover{background:var(--bg-deep)}
 .calendar-day.other{opacity:0.25}
 .calendar-day.today{background:rgba(74,222,160,0.06)}
+.calendar-day.cal-overdue{background:rgba(239,68,68,0.04);border-left:2px solid var(--red)}
 .calendar-day-num{font-size:11px;font-weight:500;color:var(--text-secondary);margin-bottom:4px}
 .calendar-day.today .calendar-day-num{width:22px;height:22px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px}
 .calendar-task-pill{font-size:9px;padding:2px 5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-secondary);cursor:grab;border-left:2px solid var(--border)}
@@ -821,6 +822,7 @@ textarea{resize:vertical;line-height:1.6}
           <span id="content-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
           <button class="btn btn-sm" onclick="randomContent()" title="Random content for inspiration">Random</button>
           <button class="btn btn-sm" onclick="exportContent()" title="Export all content as markdown">Export</button>
+          <button class="btn btn-sm" onclick="exportFilteredContent()" title="Export currently filtered content">Export View</button>
           <button class="btn btn-sm" onclick="contentManageTags()" title="Rename or delete tags">Tags</button>
           <button class="btn btn-sm" onclick="batchImportContent()" title="Paste multiple items separated by ---">Batch</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
@@ -2316,6 +2318,19 @@ function exportContent(){
     const blob=new Blob([md],{type:'text/markdown'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='content-export.md';a.click();toast('Content exported');
   });
 }
+function exportFilteredContent(){
+  const q=(document.getElementById('content-search')?.value||'').toLowerCase();
+  let items=[...S.content];
+  if(contentType!=='all')items=items.filter(c=>c.type===contentType);
+  if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
+  if(contentTagFilter)items=items.filter(c=>(c.tags||[]).includes(contentTagFilter));
+  if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+c.source+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
+  if(!items.length){toast('No items to export');return;}
+  let md='# Filtered Content Export\n';
+  md+='Filter: '+(contentType!=='all'?contentType+' / ':'')+(contentTheme!=='all'?contentTheme+' / ':'')+(contentTagFilter?'#'+contentTagFilter+' / ':'')+(q?'"'+q+'" / ':'')+items.length+' items\n\n';
+  items.forEach(c=>{md+=c.body+'\n\n---\n\n';});
+  navigator.clipboard.writeText(md).then(()=>toast('Exported '+items.length+' filtered items'));
+}
 let contentBulkMode=false, contentSelected=new Set(), contentShowAll=false;
 function toggleContentBulk(){
   contentBulkMode=!contentBulkMode;contentSelected.clear();
@@ -2692,7 +2707,8 @@ function renderCalendar(){
     const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
     const isToday=ds===today;
     const dt=S.tasks.filter(t=>t.due===ds);
-    h+=`<div class="calendar-day ${isToday?'today':''}" onclick="calClickDay('${ds}')" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')"><div class="calendar-day-num">${d}${dt.length?`<span style="font-size:7px;color:var(--accent);font-family:var(--mono);margin-left:3px">${dt.length}</span>`:''}</div>${dt.slice(0,4).map(t=>`<div class="calendar-task-pill pill-${t.priority||'p2'}" draggable="true" ondragstart="calDragStart(event,${t.id})" onclick="event.stopPropagation();openTaskDetail(${t.id})" title="${escA(t.title)}">${esc(t.title||'...')}</div>`).join('')}${dt.length>4?`<div style="font-size:8px;color:var(--text-muted)">+${dt.length-4} more</div>`:''}</div>`;
+    const hasOverdue=ds<today&&dt.some(t=>t.status!=='done');
+    h+=`<div class="calendar-day ${isToday?'today':''}${hasOverdue?' cal-overdue':''}" onclick="calClickDay('${ds}')" ondragover="event.preventDefault()" ondrop="calDrop(event,'${ds}')"><div class="calendar-day-num">${d}${dt.length?`<span style="font-size:7px;color:${hasOverdue?'var(--red)':'var(--accent)'};font-family:var(--mono);margin-left:3px">${dt.length}</span>`:''}</div>${dt.slice(0,4).map(t=>`<div class="calendar-task-pill pill-${t.priority||'p2'}" draggable="true" ondragstart="calDragStart(event,${t.id})" onclick="event.stopPropagation();openTaskDetail(${t.id})" title="${escA(t.title)}">${esc(t.title||'...')}</div>`).join('')}${dt.length>4?`<div style="font-size:8px;color:var(--text-muted)">+${dt.length-4} more</div>`:''}</div>`;
   }
   const rem=42-(first+days);
   for(let d=1;d<=rem;d++)h+=`<div class="calendar-day other"><div class="calendar-day-num">${d}</div></div>`;
@@ -4786,8 +4802,10 @@ function cmdGetItems(q) {
   });
   // Living Docs
   S.specs.forEach(s => {
-    if(s.title && (!ql || s.title.toLowerCase().includes(ql)))
-      items.push({title:s.title, desc:'Living Doc - '+(s.sections?s.sections.length:0)+' sections', icon:'S', type:'spec', action:()=>{switchSpec(s.id);switchSection('specs',null);}});
+    if(s.title && (!ql || s.title.toLowerCase().includes(ql))){
+      const specW=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);
+      items.push({title:s.title, desc:'Living Doc - '+(s.sections?s.sections.length:0)+' sections, '+specW+'w', icon:'S', type:'spec', action:()=>{switchSpec(s.id);switchSection('specs',null);}});
+    }
   });
   // KB Items
   (S.knowledgeBase||[]).forEach(k => {
