@@ -85,6 +85,8 @@ body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondar
 .sidebar-item-icon svg{opacity:0.7}
 .sidebar-item.active .sidebar-item-icon svg{opacity:1}
 .sidebar-item-count{margin-left:auto;font-size:10px;color:var(--text-muted);font-family:var(--mono)}
+.sidebar-kbd{font-size:8px;color:var(--text-muted);font-family:var(--mono);opacity:0;padding:1px 4px;border:1px solid var(--border);border-radius:3px;margin-left:auto;transition:opacity 0.15s}
+.sidebar-item:hover .sidebar-kbd{opacity:0.5}
 .sidebar-divider{height:1px;background:var(--border);margin:4px 12px}
 .sidebar-header{position:relative}
 .sidebar-toggle-btn{padding:3px 5px!important}
@@ -110,6 +112,7 @@ body{font-family:var(--font);background:var(--bg-void);color:var(--text-secondar
 .app.sidebar-collapsed .sidebar-label{display:none}
 .app.sidebar-collapsed .sidebar-item span:not(.sidebar-item-icon){display:none}
 .app.sidebar-collapsed .sidebar-item-count{display:none}
+.app.sidebar-collapsed .sidebar-kbd{display:none}
 .app.sidebar-collapsed .sidebar-section:not(:first-of-type){display:none}
 .app.sidebar-collapsed .sidebar-divider{display:none}
 .app.sidebar-collapsed #sidebar-dash{display:none!important}
@@ -191,6 +194,7 @@ textarea{resize:vertical;line-height:1.6}
 .task-row.priority-p3{border-left-color:var(--border)}
 .task-row:hover{background:var(--bg-hover)}
 .task-row.overdue{background:rgba(239,68,68,0.04)}
+.task-row.blocked-row{background:rgba(251,191,36,0.04);border-left-color:#fbbf24}
 .task-row.dragging-over{border-top:2px solid var(--accent)}
 .task-checkbox{width:15px;height:15px;border:2px solid var(--border-hover);border-radius:3px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;margin:0 auto}
 .task-checkbox:hover{border-color:var(--accent)}
@@ -695,35 +699,35 @@ textarea{resize:vertical;line-height:1.6}
       <div class="sidebar-label">Sections</div>
       <div class="sidebar-item active" onclick="switchSection('content',this)">
         <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span>Content</span>
-        <span class="sidebar-item-count" id="content-count">0</span>
+        <span class="sidebar-item-count" id="content-count">0</span><span class="sidebar-kbd">1</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('tasks',this)">
         <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><span>Tasks</span>
-        <span class="sidebar-item-count" id="tasks-count">0</span>
+        <span class="sidebar-item-count" id="tasks-count">0</span><span class="sidebar-kbd">2</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('calendar',this)">
-        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Calendar</span>
+        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span>Calendar</span><span class="sidebar-kbd">3</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('writer',this)">
         <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="15"/></svg></span><span>Writing Hub</span>
-        <span class="sidebar-item-count" id="writer-count">0</span>
+        <span class="sidebar-item-count" id="writer-count">0</span><span class="sidebar-kbd">4</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('specs',this)">
         <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span>Living Docs</span>
-        <span class="sidebar-item-count" id="specs-count">0</span>
+        <span class="sidebar-item-count" id="specs-count">0</span><span class="sidebar-kbd">5</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('links',this)">
         <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span>Links</span>
-        <span class="sidebar-item-count" id="links-count">0</span>
+        <span class="sidebar-item-count" id="links-count">0</span><span class="sidebar-kbd">6</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('whiteboard',this)">
-        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Whiteboard</span>
+        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span><span>Whiteboard</span><span class="sidebar-kbd">7</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('pipeline',this)">
-        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span><span>Pipeline</span>
+        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></span><span>Pipeline</span><span class="sidebar-kbd">8</span>
       </div>
       <div class="sidebar-item" onclick="switchSection('repos',this)">
-        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6"/><path d="M1 12h6m6 0h6"/></svg></span><span>Repos</span>
+        <span class="sidebar-item-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6"/><path d="M1 12h6m6 0h6"/></svg></span><span>Repos</span><span class="sidebar-kbd">9</span>
       </div>
     </div>
     <div class="sidebar-divider"></div>
@@ -2411,7 +2415,7 @@ function renderTasks(){
   const today=new Date().toISOString().split('T')[0];
   const projects=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
   const rows=document.getElementById('task-rows');
-  rows.innerHTML=items.map(t=>`<div class="task-row ${t.status==='done'?'completed':''} priority-${t.priority||'p2'}${t.due&&t.due<today&&t.status!=='done'?' overdue':''}" data-id="${t.id}" draggable="true" ondragstart="taskDragStart(event,${t.id})" ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,${t.id})">${taskBulkMode?`<div style="padding:0 4px;cursor:pointer" onclick="toggleTaskSelect(${t.id});this.querySelector('input').checked=taskSelected.has(${t.id})"><input type="checkbox" ${taskSelected.has(t.id)?'checked':''} style="pointer-events:none;cursor:pointer"></div>`:''}<div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id})"></div><div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name...">${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono);margin-left:4px">${esc(t.estimate)}</span>`:''}${t.timeSpent||t.timeStarted?`<span style="font-size:8px;color:${t.timeStarted?'var(--green)':'var(--text-muted)'};font-family:var(--mono);margin-left:4px">${t.timeStarted?'...':formatTimeSpent(t.timeSpent)}</span>`:''}</div><div><select class="task-select" onchange="updateTask(${t.id},'status',this.value)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div><div><select class="task-select" onchange="updateTask(${t.id},'priority',this.value)"><option value="p0" ${t.priority==='p0'?'selected':''}>P0 Critical</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1 High</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2 Medium</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3 Low</option></select></div><div><input type="text" class="task-select" style="border:1px solid transparent" value="${escA(t.project||'')}" onchange="updateTask(${t.id},'project',this.value)" placeholder="Project..." list="pdl"></div><div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)" style="color:${t.due&&t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':t.due&&t.due<=new Date(new Date().getTime()+3*86400000).toISOString().split('T')[0]?'var(--yellow)':''}"></div><div class="task-actions"><button class="task-action-btn" onclick="openTaskDetail(${t.id})" title="Details" style="font-size:10px">...</button><button class="task-action-btn del" onclick="deleteTask(${t.id})">x</button></div></div>`).join('')+`<div class="add-task-row" onclick="addTask()">+ Add task</div>`;
+  rows.innerHTML=items.map(t=>`<div class="task-row ${t.status==='done'?'completed':''} priority-${t.priority||'p2'}${t.due&&t.due<today&&t.status!=='done'?' overdue':''}${t.status==='blocked'?' blocked-row':''}" data-id="${t.id}" draggable="true" ondragstart="taskDragStart(event,${t.id})" ondragover="taskDragOver(event)" ondragleave="taskDragLeave(event)" ondrop="taskDrop(event,${t.id})">${taskBulkMode?`<div style="padding:0 4px;cursor:pointer" onclick="toggleTaskSelect(${t.id});this.querySelector('input').checked=taskSelected.has(${t.id})"><input type="checkbox" ${taskSelected.has(t.id)?'checked':''} style="pointer-events:none;cursor:pointer"></div>`:''}<div class="task-checkbox ${t.status==='done'?'checked':''}" onclick="toggleTask(${t.id})"></div><div><input type="text" class="task-title-input" value="${escA(t.title)}" onchange="updateTask(${t.id},'title',this.value)" placeholder="Task name...">${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono);margin-left:4px">${esc(t.estimate)}</span>`:''}${t.timeSpent||t.timeStarted?`<span style="font-size:8px;color:${t.timeStarted?'var(--green)':'var(--text-muted)'};font-family:var(--mono);margin-left:4px">${t.timeStarted?'...':formatTimeSpent(t.timeSpent)}</span>`:''}</div><div><select class="task-select" onchange="updateTask(${t.id},'status',this.value)"><option value="todo" ${t.status==='todo'?'selected':''}>To Do</option><option value="progress" ${t.status==='progress'?'selected':''}>In Progress</option><option value="done" ${t.status==='done'?'selected':''}>Done</option><option value="blocked" ${t.status==='blocked'?'selected':''}>Blocked</option></select></div><div><select class="task-select" onchange="updateTask(${t.id},'priority',this.value)"><option value="p0" ${t.priority==='p0'?'selected':''}>P0 Critical</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1 High</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2 Medium</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3 Low</option></select></div><div><input type="text" class="task-select" style="border:1px solid transparent" value="${escA(t.project||'')}" onchange="updateTask(${t.id},'project',this.value)" placeholder="Project..." list="pdl"></div><div><input type="date" class="task-select" value="${t.due||''}" onchange="updateTask(${t.id},'due',this.value)" style="color:${t.due&&t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':t.due&&t.due<=new Date(new Date().getTime()+3*86400000).toISOString().split('T')[0]?'var(--yellow)':''}"></div><div class="task-actions"><button class="task-action-btn" onclick="openTaskDetail(${t.id})" title="Details" style="font-size:10px">...</button><button class="task-action-btn del" onclick="deleteTask(${t.id})">x</button></div></div>`).join('')+`<div class="add-task-row" onclick="addTask()">+ Add task</div>`;
 
   ['todo','progress','done','blocked'].forEach(st=>{
     const col=document.getElementById('board-'+st),cnt=document.getElementById('bc-'+st),f=items.filter(t=>t.status===st);
@@ -4908,6 +4912,15 @@ function cmdGetItems(q) {
     if(linkUrl){
       const isUrl=linkUrl.startsWith('http')||linkUrl.includes('.');
       items.unshift({title:'Add link: '+linkUrl.substring(0,40),desc:isUrl?'Quick-save link to directory':'Not a valid URL — add anyway?',icon:'L',type:'action',action:()=>{closeCommandPalette();const url=linkUrl.startsWith('http')?linkUrl:'https://'+linkUrl;const title=url.replace(/https?:\/\/(www\.)?/,'').split('/')[0];S.links.unshift({id:Date.now(),title,url,category:'unsorted',desc:'',pinned:false,created:new Date().toISOString()});save();if(currentSection==='links')renderLinks();toast('Link saved: '+title);}});
+    }
+  }
+  // Quick goto from Cmd+K
+  if(ql && ql.startsWith('goto:')) {
+    const gq=q.substring(5).trim().toLowerCase();
+    if(gq){
+      S.tasks.filter(t=>t.title&&t.title.toLowerCase().includes(gq)).slice(0,3).forEach(t=>{items.unshift({title:'Go: '+t.title,desc:'Open task detail',icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+      S.docs.filter(d=>d.title&&d.title.toLowerCase().includes(gq)).slice(0,3).forEach(d=>{items.unshift({title:'Go: '+d.title,desc:'Open in writer',icon:'W',type:'action',action:()=>{closeCommandPalette();switchDoc(d.id);switchSection('writer',null);}});});
+      S.specs.filter(s=>s.title&&s.title.toLowerCase().includes(gq)).slice(0,3).forEach(s=>{items.unshift({title:'Go: '+s.title,desc:'Open living doc',icon:'S',type:'action',action:()=>{closeCommandPalette();switchSpec(s.id);switchSection('specs',null);}});});
     }
   }
   // Quick calc from Cmd+K
