@@ -98,7 +98,7 @@ Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
 - Living docs dedup
 - Project tasks use projectId (data integrity)
 
-**CONTINUED SESSION FEATURES (8 more commits, 28+ total):**
+**CONTINUED SESSION 1 FEATURES (commits 28+):**
 14. Repos: Add/Edit/Delete modal with role/status/desc fields
 15. Pipeline: API status indicator, text-only guidance, local history fallback
 16. Content: double-click inline editing, bulk select/delete/tag, sort by 5 criteria
@@ -114,27 +114,53 @@ Latest commit: `62d1a16` — all pushed to main, Vercel auto-deployed.
 26. Board cards: overdue dates shown in red with "!" indicator
 27. Task templates: dropdown with 5 recurring presets
 
-**SECTION HEALTH (updated):**
+**CONTINUED SESSION 2 FEATURES (commits 36+):**
+28. Pipeline: expand/collapse full text in history, source badges, delete entries, clear all
+29. Repos: role icons (SVG), relative time display, live indicator dot
+30. Content: search highlighting with green marks, improved empty states
+31. Links: improved empty state with contextual messages
+32. Keyboard: Cmd+1-9 for all 9 sections, Cmd+Shift+D for Today View
+33. Repos: search/filter input, count badge, empty state
+34. Board columns: "Drop tasks here" placeholder when empty
+35. Content: created date shown in card footer
+36. Task count: tooltip shows active/done/total breakdown
+37. Task export: copies filtered tasks as grouped markdown
+38. Daily standup: Cmd+K > "standup" generates summary
+39. Pipeline: drag-drop text/audio files onto panel
+40. Repos: "Open All" button opens all live URLs
+41. Content: pin/unpin (pinned sort to top, green border)
+42. Sidebar: overview dashboard on non-specific sections
+43. Task archive: "Archive Done" moves completed to hidden archive
+44. Content: Cmd+Z undo last delete
+45. Content/Link modals: auto-suggest themes/categories from existing data
+46. Content: lazy rendering (40 items, then "Load more")
+47. Pipeline: word/char count on input text
+48. Save indicator: tooltip shows localStorage size in KB
+49. Pipeline: prompt template buttons (Summarize, Action Items, Social Post, etc.)
+50. Card hover effects: subtle lift + deeper shadows
+
+**SECTION HEALTH (updated 2026-02-19 session 2):**
 | Section | Health | Notes |
 |---------|--------|-------|
-| Tasks | 95% | Board + list + detail + subtasks + priority colors + search + sort + recurrence + templates + duplicate + overdue |
-| Calendar | 85% | Month + week + click-create + drag-drop + ICS export + priority colors |
-| Writer | 92% | Editor + Zen Writer + versions + export + auto-save + word goals + sorted doc list |
+| Tasks | 97% | Board + list + detail + subtasks + priority + search + sort + recurrence + templates + duplicate + overdue + export + archive + standup |
+| Calendar | 88% | Month + week + click-create + drag-drop + ICS export + priority colors + today summary |
+| Writer | 92% | Editor + Zen Writer + versions + export (md/html/txt) + auto-save + word goals + sorted doc list |
 | Living Docs | 90% | Sections + icons + colors + global docs + export + drag-drop reorder |
-| Content | 88% | Cards expand + inline edit + bulk ops + sort + search + tags + word count |
-| Links | 85% | Favicons + categories + search + project assignment + URL validation + dates |
+| Content | 93% | Cards + inline edit + bulk ops + sort + search highlight + tags + pin + dates + lazy render + undo delete |
+| Links | 88% | Favicons + categories + search + project assignment + URL validation + dates + auto-suggest |
 | Whiteboard | 85% | Canvas tools solid |
-| Repos | 82% | Static data + CRUD modal + role/status badges |
-| Pipeline | 65% | UI + local history + API status + text-only guidance |
-| Cmd+K | 95% | Searches everything, opens task detail |
+| Repos | 88% | CRUD modal + role icons + timestamps + search + open-all + empty state |
+| Pipeline | 78% | UI + local history + expand/collapse + prompt templates + file drop + source badges + stats |
+| Cmd+K | 96% | Searches everything + standup + today view + Zen docs |
 
 **REMAINING:**
 - Bonus page shipping (prerequisite: ASTRA stable - NOW IT IS)
-- Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
+- Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env (to unlock API mode)
 - Link OG metadata previews
 - Google Calendar sync (future)
 - Task: custom template creation
 - Content: drag to reorder
+- Archived tasks view/restore
 
 ---
 
