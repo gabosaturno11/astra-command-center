@@ -812,6 +812,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="shortest">Shortest</option>
             <option value="alpha">A-Z</option>
           </select>
+          <span id="content-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
           <button class="btn btn-sm" onclick="exportContent()" title="Export all content as markdown">Export</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
@@ -899,6 +900,7 @@ textarea{resize:vertical;line-height:1.6}
           <div class="calendar-grid" id="cal-grid"></div>
           <div class="week-grid" id="cal-week-grid" style="display:none"></div>
         </div>
+        <div id="cal-upcoming" style="padding:8px 0 0;border-top:1px solid var(--border);margin-top:8px"></div>
       </div>
     </div>
 
@@ -2166,6 +2168,8 @@ function renderContent() {
   const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}">${c.type}</span>${c.theme?`<span class="badge badge-muted">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)">${new Date(c.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:showing.map(renderCard).join('')+(items.length>maxShow&&!contentShowAll?`<div style="grid-column:1/-1;text-align:center;padding:12px"><button class="btn btn-sm" onclick="contentShowAll=true;renderContent()">Show all ${items.length} items (${items.length-maxShow} more)</button></div>`:'');
   document.getElementById('content-count').textContent=S.content.length;
+  const totalWords=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
+  const cwEl=document.getElementById('content-word-total');if(cwEl)cwEl.textContent=totalWords.toLocaleString()+'w total';
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
 function setContentTheme(t,el){contentTheme=t;document.querySelectorAll('#content-theme-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -2450,8 +2454,20 @@ function renderCalTodaySummary(){
   if(todayTasks.length>5)h+=` <span style="color:var(--text-muted)">+${todayTasks.length-5} more</span>`;
   el.innerHTML=h;
 }
+function renderCalUpcoming(){
+  const el=document.getElementById('cal-upcoming');if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  const upcoming=S.tasks.filter(t=>t.due&&t.due>=today&&t.status!=='done').sort((a,b)=>a.due.localeCompare(b.due)).slice(0,8);
+  const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done').sort((a,b)=>a.due.localeCompare(b.due));
+  if(!upcoming.length&&!overdue.length){el.innerHTML='';return;}
+  let h='<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:6px">Upcoming</div>';
+  const renderRow=(t,isOverdue)=>{const daysLabel=t.due===today?'Today':isOverdue?'Overdue':'';return`<div style="display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:10px" onclick="openTaskDetail(${t.id})" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" style="font-size:7px;padding:1px 3px;min-width:16px;text-align:center">${t.priority||'p3'}</span><span style="flex:1;color:${isOverdue?'var(--red)':'var(--text-secondary)'}">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:${isOverdue?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'};font-family:var(--mono)">${isOverdue?t.due+' !':t.due===today?'today':t.due.substring(5)}</span></div>`;};
+  if(overdue.length){h+='<div style="font-size:8px;color:var(--red);margin:4px 0 2px;font-weight:600">OVERDUE</div>';overdue.slice(0,5).forEach(t=>{h+=renderRow(t,true);});}
+  upcoming.forEach(t=>{h+=renderRow(t,false);});
+  el.innerHTML=h;
+}
 function renderCalendar(){
-  renderCalTodaySummary();
+  renderCalTodaySummary();renderCalUpcoming();
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   if(calView === 'week') {
     renderWeekView();
