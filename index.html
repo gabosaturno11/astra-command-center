@@ -2407,7 +2407,7 @@ function renderContent() {
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:cardsHtml+(items.length>maxShow&&!contentShowAll?`<div style="grid-column:1/-1;text-align:center;padding:12px"><button class="btn btn-sm" onclick="contentShowAll=true;renderContent()">Show all ${items.length} items (${items.length-maxShow} more)</button></div>`:'');
   document.getElementById('content-count').textContent=S.content.length;
   const totalWords=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
-  const cwEl=document.getElementById('content-word-total');if(cwEl)cwEl.textContent=totalWords.toLocaleString()+'w total';
+  const cwEl=document.getElementById('content-word-total');if(cwEl){const types={};S.content.forEach(c=>{const t=c.type||'other';types[t]=(types[t]||0)+1;});const breakdown=Object.entries(types).sort((a,b)=>b[1]-a[1]).map(([t,n])=>t+':'+n).join(' | ');cwEl.textContent=totalWords.toLocaleString()+'w total';cwEl.title=breakdown;}
 }
 function setContentType(t,el){contentType=t;document.querySelectorAll('#content-type-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
 function setContentTheme(t,el){contentTheme=t;document.querySelectorAll('#content-theme-tabs .tab-btn').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active');renderContent();}
@@ -5272,6 +5272,25 @@ function closeCommandPalette() {
 function cmdGetItems(q) {
   const items = [];
   const ql = (q || '').toLowerCase();
+  // Help prefix — list all available Cmd+K prefixes
+  if(ql && (ql==='help'||ql==='help:'||ql==='?'||ql==='prefixes')){
+    const prefixes=[
+      ['task: ...','Quick-create task inline'],['note: ...','Quick-save content inline'],
+      ['find: keyword','Cross-section search with counts'],['focus:','Show P0/P1 + overdue tasks'],
+      ['week:','Upcoming 7 days task breakdown'],['daily:','Today activity summary'],
+      ['streak:','Completion streak + 7-day activity'],['timeline:','Chronological task overview'],
+      ['matrix:','Priority x status breakdown'],['template:','Create task from templates'],
+      ['compare:p1:p2','Compare two projects side-by-side'],['merge: keyword','Find + merge duplicate tasks'],
+      ['rename:old:new','Rename projects/tags globally'],['orphan:','Find disconnected items'],
+      ['health:','System diagnostics + issues'],['backup:','Data size + export actions'],
+      ['clean:','Cleanup empty tasks, dup links, etc'],['dup: keyword','Find + duplicate tasks'],
+      ['tag-tasks:','Browse tasks by tag'],['project-stats:','Per-project analytics'],
+      ['export:','All export options'],['standup','Daily standup summary'],
+    ];
+    items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
+    prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
+    return items;
+  }
   // Recent items (show when no query)
   if(!ql && recentItems.length) {
     recentItems.forEach(r => {
@@ -5703,6 +5722,23 @@ function cmdGetItems(q) {
     const sLabels={todo:'To Do',progress:'In Progress',blocked:'Blocked'};
     items.unshift({title:'Priority Matrix: '+active.length+' active tasks',desc:'Tasks grouped by priority x status',icon:'M',type:'info'});
     priorities.forEach(p=>{const pTasks=active.filter(t=>(t.priority||'p2')===p);if(pTasks.length){const statusCounts=statuses.map(s=>pTasks.filter(t=>t.status===s).length);items.push({title:pLabels[p]+': '+pTasks.length+' tasks',desc:'Todo: '+statusCounts[0]+' | In Progress: '+statusCounts[1]+' | Blocked: '+statusCounts[2],icon:p==='p0'?'!':p==='p1'?'*':'T',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);document.getElementById('task-sort').value='priority';renderTasks();}});}});
+  }
+  // Compare prefix — compare two projects
+  if(ql && ql.startsWith('compare:')){
+    const cq=q.substring(8).trim().toLowerCase();
+    const allProjs=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
+    if(!cq){items.unshift({title:'Usage: compare:project1:project2',desc:'Available: '+allProjs.join(', '),icon:'C',type:'info'});}
+    else{const parts=cq.split(':').map(p=>p.trim()).filter(Boolean);
+    if(parts.length>=2){const p1=parts[0],p2=parts[1];
+    const t1=S.tasks.filter(t=>t.project&&t.project.toLowerCase().includes(p1));const t2=S.tasks.filter(t=>t.project&&t.project.toLowerCase().includes(p2));
+    const done1=t1.filter(t=>t.status==='done').length,done2=t2.filter(t=>t.status==='done').length;
+    const active1=t1.filter(t=>t.status!=='done').length,active2=t2.filter(t=>t.status!=='done').length;
+    const time1=t1.reduce((a,t)=>a+(t.timeSpent||0),0),time2=t2.reduce((a,t)=>a+(t.timeSpent||0),0);
+    items.unshift({title:p1+' vs '+p2,desc:'Tasks: '+t1.length+' vs '+t2.length+' | Done: '+done1+' vs '+done2+' | Active: '+active1+' vs '+active2,icon:'C',type:'info'});
+    items.push({title:p1+': '+t1.length+' tasks ('+done1+' done, '+active1+' active)',desc:'Time: '+(time1?formatTimeSpent(time1):'none')+' | Completion: '+Math.round(t1.length?done1/t1.length*100:0)+'%',icon:'1',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p1;renderTasks();}});
+    items.push({title:p2+': '+t2.length+' tasks ('+done2+' done, '+active2+' active)',desc:'Time: '+(time2?formatTimeSpent(time2):'none')+' | Completion: '+Math.round(t2.length?done2/t2.length*100:0)+'%',icon:'2',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p2;renderTasks();}});
+    }else{const matching=allProjs.filter(p=>p.toLowerCase().includes(parts[0]));
+    items.unshift({title:'Type: compare:'+parts[0]+':second-project',desc:'Matches: '+matching.join(', '),icon:'C',type:'info'});}}
   }
   // Template prefix — quick task creation from templates
   if(ql && (ql.startsWith('template:') || ql==='template' || ql==='templates')){
