@@ -5931,6 +5931,12 @@ function cmdGetItems(q) {
       ['eisenhower','2x2 Urgent/Important matrix for task prioritization'],
       ['writer progress','Word count targets per doc with progress bars'],
       ['batch ops','Bulk operations: tag all, rename category, archive done'],
+      ['context','Switch workspace context: all, work, personal, creative'],
+      ['daily checklist','Recurring daily checklist that resets each morning'],
+      ['knowledge map','Map of [[wiki-link]] connections between content'],
+      ['export hub','All-in-one export: JSON, CSV, Markdown, HTML'],
+      ['dependencies','Visual task dependency graph (blocking/blocked)'],
+      ['inbox zero','Triage panel for uncategorized/incomplete items'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7753,6 +7759,30 @@ function cmdGetItems(q) {
   // Batch ops prefix
   if(ql && (ql==='batch ops' || ql==='batch operations' || ql==='bulk operations' || ql==='mass edit')){
     items.unshift({title:'Batch Operations',desc:'Bulk tag, rename, archive operations',icon:'B',type:'action',action:()=>{closeCommandPalette();showBatchOperations();}});
+  }
+  // Context switcher prefix
+  if(ql && (ql==='context' || ql==='workspace context' || ql==='switch context' || ql==='mode')){
+    items.unshift({title:'Context Switcher',desc:'Switch workspace context: work, personal, creative',icon:'C',type:'action',action:()=>{closeCommandPalette();showContextSwitcher();}});
+  }
+  // Daily checklist prefix
+  if(ql && (ql==='daily checklist' || ql==='checklist' || ql==='daily routine' || ql==='morning checklist')){
+    items.unshift({title:'Daily Checklist',desc:'Recurring checklist that resets each morning',icon:'V',type:'action',action:()=>{closeCommandPalette();showDailyChecklist();}});
+  }
+  // Knowledge map prefix
+  if(ql && (ql==='knowledge map' || ql==='wiki map' || ql==='link map' || ql==='backlinks map')){
+    items.unshift({title:'Knowledge Map',desc:'Map of [[wiki-link]] connections',icon:'K',type:'action',action:()=>{closeCommandPalette();showKnowledgeMap();}});
+  }
+  // Export hub prefix
+  if(ql && (ql==='export hub' || ql==='export all' || ql==='download data' || ql==='export formats')){
+    items.unshift({title:'Export Hub',desc:'JSON, CSV, Markdown, HTML exports',icon:'E',type:'action',action:()=>{closeCommandPalette();showContentExportHub();}});
+  }
+  // Dependencies prefix
+  if(ql && (ql==='dependencies' || ql==='task dependencies' || ql==='dependency graph' || ql==='blocked tasks')){
+    items.unshift({title:'Task Dependencies',desc:'Visual graph of blocking/blocked tasks',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDependencyGraph();}});
+  }
+  // Inbox zero prefix
+  if(ql && (ql==='inbox zero' || ql==='inbox' || ql==='triage' || ql==='unprocessed')){
+    items.unshift({title:'Inbox Zero Triage',desc:'Find uncategorized/incomplete items',icon:'I',type:'action',action:()=>{closeCommandPalette();showInboxZero();}});
   }
   return items.slice(0, 20);
 }
@@ -13000,6 +13030,193 @@ function showBatchOperations(){
   h+=`<button onclick="(function(){let count=0;(S.tasks||[]).forEach(t=>{if(t.status!=='done'&&t.due&&new Date(t.due)<new Date()){const nd=new Date();nd.setDate(nd.getDate()+7);t.due=nd.toISOString().split('T')[0];count++;}});save();alert('Rescheduled '+count+' overdue tasks to next week');})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Reschedule Overdue</button>`;
   h+='</div>';
   h+=`<div style="font-size:10px;color:var(--text-muted);padding-top:8px;border-top:1px solid var(--border)">Stats: ${content.length} content items, ${tasks.length} tasks (${tasks.filter(t=>t.status==='done').length} done)</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContextSwitcher(){
+  let panel=document.getElementById('ctx-switch-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='ctx-switch-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._workContext)S._workContext='all';
+  const contexts=[
+    {id:'all',name:'All',desc:'Show everything',icon:'*',color:'#4ade80'},
+    {id:'work',name:'Work',desc:'Work-related tasks and content only',icon:'W',color:'#60a5fa'},
+    {id:'personal',name:'Personal',desc:'Personal items and goals',icon:'P',color:'#a78bfa'},
+    {id:'creative',name:'Creative',desc:'Writing, content creation, ideas',icon:'C',color:'#facc15'},
+    {id:'urgent',name:'Urgent',desc:'Only P0/P1 tasks and overdue',icon:'!',color:'#f87171'},
+  ];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Workspace Context</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Current: <span style="color:var(--accent);font-weight:600">${contexts.find(c=>c.id===S._workContext)?.name||'All'}</span></div>`;
+  contexts.forEach(c=>{
+    const active=S._workContext===c.id;
+    h+=`<div onclick="S._workContext='${c.id}';save();showContextSwitcher();" style="display:flex;align-items:center;gap:12px;padding:12px;background:${active?c.color+'20':'var(--bg-surface)'};border:1px solid ${active?c.color:'transparent'};border-radius:8px;margin-bottom:6px;cursor:pointer">`;
+    h+=`<div style="width:36px;height:36px;border-radius:50%;background:${active?c.color:'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:${active?'#000':'var(--text-muted)'}">${c.icon}</div>`;
+    h+=`<div style="flex:1"><div style="font-size:12px;color:var(--text-primary);font-weight:600">${c.name}</div><div style="font-size:10px;color:var(--text-muted)">${c.desc}</div></div>`;
+    if(active)h+=`<div style="font-size:10px;color:${c.color};font-weight:600">ACTIVE</div>`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDailyChecklist(){
+  let panel=document.getElementById('daily-check-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='daily-check-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._dailyChecklist)S._dailyChecklist={items:[],lastReset:''};
+  const today=new Date().toISOString().split('T')[0];
+  if(S._dailyChecklist.lastReset!==today){S._dailyChecklist.items.forEach(i=>i.done=false);S._dailyChecklist.lastReset=today;save();}
+  function render(){
+    const items=S._dailyChecklist.items;
+    const done=items.filter(i=>i.done).length;
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Daily Checklist</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">${today} | ${done}/${items.length} complete</div>`;
+    if(items.length){
+      const pct=Math.round(done/items.length*100);
+      h+=`<div style="height:8px;background:var(--bg-surface);border-radius:4px;margin-bottom:16px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#4ade80;border-radius:4px"></div></div>`;
+    }
+    items.forEach((item,i)=>{
+      h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid var(--border)">`;
+      h+=`<input type="checkbox" ${item.done?'checked':''} onchange="S._dailyChecklist.items[${i}].done=this.checked;save();showDailyChecklist();" style="cursor:pointer;width:16px;height:16px">`;
+      h+=`<span style="flex:1;font-size:12px;color:${item.done?'var(--text-muted)':'var(--text-primary)'};${item.done?'text-decoration:line-through':''}">${esc(item.title)}</span>`;
+      h+=`<button onclick="S._dailyChecklist.items.splice(${i},1);save();showDailyChecklist();" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px">x</button>`;
+      h+=`</div>`;
+    });
+    h+='<div style="display:flex;gap:8px;margin-top:12px">';
+    h+=`<input id="daily-check-input" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:12px" placeholder="Add recurring item..." onkeydown="if(event.key==='Enter'){const v=this.value.trim();if(v){S._dailyChecklist.items.push({title:v,done:false});save();showDailyChecklist();}}">`;
+    h+=`<button onclick="const inp=document.getElementById('daily-check-input');const v=inp.value.trim();if(v){S._dailyChecklist.items.push({title:v,done:false});save();showDailyChecklist();}" style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:8px 12px;font-size:11px;font-weight:600;cursor:pointer">Add</button>`;
+    h+='</div>';
+    h+=`<div style="font-size:9px;color:var(--text-muted);margin-top:8px;text-align:center">Items reset daily. Check marks clear each morning.</div>`;
+    panel.innerHTML=h;
+  }
+  render();
+  document.body.appendChild(panel);
+}
+function showKnowledgeMap(){
+  let panel=document.getElementById('knowledge-map-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='knowledge-map-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const linkMap={};
+  const wikiPattern=/\[\[([^\]]+)\]\]/g;
+  content.forEach(c=>{
+    const body=(c.body||'')+(c.title||'');
+    let match;
+    while((match=wikiPattern.exec(body))!==null){
+      const target=match[1].toLowerCase();
+      if(!linkMap[c.title])linkMap[c.title]=[];
+      linkMap[c.title].push(target);
+    }
+  });
+  const entries=Object.entries(linkMap).filter(([_,refs])=>refs.length>0).sort((a,b)=>b[1].length-a[1].length);
+  const allTargets={};
+  entries.forEach(([src,refs])=>{refs.forEach(r=>{allTargets[r]=(allTargets[r]||0)+1;});});
+  const topTargets=Object.entries(allTargets).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Knowledge Map</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${entries.length} items with [[wiki-links]] | ${Object.keys(allTargets).length} unique targets</div>`;
+  if(topTargets.length){
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Most referenced:</div>';
+    const maxRef=topTargets[0]?topTargets[0][1]:1;
+    topTargets.forEach(([target,count])=>{
+      const pct=Math.round(count/maxRef*100);
+      h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><div style="width:100px;font-size:10px;color:var(--text-secondary);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(target)}</div><div style="flex:1;height:10px;background:var(--bg-surface);border-radius:5px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#4ade80;border-radius:5px"></div></div><div style="font-size:9px;color:var(--text-muted);width:25px">${count}</div></div>`;
+    });
+  }
+  if(entries.length){
+    h+='<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);margin-bottom:6px">Items with outgoing links:</div>';
+    entries.slice(0,15).forEach(([src,refs])=>{
+      h+=`<div style="padding:6px 0;border-bottom:1px solid var(--border)"><div style="font-size:11px;color:var(--text-primary);font-weight:500">${esc(src).substring(0,40)}</div>`;
+      h+=`<div style="font-size:9px;color:var(--accent);margin-top:2px">Links to: ${refs.map(r=>esc(r)).join(', ')}</div></div>`;
+    });
+  }
+  if(!entries.length&&!topTargets.length){
+    h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No [[wiki-links]] found in content. Use [[Page Name]] syntax to link items.</div>';
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentExportHub(){
+  let panel=document.getElementById('export-hub-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='export-hub-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Export Hub</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:16px">Export your workspace data in various formats.</div>';
+  const exports=[
+    {label:'Full Backup (JSON)',desc:'Complete workspace state for backup/restore',action:function(){const data=JSON.stringify(S,null,2);const blob=new Blob([data],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='astra-backup-'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(url);}},
+    {label:'Tasks (CSV)',desc:'Export tasks as CSV spreadsheet',action:function(){let csv='Title,Status,Priority,Due,Project,Created\\n';(S.tasks||[]).forEach(t=>{csv+='"'+((t.title||'').replace(/"/g,'""'))+'","'+(t.status||'')+'","'+(t.priority||'')+'","'+(t.due||'')+'","'+(t.project||'')+'","'+(t.createdAt||'')+'"\\n';});navigator.clipboard.writeText(csv);alert('Tasks CSV copied to clipboard ('+S.tasks.length+' rows)');}},
+    {label:'Content (Markdown)',desc:'Export all content as markdown',action:function(){let md='# ASTRA Content Export\\n\\n';(S.content||[]).forEach(c=>{md+='## '+((c.title||'Untitled'))+'\\n';if(c.theme)md+='*Theme: '+c.theme+'*\\n\\n';md+=(c.body||'')+('\\n\\n---\\n\\n');});navigator.clipboard.writeText(md);alert('Content markdown copied to clipboard');}},
+    {label:'Links (Markdown)',desc:'Export all links as categorized markdown',action:function(){let md='# ASTRA Links Export\\n\\n';const cats={};(S.links||[]).forEach(l=>{const cat=l.category||'Uncategorized';if(!cats[cat])cats[cat]=[];cats[cat].push(l);});Object.entries(cats).forEach(([cat,links])=>{md+='## '+cat+'\\n\\n';links.forEach(l=>{md+='- ['+((l.title||l.url)||'')+']('+((l.url)||'')+')\\n';});md+='\\n';});navigator.clipboard.writeText(md);alert('Links markdown copied to clipboard');}},
+    {label:'Writer Docs (Markdown)',desc:'Export all writer documents',action:function(){let md='';(S.writerDocs||[]).forEach(d=>{md+='# '+(d.title||'Untitled')+'\\n\\n'+(d.content||'')+'\\n\\n---\\n\\n';});navigator.clipboard.writeText(md);alert('Writer docs copied to clipboard ('+((S.writerDocs||[]).length)+' docs)');}},
+    {label:'Everything (HTML)',desc:'Full workspace as printable HTML page',action:function(){if(typeof printableExport==='function')printableExport();else alert('Printable export not available');}},
+  ];
+  exports.forEach(ex=>{
+    h+=`<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-surface);border-radius:8px;margin-bottom:6px;cursor:pointer" onclick="(${ex.action.toString()})()">`;
+    h+=`<div style="flex:1"><div style="font-size:12px;color:var(--text-primary);font-weight:500">${ex.label}</div><div style="font-size:10px;color:var(--text-muted)">${ex.desc}</div></div>`;
+    h+=`<div style="font-size:18px;color:var(--accent)">></div>`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskDependencyGraph(){
+  let panel=document.getElementById('task-dep-graph-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-dep-graph-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const withDeps=tasks.filter(t=>t.blockedBy&&t.blockedBy.length>0);
+  const blocking=tasks.filter(t=>{return tasks.some(t2=>t2.blockedBy&&t2.blockedBy.includes(t.id));});
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Task Dependencies</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${withDeps.length} blocked tasks | ${blocking.length} blocking tasks</div>`;
+  if(!withDeps.length&&!blocking.length){
+    h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No task dependencies found. Use the "B" button in task detail to set blocked-by relationships.</div>';
+  }
+  blocking.forEach(t=>{
+    const dependents=tasks.filter(t2=>t2.blockedBy&&t2.blockedBy.includes(t.id));
+    const statusColor=t.status==='done'?'#4ade80':t.status==='in-progress'?'#facc15':'#60a5fa';
+    h+=`<div style="margin-bottom:12px">`;
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:8px;border-left:3px solid ${statusColor}">`;
+    h+=`<div style="font-size:12px;color:var(--text-primary);font-weight:600;flex:1">${esc(t.title||'').substring(0,35)}</div>`;
+    h+=`<div style="font-size:9px;color:${statusColor}">${t.status}</div>`;
+    h+=`</div>`;
+    dependents.forEach(dep=>{
+      const depColor=dep.status==='done'?'#4ade80':dep.status==='in-progress'?'#facc15':'#f87171';
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 28px;border-left:1px dashed var(--border);margin-left:12px">`;
+      h+=`<span style="color:var(--text-muted);font-size:10px">blocks ></span>`;
+      h+=`<span style="font-size:11px;color:var(--text-secondary)">${esc(dep.title||'').substring(0,30)}</span>`;
+      h+=`<span style="font-size:9px;color:${depColor};margin-left:auto">${dep.status}</span>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showInboxZero(){
+  let panel=document.getElementById('inbox-zero-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='inbox-zero-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const unprocessed=[];
+  (S.tasks||[]).filter(t=>t.status==='todo'&&!t.priority).forEach(t=>unprocessed.push({type:'task',item:t,issue:'No priority set'}));
+  (S.tasks||[]).filter(t=>t.status==='todo'&&!t.due).forEach(t=>unprocessed.push({type:'task',item:t,issue:'No due date'}));
+  (S.tasks||[]).filter(t=>t.status==='todo'&&!t.project&&!t.projectId).forEach(t=>unprocessed.push({type:'task',item:t,issue:'No project assigned'}));
+  (S.content||[]).filter(c=>!c.tags||c.tags.length===0).forEach(c=>unprocessed.push({type:'content',item:c,issue:'No tags'}));
+  (S.content||[]).filter(c=>!c.theme&&!c.category).forEach(c=>unprocessed.push({type:'content',item:c,issue:'No category/theme'}));
+  (S.links||[]).filter(l=>!l.category).forEach(l=>unprocessed.push({type:'link',item:l,issue:'No category'}));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Inbox Zero Triage</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${unprocessed.length} items need attention</div>`;
+  if(!unprocessed.length){
+    h+='<div style="text-align:center;padding:40px"><div style="font-size:24px;color:#4ade80;margin-bottom:8px">Inbox Zero!</div><div style="font-size:11px;color:var(--text-muted)">All items are categorized and processed.</div></div>';
+  }
+  const grouped={task:[],content:[],link:[]};
+  unprocessed.forEach(u=>{if(grouped[u.type])grouped[u.type].push(u);});
+  ['task','content','link'].forEach(type=>{
+    const items=grouped[type];
+    if(!items.length)return;
+    const colors={task:'#60a5fa',content:'#a78bfa',link:'#38bdf8'};
+    h+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:${colors[type]};margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${type.charAt(0).toUpperCase()+type.slice(1)}s (${items.length})</div>`;
+    items.slice(0,10).forEach(u=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px">`;
+      h+=`<span style="color:var(--text-secondary);flex:1">${esc((u.item.title||u.item.url||'').substring(0,35))}</span>`;
+      h+=`<span style="font-size:9px;color:#f87171">${u.issue}</span>`;
+      h+=`</div>`;
+    });
+    if(items.length>10)h+=`<div style="font-size:10px;color:var(--text-muted)">+${items.length-10} more</div>`;
+    h+=`</div>`;
+  });
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
