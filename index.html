@@ -6089,6 +6089,12 @@ function cmdGetItems(q) {
       ['ascii art','Convert text to ASCII block letters'],
       ['priority matrix','Task priority matrix showing all 4 priority levels'],
       ['code snippets','Save and manage reusable code snippets'],
+      ['character counter','Count characters, words, sentences, read time'],
+      ['task treemap','Treemap visualization of tasks by project'],
+      ['polls','Create and vote on quick polls'],
+      ['hash generator','SHA-256/384/512/1 hash generator for text'],
+      ['project progress','Progress bars for all projects with stats'],
+      ['quick sketch','Mini drawing canvas with colors and sizes'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8525,6 +8531,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='code snippets' || ql==='snippets' || ql==='snippet' || ql==='code manager')){
     items.unshift({title:'Code Snippets',desc:'Save and manage code snippets',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSnippet();}});
+  }
+  if(ql && (ql==='character counter' || ql==='char count' || ql==='word counter' || ql==='text stats')){
+    items.unshift({title:'Character Counter',desc:'Count chars, words, sentences, read time',icon:'C',type:'action',action:()=>{closeCommandPalette();showCharCounter();}});
+  }
+  if(ql && (ql==='task treemap' || ql==='treemap' || ql==='tree map' || ql==='project map')){
+    items.unshift({title:'Task Treemap',desc:'Treemap visualization by project',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTreemap();}});
+  }
+  if(ql && (ql==='polls' || ql==='poll' || ql==='quick poll' || ql==='vote')){
+    items.unshift({title:'Quick Polls',desc:'Create and vote on polls',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPoll();}});
+  }
+  if(ql && (ql==='hash generator' || ql==='hash' || ql==='sha256' || ql==='sha')){
+    items.unshift({title:'Hash Generator',desc:'SHA-256/384/512/1 hash generator',icon:'H',type:'action',action:()=>{closeCommandPalette();showHashGenerator();}});
+  }
+  if(ql && (ql==='project progress' || ql==='progress' || ql==='project bars' || ql==='progress bars')){
+    items.unshift({title:'Project Progress',desc:'Progress bars for all projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showProjectProgress();}});
+  }
+  if(ql && (ql==='quick sketch' || ql==='sketch' || ql==='draw' || ql==='doodle')){
+    items.unshift({title:'Quick Sketch',desc:'Mini drawing canvas',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickWhiteboard();}});
   }
   return items.slice(0, 20);
 }
@@ -18844,6 +18868,200 @@ function showQuickSnippet(){
     el.innerHTML=h2;
   };
   window._snipRender();
+}
+function showCharCounter(){
+  let panel=document.getElementById('char-counter-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='char-counter-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw';
+  window._ccUpdate=function(){
+    var ta=document.getElementById('cc-text');if(!ta)return;
+    var text=ta.value;
+    var chars=text.length;
+    var charsNoSpace=text.replace(/\s/g,'').length;
+    var words=text.trim()?text.trim().split(/\s+/).length:0;
+    var sentences=text.trim()?text.split(/[.!?]+/).filter(function(s){return s.trim();}).length:0;
+    var paras=text.trim()?text.split(/\n\n+/).filter(function(p){return p.trim();}).length:0;
+    var lines=text?text.split('\n').length:0;
+    var readTime=Math.max(1,Math.ceil(words/200));
+    var speakTime=Math.max(1,Math.ceil(words/130));
+    var stats=[
+      {label:'Characters',value:chars},
+      {label:'Chars (no space)',value:charsNoSpace},
+      {label:'Words',value:words},
+      {label:'Sentences',value:sentences},
+      {label:'Paragraphs',value:paras},
+      {label:'Lines',value:lines},
+      {label:'Read time',value:readTime+'m'},
+      {label:'Speak time',value:speakTime+'m'}
+    ];
+    var out=document.getElementById('cc-stats');if(!out)return;
+    out.innerHTML=stats.map(function(s){return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)"><span style="font-size:10px;color:var(--text-muted)">'+s.label+'</span><span style="font-size:11px;color:var(--accent);font-family:var(--mono);font-weight:600">'+s.value+'</span></div>';}).join('');
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Character Counter</span><button onclick="document.getElementById(\'char-counter-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="cc-text" oninput="window._ccUpdate()" placeholder="Type or paste text here..." style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--text);resize:vertical;outline:none;margin-bottom:10px;box-sizing:border-box"></textarea>';
+  h+='<div id="cc-stats"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  window._ccUpdate();
+}
+function showTaskTreemap(){
+  let panel=document.getElementById('task-treemap-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-treemap-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw';
+  var projs={};
+  S.tasks.forEach(function(t){var p=t.project||'No Project';projs[p]=(projs[p]||0)+1;});
+  var entries=Object.entries(projs).sort(function(a,b){return b[1]-a[1];});
+  var total=S.tasks.length||1;
+  var colors=['#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#22c55e','#f97316','#a855f7','#14b8a6'];
+  var w=540,ht=300;
+  // Simple treemap layout
+  var rects=[];var x=0;var y=0;var rw=w;var rh=ht;
+  entries.forEach(function(e,i){
+    var frac=e[1]/total;
+    if(rw>=rh){
+      var bw=Math.round(frac*rw);
+      rects.push({x:x,y:y,w:Math.max(bw,1),h:rh,label:e[0],count:e[1],color:colors[i%colors.length]});
+      x+=bw;rw-=bw;
+    }else{
+      var bh=Math.round(frac*rh);
+      rects.push({x:x,y:y,w:rw,h:Math.max(bh,1),label:e[0],count:e[1],color:colors[i%colors.length]});
+      y+=bh;rh-=bh;
+    }
+  });
+  var svg='<svg width="'+w+'" height="'+ht+'" viewBox="0 0 '+w+' '+ht+'">';
+  rects.forEach(function(r){
+    svg+='<rect x="'+r.x+'" y="'+r.y+'" width="'+r.w+'" height="'+r.h+'" fill="'+r.color+'" opacity="0.25" stroke="'+r.color+'" stroke-width="1.5" rx="3"><title>'+esc(r.label)+': '+r.count+' tasks</title></rect>';
+    if(r.w>40&&r.h>30){
+      svg+='<text x="'+(r.x+r.w/2)+'" y="'+(r.y+r.h/2-4)+'" fill="'+r.color+'" font-size="'+(r.w>100?'11':'9')+'" text-anchor="middle" font-weight="600">'+esc(r.label.length>15?r.label.substring(0,15)+'..':r.label)+'</text>';
+      svg+='<text x="'+(r.x+r.w/2)+'" y="'+(r.y+r.h/2+10)+'" fill="#999" font-size="9" text-anchor="middle">'+r.count+'</text>';
+    }
+  });
+  svg+='</svg>';
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Treemap</span><button onclick="document.getElementById(\'task-treemap-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="overflow-x:auto">'+svg+'</div>';
+  h+='<div style="font-size:9px;color:var(--text-muted);text-align:center;margin-top:6px">Area proportional to task count per project</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickPoll(){
+  let panel=document.getElementById('poll-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='poll-widget';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._polls)S._polls=[];
+  window._pollCreate=function(){
+    var q=document.getElementById('poll-q');var opts=document.getElementById('poll-opts');
+    if(!q||!opts||!q.value.trim()||!opts.value.trim())return;
+    var options=opts.value.split('\n').filter(function(o){return o.trim();}).map(function(o){return {text:o.trim(),votes:0};});
+    if(options.length<2)return;
+    S._polls.unshift({question:q.value.trim(),options:options,created:new Date().toISOString().split('T')[0]});
+    save();window._pollRender();
+  };
+  window._pollVote=function(pi,oi){S._polls[pi].options[oi].votes++;save();window._pollRender();};
+  window._pollDel=function(i){S._polls.splice(i,1);save();window._pollRender();};
+  window._pollRender=function(){
+    var el=document.getElementById('poll-widget');if(!el)return;
+    var h2='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Quick Polls</span><button onclick="document.getElementById(\'poll-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h2+='<input id="poll-q" placeholder="Question..." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:5px 8px;font-size:10px;color:var(--text);outline:none;margin-bottom:4px;box-sizing:border-box">';
+    h2+='<textarea id="poll-opts" placeholder="Options (one per line)..." style="width:100%;height:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:5px 8px;font-size:10px;color:var(--text);resize:none;outline:none;margin-bottom:6px;box-sizing:border-box"></textarea>';
+    h2+='<button onclick="window._pollCreate()" style="padding:5px 14px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600;margin-bottom:12px">Create Poll</button>';
+    S._polls.forEach(function(p,pi){
+      var totalV=p.options.reduce(function(s,o){return s+o.votes;},0);
+      h2+='<div style="border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:8px">';
+      h2+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;font-weight:600;color:var(--text)">'+esc(p.question)+'</span><button onclick="window._pollDel('+pi+')" style="background:none;border:none;color:#666;cursor:pointer;font-size:9px">x</button></div>';
+      p.options.forEach(function(o,oi){
+        var pct=totalV>0?Math.round(o.votes/totalV*100):0;
+        h2+='<div onclick="window._pollVote('+pi+','+oi+')" style="cursor:pointer;margin-bottom:4px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px"><span style="color:var(--text)">'+esc(o.text)+'</span><span style="color:var(--accent);font-family:var(--mono)">'+pct+'% ('+o.votes+')</span></div><div style="height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:3px;transition:width 0.3s"></div></div></div>';
+      });
+      h2+='<div style="font-size:8px;color:var(--text-muted);margin-top:4px">'+totalV+' votes | '+p.created+'</div>';
+      h2+='</div>';
+    });
+    if(S._polls.length===0)h2+='<div style="padding:10px;text-align:center;font-size:10px;color:var(--text-muted)">No polls yet</div>';
+    el.innerHTML=h2;
+  };
+  window._pollRender();
+}
+function showHashGenerator(){
+  let panel=document.getElementById('hash-gen-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='hash-gen-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw';
+  window._hashGen=async function(){
+    var text=document.getElementById('hash-input').value||'';
+    var enc=new TextEncoder();var data=enc.encode(text);
+    var results=[];
+    var algos=[{name:'SHA-256',algo:'SHA-256'},{name:'SHA-384',algo:'SHA-384'},{name:'SHA-512',algo:'SHA-512'},{name:'SHA-1',algo:'SHA-1'}];
+    for(var i=0;i<algos.length;i++){
+      try{
+        var hash=await crypto.subtle.digest(algos[i].algo,data);
+        var arr=Array.from(new Uint8Array(hash));
+        var hex=arr.map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+        results.push({name:algos[i].name,hex:hex});
+      }catch(e){results.push({name:algos[i].name,hex:'Error'});}
+    }
+    var out=document.getElementById('hash-out');if(!out)return;
+    out.innerHTML=results.map(function(r){
+      return '<div style="margin-bottom:8px"><div style="font-size:9px;color:var(--accent);font-weight:600;margin-bottom:2px">'+r.name+'</div><div style="display:flex;gap:4px"><input readonly value="'+r.hex+'" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 6px;font-size:9px;color:var(--text);font-family:var(--mono);outline:none"><button onclick="navigator.clipboard.writeText(\''+r.hex+'\')" style="padding:3px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:8px">Copy</button></div></div>';
+    }).join('');
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Hash Generator</span><button onclick="document.getElementById(\'hash-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="hash-input" oninput="window._hashGen()" placeholder="Type text to hash..." style="width:100%;height:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--text);resize:none;outline:none;margin-bottom:10px;box-sizing:border-box"></textarea>';
+  h+='<div id="hash-out"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectProgress(){
+  let panel=document.getElementById('proj-progress-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='proj-progress-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  var projs={};
+  S.tasks.forEach(function(t){
+    var p=t.project||'No Project';
+    if(!projs[p])projs[p]={total:0,done:0,inprog:0,p0:0,overdue:0};
+    projs[p].total++;
+    if(t.status==='done')projs[p].done++;
+    if(t.status==='in-progress')projs[p].inprog++;
+    if(t.priority==='p0'&&t.status!=='done')projs[p].p0++;
+    if(t.due&&t.due<new Date().toISOString().split('T')[0]&&t.status!=='done')projs[p].overdue++;
+  });
+  var entries=Object.entries(projs).sort(function(a,b){return b[1].total-a[1].total;});
+  var colors=['#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#22c55e','#f97316'];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Project Progress</span><button onclick="document.getElementById(\'proj-progress-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  entries.forEach(function(e,i){
+    var d=e[1];var pct=d.total>0?Math.round(d.done/d.total*100):0;
+    var col=colors[i%colors.length];
+    h+='<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:var(--radius);padding:10px">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:'+col+'">'+esc(e[0])+'</span><span style="font-size:11px;font-weight:700;color:var(--accent);font-family:var(--mono)">'+pct+'%</span></div>';
+    h+='<div style="height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:'+pct+'%;background:'+col+';border-radius:4px;transition:width 0.3s"></div></div>';
+    h+='<div style="display:flex;gap:10px;font-size:9px;color:var(--text-muted)">';
+    h+='<span>'+d.done+'/'+d.total+' done</span>';
+    h+='<span style="color:#f59e0b">'+d.inprog+' active</span>';
+    if(d.p0>0)h+='<span style="color:#ef4444">'+d.p0+' critical</span>';
+    if(d.overdue>0)h+='<span style="color:#ef4444">'+d.overdue+' overdue</span>';
+    h+='</div></div>';
+  });
+  if(entries.length===0)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No tasks yet</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickWhiteboard(){
+  let panel=document.getElementById('qwb-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='qwb-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw';
+  var w=550,ht=350;
+  window._qwbDrawing=false;window._qwbColor='#4ade80';window._qwbSize=2;
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:15px;color:var(--text)">Quick Sketch</span><div style="display:flex;gap:4px;align-items:center">';
+  ['#4ade80','#3b82f6','#ef4444','#f59e0b','#fff','#888'].forEach(function(c){
+    h+='<button onclick="window._qwbColor=\''+c+'\'" style="width:16px;height:16px;border-radius:50%;background:'+c+';border:1px solid #555;cursor:pointer"></button>';
+  });
+  h+='<select onchange="window._qwbSize=parseInt(this.value)" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:2px;font-size:9px;color:var(--text)"><option value="1">1px</option><option value="2" selected>2px</option><option value="4">4px</option><option value="8">8px</option></select>';
+  h+='<button onclick="var c=document.getElementById(\'qwb-canvas\');if(c)c.getContext(\'2d\').clearRect(0,0,'+w+','+ht+')" style="padding:2px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px">Clear</button>';
+  h+='<button onclick="document.getElementById(\'qwb-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button>';
+  h+='</div></div>';
+  h+='<canvas id="qwb-canvas" width="'+w+'" height="'+ht+'" style="background:#111;border:1px solid var(--border);border-radius:var(--radius);cursor:crosshair;display:block;width:100%"></canvas>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  var canvas=document.getElementById('qwb-canvas');
+  var ctx=canvas.getContext('2d');
+  ctx.lineCap='round';ctx.lineJoin='round';
+  function getPos(e){var r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*(w/r.width),y:(e.clientY-r.top)*(ht/r.height)};}
+  canvas.addEventListener('mousedown',function(e){window._qwbDrawing=true;ctx.beginPath();var p=getPos(e);ctx.moveTo(p.x,p.y);});
+  canvas.addEventListener('mousemove',function(e){if(!window._qwbDrawing)return;ctx.strokeStyle=window._qwbColor;ctx.lineWidth=window._qwbSize;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
+  canvas.addEventListener('mouseup',function(){window._qwbDrawing=false;});
+  canvas.addEventListener('mouseleave',function(){window._qwbDrawing=false;});
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
