@@ -6689,6 +6689,12 @@ function cmdGetItems(q) {
       ['python','Python pip venv pytest ref'],
       ['daily goals','Daily goals tracker with checkboxes'],
       ['text counter','Text counter words chars sentences'],
+      ['go','Go Golang mod build test ref'],
+      ['retro','Retrospective board went well improve actions'],
+      ['aspect ratio','Aspect ratio calculator presets'],
+      ['java','Java Gradle Maven build test ref'],
+      ['mood','Mood tracker daily log with graph'],
+      ['pomodoro','Simple pomodoro 25min timer'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10925,6 +10931,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='text counter' || ql==='word counter' || ql==='char count' || ql==='text stats')){
     items.unshift({title:'Text Counter',desc:'Words, chars, sentences, read time',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTextCounter();}});
+  }
+  if(ql && (ql==='go' || ql==='golang' || ql==='go ref' || ql==='go build')){
+    items.unshift({title:'Go/Golang Reference',desc:'Mod, build, test, cross-compile',icon:'G',type:'action',action:()=>{closeCommandPalette();showGoLangRef();}});
+  }
+  if(ql && (ql==='retro' || ql==='retrospective' || ql==='retro board' || ql==='sprint retro')){
+    items.unshift({title:'Retrospective Board',desc:'Went well, improve, action items',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskRetroBoard();}});
+  }
+  if(ql && (ql==='aspect ratio' || ql==='ratio calc' || ql==='aspect' || ql==='screen ratio')){
+    items.unshift({title:'Aspect Ratio Calculator',desc:'Width/height ratio with presets',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAspectRatioCalc();}});
+  }
+  if(ql && (ql==='java' || ql==='gradle' || ql==='maven' || ql==='java ref')){
+    items.unshift({title:'Java/Gradle/Maven Reference',desc:'Build, test, deps, wrapper',icon:'J',type:'action',action:()=>{closeCommandPalette();showJavaGradleRef();}});
+  }
+  if(ql && (ql==='mood' || ql==='mood tracker' || ql==='how am i' || ql==='feeling')){
+    items.unshift({title:'Mood Tracker',desc:'Daily mood log with trend graph',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskMoodTracker();}});
+  }
+  if(ql && (ql==='pomodoro' || ql==='pom timer' || ql==='25 min' || ql==='pomodoro timer')){
+    items.unshift({title:'Pomodoro Timer',desc:'25min work / 5min break cycle',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPomodoroSimple();}});
   }
   return items.slice(0, 20);
 }
@@ -38904,6 +38928,142 @@ function showQuickTextCounter(){
     stats.forEach(([label,val])=>{el.innerHTML+='<div style="padding:4px 8px;background:var(--bg-surface);border-radius:4px;display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--text-muted)">'+label+'</span><span style="font-size:11px;font-weight:600;color:var(--text-primary)">'+val+'</span></div>';});
   };
   window._updateTextCount();
+}
+function showGoLangRef(){
+  let p=document.getElementById('go-ref-panel');if(p)p.remove();
+  const cmds={'Module & Build':['go mod init mymodule','go mod tidy','go mod download','go mod vendor','go mod graph','go build','go build -o myapp','go build -ldflags="-s -w"','go install','go run main.go','go run .','go clean -cache'],'Testing':['go test','go test ./...','go test -v','go test -run TestName','go test -count=1','go test -race','go test -cover','go test -coverprofile=coverage.out','go tool cover -html=coverage.out','go test -bench=.','go test -benchmem'],'Tools':['go fmt ./...','go vet ./...','gofmt -s -w .','go doc package','go doc -all package','golangci-lint run','go generate ./...','go tool pprof','go tool trace','go version','go env'],'Dependencies':['go get package@latest','go get package@v1.2.3','go get -u ./...','go list -m all','go list -m -u all','go list -m -json all','go work init','go work use ./module'],'Cross Compile':['GOOS=linux GOARCH=amd64 go build','GOOS=darwin GOARCH=arm64 go build','GOOS=windows GOARCH=amd64 go build','go tool dist list','CGO_ENABLED=0 go build']};
+  p=document.createElement('div');p.id='go-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Go / Golang Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskRetroBoard(){
+  let p=document.getElementById('retro-panel');if(p)p.remove();
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._retroBoards)S._retroBoards={};
+  if(!S._retroBoards[today])S._retroBoards[today]={good:[],improve:[],action:[]};
+  p=document.createElement('div');p.id='retro-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderRetro=function(){
+    const board=S._retroBoards[today];
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Retrospective Board</div><div style="display:flex;gap:6px;align-items:center"><button onclick="window._copyRetro()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+new Date().toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+'</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
+    const cols=[{key:'good',label:'Went Well',color:'#4ade80',icon:'+'},{key:'improve',label:'To Improve',color:'#fbbf24',icon:'!'},{key:'action',label:'Action Items',color:'#60a5fa',icon:'>'}];
+    cols.forEach(col=>{
+      h+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;border-top:3px solid '+col.color+'">';
+      h+='<div style="font-size:12px;font-weight:600;color:'+col.color+';margin-bottom:8px">'+col.label+'</div>';
+      board[col.key].forEach((item,i)=>{
+        h+='<div style="display:flex;justify-content:space-between;align-items:start;padding:4px 6px;background:var(--bg-elevated);border-radius:4px;margin-bottom:4px"><span style="font-size:11px;color:var(--text-primary);flex:1">'+esc(item)+'</span><button onclick="window._removeRetroItem(\''+col.key+'\','+i+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;flex-shrink:0">&times;</button></div>';
+      });
+      h+='<input type="text" placeholder="Add..." onkeydown="if(event.key===\'Enter\'){window._addRetroItem(\''+col.key+'\',this.value);this.value=\'\'}" style="width:100%;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:4px 6px;color:var(--text-primary);font-size:11px;margin-top:4px">';
+      h+='</div>';
+    });
+    h+='</div>';
+    document.getElementById('retro-panel').innerHTML=h;
+  };
+  window._addRetroItem=function(col,text){if(!text.trim())return;S._retroBoards[today][col].push(text.trim());save();window._renderRetro();};
+  window._removeRetroItem=function(col,i){S._retroBoards[today][col].splice(i,1);save();window._renderRetro();};
+  window._copyRetro=function(){const b=S._retroBoards[today];let md='# Retro - '+today+'\n\n## Went Well\n'+b.good.map(i=>'- '+i).join('\n')+'\n\n## To Improve\n'+b.improve.map(i=>'- '+i).join('\n')+'\n\n## Action Items\n'+b.action.map(i=>'- '+i).join('\n');navigator.clipboard.writeText(md);};
+  document.body.appendChild(p);
+  window._renderRetro();
+}
+function showQuickAspectRatioCalc(){
+  let w=document.getElementById('aspect-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='aspect-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Aspect Ratio</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="display:flex;gap:6px;margin-bottom:8px"><div><label style="font-size:10px;color:var(--text-muted)">Width</label><input type="number" id="ar-w" value="1920" oninput="window._calcAR()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px"></div><div><label style="font-size:10px;color:var(--text-muted)">Height</label><input type="number" id="ar-h" value="1080" oninput="window._calcAR()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px"></div></div><div id="ar-result" style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px;margin-bottom:8px"></div><div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Common ratios:</div><div style="display:flex;flex-wrap:wrap;gap:4px" id="ar-presets"></div>';
+  document.body.appendChild(w);
+  const presets=[{label:'16:9',w:1920,h:1080},{label:'4:3',w:1024,h:768},{label:'21:9',w:2560,h:1080},{label:'1:1',w:1080,h:1080},{label:'9:16',w:1080,h:1920},{label:'3:2',w:1500,h:1000}];
+  const pe=document.getElementById('ar-presets');
+  presets.forEach(p=>{pe.innerHTML+='<button onclick="document.getElementById(\'ar-w\').value='+p.w+';document.getElementById(\'ar-h\').value='+p.h+';window._calcAR()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer">'+p.label+'</button>';});
+  window._calcAR=function(){
+    const w=parseInt(document.getElementById('ar-w').value)||1;const h=parseInt(document.getElementById('ar-h').value)||1;
+    const gcd=function(a,b){return b?gcd(b,a%b):a;};const g=gcd(w,h);
+    const ratio=(w/g)+':'+(h/g);const decimal=(w/h).toFixed(4);
+    document.getElementById('ar-result').innerHTML='<div style="font-size:24px;font-weight:700;color:var(--accent)">'+ratio+'</div><div style="font-size:11px;color:var(--text-muted)">'+decimal+' | '+w+'x'+h+'</div>';
+  };
+  window._calcAR();
+}
+function showJavaGradleRef(){
+  let p=document.getElementById('gradle-ref-panel');if(p)p.remove();
+  const cmds={'Build & Run':['gradle build','gradle build -x test','gradle clean','gradle clean build','gradle run','gradle bootRun','gradle jar','gradle bootJar','gradle assemble','gradle classes'],'Testing':['gradle test','gradle test --tests MyTest','gradle test --info','gradle test --rerun-tasks','gradle jacocoTestReport','gradle check'],'Dependencies':['gradle dependencies','gradle dependencies --configuration runtimeClasspath','gradle dependencyInsight --dependency lib','gradle refreshDependencies','gradle buildEnvironment'],'Tasks & Info':['gradle tasks','gradle tasks --all','gradle properties','gradle projects','gradle help --task build','gradle --version','gradle --status','gradle --stop'],'Wrapper':['gradle wrapper','gradle wrapper --gradle-version 8.5','./gradlew build','./gradlew bootRun','./gradlew test','chmod +x gradlew'],'Maven (mvn)':['mvn clean install','mvn clean package','mvn test','mvn compile','mvn dependency:tree','mvn spring-boot:run','mvn versions:display-dependency-updates','mvn -pl module -am install']};
+  p=document.createElement('div');p.id='gradle-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Java / Gradle / Maven Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskMoodTracker(){
+  let p=document.getElementById('mood-panel');if(p)p.remove();
+  if(!S._moodLog)S._moodLog=[];
+  p=document.createElement('div');p.id='mood-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const moods=[{level:5,label:'Great',color:'#4ade80'},{level:4,label:'Good',color:'#a3e635'},{level:3,label:'Okay',color:'#fbbf24'},{level:2,label:'Low',color:'#fb923c'},{level:1,label:'Rough',color:'#f87171'}];
+  window._renderMood=function(){
+    const today=new Date().toISOString().split('T')[0];
+    const todayEntry=S._moodLog.find(m=>m.date===today);
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Mood Tracker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+    h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">How are you feeling today?</div>';
+    h+='<div style="display:flex;gap:8px;margin-bottom:16px;justify-content:center">';
+    moods.forEach(m=>{
+      const selected=todayEntry&&todayEntry.level===m.level;
+      h+='<button onclick="window._logMood('+m.level+')" style="width:60px;padding:10px 4px;background:'+(selected?m.color:'var(--bg-surface)')+';color:'+(selected?'#000':'var(--text-primary)')+';border:2px solid '+(selected?m.color:'var(--border)')+';border-radius:8px;cursor:pointer;text-align:center"><div style="font-size:18px;margin-bottom:2px">'+['','(',':|',':|',':)','XD'][m.level]+'</div><div style="font-size:9px">'+m.label+'</div></button>';
+    });
+    h+='</div>';
+    if(todayEntry&&todayEntry.note){h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Today\'s note:</div><div style="font-size:12px;color:var(--text-primary);padding:6px;background:var(--bg-surface);border-radius:4px;margin-bottom:12px">'+esc(todayEntry.note)+'</div>';}
+    h+='<input type="text" id="mood-note" placeholder="Add a note (optional)..." onkeydown="if(event.key===\'Enter\')window._saveMoodNote()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;margin-bottom:12px">';
+    const last7=S._moodLog.slice(-7);
+    if(last7.length>0){
+      h+='<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Last 7 entries</div>';
+      const w2=300,ht=60;
+      h+='<svg width="'+w2+'" height="'+(ht+20)+'" viewBox="0 0 '+w2+' '+(ht+20)+'" style="width:100%">';
+      let path='M';
+      last7.forEach((entry,i)=>{const x=(i/(Math.max(last7.length-1,1)))*w2;const y=ht-((entry.level-1)/4)*ht;path+=(i===0?'':' L')+x.toFixed(1)+' '+y.toFixed(1);const mc=moods.find(m=>m.level===entry.level);h+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4" fill="'+(mc?mc.color:'#888')+'"/>';h+='<text x="'+x.toFixed(1)+'" y="'+(ht+14)+'" font-size="8" fill="var(--text-muted)" text-anchor="middle">'+entry.date.slice(5)+'</text>';});
+      h+='<path d="'+path+'" fill="none" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="2"/>';
+      h+='</svg>';
+    }
+    document.getElementById('mood-panel').innerHTML=h;
+  };
+  window._logMood=function(level){
+    const today=new Date().toISOString().split('T')[0];
+    const existing=S._moodLog.findIndex(m=>m.date===today);
+    if(existing>=0)S._moodLog[existing].level=level;
+    else S._moodLog.push({date:today,level,note:''});
+    save();window._renderMood();
+  };
+  window._saveMoodNote=function(){
+    const today=new Date().toISOString().split('T')[0];
+    const note=document.getElementById('mood-note').value.trim();
+    const existing=S._moodLog.findIndex(m=>m.date===today);
+    if(existing>=0)S._moodLog[existing].note=note;
+    else S._moodLog.push({date:today,level:3,note});
+    save();window._renderMood();
+  };
+  document.body.appendChild(p);
+  window._renderMood();
+}
+function showQuickPomodoroSimple(){
+  let w=document.getElementById('pom-simple-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='pom-simple-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Pomodoro</div><button onclick="if(window._pomInterval2)clearInterval(window._pomInterval2);this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="pom-display2" style="font-size:40px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:4px;font-family:monospace">25:00</div><div id="pom-label2" style="font-size:11px;color:var(--accent);text-align:center;margin-bottom:10px">Work Session</div><div id="pom-count2" style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:10px">Sessions: 0</div><div style="display:flex;gap:6px"><button onclick="window._pomStart2()" id="pom-btn2" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Start</button><button onclick="window._pomReset2()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Reset</button><button onclick="window._pomSkip2()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Skip</button></div>';
+  document.body.appendChild(w);
+  window._pomState2='work';window._pomTime2=25*60;window._pomSessions2=0;window._pomRunning2=false;window._pomInterval2=null;
+  window._pomUpdate2=function(){const m=Math.floor(window._pomTime2/60);const s=window._pomTime2%60;document.getElementById('pom-display2').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');document.getElementById('pom-display2').style.color=window._pomState2==='work'?'var(--text-primary)':'#4ade80';document.getElementById('pom-label2').textContent=window._pomState2==='work'?'Work Session':'Break';document.getElementById('pom-count2').textContent='Sessions: '+window._pomSessions2;};
+  window._pomStart2=function(){if(window._pomRunning2){clearInterval(window._pomInterval2);window._pomRunning2=false;document.getElementById('pom-btn2').textContent='Start';return;}window._pomRunning2=true;document.getElementById('pom-btn2').textContent='Pause';window._pomInterval2=setInterval(()=>{window._pomTime2--;if(window._pomTime2<=0){clearInterval(window._pomInterval2);window._pomRunning2=false;document.getElementById('pom-btn2').textContent='Start';if(window._pomState2==='work'){window._pomSessions2++;window._pomState2='break';window._pomTime2=5*60;}else{window._pomState2='work';window._pomTime2=25*60;}window._pomUpdate2();}else window._pomUpdate2();},1000);};
+  window._pomReset2=function(){if(window._pomInterval2)clearInterval(window._pomInterval2);window._pomRunning2=false;window._pomState2='work';window._pomTime2=25*60;document.getElementById('pom-btn2').textContent='Start';window._pomUpdate2();};
+  window._pomSkip2=function(){if(window._pomInterval2)clearInterval(window._pomInterval2);window._pomRunning2=false;if(window._pomState2==='work'){window._pomSessions2++;window._pomState2='break';window._pomTime2=5*60;}else{window._pomState2='work';window._pomTime2=25*60;}document.getElementById('pom-btn2').textContent='Start';window._pomUpdate2();};
+  window._pomUpdate2();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
