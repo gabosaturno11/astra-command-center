@@ -6002,6 +6002,9 @@ function cmdGetItems(q) {
       ['random task','Pick a random active task to work on'],
       ['sort content','Permanently sort all content items by various criteria'],
       ['water','Track daily water intake with glass counter'],
+      ['reading queue','Unread/read link tracking with mark-as-read'],
+      ['completion graph','14-day SVG bar chart of created vs completed tasks'],
+      ['color picker','Quick color picker with palette and hex input'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8108,6 +8111,18 @@ function cmdGetItems(q) {
   // Water prefix
   if(ql && (ql==='water' || ql==='water tracker' || ql==='hydration' || ql==='drink')){
     items.unshift({title:'Water Tracker',desc:'Track daily water glasses',icon:'W',type:'action',action:()=>{closeCommandPalette();showWaterTracker();}});
+  }
+  // Reading queue prefix
+  if(ql && (ql==='reading queue' || ql==='read later' || ql==='unread' || ql==='reading list')){
+    items.unshift({title:'Reading Queue',desc:'Track unread/read links',icon:'R',type:'action',action:()=>{closeCommandPalette();showLinkReadingQueue();}});
+  }
+  // Completion graph prefix
+  if(ql && (ql==='completion graph' || ql==='task graph' || ql==='created vs done' || ql==='velocity graph')){
+    items.unshift({title:'Completion Graph',desc:'14-day created vs completed SVG chart',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskCompletionGraph();}});
+  }
+  // Color picker prefix
+  if(ql && (ql==='color picker' || ql==='color' || ql==='colours' || ql==='hex color')){
+    items.unshift({title:'Color Picker',desc:'Quick color palette with hex input',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColor();}});
   }
   return items.slice(0, 20);
 }
@@ -15415,6 +15430,83 @@ function showWaterTracker(){
   h+='<button onclick="(function(){const k=new Date().toISOString().split(\'T\')[0];S._waterLog[k]=(S._waterLog[k]||0)+1;save();showWaterTracker();})()" style="flex:1;padding:8px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">+ Glass</button>';
   h+='<button onclick="(function(){const k=new Date().toISOString().split(\'T\')[0];S._waterLog[k]=Math.max(0,(S._waterLog[k]||0)-1);save();showWaterTracker();})()" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;cursor:pointer;font-size:11px">-</button></div>';
   if(glasses>=goal)h+='<div style="text-align:center;font-size:10px;color:var(--accent);margin-top:8px;font-weight:600">Goal reached! Stay hydrated!</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showLinkReadingQueue(){
+  let panel=document.getElementById('link-queue-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='link-queue-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const links=S.links||[];
+  const unread=links.filter(l=>!l.read);
+  const read=links.filter(l=>l.read);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Reading Queue</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:flex;gap:12px;margin-bottom:12px;font-size:11px;color:var(--text-muted)"><span>Unread: <strong style="color:var(--accent)">'+unread.length+'</strong></span><span>Read: <strong>'+read.length+'</strong></span><span>Total: <strong>'+links.length+'</strong></span></div>';
+  h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Unread ('+unread.length+')</h4>';
+  if(unread.length===0)h+='<div style="color:var(--text-muted);font-size:11px;padding:8px 0">All caught up!</div>';
+  unread.slice(0,20).forEach(l=>{
+    let domain='';try{domain=new URL(l.url).hostname.replace('www.','');}catch(e){}
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px">';
+    h+='<button onclick="(function(){const l=S.links.find(x=>x.id===\''+l.id+'\');if(l)l.read=true;save();showLinkReadingQueue();})()" style="width:20px;height:20px;border-radius:50%;border:2px solid var(--border);background:transparent;cursor:pointer;flex-shrink:0"></button>';
+    h+='<div style="flex:1;overflow:hidden"><a href="'+esc(l.url)+'" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(l.title||domain||l.url)+'</a>';
+    h+='<div style="font-size:9px;color:var(--text-muted)">'+esc(domain)+'</div></div></div>';
+  });
+  if(read.length>0){
+    h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Read ('+read.length+')</h4>';
+    read.slice(0,10).forEach(l=>{
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:6px;opacity:0.5;font-size:11px">';
+      h+='<span style="color:var(--accent);font-size:10px">V</span>';
+      h+='<span>'+esc(l.title||l.url)+'</span></div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskCompletionGraph(){
+  let panel=document.getElementById('task-completion-graph-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-completion-graph-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=S.tasks||[];
+  const days14=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days14.push(d.toISOString().split('T')[0]);}
+  const created=days14.map(d=>tasks.filter(t=>t.created&&t.created.startsWith(d)).length);
+  const done=days14.map(d=>tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt.startsWith(d)).length);
+  const maxVal=Math.max(...created,...done,1);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Completion Graph</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;display:flex;gap:12px"><span><span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:2px;margin-right:4px"></span>Created</span><span><span style="display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:2px;margin-right:4px"></span>Completed</span></div>';
+  // SVG chart
+  const w=600;const ch=180;const padding=30;const barW=(w-padding*2)/14/2-2;
+  h+='<svg viewBox="0 0 '+w+' '+(ch+30)+'" style="width:100%;height:auto">';
+  // Grid lines
+  for(let i=0;i<=4;i++){const y=padding+i*(ch-padding)/4;h+='<line x1="'+padding+'" y1="'+y+'" x2="'+(w-10)+'" y2="'+y+'" stroke="rgba(255,255,255,0.05)" />';}
+  days14.forEach((d,i)=>{
+    const x=padding+i*(w-padding*2)/14;
+    const cH=created[i]/maxVal*(ch-padding);
+    const dH=done[i]/maxVal*(ch-padding);
+    h+='<rect x="'+x+'" y="'+(ch-cH)+'" width="'+barW+'" height="'+Math.max(1,cH)+'" fill="#3b82f6" rx="2" />';
+    h+='<rect x="'+(x+barW+2)+'" y="'+(ch-dH)+'" width="'+barW+'" height="'+Math.max(1,dH)+'" fill="#4ade80" rx="2" />';
+    if(i%2===0)h+='<text x="'+(x+barW)+'" y="'+(ch+16)+'" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="9">'+d.slice(5)+'</text>';
+  });
+  h+='</svg>';
+  const total14Created=created.reduce((s,v)=>s+v,0);
+  const total14Done=done.reduce((s,v)=>s+v,0);
+  h+='<div style="display:flex;gap:20px;margin-top:8px;font-size:11px;color:var(--text-muted)">';
+  h+='<span>14-day created: <strong style="color:#3b82f6">'+total14Created+'</strong></span>';
+  h+='<span>14-day done: <strong style="color:var(--accent)">'+total14Done+'</strong></span>';
+  h+='<span>Net: <strong style="color:'+(total14Done>=total14Created?'var(--accent)':'#ef4444')+'">'+(total14Done-total14Created)+'</strong></span></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickColor(){
+  let panel=document.getElementById('quick-color-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-color-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  const colors=['#ef4444','#f97316','#eab308','#22c55e','#4ade80','#14b8a6','#06b6d4','#22d3ee','#3b82f6','#6366f1','#8b5cf6','#a78bfa','#d946ef','#ec4899','#f43f5e','#ffffff','#6b7280','#000000'];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Color Picker</h4><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<div id="qc-preview" style="height:40px;border-radius:6px;background:#4ade80;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-family:monospace;color:#000">#4ade80</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:8px">';
+  colors.forEach(c=>{
+    h+='<button onclick="(function(){document.getElementById(\'qc-preview\').style.background=\''+c+'\';document.getElementById(\'qc-preview\').textContent=\''+c+'\';document.getElementById(\'qc-hex\').value=\''+c+'\';navigator.clipboard.writeText(\''+c+'\');})()" style="width:100%;aspect-ratio:1;border-radius:4px;background:'+c+';border:1px solid var(--border);cursor:pointer"></button>';
+  });
+  h+='</div>';
+  h+='<input id="qc-hex" placeholder="#hex" value="#4ade80" oninput="document.getElementById(\'qc-preview\').style.background=this.value;document.getElementById(\'qc-preview\').textContent=this.value" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;font-family:monospace;box-sizing:border-box;margin-bottom:6px">';
+  h+='<button onclick="(function(){navigator.clipboard.writeText(document.getElementById(\'qc-hex\').value);if(typeof showNotification===\'function\')showNotification(\'Color copied!\');})()" style="width:100%;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Copy Color</button>';
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
