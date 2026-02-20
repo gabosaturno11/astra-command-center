@@ -5948,6 +5948,9 @@ function cmdGetItems(q) {
       ['quote','Random motivational quote (15 curated quotes)'],
       ['accent color','Change ASTRA accent color (12 options)'],
       ['session log','Log what you worked on with timestamps'],
+      ['recent edits','Most recently edited items across all sections'],
+      ['doc outline','Document headings/outlines from writer docs'],
+      ['backlog','Backlog groomer: prioritize and schedule unassigned tasks'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7838,6 +7841,18 @@ function cmdGetItems(q) {
   // Session log prefix
   if(ql && (ql==='session log' || ql==='work log' || ql==='log session' || ql==='what i did')){
     items.unshift({title:'Session Log',desc:'Log what you worked on with timestamps',icon:'L',type:'action',action:()=>{closeCommandPalette();showSessionLog();}});
+  }
+  // Recent edits prefix
+  if(ql && (ql==='recent edits' || ql==='last edited' || ql==='recently modified' || ql==='latest edits')){
+    items.unshift({title:'Recent Edits',desc:'Most recently edited items everywhere',icon:'R',type:'action',action:()=>{closeCommandPalette();showRecentEdits();}});
+  }
+  // Doc outline prefix
+  if(ql && (ql==='doc outline' || ql==='document outline' || ql==='headings' || ql==='doc structure')){
+    items.unshift({title:'Document Outlines',desc:'Heading structure of writer docs',icon:'O',type:'action',action:()=>{closeCommandPalette();showDocOutline();}});
+  }
+  // Backlog prefix
+  if(ql && (ql==='backlog' || ql==='backlog groomer' || ql==='unscheduled' || ql==='groom backlog')){
+    items.unshift({title:'Backlog Groomer',desc:'Prioritize and schedule unassigned tasks',icon:'B',type:'action',action:()=>{closeCommandPalette();showBacklogGroomer();}});
   }
   return items.slice(0, 20);
 }
@@ -13636,6 +13651,70 @@ function showSessionLog(){
   }
   render();
   document.body.appendChild(panel);
+}
+function showRecentEdits(){
+  let panel=document.getElementById('recent-edits-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='recent-edits-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const items=[];
+  (S.content||[]).forEach(c=>{if(c.updatedAt)items.push({type:'Content',title:c.title,date:c.updatedAt,color:'#a78bfa'});else if(c.createdAt)items.push({type:'Content',title:c.title,date:c.createdAt,color:'#a78bfa'});});
+  (S.tasks||[]).forEach(t=>{if(t.completedAt)items.push({type:'Task',title:t.title,date:t.completedAt,color:'#60a5fa'});else if(t.createdAt)items.push({type:'Task',title:t.title,date:t.createdAt,color:'#60a5fa'});});
+  (S.writerDocs||[]).forEach(d=>{if(d.updatedAt)items.push({type:'Doc',title:d.title,date:d.updatedAt,color:'#fbbf24'});});
+  (S.links||[]).forEach(l=>{if(l.createdAt)items.push({type:'Link',title:l.title||l.url,date:l.createdAt,color:'#38bdf8'});});
+  items.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Recent Edits</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!items.length)h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No recent edits found</div>';
+  items.slice(0,30).forEach(item=>{
+    const d=new Date(item.date);
+    const ago=Math.floor((Date.now()-d)/(1000*60));
+    let agoStr;
+    if(ago<60)agoStr=ago+'m ago';else if(ago<1440)agoStr=Math.floor(ago/60)+'h ago';else agoStr=Math.floor(ago/1440)+'d ago';
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)"><div style="background:${item.color};color:#000;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;min-width:45px;text-align:center">${item.type}</div><div style="flex:1;font-size:11px;color:var(--text-primary)">${esc((item.title||'Untitled').substring(0,40))}</div><div style="font-size:9px;color:var(--text-muted)">${agoStr}</div></div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDocOutline(){
+  let panel=document.getElementById('doc-outline-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='doc-outline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const docs=(S.writerDocs||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Document Outlines</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!docs.length){h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No writer docs found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  docs.forEach(d=>{
+    const headings=[];
+    (d.content||'').split('\n').forEach(line=>{
+      const m=line.match(/^(#{1,3})\s+(.+)/);
+      if(m)headings.push({level:m[1].length,text:m[2]});
+    });
+    h+=`<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:4px">${esc(d.title||'Untitled')}</div>`;
+    if(!headings.length){h+=`<div style="font-size:10px;color:var(--text-muted);padding-left:12px">No headings found (use # syntax)</div>`;}
+    headings.forEach(heading=>{
+      const indent=(heading.level-1)*16;
+      h+=`<div style="font-size:11px;color:var(--text-secondary);padding:2px 0 2px ${indent+12}px">${'#'.repeat(heading.level)} ${esc(heading.text)}</div>`;
+    });
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showBacklogGroomer(){
+  let panel=document.getElementById('backlog-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='backlog-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const backlog=(S.tasks||[]).filter(t=>t.status==='todo'&&!t.due);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Backlog Groomer (${backlog.length})</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!backlog.length){h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No unscheduled TODO tasks. Your backlog is clean!</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Tasks without due dates. Set priority and schedule them.</div>';
+  backlog.forEach(t=>{
+    const age=t.createdAt?Math.floor((Date.now()-new Date(t.createdAt))/(1000*60*60*24)):0;
+    const ageColor=age>14?'#f87171':age>7?'#facc15':'#4ade80';
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px">`;
+    h+=`<div style="min-width:30px;text-align:center;font-size:10px;color:${ageColor};font-weight:600">${age}d</div>`;
+    h+=`<div style="flex:1;font-size:11px;color:var(--text-primary)">${esc(t.title||'').substring(0,35)}</div>`;
+    h+=`<select onchange="const task=(S.tasks||[]).find(x=>x.id==='${t.id}');if(task){task.priority=this.value;save();}" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:2px;font-size:9px"><option value="" ${!t.priority?'selected':''}>-</option><option value="p0" ${t.priority==='p0'?'selected':''}>P0</option><option value="p1" ${t.priority==='p1'?'selected':''}>P1</option><option value="p2" ${t.priority==='p2'?'selected':''}>P2</option><option value="p3" ${t.priority==='p3'?'selected':''}>P3</option></select>`;
+    h+=`<input type="date" value="${t.due||''}" onchange="const task=(S.tasks||[]).find(x=>x.id==='${t.id}');if(task){task.due=this.value;save();}" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:2px;font-size:9px;width:100px">`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
