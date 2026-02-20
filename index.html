@@ -6527,6 +6527,12 @@ function cmdGetItems(q) {
       ['sed','sed stream editor reference'],
       ['workload','Workload balance across projects'],
       ['countdown','Countdown timer with presets'],
+      ['awk','awk text processing reference'],
+      ['task age','Task age distribution analysis'],
+      ['dice','Dice roller for tabletop games'],
+      ['jq','jq JSON processor reference'],
+      ['tag cloud','Visual tag cloud from tasks and content'],
+      ['lorem','Lorem ipsum placeholder text generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10277,6 +10283,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='timer countdown' || ql==='count down')){
     items.unshift({title:'Countdown Timer',desc:'Countdown with preset durations',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
+  }
+  if(ql && (ql==='awk' || ql==='awk ref' || ql==='awk commands' || ql==='text processing')){
+    items.unshift({title:'awk Reference',desc:'Text processing and pattern scanning',icon:'A',type:'action',action:()=>{closeCommandPalette();showAwkRef();}});
+  }
+  if(ql && (ql==='task age' || ql==='age distribution' || ql==='task aging' || ql==='stale tasks')){
+    items.unshift({title:'Task Age Distribution',desc:'How old are your active tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAgeDistribution();}});
+  }
+  if(ql && (ql==='dice' || ql==='dice roller' || ql==='d20' || ql==='roll dice')){
+    items.unshift({title:'Dice Roller',desc:'Roll d4 through d100 dice',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDiceRoller();}});
+  }
+  if(ql && (ql==='jq' || ql==='jq ref' || ql==='json processor' || ql==='jq commands')){
+    items.unshift({title:'jq Reference',desc:'JSON processor commands and filters',icon:'J',type:'action',action:()=>{closeCommandPalette();showJqRef();}});
+  }
+  if(ql && (ql==='tag cloud' || ql==='tags' || ql==='tag overview' || ql==='tag visualization')){
+    items.unshift({title:'Tag Cloud',desc:'Visual tag cloud from all items',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTagCloud();}});
+  }
+  if(ql && (ql==='lorem' || ql==='lorem ipsum' || ql==='placeholder text' || ql==='dummy text')){
+    items.unshift({title:'Lorem Generator',desc:'Generate placeholder text',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLoremGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -33550,6 +33574,238 @@ function showQuickCountdownTimer(){
     render();
   };
   window._cdReset=()=>{running=false;clearInterval(window._cdInterval);timeLeft=total;render();};
+  render();
+  document.body.appendChild(d);
+}
+function showAwkRef(){
+  const cmds={
+    'Basic Usage':{
+      'awk \'{print}\'':'Print all lines',
+      'awk \'{print $1}\'':'Print first field',
+      'awk \'{print $1,$3}\'':'Print fields 1 and 3',
+      'awk -F: \'{print $1}\'':'Set field separator to :',
+      'awk \'/pattern/\'':'Print matching lines',
+      'awk \'!/pattern/\'':'Print non-matching lines',
+      'awk \'NR==5\'':'Print line 5 only',
+      'awk \'NR>=5 && NR<=10\'':'Print lines 5-10'
+    },
+    'Variables':{
+      'NR':'Current line number',
+      'NF':'Number of fields in current line',
+      'FS':'Input field separator',
+      'OFS':'Output field separator',
+      'RS':'Input record separator',
+      'ORS':'Output record separator',
+      'FILENAME':'Current filename',
+      '$0':'Entire current line'
+    },
+    'Patterns':{
+      'BEGIN{...}':'Execute before processing',
+      'END{...}':'Execute after processing',
+      '/regex/{...}':'Match regex pattern',
+      '$1 > 100{...}':'Field comparison',
+      'length($0) > 80':'Line length filter',
+      'awk \'{sum+=$1} END{print sum}\'':'Sum column values',
+      'awk \'{print NR": "$0}\'':'Add line numbers',
+      'awk \'!seen[$0]++\'':'Remove duplicates'
+    },
+    'Functions':{
+      'length(s)':'String length',
+      'substr(s,pos,len)':'Substring extraction',
+      'split(s,arr,sep)':'Split string into array',
+      'gsub(/pat/,"rep",s)':'Global substitute',
+      'sub(/pat/,"rep",s)':'First substitute',
+      'tolower(s)':'Convert to lowercase',
+      'toupper(s)':'Convert to uppercase',
+      'sprintf(fmt,args)':'Formatted string'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">awk Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskAgeDistribution(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const now=new Date();
+  const buckets=[{label:'< 1 day',max:1},{label:'1-3 days',max:3},{label:'3-7 days',max:7},{label:'1-2 weeks',max:14},{label:'2-4 weeks',max:28},{label:'1-3 months',max:90},{label:'3+ months',max:Infinity}];
+  const active=tasks.filter(t=>t.status!=='done');
+  const counts=buckets.map(()=>0);
+  active.forEach(t=>{
+    const created=new Date(t.created||t.id||now);
+    const days=(now-created)/(1000*60*60*24);
+    for(let i=0;i<buckets.length;i++){if(days<buckets[i].max){counts[i]++;break;}}
+  });
+  const maxC=Math.max(...counts,1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Task Age Distribution</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="color:var(--text-muted);font-size:11px;margin-bottom:12px">'+active.length+' active tasks analyzed</div>';
+  buckets.forEach((b,i)=>{
+    const pct=Math.round((counts[i]/maxC)*100);
+    const color=i<2?'#4ade80':i<4?'#f59e0b':'#ef4444';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    html+='<span style="font-size:11px;color:var(--text-muted);min-width:80px;text-align:right">'+b.label+'</span>';
+    html+='<div style="flex:1;height:16px;background:var(--bg-base);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:4px;min-width:'+(counts[i]?'2px':'0')+'"></div></div>';
+    html+='<span style="font-size:11px;color:var(--text-muted);min-width:24px">'+counts[i]+'</span>';
+    html+='</div>';
+  });
+  const avgAge=active.length?Math.round(active.reduce((s,t)=>{const c=new Date(t.created||t.id||now);return s+(now-c)/(1000*60*60*24);},0)/active.length):0;
+  html+='<div style="color:var(--text-muted);font-size:11px;text-align:center;margin-top:12px;padding-top:8px;border-top:1px solid var(--border)">Average age: '+avgAge+' days</div>';
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickDiceRoller(){
+  let ex=document.getElementById('dice-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='dice-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let history=[];
+  const dice=[{label:'d4',sides:4},{label:'d6',sides:6},{label:'d8',sides:8},{label:'d10',sides:10},{label:'d12',sides:12},{label:'d20',sides:20},{label:'d100',sides:100}];
+  function roll(sides){const arr=new Uint32Array(1);crypto.getRandomValues(arr);return(arr[0]%sides)+1;}
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">Dice Roller</span><button onclick="document.getElementById(\'dice-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">';
+    dice.forEach(die=>{
+      html+='<button onclick="window._rollDie('+die.sides+')" style="background:var(--bg-surface);color:#4ade80;border:1px solid var(--border);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;min-width:44px">'+die.label+'</button>';
+    });
+    html+='</div>';
+    if(history.length){
+      html+='<div style="background:var(--bg-base);border-radius:6px;padding:8px;max-height:150px;overflow-y:auto">';
+      history.slice(-10).reverse().forEach((h,i)=>{
+        html+='<div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;'+(i===0?'color:#4ade80;font-weight:600':'color:var(--text-muted)')+'"><span>'+h.die+'</span><span style="font-family:monospace;font-size:14px">'+h.result+'</span></div>';
+      });
+      html+='</div>';
+      html+='<button onclick="window._clearDice()" style="width:100%;margin-top:8px;background:var(--bg-surface);color:var(--text-muted);border:1px solid var(--border);padding:4px;border-radius:4px;cursor:pointer;font-size:11px">Clear History</button>';
+    }
+    d.innerHTML=html;
+  }
+  window._rollDie=(sides)=>{const r=roll(sides);history.push({die:'d'+sides,result:r});render();};
+  window._clearDice=()=>{history=[];render();};
+  render();
+  document.body.appendChild(d);
+}
+function showJqRef(){
+  const cmds={
+    'Basic Filters':{
+      '.':'Identity (pass through)',
+      '.key':'Object field access',
+      '.key1.key2':'Nested field access',
+      '.[]':'Iterate array elements',
+      '.[0]':'Array index',
+      '.[2:5]':'Array slice',
+      '.key[]':'Iterate object field array',
+      'keys':'Get object keys'
+    },
+    'Output Control':{
+      '-r':'Raw output (no quotes)',
+      '-c':'Compact output',
+      '-S':'Sort keys',
+      '-e':'Exit on error',
+      '--tab':'Use tabs for indent',
+      '--indent N':'Set indent level',
+      '-n':'Null input mode',
+      '--slurp/-s':'Read all inputs as array'
+    },
+    'Selection':{
+      'select(.key > 5)':'Filter by condition',
+      'select(.name | test("pat"))':'Filter by regex',
+      'map(.)':'Apply to each element',
+      'map(select(.x))':'Filter array elements',
+      '[.[] | select(.a)]':'Filter and collect',
+      'first(.[]|select(.x))':'Get first match',
+      'limit(3; .[])':'Limit results',
+      'del(.key)':'Delete field'
+    },
+    'Transformation':{
+      '{newkey: .oldkey}':'Rename fields',
+      '[.[] | .field]':'Extract field from array',
+      'group_by(.key)':'Group array by key',
+      'sort_by(.key)':'Sort by field',
+      'unique_by(.key)':'Unique by field',
+      'to_entries':'Object to key-value pairs',
+      'from_entries':'Key-value pairs to object',
+      'flatten':'Flatten nested arrays'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">jq Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskTagCloud(){
+  const tasks=S.tasks||[];const content=S.content||[];
+  const tagMap={};
+  tasks.forEach(t=>{(t.tags||[]).forEach(tag=>{tagMap[tag]=(tagMap[tag]||0)+1;});});
+  content.forEach(c=>{(c.tags||[]).forEach(tag=>{tagMap[tag]=(tagMap[tag]||0)+1;});});
+  const entries=Object.entries(tagMap).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length){alert('No tags found');return;}
+  const maxCount=entries[0][1];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Tag Cloud</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="color:var(--text-muted);font-size:11px;margin-bottom:12px">'+entries.length+' unique tags across tasks and content</div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px">';
+  entries.slice(0,50).forEach(([tag,count])=>{
+    const size=12+Math.round((count/maxCount)*16);
+    const opacity=0.5+(count/maxCount)*0.5;
+    html+='<span style="font-size:'+size+'px;color:rgba(74,222,128,'+opacity+');cursor:default;padding:2px 6px" title="'+count+' items">'+esc(tag)+'</span>';
+  });
+  html+='</div>';
+  html+='<div style="border-top:1px solid var(--border);padding-top:12px">';
+  entries.slice(0,15).forEach(([tag,count])=>{
+    const pct=Math.round((count/maxCount)*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted);min-width:100px;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(tag)+'</span>';
+    html+='<div style="flex:1;height:8px;background:var(--bg-base);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:4px"></div></div>';
+    html+='<span style="font-size:11px;color:var(--text-muted);min-width:24px">'+count+'</span></div>';
+  });
+  html+='</div></div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickLoremGenerator(){
+  let ex=document.getElementById('lorem-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='lorem-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+  const words='lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+  function genWords(n){let out=[];for(let i=0;i<n;i++)out.push(words[Math.floor(Math.random()*words.length)]);out[0]=out[0][0].toUpperCase()+out[0].slice(1);return out.join(' ')+'.';}
+  function genSentences(n){let out=[];for(let i=0;i<n;i++)out.push(genWords(8+Math.floor(Math.random()*12)));return out.join(' ');}
+  function genParagraphs(n){let out=[];for(let i=0;i<n;i++)out.push(genSentences(3+Math.floor(Math.random()*4)));return out.join('\n\n');}
+  let mode='paragraphs',count=3;
+  function render(){
+    let text=mode==='words'?genWords(count):mode==='sentences'?genSentences(count):genParagraphs(count);
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">Lorem Generator</span><button onclick="document.getElementById(\'lorem-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="display:flex;gap:4px;margin-bottom:8px">';
+    ['words','sentences','paragraphs'].forEach(m=>{
+      html+='<button onclick="window._loremMode(\''+m+'\')" style="background:'+(mode===m?'#4ade8033':'var(--bg-surface)')+';color:'+(mode===m?'#4ade80':'var(--text-muted)')+';border:1px solid '+(mode===m?'#4ade80':'var(--border)')+';padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">'+m[0].toUpperCase()+m.slice(1)+'</button>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:11px;color:var(--text-muted)">Count:</span><input type="number" value="'+count+'" min="1" max="100" onchange="window._loremCount(this.value)" style="width:60px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:4px;font-size:12px"></div>';
+    html+='<div id="lorem-output" style="background:var(--bg-base);padding:10px;border-radius:6px;font-size:11px;color:var(--text-secondary);max-height:180px;overflow-y:auto;line-height:1.6;white-space:pre-wrap">'+esc(text)+'</div>';
+    html+='<div style="display:flex;gap:8px;margin-top:8px">';
+    html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'lorem-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',500)" style="flex:1;background:#4ade80;color:#000;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Copy</button>';
+    html+='<button onclick="window._loremRegen()" style="flex:1;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px;border-radius:4px;cursor:pointer;font-size:12px">Regenerate</button>';
+    html+='</div>';
+    d.innerHTML=html;
+  }
+  window._loremMode=(m)=>{mode=m;render();};
+  window._loremCount=(v)=>{count=Math.max(1,parseInt(v)||1);render();};
+  window._loremRegen=()=>{render();};
   render();
   document.body.appendChild(d);
 }
