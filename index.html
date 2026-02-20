@@ -5951,6 +5951,9 @@ function cmdGetItems(q) {
       ['recent edits','Most recently edited items across all sections'],
       ['doc outline','Document headings/outlines from writer docs'],
       ['backlog','Backlog groomer: prioritize and schedule unassigned tasks'],
+      ['focus score history','30-day focus score trend line chart'],
+      ['convert','Convert between types: content>task, task>content, etc.'],
+      ['workspace stats','Comprehensive 12-metric workspace statistics'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7853,6 +7856,18 @@ function cmdGetItems(q) {
   // Backlog prefix
   if(ql && (ql==='backlog' || ql==='backlog groomer' || ql==='unscheduled' || ql==='groom backlog')){
     items.unshift({title:'Backlog Groomer',desc:'Prioritize and schedule unassigned tasks',icon:'B',type:'action',action:()=>{closeCommandPalette();showBacklogGroomer();}});
+  }
+  // Focus score history prefix
+  if(ql && (ql==='focus score history' || ql==='score history' || ql==='focus trend' || ql==='score trend')){
+    items.unshift({title:'Focus Score History',desc:'30-day focus score trend chart',icon:'F',type:'action',action:()=>{closeCommandPalette();showFocusScoreHistory();}});
+  }
+  // Convert prefix
+  if(ql && (ql==='convert' || ql==='quick convert' || ql==='transform' || ql==='change type')){
+    items.unshift({title:'Quick Convert',desc:'Convert between content, task, link, doc',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickConvert();}});
+  }
+  // Workspace stats prefix
+  if(ql && (ql==='workspace stats' || ql==='all stats' || ql==='statistics' || ql==='numbers')){
+    items.unshift({title:'Workspace Statistics',desc:'12-metric comprehensive stats overview',icon:'S',type:'action',action:()=>{closeCommandPalette();showWorkspaceStats();}});
   }
   return items.slice(0, 20);
 }
@@ -13714,6 +13729,98 @@ function showBacklogGroomer(){
     h+=`<input type="date" value="${t.due||''}" onchange="const task=(S.tasks||[]).find(x=>x.id==='${t.id}');if(task){task.due=this.value;save();}" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:2px;font-size:9px;width:100px">`;
     h+=`</div>`;
   });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showFocusScoreHistory(){
+  let panel=document.getElementById('focus-score-hist-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='focus-score-hist-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const stats=(S._dailyStats||[]);
+  const days=30;const now=new Date();
+  const dayScores=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const dateStr=d.toISOString().split('T')[0];
+    const stat=stats.find(s=>s.date===dateStr);
+    let score=0;
+    if(stat){score=Math.min(100,((stat.tasksDone||0)*10)+((stat.contentCreated||0)*15)+((stat.focusMinutes||0)*0.5)+((stat.wordsWritten||0)*0.01));}
+    dayScores.push({label:d.toLocaleDateString('en',{month:'short',day:'numeric'}),score:Math.round(score),date:dateStr});
+  }
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Focus Score Trend (30 Days)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const avg=dayScores.reduce((s,d)=>s+d.score,0)/days;
+  h+=`<div style="text-align:center;margin-bottom:12px"><span style="font-size:28px;font-weight:700;color:${avg>=70?'#4ade80':avg>=40?'#facc15':'#f87171'}">${avg.toFixed(0)}</span><span style="font-size:12px;color:var(--text-muted)"> avg score</span></div>`;
+  const svgW=560,svgH=140,padL=30,padB=20,padT=10;
+  const chartW=svgW-padL-10,chartH=svgH-padT-padB;
+  h+=`<svg width="100%" viewBox="0 0 ${svgW} ${svgH}" style="display:block">`;
+  for(let i=0;i<=4;i++){const y=padT+chartH-i*(chartH/4);h+=`<line x1="${padL}" y1="${y}" x2="${svgW-10}" y2="${y}" stroke="var(--border)" stroke-width="0.5"/>`;h+=`<text x="${padL-3}" y="${y+3}" text-anchor="end" fill="var(--text-muted)" font-size="8">${i*25}</text>`;}
+  let path='';
+  dayScores.forEach((d,i)=>{
+    const x=padL+i*(chartW/(days-1));
+    const y=padT+chartH-d.score/100*chartH;
+    path+=(i===0?'M':'L')+x+','+y;
+    const color=d.score>=70?'#4ade80':d.score>=40?'#facc15':'#f87171';
+    if(d.score>0)h+=`<circle cx="${x}" cy="${y}" r="2.5" fill="${color}"/>`;
+  });
+  h+=`<path d="${path}" fill="none" stroke="#4ade80" stroke-width="1.5" opacity="0.7"/>`;
+  dayScores.forEach((d,i)=>{if(i%5===0){const x=padL+i*(chartW/(days-1));h+=`<text x="${x}" y="${svgH-3}" text-anchor="middle" fill="var(--text-muted)" font-size="7">${d.label}</text>`;}});
+  h+=`</svg>`;
+  const activeDays=dayScores.filter(d=>d.score>0).length;
+  const bestDay=dayScores.reduce((max,d)=>d.score>max.score?d:max,{score:0,label:'-'});
+  h+=`<div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:10px;color:var(--text-muted)"><span>${activeDays} active days</span><span>Best: ${bestDay.score} (${bestDay.label})</span></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickConvert(){
+  let panel=document.getElementById('quick-convert-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-convert-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Quick Convert</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:16px">Convert items between types. Original item is preserved.</div>';
+  const conversions=[
+    {from:'Content',to:'Task',desc:'Create task from content title',action:function(){const items=(S.content||[]);if(!items.length){alert('No content items');return;}const titles=items.map(c=>c.title||'Untitled').slice(0,20);const pick=prompt('Enter content title to convert to task:\\n'+titles.join('\\n'));if(!pick)return;const item=items.find(c=>(c.title||'').toLowerCase().includes(pick.toLowerCase()));if(!item){alert('Not found');return;}if(!S.tasks)S.tasks=[];S.tasks.push({id:'t_'+Date.now(),title:item.title||'',description:item.body||'',status:'todo',priority:'p2',due:'',tags:item.tags||[],createdAt:new Date().toISOString(),timeTracked:0});save();alert('Task created from: '+item.title);}},
+    {from:'Task',to:'Content',desc:'Save task as content note',action:function(){const tasks=(S.tasks||[]).filter(t=>t.status==='done');if(!tasks.length){alert('No done tasks');return;}const titles=tasks.map(t=>t.title||'Untitled').slice(0,20);const pick=prompt('Enter done task title to save as content:\\n'+titles.join('\\n'));if(!pick)return;const task=tasks.find(t=>(t.title||'').toLowerCase().includes(pick.toLowerCase()));if(!task){alert('Not found');return;}if(!S.content)S.content=[];S.content.unshift({id:'c_'+Date.now(),title:task.title,body:(task.description||'')+'\\n\\nConverted from task. Priority: '+(task.priority||'none'),tags:task.tags||[],theme:'From Task',createdAt:new Date().toISOString()});save();alert('Content created from: '+task.title);}},
+    {from:'Link',to:'Content',desc:'Save link as content reference',action:function(){const links=(S.links||[]);if(!links.length){alert('No links');return;}const pick=prompt('Enter link title/URL to save as content:');if(!pick)return;const link=links.find(l=>(l.title||'').toLowerCase().includes(pick.toLowerCase())||(l.url||'').toLowerCase().includes(pick.toLowerCase()));if(!link){alert('Not found');return;}if(!S.content)S.content=[];S.content.unshift({id:'c_'+Date.now(),title:link.title||link.url,body:'URL: '+(link.url||'')+'\\nCategory: '+(link.category||'')+'\\n\\nConverted from link.',tags:link.tags||[],theme:'Reference',createdAt:new Date().toISOString()});save();alert('Content created from link: '+(link.title||link.url));}},
+    {from:'Content',to:'Writer Doc',desc:'Create writer doc from content',action:function(){const items=(S.content||[]).filter(c=>(c.body||'').length>50);if(!items.length){alert('No content items with enough text');return;}const pick=prompt('Enter content title to create writer doc:');if(!pick)return;const item=items.find(c=>(c.title||'').toLowerCase().includes(pick.toLowerCase()));if(!item){alert('Not found');return;}if(!S.writerDocs)S.writerDocs=[];S.writerDocs.push({id:'wd_'+Date.now(),title:item.title||'Untitled',content:item.body||'',versions:[],updatedAt:new Date().toISOString()});save();alert('Writer doc created from: '+item.title);}},
+  ];
+  conversions.forEach(c=>{
+    h+=`<div onclick="(${c.action.toString()})()" style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-surface);border-radius:8px;margin-bottom:6px;cursor:pointer">`;
+    h+=`<div style="font-size:11px;color:#60a5fa;font-weight:600;min-width:60px">${c.from}</div>`;
+    h+=`<div style="color:var(--accent);font-size:14px">></div>`;
+    h+=`<div style="font-size:11px;color:#4ade80;font-weight:600;min-width:60px">${c.to}</div>`;
+    h+=`<div style="font-size:10px;color:var(--text-muted);flex:1">${c.desc}</div>`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWorkspaceStats(){
+  let panel=document.getElementById('ws-stats-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='ws-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const t=(S.tasks||[]);const c=(S.content||[]);const l=(S.links||[]);const d=(S.writerDocs||[]);const p=(S.projects||[]);
+  const totalWords=c.reduce((s,i)=>s+(i.body||'').trim().split(/\s+/).filter(Boolean).length,0)+d.reduce((s,i)=>s+(i.content||'').trim().split(/\s+/).filter(Boolean).length,0);
+  const stateSize=JSON.stringify(S).length;
+  const allTags=new Set();
+  c.forEach(i=>(i.tags||[]).forEach(tg=>allTags.add(tg)));
+  t.forEach(i=>(i.tags||[]).forEach(tg=>allTags.add(tg)));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Workspace Statistics</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const stats=[
+    {label:'Total Tasks',value:t.length,color:'#60a5fa'},
+    {label:'Done Tasks',value:t.filter(i=>i.status==='done').length,color:'#4ade80'},
+    {label:'In Progress',value:t.filter(i=>i.status==='in-progress').length,color:'#facc15'},
+    {label:'Content Items',value:c.length,color:'#a78bfa'},
+    {label:'Links',value:l.length,color:'#38bdf8'},
+    {label:'Writer Docs',value:d.length,color:'#fbbf24'},
+    {label:'Projects',value:p.length,color:'#f472b6'},
+    {label:'Total Words',value:totalWords.toLocaleString(),color:'#34d399'},
+    {label:'Unique Tags',value:allTags.size,color:'#fb923c'},
+    {label:'Storage',value:(stateSize/1024).toFixed(1)+'KB',color:'#818cf8'},
+    {label:'Est. Pages',value:Math.ceil(totalWords/250),color:'#2dd4bf'},
+    {label:'Completion %',value:t.length?(Math.round(t.filter(i=>i.status==='done').length/t.length*100)+'%'):'N/A',color:'#f87171'},
+  ];
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  stats.forEach(s=>{
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:${s.color}">${s.value}</div><div style="font-size:9px;color:var(--text-muted)">${s.label}</div></div>`;
+  });
+  h+='</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
