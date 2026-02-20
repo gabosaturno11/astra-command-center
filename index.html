@@ -1011,6 +1011,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="writer-toolbar-btn" onclick="toggleWriterPanel()" title="History">H</button>
               <button class="writer-toolbar-btn" onclick="writerDetailedStats()" title="Detailed writing statistics">St</button>
               <button class="writer-toolbar-btn" onclick="mergeDocs()" title="Merge another doc into current">Mg</button>
+              <button class="writer-toolbar-btn" onclick="writerOutline()" title="Show document outline (headings)">Out</button>
               <select class="writer-toolbar-select" id="writer-export-sel" onchange="writerExport(this.value);this.selectedIndex=0">
                 <option value="">Export</option>
                 <option value="md">Markdown</option>
@@ -3320,6 +3321,23 @@ function writerDetailedStats(){
     'Headings: '+headings,'Links: '+links
   ];
   alert((d.title||'Untitled')+'\n\n'+stats.join('\n'));
+}
+function writerOutline(){
+  const ed=document.getElementById('writer-editor');if(!ed)return;
+  const headings=ed.querySelectorAll('h1,h2,h3,h4,h5');
+  if(!headings.length){toast('No headings found in document');return;}
+  let existing=document.getElementById('writer-outline-panel');
+  if(existing){existing.remove();return;}
+  const panel=document.createElement('div');panel.id='writer-outline-panel';
+  panel.style.cssText='position:absolute;right:8px;top:40px;width:220px;max-height:60vh;overflow-y:auto;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)';
+  let html='<div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><span>Outline ('+headings.length+')</span><span onclick="this.closest(\'#writer-outline-panel\').remove()" style="cursor:pointer;font-size:10px">x</span></div>';
+  headings.forEach((h,i)=>{
+    const level=parseInt(h.tagName[1]);const indent=(level-1)*12;
+    html+=`<div style="padding:3px 4px 3px ${indent}px;cursor:pointer;font-size:${13-level}px;color:var(--text-secondary);border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="document.getElementById('writer-editor').querySelectorAll('h1,h2,h3,h4,h5')[${i}].scrollIntoView({behavior:'smooth',block:'center'})">${esc(h.textContent||'Untitled')}</div>`;
+  });
+  panel.innerHTML=html;
+  ed.parentElement.style.position='relative';
+  ed.parentElement.appendChild(panel);
 }
 function writerToContent(){const d=getActiveDoc();if(!d)return;snapshotWriter();const ed=document.getElementById('writer-editor');const text=ed.innerText||'';if(!text.trim()){toast('Document is empty');return;}S.content.unshift({id:Date.now(),type:'caption',theme:d.title||'writer',body:text,tags:['from-writer'],source:'writer-export',created:new Date().toISOString()});save();toast('Saved to Content: '+(d.title||'Untitled').substring(0,30));}
 function exportAllDocs(){
@@ -5981,6 +5999,31 @@ function cmdGetItems(q) {
       items.unshift({title:p+' ('+pct+'%)',desc:active+' active, '+done+' done | '+specs+' specs'+(tm?' | '+formatTimeSpent(tm)+' tracked':''),icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p;renderTasks();}});
     });
     if(!filtered.length)items.unshift({title:'No projects found',desc:'Tasks have no project assignments',icon:'!',type:'info'});
+  }
+  // Goal tracker prefix
+  if(ql && (ql.startsWith('goal:') || ql==='goal' || ql==='goals')){
+    if(!S.goals)S.goals=[];
+    const gq=ql.startsWith('goal:')?q.substring(5).trim():'';
+    if(gq && gq.startsWith('+')){
+      const parts=gq.substring(1).trim().split('/');
+      const name=parts[0]?.trim();const target=parseInt(parts[1])||100;const unit=parts[2]?.trim()||'';
+      if(name){items.unshift({title:'Create goal: '+name+' (0/'+target+(unit?' '+unit:'')+')',desc:'Add new trackable goal',icon:'+',type:'action',action:()=>{S.goals.push({id:Date.now(),name,target,current:0,unit,created:new Date().toISOString()});save();toast('Goal created: '+name);closeCommandPalette();}});}
+    }else{
+      S.goals.forEach(g=>{
+        const pct=g.target?Math.round((g.current/g.target)*100):0;
+        const barW=80;const fillW=Math.min(Math.round((pct/100)*barW),barW);
+        items.unshift({title:g.name+' ('+g.current+'/'+g.target+(g.unit?' '+g.unit:'')+') '+pct+'%',desc:'Click to increment | goal:+1 / goal:-1 to adjust',icon:'G',type:'action',action:()=>{
+          const adj=prompt('Adjust "'+g.name+'" ('+g.current+'/'+g.target+')\nEnter new value or +/-N:','+'+(g.target>10?1:Math.ceil(g.target/10)));
+          if(!adj)return;
+          if(adj.startsWith('+'))g.current=Math.min(g.current+parseInt(adj.substring(1))||1,g.target);
+          else if(adj.startsWith('-'))g.current=Math.max(g.current-(parseInt(adj.substring(1))||1),0);
+          else g.current=Math.max(0,Math.min(parseInt(adj)||0,g.target));
+          if(g.current>=g.target)toast('Goal completed: '+g.name+'!');
+          save();closeCommandPalette();
+        }});
+      });
+      if(!S.goals.length)items.unshift({title:'No goals yet',desc:'Type goal:+name/target/unit (e.g. goal:+Book chapters/12/chapters)',icon:'!',type:'info'});
+    }
   }
   // Habit tracker prefix
   if(ql && (ql.startsWith('habit:') || ql==='habit' || ql==='habits')){
