@@ -5814,6 +5814,9 @@ function cmdGetItems(q) {
       ['quick actions','Floating action bar with most-used functions'],
       ['due heatmap','Calendar heatmap of task due dates (load per day)'],
       ['writing goals','Set and track daily/weekly word count goals'],
+      ['project compare','Side-by-side comparison of two projects'],
+      ['task aging','Find stale/aging tasks that need attention'],
+      ['import links md','Import links from pasted markdown text'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7158,6 +7161,18 @@ function cmdGetItems(q) {
   // Writing goals prefix
   if(ql && (ql==='writing goals' || ql==='word goals' || ql==='writing target' || ql==='word count goal')){
     items.unshift({title:'Writing Goals',desc:'Set and track daily/weekly word count targets',icon:'W',type:'action',action:()=>{closeCommandPalette();showWritingGoals();}});
+  }
+  // Project compare prefix
+  if(ql && (ql==='project compare' || ql==='compare projects' || ql==='project vs' || ql==='project comparison')){
+    items.unshift({title:'Project Comparison',desc:'Side-by-side stats for two projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showProjectComparison();}});
+  }
+  // Task aging prefix
+  if(ql && (ql==='task aging' || ql==='stale tasks' || ql==='old tasks' || ql==='aging report')){
+    items.unshift({title:'Task Aging Report',desc:'Find stale (30d+), aging (14-30d), and fresh (<14d) tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAging();}});
+  }
+  // Import links from markdown prefix
+  if(ql && (ql==='import links md' || ql==='import links' || ql==='paste links' || ql==='markdown links')){
+    items.unshift({title:'Import Links from Markdown',desc:'Paste markdown text to extract and import URLs',icon:'L',type:'action',action:()=>{closeCommandPalette();importLinksFromMarkdown();}});
   }
   return items.slice(0, 20);
 }
@@ -8527,6 +8542,102 @@ function showWritingGoals(){
   h+=`<div style="display:flex;gap:8px;margin-bottom:12px"><div style="flex:1"><label style="font-size:9px;color:var(--text-muted)">Daily Words</label><input id="wg-daily" type="number" value="${S._writingGoals.daily}" style="width:100%;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;box-sizing:border-box"></div><div style="flex:1"><label style="font-size:9px;color:var(--text-muted)">Weekly Words</label><input id="wg-weekly" type="number" value="${S._writingGoals.weekly}" style="width:100%;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;box-sizing:border-box"></div><button onclick="S._writingGoals={daily:parseInt(document.getElementById('wg-daily').value)||500,weekly:parseInt(document.getElementById('wg-weekly').value)||3000};save();toast('Goals updated');showWritingGoals()" style="padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;font-size:10px;font-weight:600;cursor:pointer;align-self:flex-end">Save</button></div>`;
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Writing Goals</span><button onclick="document.getElementById('writing-goals-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
+}
+function showProjectComparison(){
+  let panel=document.getElementById('proj-compare-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='proj-compare-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
+  if(projects.length<2){panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Project Comparison</span><button onclick="document.getElementById('proj-compare-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">Need at least 2 projects to compare</div>`;document.body.appendChild(panel);return;}
+  function getStats(proj){
+    const tasks=S.tasks.filter(t=>t.project===proj);
+    const done=tasks.filter(t=>t.status==='done').length;
+    const active=tasks.filter(t=>t.status!=='done').length;
+    const today=new Date().toISOString().split('T')[0];
+    const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today).length;
+    const content=S.content.filter(c=>c.theme===proj||c.project===proj).length;
+    const docs=(S.docs||[]).filter(d=>d.project===proj).length;
+    const links=(S.links||[]).filter(l=>l.project===proj).length;
+    const totalWords=tasks.reduce((s,t)=>s+((t.description||'').split(/\s+/).length),0);
+    const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);const weekStr=weekAgo.toISOString().split('T')[0];
+    const velocity=tasks.filter(t=>t.completedAt&&t.completedAt.split('T')[0]>=weekStr).length;
+    return{total:tasks.length,done,active,overdue,content,docs,links,velocity,pct:tasks.length?Math.round(done/tasks.length*100):0};
+  }
+  let h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  projects.slice(0,2).forEach((proj,i)=>{
+    const s=getStats(proj);
+    const healthScore=Math.min(100,Math.max(0,s.pct-(s.overdue*10)+(s.velocity*5)));
+    const healthColor=healthScore>=70?'#22c55e':healthScore>=40?'#f59e0b':'#ef4444';
+    h+=`<div style="padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px;border-bottom:2px solid ${i===0?'#3b82f6':'#8b5cf6'};padding-bottom:4px">${esc(proj)}</div>`;
+    h+=`<div style="font-size:9px;display:grid;gap:4px">`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Tasks</span><span style="color:var(--text-primary)">${s.total}</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Done</span><span style="color:#22c55e">${s.done} (${s.pct}%)</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Active</span><span style="color:#3b82f6">${s.active}</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Overdue</span><span style="color:#ef4444">${s.overdue}</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">7d Velocity</span><span style="color:var(--accent)">${s.velocity}</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Content</span><span>${s.content}</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Docs</span><span>${s.docs}</span></div>`;
+    h+=`<div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Links</span><span>${s.links}</span></div>`;
+    h+=`<div style="margin-top:4px;display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Health</span><span style="color:${healthColor};font-weight:600">${healthScore}</span></div>`;
+    h+=`</div></div>`;
+  });
+  h+='</div>';
+  if(projects.length>2){h+=`<div style="font-size:9px;color:var(--text-muted);margin-top:8px">Showing first 2 of ${projects.length} projects</div>`;}
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Project Comparison</span><button onclick="document.getElementById('proj-compare-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showTaskAging(){
+  let panel=document.getElementById('task-aging-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-aging-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();
+  const active=S.tasks.filter(t=>t.status!=='done').map(t=>{
+    const created=t.createdAt?new Date(t.createdAt):now;
+    const ageDays=Math.floor((now-created)/(1000*60*60*24));
+    return{...t,ageDays};
+  }).sort((a,b)=>b.ageDays-a.ageDays);
+  const stale=active.filter(t=>t.ageDays>30);
+  const aging=active.filter(t=>t.ageDays>14&&t.ageDays<=30);
+  const fresh=active.filter(t=>t.ageDays<=14);
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#ef4444">${stale.length}</div><div style="font-size:8px;color:var(--text-muted)">Stale (30+ days)</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#f59e0b">${aging.length}</div><div style="font-size:8px;color:var(--text-muted)">Aging (14-30)</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#22c55e">${fresh.length}</div><div style="font-size:8px;color:var(--text-muted)">Fresh (<14)</div></div>`;
+  h+='</div>';
+  function renderGroup(tasks,label,color){
+    if(!tasks.length)return'';
+    let r=`<div style="font-size:10px;font-weight:600;color:${color};margin-bottom:4px">${label}</div>`;
+    tasks.slice(0,12).forEach(t=>{
+      r+=`<div onclick="document.getElementById('task-aging-panel').remove();openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:6px;padding:3px 6px;cursor:pointer;border-left:2px solid ${color};margin:2px 0;font-size:10px" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="min-width:30px;font-size:8px;color:${color};font-weight:600">${t.ageDays}d</span><span style="flex:1;color:var(--text-primary)">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:var(--text-muted)">${t.status}</span></div>`;
+    });
+    if(tasks.length>12)r+=`<div style="font-size:8px;color:var(--text-muted);padding:2px 6px">+${tasks.length-12} more</div>`;
+    return r+'<div style="height:8px"></div>';
+  }
+  h+=renderGroup(stale,'Stale Tasks (30+ days old)','#ef4444');
+  h+=renderGroup(aging,'Aging Tasks (14-30 days)','#f59e0b');
+  h+=renderGroup(fresh,'Fresh Tasks (<14 days)','#22c55e');
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Task Aging Report</span><button onclick="document.getElementById('task-aging-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function importLinksFromMarkdown(){
+  const text=prompt('Paste markdown with URLs (e.g. [title](url) or raw URLs):');
+  if(!text)return;
+  const linkRegex=/\[([^\]]+)\]\(([^)]+)\)/g;
+  const urlRegex=/https?:\/\/[^\s<>"']+/g;
+  const found=[];let m;
+  while((m=linkRegex.exec(text))!==null){found.push({title:m[1],url:m[2]});}
+  const rawUrls=text.match(urlRegex)||[];
+  rawUrls.forEach(u=>{if(!found.some(f=>f.url===u))found.push({title:u.replace(/https?:\/\//,'').substring(0,40),url:u});});
+  if(!found.length){toast('No URLs found in text');return;}
+  const existing=new Set((S.links||[]).map(l=>l.url));
+  let added=0;
+  found.forEach(f=>{
+    if(existing.has(f.url))return;
+    S.links.unshift({id:Date.now()+added,title:f.title,url:f.url,category:'imported',createdAt:new Date().toISOString()});
+    added++;
+  });
+  save();renderLinks();
+  toast('Imported '+added+' links ('+(found.length-added)+' duplicates skipped)');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
