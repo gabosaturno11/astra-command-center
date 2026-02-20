@@ -6020,6 +6020,12 @@ function cmdGetItems(q) {
       ['eisenhower','Eisenhower matrix - urgent vs important task grid'],
       ['recent activity','Cross-section activity timeline'],
       ['quick note','Floating sticky note widget'],
+      ['project timeline','Gantt-style project date ranges'],
+      ['recurring','Overview of all recurring tasks'],
+      ['quick link','Floating quick link saver widget'],
+      ['data backup','Full data export/import and snapshot manager'],
+      ['wall of fame','Showcase completed high-priority tasks'],
+      ['content calendar','Content items on a monthly calendar grid'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8198,6 +8204,30 @@ function cmdGetItems(q) {
   // Quick note prefix
   if(ql && (ql==='quick note' || ql==='sticky' || ql==='sticky note' || ql==='note widget')){
     items.unshift({title:'Quick Note',desc:'Floating sticky note widget',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNote();}});
+  }
+  // Project timeline prefix
+  if(ql && (ql==='project timeline' || ql==='gantt' || ql==='timeline projects' || ql==='project dates')){
+    items.unshift({title:'Project Timeline',desc:'Gantt-style project date ranges',icon:'T',type:'action',action:()=>{closeCommandPalette();showProjectTimeline();}});
+  }
+  // Recurring prefix
+  if(ql && (ql==='recurring' || ql==='recurrence' || ql==='recurring tasks' || ql==='repeat')){
+    items.unshift({title:'Recurring Tasks',desc:'Overview of all recurring tasks',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskRecurrence();}});
+  }
+  // Quick link prefix
+  if(ql && (ql==='quick link' || ql==='save link' || ql==='link widget' || ql==='bookmark quick')){
+    items.unshift({title:'Quick Link',desc:'Floating link saver widget',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLink();}});
+  }
+  // Data backup prefix
+  if(ql && (ql==='data backup' || ql==='backup' || ql==='export data' || ql==='import data')){
+    items.unshift({title:'Data Backup',desc:'Full export/import and snapshots',icon:'B',type:'action',action:()=>{closeCommandPalette();showDataBackup();}});
+  }
+  // Wall of fame prefix
+  if(ql && (ql==='wall of fame' || ql==='fame' || ql==='achievements' || ql==='completed p0')){
+    items.unshift({title:'Wall of Fame',desc:'Completed high-priority tasks',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWallOfFame();}});
+  }
+  // Content calendar prefix
+  if(ql && (ql==='content calendar' || ql==='content dates' || ql==='content grid' || ql==='when content')){
+    items.unshift({title:'Content Calendar',desc:'Content on monthly grid',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentCalendar();}});
   }
   return items.slice(0, 20);
 }
@@ -16070,6 +16100,212 @@ function showQuickNote(){
     if(S._quickNotes.length)h+='<button onclick="S._quickNotes=[];save();this.closest(\'#quick-note-widget\')._render()" style="margin-top:6px;background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:10px;padding:3px 8px;width:100%">Clear All</button>';
     panel.innerHTML=h;
     panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showProjectTimeline(){
+  let panel=document.getElementById('proj-timeline-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='proj-timeline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=(S.projects||[]);
+  const tasks=(S.tasks||[]);
+  const now=new Date();
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Project Timeline</span><button onclick="this.closest(\'#proj-timeline-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!projects.length){
+    h+='<div style="text-align:center;color:var(--text-muted);padding:30px;font-size:12px">No projects found</div>';
+  } else {
+    // Find date range: earliest task created to latest task due
+    let minDate=now,maxDate=now;
+    tasks.forEach(t=>{
+      if(t.created){const d=new Date(t.created);if(d<minDate)minDate=d;}
+      if(t.due){const d=new Date(t.due);if(d>maxDate)maxDate=d;}
+    });
+    const rangeMs=maxDate-minDate||86400000;
+    const totalDays=Math.max(Math.ceil(rangeMs/86400000),7);
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">'+minDate.toISOString().substring(0,10)+' to '+maxDate.toISOString().substring(0,10)+' ('+totalDays+' days)</div>';
+    projects.forEach(p=>{
+      const ptasks=tasks.filter(t=>t.project===p.name||t.projectId===p.id);
+      if(!ptasks.length)return;
+      const done=ptasks.filter(t=>t.status==='done').length;
+      const pct=Math.round(done/ptasks.length*100);
+      // Find this project's date span
+      let pMin=maxDate,pMax=minDate;
+      ptasks.forEach(t=>{
+        if(t.created){const d=new Date(t.created);if(d<pMin)pMin=d;}
+        if(t.due){const d=new Date(t.due);if(d>pMax)pMax=d;}
+        if(t.completedAt){const d=new Date(t.completedAt);if(d>pMax)pMax=d;}
+      });
+      const leftPct=Math.max(0,Math.round((pMin-minDate)/rangeMs*100));
+      const widthPct=Math.max(5,Math.round((pMax-pMin)/rangeMs*100));
+      const col=pct===100?'#4ade80':pct>50?'#f59e0b':'#3b82f6';
+      h+='<div style="margin-bottom:10px">';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--text);font-weight:600">'+esc(p.name)+'</span><span style="font-size:10px;color:var(--text-muted)">'+done+'/'+ptasks.length+' ('+pct+'%)</span></div>';
+      h+='<div style="height:18px;background:var(--bg-surface);border-radius:3px;position:relative;overflow:hidden">';
+      h+='<div style="position:absolute;left:'+leftPct+'%;width:'+widthPct+'%;height:100%;background:'+col+'44;border-radius:3px"></div>';
+      h+='<div style="position:absolute;left:'+leftPct+'%;width:'+(widthPct*pct/100)+'%;height:100%;background:'+col+';border-radius:3px"></div>';
+      h+='</div></div>';
+    });
+    // Today marker info
+    const todayPct=Math.round((now-minDate)/rangeMs*100);
+    h+='<div style="font-size:10px;color:#4ade80;margin-top:8px">Today is at '+todayPct+'% of the timeline</div>';
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskRecurrence(){
+  let panel=document.getElementById('recurrence-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='recurrence-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const recurring=(S.tasks||[]).filter(t=>t.recurrence&&t.recurrence!=='none');
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Recurring Tasks</span><button onclick="this.closest(\'#recurrence-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+recurring.length+' recurring tasks configured</div>';
+  if(!recurring.length){
+    h+='<div style="text-align:center;color:var(--text-muted);padding:30px;font-size:12px">No recurring tasks. Set recurrence in task detail modal.</div>';
+  }
+  const groups={};
+  recurring.forEach(t=>{
+    const r=t.recurrence||'unknown';
+    if(!groups[r])groups[r]=[];
+    groups[r].push(t);
+  });
+  const recColors={daily:'#ef4444',weekday:'#f59e0b',weekly:'#3b82f6',biweekly:'#8b5cf6',monthly:'#4ade80'};
+  Object.keys(groups).sort().forEach(r=>{
+    const col=recColors[r]||'#6b7280';
+    h+='<div style="margin-bottom:12px">';
+    h+='<div style="font-size:11px;font-weight:700;color:'+col+';padding:4px 0;border-bottom:1px solid var(--border);text-transform:uppercase">'+r+' ('+groups[r].length+')</div>';
+    groups[r].forEach(t=>{
+      const statusCol=t.status==='done'?'#4ade80':t.status==='in-progress'?'#f59e0b':'#6b7280';
+      h+='<div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+      h+='<span style="width:8px;height:8px;border-radius:50%;background:'+statusCol+';flex-shrink:0"></span>';
+      h+='<span style="flex:1;font-size:12px;color:var(--text)">'+esc(t.title)+'</span>';
+      if(t.due)h+='<span style="font-size:10px;color:var(--text-muted)">next: '+t.due.substring(0,10)+'</span>';
+      h+='<span style="font-size:9px;color:var(--text-muted)">'+t.status+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickLink(){
+  let panel=document.getElementById('quick-link-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-link-widget';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:12px;color:var(--text)">Quick Link Saver</span><button onclick="this.closest(\'#quick-link-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<input id="ql-url" placeholder="Paste URL..." style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:6px;box-sizing:border-box">';
+  h+='<input id="ql-title" placeholder="Title (optional)" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:6px;box-sizing:border-box">';
+  h+='<select id="ql-cat" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:8px">';
+  const cats=[...new Set((S.links||[]).map(l=>l.category).filter(Boolean))];
+  h+='<option value="">No category</option>';
+  cats.forEach(c=>{h+='<option value="'+esc(c)+'">'+esc(c)+'</option>';});
+  h+='</select>';
+  h+='<button onclick="const url=document.getElementById(\'ql-url\').value.trim();if(!url)return;if(!S.links)S.links=[];S.links.push({id:\'l_\'+Date.now(),url:url,title:document.getElementById(\'ql-title\').value.trim()||url,category:document.getElementById(\'ql-cat\').value,project:\'\',created:new Date().toISOString()});save();document.getElementById(\'ql-url\').value=\'\';document.getElementById(\'ql-title\').value=\'\';if(typeof renderLinks===\'function\')renderLinks();" style="width:100%;padding:6px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Save Link</button>';
+  h+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">'+(S.links||[]).length+' links saved</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDataBackup(){
+  let panel=document.getElementById('data-backup-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='data-backup-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._backups)S._backups=[];
+  function render(){
+    const size=JSON.stringify(S).length;
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Data Backup Manager</span><button onclick="this.closest(\'#data-backup-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Current data size: '+(size/1024).toFixed(1)+'KB | Tasks: '+(S.tasks||[]).length+' | Content: '+(S.content||[]).length+' | Links: '+(S.links||[]).length+' | Docs: '+(S.writerDocs||[]).length+'</div>';
+    h+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
+    h+='<button onclick="const d=new Date().toISOString().substring(0,19).replace(/[:\\-T]/g,\'\');const b=JSON.stringify(S);const blob=new Blob([b],{type:\'application/json\'});const a=document.createElement(\'a\');a.href=URL.createObjectURL(blob);a.download=\'astra-backup-\'+d+\'.json\';a.click()" style="padding:6px 12px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Download Full Backup</button>';
+    h+='<button onclick="const snap={time:new Date().toISOString(),tasks:(S.tasks||[]).length,content:(S.content||[]).length,links:(S.links||[]).length,docs:(S.writerDocs||[]).length,size:JSON.stringify(S).length};S._backups.unshift(snap);if(S._backups.length>20)S._backups.length=20;save();this.closest(\'#data-backup-panel\')._render()" style="padding:6px 12px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Save Snapshot</button>';
+    h+='<label style="padding:6px 12px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px"><input type="file" accept=".json" style="display:none" onchange="const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=function(e){try{const d=JSON.parse(e.target.result);if(!confirm(\'Restore backup? This will overwrite current data.\'))return;Object.assign(S,d);save();if(typeof renderAll===\'function\')renderAll();alert(\'Restored!\')}catch(err){alert(\'Invalid backup file\')}};r.readAsText(f)">Import Backup</label>';
+    h+='</div>';
+    if(S._backups.length){
+      h+='<div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:6px">Snapshots ('+S._backups.length+')</div>';
+      S._backups.forEach((b,i)=>{
+        h+='<div style="padding:6px 8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;font-size:11px">';
+        h+='<span style="color:var(--text-muted)">'+b.time.substring(0,16).replace('T',' ')+'</span>';
+        h+='<span style="color:var(--text)">T:'+b.tasks+' C:'+b.content+' L:'+b.links+' D:'+b.docs+'</span>';
+        h+='<span style="color:var(--text-muted);font-size:9px">'+(b.size/1024).toFixed(0)+'KB</span>';
+        h+='</div>';
+      });
+    }
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showTaskWallOfFame(){
+  let panel=document.getElementById('wall-of-fame-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='wall-of-fame-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const completed=(S.tasks||[]).filter(t=>t.status==='done'&&(t.priority==='p0'||t.priority==='p1'));
+  completed.sort((a,b)=>(b.completedAt||b.created||'').localeCompare(a.completedAt||a.created||''));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Wall of Fame</span><button onclick="this.closest(\'#wall-of-fame-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+completed.length+' high-priority tasks completed</div>';
+  if(!completed.length){
+    h+='<div style="text-align:center;color:var(--text-muted);padding:30px;font-size:12px">Complete P0 or P1 tasks to see them here</div>';
+  }
+  completed.forEach(t=>{
+    const pCol=t.priority==='p0'?'#ef4444':'#f59e0b';
+    h+='<div style="padding:12px;margin-bottom:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid '+pCol+'">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
+    h+='<span style="font-size:13px;font-weight:600;color:var(--text)">'+esc(t.title)+'</span>';
+    h+='<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+pCol+'22;color:'+pCol+';font-weight:600">'+t.priority.toUpperCase()+'</span>';
+    h+='</div>';
+    if(t.description)h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">'+esc(t.description).substring(0,120)+'</div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    if(t.completedAt)h+='<span>Completed: '+t.completedAt.substring(0,10)+'</span>';
+    if(t.project)h+='<span>Project: '+esc(t.project)+'</span>';
+    if(t.timeTracked)h+='<span>Time: '+Math.round(t.timeTracked/60)+'min</span>';
+    h+='</div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentCalendar(){
+  let panel=document.getElementById('content-cal-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='content-cal-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();
+  let viewMonth=now.getMonth(),viewYear=now.getFullYear();
+  function render(){
+    const first=new Date(viewYear,viewMonth,1);
+    const startDay=first.getDay()||7;
+    const daysInMonth=new Date(viewYear,viewMonth+1,0).getDate();
+    const monthName=first.toLocaleString('default',{month:'long',year:'numeric'});
+    // Group content by date
+    const byDate={};
+    (S.content||[]).forEach(c=>{
+      if(!c.created)return;
+      const d=c.created.substring(0,10);
+      if(!byDate[d])byDate[d]=[];
+      byDate[d].push(c);
+    });
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">';
+    h+='<span style="font-weight:700;font-size:15px;color:var(--text)">Content Calendar</span>';
+    h+='<div style="display:flex;gap:8px;align-items:center">';
+    h+='<button onclick="this.closest(\'#content-cal-panel\')._nav(-1)" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;padding:3px 8px;font-size:12px">&lt;</button>';
+    h+='<span style="font-size:13px;color:var(--text);min-width:140px;text-align:center">'+monthName+'</span>';
+    h+='<button onclick="this.closest(\'#content-cal-panel\')._nav(1)" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;padding:3px 8px;font-size:12px">&gt;</button>';
+    h+='</div>';
+    h+='<button onclick="this.closest(\'#content-cal-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px">';
+    ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{
+      h+='<div style="text-align:center;font-size:10px;color:var(--text-muted);padding:4px">'+d+'</div>';
+    });
+    h+='</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px">';
+    for(let i=1;i<startDay;i++)h+='<div style="background:var(--bg-surface);min-height:60px;padding:4px;border-radius:2px"></div>';
+    for(let d=1;d<=daysInMonth;d++){
+      const dateStr=viewYear+'-'+String(viewMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      const items=byDate[dateStr]||[];
+      const isToday=dateStr===now.toISOString().substring(0,10);
+      h+='<div style="background:var(--bg-surface);min-height:60px;padding:4px;border-radius:2px;'+(isToday?'border:1px solid var(--accent)':'')+'">';
+      h+='<div style="font-size:10px;color:'+(isToday?'var(--accent)':'var(--text-muted)')+';font-weight:'+(isToday?'700':'400')+'">'+d+'</div>';
+      items.slice(0,3).forEach(c=>{
+        const themeCol=c.theme==='strategy'?'#3b82f6':c.theme==='creative'?'#a78bfa':c.theme==='technical'?'#4ade80':'#f59e0b';
+        h+='<div style="font-size:8px;padding:1px 3px;background:'+themeCol+'22;color:'+themeCol+';border-radius:2px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.title)+'</div>';
+      });
+      if(items.length>3)h+='<div style="font-size:8px;color:var(--text-muted)">+'+(items.length-3)+'</div>';
+      h+='</div>';
+    }
+    h+='</div>';
+    panel.innerHTML=h;
+    panel._nav=function(dir){viewMonth+=dir;if(viewMonth>11){viewMonth=0;viewYear++;}if(viewMonth<0){viewMonth=11;viewYear--;}render();};
   }
   render();document.body.appendChild(panel);
 }
