@@ -1106,7 +1106,7 @@ textarea{resize:vertical;line-height:1.6}
         </div>
         <div class="wb-actions">
           <button class="btn btn-sm" onclick="openTplModal()">Templates</button>
-          <select class="writer-toolbar-select" onchange="wbExport(this.value);this.selectedIndex=0" style="width:auto"><option value="">Export</option><option value="png">PNG</option><option value="svg">SVG</option><option value="json">JSON</option></select>
+          <select class="writer-toolbar-select" onchange="wbExport(this.value);this.selectedIndex=0" style="width:auto"><option value="">Export</option><option value="png">PNG</option><option value="svg">SVG</option><option value="json">JSON</option><option value="text">Text Outline</option></select>
           <button class="btn btn-sm" onclick="wbImportJSON()" title="Import whiteboard JSON">Import</button>
           <button class="btn btn-sm" onclick="wbClearAll()">Clear</button>
           <input type="text" id="wb-search" placeholder="Find node..." oninput="wbSearchNodes(this.value)" style="width:100px;padding:2px 6px;font-size:9px;background:var(--bg-input);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--mono)">
@@ -3092,6 +3092,17 @@ function exportMonth(){
   if(monthDone.length){md+='## Completed This Month ('+monthDone.length+')\n';monthDone.forEach(t=>{md+='- '+t.title+(t.project?' ['+t.project+']':'')+'\n';});}
   navigator.clipboard.writeText(md).then(()=>toast(months[calMonth]+' summary copied'));
 }
+function exportTasksICS(){
+  const tasks=S.tasks.filter(t=>t.due&&t.status!=='done');
+  if(!tasks.length){toast('No active tasks with due dates');return;}
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Saturno Hub//EN\r\nCALSCALE:GREGORIAN\r\n';
+  tasks.forEach(t=>{
+    const d=t.due.replace(/-/g,'');
+    ics+='BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:'+d+'\r\nDTEND;VALUE=DATE:'+d+'\r\nSUMMARY:'+(t.title||'Task').replace(/[,;\\]/g,' ')+'\r\nDESCRIPTION:'+(t.priority||'').toUpperCase()+(t.project?' ['+t.project.replace(/[,;\\]/g,' ')+']':'')+(t.description?' - '+(t.description||'').substring(0,100).replace(/[,;\\]/g,' '):'')+'\r\nUID:saturno-'+t.id+'@hub\r\nEND:VEVENT\r\n';
+  });
+  ics+='END:VCALENDAR\r\n';
+  const blob=new Blob([ics],{type:'text/calendar'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-tasks.ics';a.click();toast('Exported '+tasks.length+' tasks as ICS');
+}
 
 // === WRITING HUB ===
 function getActiveDoc(){return S.docs.find(d=>d.id===S.activeDoc);}
@@ -4708,6 +4719,14 @@ function wbAutoLayout() {
 
 function wbExport(fmt) {
   if(!fmt) return;
+  if(fmt === 'text') {
+    let md='# Whiteboard Outline\n\n';
+    const byType={};wbNodes.forEach(n=>{const t=n.type||'note';if(!byType[t])byType[t]=[];byType[t].push(n);});
+    Object.entries(byType).sort().forEach(([type,nodes])=>{md+='## '+type.charAt(0).toUpperCase()+type.slice(1)+' ('+nodes.length+')\n\n';nodes.forEach(n=>{md+='- **'+n.title+'**'+(n.body?' - '+n.body:'')+'\n';});md+='\n';});
+    const connText=wbConns.map(c=>{const f=wbNodes.find(n=>n.id===c.from),t=wbNodes.find(n=>n.id===c.to);return f&&t?'- '+f.title+' -> '+t.title:null;}).filter(Boolean);
+    if(connText.length){md+='## Connections\n\n'+connText.join('\n')+'\n';}
+    navigator.clipboard.writeText(md).then(()=>toast('Outline copied ('+wbNodes.length+' nodes)'));return;
+  }
   if(fmt === 'json') { const blob = new Blob([JSON.stringify({nodes:wbNodes,conns:wbConns},null,2)],{type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'whiteboard.json'; a.click(); toast('JSON exported'); return; }
   if(fmt === 'png' || fmt === 'svg') {
     const canvas = document.createElement('canvas');
@@ -5246,6 +5265,7 @@ function cmdGetItems(q) {
   if(!ql || 'export links html download'.includes(ql)) items.push({title:'Export Links as HTML', desc:'Download all links as styled HTML by category', icon:'L', type:'action', action:()=>{closeCommandPalette();exportAllLinksHTML();}});
   if(!ql || 'export content markdown md download'.includes(ql)) items.push({title:'Export Content as MD', desc:'Download all content grouped by type as Markdown', icon:'C', type:'action', action:()=>{closeCommandPalette();exportAllContentMD();}});
   if(!ql || 'export docs writer markdown md download'.includes(ql)) items.push({title:'Export Docs as MD', desc:'Download all writer documents as Markdown', icon:'W', type:'action', action:()=>{closeCommandPalette();exportAllDocsMD();}});
+  if(!ql || 'export tasks ics calendar file'.includes(ql)) items.push({title:'Export Tasks as ICS', desc:'Download active tasks with due dates as calendar file', icon:'C', type:'action', action:()=>{closeCommandPalette();exportTasksICS();}});
   // Quick create task from Cmd+K with @date and !priority
   if(ql && ql.startsWith('task:')) {
     let taskRaw=q.substring(5).trim();
@@ -5393,6 +5413,8 @@ function cmdGetItems(q) {
     items.unshift({title:'Export Links as HTML',desc:S.links.length+' links grouped by category',icon:'E',type:'action',action:()=>{closeCommandPalette();exportAllLinksHTML();}});
     items.unshift({title:'Export Content as MD',desc:S.content.length+' items grouped by type',icon:'E',type:'action',action:()=>{closeCommandPalette();exportAllContentMD();}});
     items.unshift({title:'Export Docs as MD',desc:S.docs.length+' writer documents as Markdown',icon:'E',type:'action',action:()=>{closeCommandPalette();exportAllDocsMD();}});
+    items.unshift({title:'Export Tasks as ICS',desc:'Active tasks as calendar file',icon:'E',type:'action',action:()=>{closeCommandPalette();exportTasksICS();}});
+    items.unshift({title:'Export Whiteboard as Text',desc:'Copy node outline to clipboard',icon:'E',type:'action',action:()=>{closeCommandPalette();wbExport('text');}});
     items.unshift({title:'Export All Data (JSON)',desc:'Full backup of all sections',icon:'E',type:'action',action:()=>{closeCommandPalette();exportAll();}});
   }
   // Progress prefix - project completion percentages
@@ -5526,6 +5548,16 @@ function cmdGetItems(q) {
     const filtered=tq?allTaskTags.filter(t=>t.includes(tq)):allTaskTags;
     filtered.slice(0,8).forEach(tag=>{const cnt=S.tasks.filter(t=>(t.tags||[]).includes(tag)).length;items.unshift({title:'Tag: '+tag,desc:cnt+' tasks',icon:'T',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);document.getElementById('task-search').value='#'+tag;renderTasks();toast('Filtered by tag: '+tag);}});});
     if(!filtered.length)items.unshift({title:'No task tags found',desc:tq?'No tags matching "'+tq+'"':'No tasks have tags yet',icon:'!',type:'info'});
+  }
+  // Streak prefix — consecutive days with completed tasks
+  if(ql && (ql.startsWith('streak:') || ql==='streak' || ql==='streaks')){
+    const dates=new Set();S.tasks.forEach(t=>{if(t.completedAt)dates.add(t.completedAt.split('T')[0]);});
+    let streak=0;const d=new Date();d.setHours(0,0,0,0);
+    while(dates.has(d.toISOString().split('T')[0])||d.toISOString().split('T')[0]===new Date().toISOString().split('T')[0]){if(dates.has(d.toISOString().split('T')[0]))streak++;d.setDate(d.getDate()-1);}
+    const totalDays=dates.size;const longestStreak=(()=>{const sorted=[...dates].sort();let max=1,cur=1;for(let i=1;i<sorted.length;i++){const prev=new Date(sorted[i-1]+'T12:00:00'),curr=new Date(sorted[i]+'T12:00:00');if(Math.round((curr-prev)/86400000)===1){cur++;if(cur>max)max=cur;}else cur=1;}return sorted.length?max:0;})();
+    items.unshift({title:'Current streak: '+streak+' day'+(streak!==1?'s':''),desc:'Best: '+longestStreak+' days | Total active days: '+totalDays,icon:'*',type:'info'});
+    const last7=[];for(let i=0;i<7;i++){const dd=new Date();dd.setDate(dd.getDate()-i);const ds=dd.toISOString().split('T')[0];const cnt=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(ds)).length;if(cnt)last7.push({date:ds,count:cnt});}
+    last7.forEach(d=>{items.push({title:d.date+': '+d.count+' completed',desc:'',icon:'T',type:'info'});});
   }
   // Daily activity log prefix
   if(ql && (ql.startsWith('daily:') || ql==='daily' || ql==='activity')){
