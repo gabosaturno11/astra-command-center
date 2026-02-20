@@ -846,6 +846,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="contentReadLaterFilter=!contentReadLaterFilter;this.style.color=contentReadLaterFilter?'var(--accent-cyan)':'';renderContent()" id="content-rl-btn" title="Show only Read Later items">RL</button>
           <button class="btn btn-sm" onclick="contentShowArchived=!contentShowArchived;this.style.color=contentShowArchived?'var(--yellow)':'';renderContent()" id="content-archive-btn" title="Show/hide archived content">Archived</button>
           <button class="btn btn-sm" onclick="contentFindDuplicates()" title="Find duplicate/similar content items" style="color:#f59e0b">Dupes</button>
+          <button class="btn btn-sm" onclick="contentWordCloud()" title="Generate word cloud from content" style="color:#a855f7">Cloud</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -6313,6 +6314,21 @@ function cmdGetItems(q) {
     filtered.slice(0,15).forEach(e=>{items.unshift({title:e.text,desc:timeAgo(e.time)+' | '+e.type,icon:e.icon,type:'info'});});
     if(!filtered.length)items.unshift({title:'No activity found',desc:'System activity log is empty',icon:'!',type:'info'});
   }
+  // Focus timer prefix
+  if(ql && (ql.startsWith('focus:') || ql==='focus' || ql==='pomodoro')){
+    const fq=ql.startsWith('focus:')?q.substring(6).trim():'';
+    const mins=parseInt(fq)||25;
+    if(focusTimerInterval){
+      const rem=Math.max(0,focusTimerEnd-Date.now());const m=Math.floor(rem/60000);const s=Math.floor((rem%60000)/1000);
+      items.unshift({title:'Focus timer running: '+m+':'+String(s).padStart(2,'0'),desc:'Click to stop',icon:'F',type:'action',action:()=>{closeCommandPalette();stopFocusTimer();toast('Focus timer stopped');}});
+    }else{
+      const active=S.tasks.filter(t=>t.status==='progress');
+      active.slice(0,5).forEach(t=>{
+        items.unshift({title:'Focus on: '+t.title+' ('+mins+'min)',desc:'Start focus timer and track time to this task',icon:'F',type:'action',action:()=>{closeCommandPalette();startFocusTimer(t.id,mins);}});
+      });
+      items.unshift({title:'Focus timer: '+mins+' minutes (no task)',desc:'Type focus:N for custom minutes (default 25)',icon:'F',type:'action',action:()=>{closeCommandPalette();startFocusTimer(null,mins);}});
+    }
+  }
   // Writer stats prefix
   if(ql && (ql==='writerstats' || ql==='ws' || ql.startsWith('writerstats:'))){
     const totalWords=S.docs.reduce((a,d)=>a+countW(d.body),0);
@@ -7253,6 +7269,58 @@ async function reposHealthCheck(){
   toast(up+'/'+repos.length+' repos responding');
   summary.forEach(s=>{if(s){const repo=(S.repos||[]).find(r=>r.name===s.name);if(repo){repo.lastCheck=new Date().toISOString();repo.lastCheckOk=s.ok;}}});
   save();reposRefresh();
+}
+
+// === FOCUS TIMER ===
+let focusTimerInterval=null;let focusTimerEnd=0;let focusTimerTaskId=null;
+function startFocusTimer(taskId,minutes){
+  minutes=minutes||25;
+  if(focusTimerInterval){clearInterval(focusTimerInterval);const fp=document.getElementById('focus-timer-float');if(fp)fp.remove();}
+  focusTimerTaskId=taskId||null;focusTimerEnd=Date.now()+minutes*60*1000;
+  const t=taskId?S.tasks.find(x=>x.id===taskId):null;
+  const panel=document.createElement('div');panel.id='focus-timer-float';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--bg-surface);border:1px solid var(--accent);border-radius:12px;padding:12px 16px;z-index:9999;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.4)';
+  panel.innerHTML='<div style="font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Focus Mode</div>'+(t?'<div style="font-size:10px;color:var(--text);margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">'+esc(t.title)+'</div>':'')+'<div id="focus-timer-display" style="font-size:24px;color:var(--accent);font-family:var(--mono);text-align:center">'+minutes+':00</div><div style="display:flex;gap:6px;margin-top:8px;justify-content:center"><button onclick="stopFocusTimer()" style="font-size:9px;padding:3px 10px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer">Stop</button><button onclick="extendFocusTimer(5)" style="font-size:9px;padding:3px 10px;background:var(--bg-elevated);color:var(--text);border:1px solid var(--border);border-radius:4px;cursor:pointer">+5m</button></div>';
+  document.body.appendChild(panel);
+  focusTimerInterval=setInterval(()=>{
+    const rem=Math.max(0,focusTimerEnd-Date.now());
+    const m=Math.floor(rem/60000);const s=Math.floor((rem%60000)/1000);
+    const disp=document.getElementById('focus-timer-display');
+    if(disp)disp.textContent=m+':'+String(s).padStart(2,'0');
+    if(rem<=0){stopFocusTimer();toast('Focus session complete!');if(focusTimerTaskId){const tk=S.tasks.find(x=>x.id===focusTimerTaskId);if(tk){tk.timeSpent=(tk.timeSpent||0)+minutes;save();renderTasks();}}}
+  },1000);
+  toast('Focus timer: '+minutes+'min'+(t?' on '+t.title.substring(0,30):''));
+}
+function stopFocusTimer(){
+  if(focusTimerInterval){clearInterval(focusTimerInterval);focusTimerInterval=null;}
+  const fp=document.getElementById('focus-timer-float');if(fp)fp.remove();
+  if(focusTimerTaskId){const elapsed=Math.max(0,Math.round(((focusTimerEnd>Date.now()?focusTimerEnd-(focusTimerEnd-Date.now()):focusTimerEnd)-Date.now()+focusTimerEnd-Date.now())/60000));const t=S.tasks.find(x=>x.id===focusTimerTaskId);if(t){const mins=Math.max(1,Math.round((Date.now()-(focusTimerEnd-25*60000))/60000));t.timeSpent=(t.timeSpent||0)+mins;save();renderTasks();}}
+  focusTimerTaskId=null;
+}
+function extendFocusTimer(mins){focusTimerEnd+=mins*60*1000;toast('+'+mins+' minutes added');}
+
+// === CONTENT WORD CLOUD ===
+function contentWordCloud(){
+  const allText=S.content.map(c=>c.body||'').join(' ');
+  if(allText.trim().length<50){toast('Not enough content for word cloud');return;}
+  const stop=new Set(['the','be','to','of','and','a','in','that','have','i','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us','is','are','was','were','been','being','has','had','does','did','may','might','shall','should','must','need','am','very','much','more','own','each','every','while','still','through','where','too','around','find','here','thing','many','well','also','between','before','after','during','without','again','same','another','such','already','since','something','anything','everything','nothing','always','never','often','really']);
+  const words=allText.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>2&&!stop.has(w));
+  const freq={};words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,40);
+  if(!sorted.length){toast('No words found');return;}
+  const maxF=sorted[0][1];const minF=sorted[sorted.length-1][1];
+  const panel=document.createElement('div');panel.id='content-wordcloud-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:24px;z-index:9999;max-width:520px;max-height:70vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6)';
+  const colors=['#4ade80','#22d3ee','#a855f7','#f472b6','#fbbf24','#60a5fa','#34d399','#fb923c'];
+  let cloud='<div style="display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;justify-content:center;padding:12px">';
+  sorted.forEach(([w,c],i)=>{
+    const size=Math.round(10+((c-minF)/(maxF-minF||1))*22);
+    const color=colors[i%colors.length];
+    cloud+=`<span style="font-size:${size}px;color:${color};opacity:${0.6+(c/maxF)*0.4};cursor:default" title="${w}: ${c} occurrences">${esc(w)}</span>`;
+  });
+  cloud+='</div>';
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:var(--accent);font-weight:600">Content Word Cloud</span><button onclick="this.closest(\'#content-wordcloud-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div><div style="font-size:9px;color:var(--text-muted);margin-bottom:12px">'+sorted.length+' unique words from '+S.content.length+' items</div>'+cloud;
+  document.body.appendChild(panel);
 }
 
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{});}
