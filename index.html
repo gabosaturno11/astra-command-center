@@ -5885,6 +5885,8 @@ function cmdGetItems(q) {
       ['print export','Downloadable printable HTML export'],
       ['slides','Convert content to presentation slides'],
       ['workload','14-day task workload forecast'],
+      ['gratitude','Daily gratitude journal with streak'],
+      ['task templates','8 task templates: bug fix, feature, research, etc.'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7523,6 +7525,14 @@ function cmdGetItems(q) {
   // Workload prefix
   if(ql && (ql==='workload' || ql==='task workload' || ql==='workload forecast' || ql==='load')){
     items.unshift({title:'Workload Forecast',desc:'14-day task workload with overload warnings',icon:'W',type:'action',action:()=>{closeCommandPalette();showWorkloadIndicator();}});
+  }
+  // Gratitude prefix
+  if(ql && (ql==='gratitude' || ql==='gratitude journal' || ql==='grateful' || ql==='journal')){
+    items.unshift({title:'Gratitude Journal',desc:'Daily gratitude entries with streak tracking',icon:'G',type:'action',action:()=>{closeCommandPalette();showGratitudeJournal();}});
+  }
+  // Task templates prefix
+  if(ql && (ql==='task templates' || ql==='templates task' || ql==='template library' || ql==='new from template')){
+    items.unshift({title:'Task Template Library',desc:'8 templates: bug fix, feature, research, review, etc.',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTemplateLibrary();}});
   }
   return items.slice(0, 20);
 }
@@ -11228,6 +11238,87 @@ function setTaskDueDate(taskId,dateStr){
   task.due=dateStr;save();
   document.getElementById('mini-datepicker').remove();
   showToast(dateStr?'Due date set: '+dateStr:'Due date cleared');
+}
+function showGratitudeJournal(){
+  if(!S._gratitude)S._gratitude=[];
+  const today=new Date().toISOString().split('T')[0];
+  const panel=document.createElement('div');panel.id='gratitude-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Gratitude Journal</span><button onclick="document.getElementById('gratitude-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  const todayEntry=S._gratitude.find(g=>g.date===today);
+  h+=`<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:6px">${new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>`;
+  h+=`<textarea id="gratitude-input" style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;padding:10px;resize:none;box-sizing:border-box" placeholder="What are you grateful for today?">${todayEntry?esc(todayEntry.text):''}</textarea>`;
+  h+=`<button onclick="saveGratitude()" style="margin-top:6px;padding:6px 16px;background:var(--accent);border:none;border-radius:4px;color:#000;font-weight:600;cursor:pointer;font-size:11px">Save</button></div>`;
+  const recent=S._gratitude.filter(g=>g.date!==today).slice(0,10);
+  if(recent.length){
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Recent Entries (${S._gratitude.length} total)</div>`;
+    h+=`<div style="display:grid;gap:6px">`;
+    recent.forEach(g=>{
+      h+=`<div style="padding:8px;background:var(--bg-surface);border-radius:6px;border-left:2px solid var(--accent)">`;
+      h+=`<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">${new Date(g.date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}</div>`;
+      h+=`<div style="font-size:11px;color:var(--text-secondary);line-height:1.5">${esc(g.text)}</div>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  h+=`<div style="margin-top:12px;font-size:10px;color:var(--text-muted);text-align:center">Streak: ${calcGratitudeStreak()} days</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function saveGratitude(){
+  const input=document.getElementById('gratitude-input');if(!input)return;
+  const text=input.value.trim();if(!text)return;
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._gratitude)S._gratitude=[];
+  const existing=S._gratitude.findIndex(g=>g.date===today);
+  if(existing>=0){S._gratitude[existing].text=text;}
+  else{S._gratitude.unshift({date:today,text});}
+  if(S._gratitude.length>365)S._gratitude=S._gratitude.slice(0,365);
+  save();showToast('Gratitude saved');
+}
+function calcGratitudeStreak(){
+  const entries=S._gratitude||[];if(!entries.length)return 0;
+  const dates=entries.map(g=>g.date).sort().reverse();
+  let streak=0;const now=new Date();
+  for(let i=0;i<dates.length;i++){
+    const expected=new Date(now);expected.setDate(expected.getDate()-i);
+    if(dates[i]===expected.toISOString().split('T')[0])streak++;else break;
+  }
+  return streak;
+}
+function showTaskTemplateLibrary(){
+  const templates=[
+    {name:'Bug Fix',title:'Fix: ',priority:'p1',desc:'Steps to reproduce:\\n1. \\n\\nExpected:\\n\\nActual:\\n'},
+    {name:'Feature Request',title:'Feature: ',priority:'p2',desc:'As a user, I want to...\\n\\nAcceptance criteria:\\n- [ ] \\n'},
+    {name:'Research',title:'Research: ',priority:'p2',desc:'Questions to answer:\\n1. \\n\\nSources:\\n- \\n\\nFindings:\\n'},
+    {name:'Meeting Follow-up',title:'Follow-up: ',priority:'p1',desc:'Meeting: \\nDate: '+new Date().toLocaleDateString()+'\\n\\nAction items:\\n- [ ] \\n'},
+    {name:'Content Creation',title:'Create: ',priority:'p2',desc:'Topic: \\nAudience: \\nFormat: \\n\\nOutline:\\n1. \\n'},
+    {name:'Code Review',title:'Review: ',priority:'p1',desc:'PR/Branch: \\n\\nChecklist:\\n- [ ] Tests pass\\n- [ ] No security issues\\n- [ ] Code is readable\\n'},
+    {name:'Weekly Goal',title:'Week Goal: ',priority:'p1',desc:'Target: \\nDeadline: Friday\\n\\nMilestones:\\n- [ ] Mon: \\n- [ ] Wed: \\n- [ ] Fri: \\n'},
+    {name:'Learning',title:'Learn: ',priority:'p3',desc:'Resource: \\nTime: \\n\\nNotes:\\n\\nKey takeaways:\\n1. \\n'},
+  ];
+  const panel=document.createElement('div');panel.id='task-template-lib-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Task Templates (${templates.length})</span><button onclick="document.getElementById('task-template-lib-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">`;
+  templates.forEach((t,i)=>{
+    const pColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f59e0b':t.priority==='p2'?'#3b82f6':'#6b7280';
+    h+=`<div onclick="createFromTaskTemplate(${i})" style="padding:12px;background:var(--bg-surface);border-radius:8px;cursor:pointer;border:1px solid transparent;border-left:3px solid ${pColor};transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent';this.style.borderLeftColor='${pColor}'">`;
+    h+=`<div style="font-size:12px;font-weight:600;color:var(--text-primary)">${t.name}</div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted);margin-top:4px">${t.desc.replace(/\\n/g,' ').substring(0,50)}...</div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+  window._taskTemplates=templates;
+}
+function createFromTaskTemplate(idx){
+  const templates=window._taskTemplates;if(!templates||!templates[idx])return;
+  const t=templates[idx];
+  const title=prompt('Task title:',t.title);if(!title)return;
+  if(!S.tasks)S.tasks=[];
+  S.tasks.unshift({id:'t_'+Date.now(),title,status:'todo',priority:t.priority,project:'',due:'',created:new Date().toISOString(),description:t.desc.replace(/\\n/g,'\n'),subtasks:[]});
+  save();const p=document.getElementById('task-template-lib-panel');if(p)p.remove();
+  switchSection('tasks');renderTasks();showToast('Task created from template: '+t.name);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
