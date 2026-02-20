@@ -900,6 +900,7 @@ textarea{resize:vertical;line-height:1.6}
             <select id="task-bulk-priority" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Priority</option><option value="p0">P0</option><option value="p1">P1</option><option value="p2">P2</option><option value="p3">P3</option></select>
             <input type="date" id="task-bulk-due" style="font-size:9px;padding:3px 4px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;width:110px" title="Set due date">
             <button class="btn btn-sm" onclick="taskBulkTag()" style="color:var(--accent-cyan)">Tag</button>
+            <button class="btn btn-sm" onclick="taskBulkMove()" style="color:var(--accent)">Move</button>
             <button class="btn btn-sm btn-danger" onclick="taskBulkDelete()">Delete</button>
             <button class="btn btn-sm" onclick="taskBulkApply()">Apply</button>
             <button class="btn btn-sm" onclick="taskBulkSelectAll()">All</button>
@@ -1008,6 +1009,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="writer-toolbar-btn" onclick="saveVersion()" title="Save Version">v+</button>
               <button class="writer-toolbar-btn" onclick="toggleWriterPanel()" title="History">H</button>
               <button class="writer-toolbar-btn" onclick="writerDetailedStats()" title="Detailed writing statistics">St</button>
+              <button class="writer-toolbar-btn" onclick="mergeDocs()" title="Merge another doc into current">Mg</button>
               <select class="writer-toolbar-select" id="writer-export-sel" onchange="writerExport(this.value);this.selectedIndex=0">
                 <option value="">Export</option>
                 <option value="md">Markdown</option>
@@ -2726,6 +2728,15 @@ function taskBulkDelete(){
   if(!confirm('Delete '+taskSelected.size+' tasks?'))return;
   S.tasks=S.tasks.filter(t=>!taskSelected.has(t.id));save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Deleted');
 }
+function taskBulkMove(){
+  if(!taskSelected.size){toast('No tasks selected');return;}
+  const projects=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();
+  const target=prompt('Move '+taskSelected.size+' tasks to project:\n\n'+projects.map((p,i)=>(i+1)+'. '+p).join('\n')+'\n\nType project name:');
+  if(!target||!target.trim())return;
+  let count=0;
+  S.tasks.forEach(t=>{if(taskSelected.has(t.id)){t.project=target.trim();count++;}});
+  save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Moved '+count+' tasks to '+target.trim());
+}
 function exportTasks(){
   const items=getFilteredTasks();
   const today=new Date().toISOString().split('T')[0];
@@ -3189,6 +3200,21 @@ function switchDoc(id){if(S.activeDoc===id)return;snapshotWriter();save();S.acti
 function newDocFromTemplate(title,body){snapshotWriter();const d={id:Date.now(),title,body,versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.querySelectorAll('.btn-group div[style*="display: block"],.btn-group div[style*="display:block"]').forEach(d=>d.style.display='none');toast('Created: '+title);}
 function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.getElementById('writer-title').focus();}
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
+function mergeDocs(){
+  snapshotWriter();
+  const others=S.docs.filter(d=>d.id!==S.activeDoc);
+  if(!others.length){toast('Need at least 2 docs to merge');return;}
+  const target=prompt('Merge which doc into current?\n\n'+others.map((d,i)=>(i+1)+'. '+(d.title||'Untitled')+' ('+countW(d.body)+'w)').join('\n'));
+  if(!target)return;
+  const idx=parseInt(target)-1;
+  if(isNaN(idx)||idx<0||idx>=others.length){toast('Invalid selection');return;}
+  const src=others[idx];const cur=getActiveDoc();if(!cur)return;
+  cur.body=(cur.body||'')+'<hr><h2>'+(src.title||'Merged Section')+'</h2>'+(src.body||'');
+  cur.updated=new Date().toISOString();
+  if(src.tags&&src.tags.length){if(!cur.tags)cur.tags=[];src.tags.forEach(t=>{if(!cur.tags.includes(t))cur.tags.push(t);});}
+  S.docs=S.docs.filter(d=>d.id!==src.id);
+  save();renderWriter();toast('Merged "'+src.title+'" into "'+cur.title+'"');
+}
 function dupDoc(id){const d=S.docs.find(x=>x.id===id);if(!d)return;snapshotWriter();const dup={...d,id:Date.now(),title:(d.title||'Untitled')+' (copy)',created:new Date().toISOString(),updated:new Date().toISOString(),versions:[]};S.docs.unshift(dup);S.activeDoc=dup.id;save();renderWriter();toast('Duplicated');}
 function snapshotWriter(){const d=getActiveDoc();if(!d)return;const t=document.getElementById('writer-title'),e=document.getElementById('writer-editor');if(!t||!e)return;d.title=t.value;d.body=e.innerHTML;d.updated=new Date().toISOString();}
 function onWriterChange(){clearTimeout(writerTimer);document.getElementById('ws-saved').textContent='Unsaved';document.getElementById('ws-saved').style.color='var(--yellow)';writerTimer=setTimeout(()=>{snapshotWriter();save();renderDocList();document.getElementById('ws-saved').textContent='Saved';document.getElementById('ws-saved').style.color='var(--green)';},800);updateWS();scheduleAutoBackup();}
@@ -5919,6 +5945,19 @@ function cmdGetItems(q) {
       items.unshift({title:p+' ('+pct+'%)',desc:active+' active, '+done+' done | '+specs+' specs'+(tm?' | '+formatTimeSpent(tm)+' tracked':''),icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p;renderTasks();}});
     });
     if(!filtered.length)items.unshift({title:'No projects found',desc:'Tasks have no project assignments',icon:'!',type:'info'});
+  }
+  // Activity log prefix
+  if(ql && (ql.startsWith('log:') || ql==='log' || ql==='activity')){
+    const events=[];
+    S.tasks.forEach(t=>{if(t.created)events.push({time:t.created,text:'Task: '+t.title,type:'task',icon:'T'});if(t.log)t.log.forEach(e=>{if(e.at)events.push({time:e.at,text:t.title+' -> '+e.to,type:'task',icon:'T'});});});
+    S.content.forEach(c=>{if(c.created)events.push({time:c.created,text:'Content: '+(c.title||c.body.substring(0,40)),type:'content',icon:'C'});});
+    S.docs.forEach(d=>{if(d.updated)events.push({time:d.updated,text:'Doc: '+(d.title||'Untitled'),type:'doc',icon:'W'});else if(d.created)events.push({time:d.created,text:'Doc: '+(d.title||'Untitled'),type:'doc',icon:'W'});});
+    S.links.forEach(l=>{if(l.created)events.push({time:l.created,text:'Link: '+(l.title||l.url),type:'link',icon:'L'});});
+    events.sort((a,b)=>b.time.localeCompare(a.time));
+    const lq=ql.startsWith('log:')?q.substring(4).trim().toLowerCase():'';
+    const filtered=lq?events.filter(e=>e.text.toLowerCase().includes(lq)):events;
+    filtered.slice(0,15).forEach(e=>{items.unshift({title:e.text,desc:timeAgo(e.time)+' | '+e.type,icon:e.icon,type:'info'});});
+    if(!filtered.length)items.unshift({title:'No activity found',desc:'System activity log is empty',icon:'!',type:'info'});
   }
   // Count prefix
   if(ql && ql.startsWith('count:')){
