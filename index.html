@@ -830,6 +830,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="shuffle">Shuffle</option>
             <option value="theme">By Theme</option>
             <option value="type">By Type</option>
+            <option value="tag">By Tag</option>
           </select>
           <span id="content-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
           <button class="btn btn-sm" onclick="randomContent()" title="Random content for inspiration">Random</button>
@@ -1751,6 +1752,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm" onclick="copyTaskAsMarkdown()" title="Copy task as markdown">Copy MD</button>
       <button class="btn btn-sm" onclick="snoozeTask(1)" title="Push due date +1 day" style="color:var(--yellow)">+1d</button>
       <button class="btn btn-sm" onclick="snoozeTask(7)" title="Push due date +1 week" style="color:var(--yellow)">+1w</button>
+      <button class="btn btn-sm" onclick="cloneTaskToProject()" title="Clone task to another project" style="color:var(--accent-cyan)">Clone</button>
       <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
     </div>
   </div>
@@ -2327,7 +2329,13 @@ function weeklyProductivity(){
   const createdThisWeek=S.tasks.filter(t=>t.created&&t.created>=weekStart.toISOString()).length;
   const contentThisWeek=S.content.filter(c=>c.created&&c.created>=weekStart.toISOString()).length;
   if(!doneThisWeek&&!createdThisWeek&&!contentThisWeek)return'';
-  return `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">This Week</div>${doneThisWeek?`<div style="font-size:10px;color:var(--accent)">${doneThisWeek} tasks completed</div>`:''}<div style="font-size:10px;color:var(--text-muted)">${createdThisWeek} tasks created</div>${contentThisWeek?`<div style="font-size:10px;color:var(--text-muted)">${contentThisWeek} content added</div>`:''}</div>`;
+  const dayLabels=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayCounts=days.map(d=>{const done=S.tasks.filter(t=>t.status==='done'&&t.log&&t.log.some(e=>e.to==='done'&&e.at&&e.at.startsWith(d))).length;const created=S.tasks.filter(t=>t.created&&t.created.startsWith(d)).length;return done+created;});
+  const maxC=Math.max(...dayCounts,1);
+  const barW=16;const barGap=4;const chartH=28;const svgW=(barW+barGap)*7-barGap;
+  const bars=dayCounts.map((c,i)=>{const h=Math.max(2,Math.round((c/maxC)*chartH));const x=i*(barW+barGap);const y=chartH-h;const isToday=days[i]===new Date().toISOString().split('T')[0];return`<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="2" fill="${isToday?'var(--accent)':'rgba(74,222,128,0.3)'}"/><text x="${x+barW/2}" y="${chartH+10}" text-anchor="middle" font-size="6" fill="var(--text-muted)">${dayLabels[i]}</text>${c?`<text x="${x+barW/2}" y="${y-2}" text-anchor="middle" font-size="7" fill="var(--text-muted)">${c}</text>`:''}`;}).join('');
+  const sparkSvg=`<svg width="${svgW}" height="${chartH+14}" style="margin-top:6px;display:block">${bars}</svg>`;
+  return `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">This Week</div>${doneThisWeek?`<div style="font-size:10px;color:var(--accent)">${doneThisWeek} tasks completed</div>`:''}<div style="font-size:10px;color:var(--text-muted)">${createdThisWeek} tasks created</div>${contentThisWeek?`<div style="font-size:10px;color:var(--text-muted)">${contentThisWeek} content added</div>`:''} ${sparkSvg}</div>`;
 }
 
 function weeklyReport(){
@@ -2379,6 +2387,7 @@ function renderContent() {
   else if(sortVal==='shuffle')items.sort(()=>Math.random()-0.5);
   else if(sortVal==='theme')items.sort((a,b)=>(a.theme||'zzz').localeCompare(b.theme||'zzz'));
   else if(sortVal==='type')items.sort((a,b)=>(a.type||'zzz').localeCompare(b.type||'zzz'));
+  else if(sortVal==='tag')items.sort((a,b)=>((a.tags&&a.tags[0])||'zzz').localeCompare((b.tags&&b.tags[0])||'zzz'));
   items.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
   items.sort((a,b)=>(b.starred?1:0)-(a.starred?1:0));
   const maxShow=40;
@@ -2387,7 +2396,7 @@ function renderContent() {
   const renderCard=c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;const sizeLabel=wc>500?'long':wc>100?'medium':'short';const sizeColor=wc>500?'var(--accent-cyan)':wc>100?'var(--text-muted)':'var(--yellow)';const bodyHtml=q?highlight(c.body,q):parseWikiLinks(esc(c.body));return`<div class="content-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'content',id:${c.id}}))" ${c.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${c.starred?'<div style="font-size:8px;color:var(--yellow);padding:4px 10px 0">* Starred</div>':''}${c.pinned?'<div style="font-size:8px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;padding:4px 10px 0">Pinned</div>':''}${contentBulkMode?`<div style="padding:4px 8px 0;cursor:pointer" onclick="toggleContentSelect(${c.id},this)"><input type="checkbox" ${contentSelected.has(c.id)?'checked':''} style="pointer-events:none"></div>`:''}<div class="content-card-body" onclick="${contentBulkMode?`toggleContentSelect(${c.id},this.parentElement)`:`this.classList.toggle('expanded')`}" ondblclick="${contentBulkMode?'':`contentInlineEdit(${c.id},this,event)`}">${bodyHtml}</div><div class="content-card-footer"><span class="badge ${c.type==='caption'?'badge-blue':'badge-purple'}" style="cursor:pointer" onclick="event.stopPropagation();setContentType('${c.type}',null);toast('Filtered: ${c.type}')">${c.type}</span>${c.theme?`<span class="badge badge-muted" style="cursor:pointer" onclick="event.stopPropagation();contentTheme='${escA(c.theme)}';renderContent();toast('Theme: ${escA(c.theme)}')">${esc(c.theme)}</span>`:''}${c.source?`<span style="font-size:8px;color:var(--text-muted)">${esc(c.source)}</span>`:''}<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w${wc>50?' / '+Math.max(1,Math.ceil(wc/238))+'m':''}</span><span style="font-size:7px;color:${sizeColor};border:1px solid ${sizeColor};border-radius:3px;padding:0 3px;opacity:0.6">${sizeLabel}</span>${c.created?`<span style="font-size:8px;color:var(--text-muted)" title="${new Date(c.created).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}">${timeAgo(c.created)}</span>`:''} ${(c.tags||[]).map(t=>`<span class="badge badge-muted" style="font-size:7px">${esc(t)}</span>`).join('')}<div class="content-card-actions"><button class="btn btn-sm btn-ghost" onclick="starContent(${c.id})" style="${c.starred?'color:var(--yellow)':''}">*</button><button class="btn btn-sm btn-ghost" onclick="pinContent(${c.id})" style="${c.pinned?'color:var(--accent)':''}">${c.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="copyContent(${c.id})">Copy</button><button class="btn btn-sm btn-ghost" onclick="openContentModal(${c.id})">Edit</button><button class="btn btn-sm btn-ghost" onclick="dupContent(${c.id})">Dup</button><button class="btn btn-sm btn-ghost" onclick="readContent(${c.id})">Read</button><button class="btn btn-sm btn-ghost" onclick="contentToDoc(${c.id})">Doc</button><button class="btn btn-sm btn-ghost" onclick="contentToPipeline(${c.id})">Pipe</button><button class="btn btn-sm btn-ghost" onclick="splitContent(${c.id})" title="Split at ---">Split</button><button class="btn btn-sm btn-ghost btn-danger" onclick="delContent(${c.id})">Del</button></div></div></div>`;};
   const dateGrp=d=>{if(!d)return'Unknown';const now=new Date();const cd=new Date(d);const diff=Math.floor((now-cd)/86400000);if(diff<1)return'Today';if(diff<7)return'This Week';if(diff<30)return'This Month';if(diff<90)return'Last 3 Months';return'Older';};
   const wcGrp=wc=>{if(wc===0)return'Empty';if(wc<50)return'Short (<50w)';if(wc<200)return'Medium (50-200w)';if(wc<500)return'Long (200-500w)';return'Very Long (500w+)';};
-  let cardsHtml='';if(sortVal==='theme'||sortVal==='type'||sortVal==='newest'||sortVal==='oldest'||sortVal==='longest'||sortVal==='shortest'||sortVal==='alpha'){let lastGrp=null;showing.forEach(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;let grp;if(sortVal==='theme')grp=c.theme||'Unthemed';else if(sortVal==='type')grp=c.type||'other';else if(sortVal==='longest'||sortVal==='shortest')grp=wcGrp(wc);else if(sortVal==='alpha')grp=(c.body||' ')[0].toUpperCase();else grp=dateGrp(c.created);if(grp!==lastGrp){const cnt=showing.filter(x=>{const xwc=x.body.trim().split(/\s+/).filter(z=>z.length).length;if(sortVal==='theme')return(x.theme||'Unthemed')===grp;if(sortVal==='type')return(x.type||'other')===grp;if(sortVal==='longest'||sortVal==='shortest')return wcGrp(xwc)===grp;if(sortVal==='alpha')return(x.body||' ')[0].toUpperCase()===grp;return dateGrp(x.created)===grp;}).length;const clr=sortVal==='type'?(grp==='caption'?'#3b82f6':'#a855f7'):(sortVal==='newest'||sortVal==='oldest')?'var(--yellow)':(sortVal==='longest'||sortVal==='shortest')?'var(--accent-cyan)':sortVal==='alpha'?'var(--accent)':'var(--accent)';cardsHtml+=`<div style="grid-column:1/-1;padding:8px 4px 4px;font-size:11px;font-weight:600;color:${clr};border-bottom:1px solid var(--border);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em">${esc(grp)} <span style="font-size:9px;color:var(--text-muted);font-weight:400">${cnt}</span></div>`;lastGrp=grp;}cardsHtml+=renderCard(c);});}else{cardsHtml=showing.map(renderCard).join('');}
+  let cardsHtml='';if(sortVal==='theme'||sortVal==='type'||sortVal==='newest'||sortVal==='oldest'||sortVal==='longest'||sortVal==='shortest'||sortVal==='alpha'||sortVal==='tag'){let lastGrp=null;showing.forEach(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;let grp;if(sortVal==='theme')grp=c.theme||'Unthemed';else if(sortVal==='type')grp=c.type||'other';else if(sortVal==='tag')grp=(c.tags&&c.tags[0])||'Untagged';else if(sortVal==='longest'||sortVal==='shortest')grp=wcGrp(wc);else if(sortVal==='alpha')grp=(c.body||' ')[0].toUpperCase();else grp=dateGrp(c.created);if(grp!==lastGrp){const cnt=showing.filter(x=>{const xwc=x.body.trim().split(/\s+/).filter(z=>z.length).length;if(sortVal==='theme')return(x.theme||'Unthemed')===grp;if(sortVal==='type')return(x.type||'other')===grp;if(sortVal==='tag')return((x.tags&&x.tags[0])||'Untagged')===grp;if(sortVal==='longest'||sortVal==='shortest')return wcGrp(xwc)===grp;if(sortVal==='alpha')return(x.body||' ')[0].toUpperCase()===grp;return dateGrp(x.created)===grp;}).length;const clr=sortVal==='type'?(grp==='caption'?'#3b82f6':'#a855f7'):(sortVal==='newest'||sortVal==='oldest')?'var(--yellow)':(sortVal==='longest'||sortVal==='shortest')?'var(--accent-cyan)':sortVal==='tag'?'#f59e0b':sortVal==='alpha'?'var(--accent)':'var(--accent)';cardsHtml+=`<div style="grid-column:1/-1;padding:8px 4px 4px;font-size:11px;font-weight:600;color:${clr};border-bottom:1px solid var(--border);margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em">${esc(grp)} <span style="font-size:9px;color:var(--text-muted);font-weight:400">${cnt}</span></div>`;lastGrp=grp;}cardsHtml+=renderCard(c);});}else{cardsHtml=showing.map(renderCard).join('');}
   g.innerHTML=!items.length?`<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px;opacity:0.3">C</div><div style="font-size:12px">${q?'No matching content':'No content yet'}</div><div style="font-size:10px;margin-top:4px">${q?'Try a different search term':'Click + Add to paste from Apple Notes'}</div></div>`:cardsHtml+(items.length>maxShow&&!contentShowAll?`<div style="grid-column:1/-1;text-align:center;padding:12px"><button class="btn btn-sm" onclick="contentShowAll=true;renderContent()">Show all ${items.length} items (${items.length-maxShow} more)</button></div>`:'');
   document.getElementById('content-count').textContent=S.content.length;
   const totalWords=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
@@ -2896,6 +2905,17 @@ function copyTaskAsMarkdown(){
   md+='\n*Created: '+(t.created||'unknown')+'*\n';
   if(t.completedAt)md+='*Completed: '+t.completedAt+'*\n';
   navigator.clipboard.writeText(md).then(()=>toast('Task copied as markdown'));
+}
+function cloneTaskToProject(){
+  const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
+  const projects=[...new Set(S.tasks.map(x=>x.project).filter(Boolean))].sort();
+  const current=t.project||'';
+  const others=projects.filter(p=>p!==current);
+  const target=prompt('Clone task to project:'+(others.length?'\nExisting: '+others.join(', '):'')+'\n\nCurrent: '+(current||'none'));
+  if(!target||!target.trim())return;
+  const clone={...JSON.parse(JSON.stringify(t)),id:Date.now(),project:target.trim(),created:new Date().toISOString(),status:'todo'};
+  delete clone.completedAt;delete clone.timeSpent;delete clone.timeStarted;delete clone.log;
+  S.tasks.unshift(clone);save();renderTasks();toast('Cloned to '+target.trim());
 }
 function snoozeTask(days){
   const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
@@ -5601,6 +5621,29 @@ function cmdGetItems(q) {
     items.unshift({title:'Current streak: '+streak+' day'+(streak!==1?'s':''),desc:'Best: '+longestStreak+' days | Total active days: '+totalDays,icon:'*',type:'info'});
     const last7=[];for(let i=0;i<7;i++){const dd=new Date();dd.setDate(dd.getDate()-i);const ds=dd.toISOString().split('T')[0];const cnt=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(ds)).length;if(cnt)last7.push({date:ds,count:cnt});}
     last7.forEach(d=>{items.push({title:d.date+': '+d.count+' completed',desc:'',icon:'T',type:'info'});});
+  }
+  // Week prefix — upcoming week tasks breakdown
+  if(ql && (ql.startsWith('week:') || ql==='week' || ql==='weekly')){
+    const active=S.tasks.filter(t=>t.status!=='done'&&t.due);
+    const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const days=[];for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()+i);days.push(d.toISOString().split('T')[0]);}
+    const noDue=S.tasks.filter(t=>t.status!=='done'&&!t.due).length;
+    items.unshift({title:'Week ahead: '+active.filter(t=>days.includes(t.due)).length+' tasks scheduled',desc:noDue+' tasks have no due date',icon:'W',type:'info'});
+    days.forEach(d=>{const dayTasks=active.filter(t=>t.due===d);const dt=new Date(d+'T12:00:00');const label=dayNames[dt.getDay()]+' '+dt.toLocaleDateString('en-US',{month:'short',day:'numeric'});if(dayTasks.length){dayTasks.forEach((t,i)=>{items.push({title:(i===0?label+': ':'')+t.title,desc:t.priority+' | '+(t.project||'')+(t.estimate?' | '+t.estimate:''),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}else{items.push({title:label+': (free)',desc:'No tasks scheduled',icon:'-',type:'info'});}});
+  }
+  // Focus prefix — urgent/critical tasks at a glance
+  if(ql && (ql.startsWith('focus:') || ql==='focus' || ql==='urgent')){
+    const today=new Date().toISOString().split('T')[0];
+    const active=S.tasks.filter(t=>t.status!=='done');
+    const p0=active.filter(t=>t.priority==='p0');
+    const p1=active.filter(t=>t.priority==='p1');
+    const overdue=active.filter(t=>t.due&&t.due<today);
+    const dueToday=active.filter(t=>t.due===today);
+    const blocked=active.filter(t=>t.status==='blocked');
+    items.unshift({title:'Focus: '+p0.length+' P0, '+p1.length+' P1, '+overdue.length+' overdue',desc:dueToday.length+' due today | '+blocked.length+' blocked | '+active.length+' total active',icon:'!',type:'info'});
+    overdue.forEach(t=>{items.push({title:'OVERDUE: '+t.title,desc:(t.due||'')+' | '+t.priority+' | '+(t.project||''),icon:'!',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+    p0.filter(t=>!overdue.includes(t)).forEach(t=>{items.push({title:'P0: '+t.title,desc:t.status+' | '+(t.due||'no date')+' | '+(t.project||''),icon:'!',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+    p1.filter(t=>!overdue.includes(t)).slice(0,5).forEach(t=>{items.push({title:'P1: '+t.title,desc:t.status+' | '+(t.due||'no date')+' | '+(t.project||''),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
   }
   // Daily activity log prefix
   if(ql && (ql.startsWith('daily:') || ql==='daily' || ql==='activity')){
