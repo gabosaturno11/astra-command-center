@@ -6362,6 +6362,12 @@ function cmdGetItems(q) {
       ['go','Go command reference'],
       ['archive stats','Task archive statistics'],
       ['markdown table','Markdown table generator'],
+      ['composer','Composer/PHP command reference'],
+      ['milestones','Task completion milestones'],
+      ['placeholder image','Placeholder image URL generator'],
+      ['ruby','Ruby/Rails command reference'],
+      ['focus score','Personal focus score gauge'],
+      ['slug','URL slug and camelCase generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9617,6 +9623,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='markdown table' || ql==='md table' || ql==='table generator' || ql==='generate table')){
     items.unshift({title:'Markdown Table Generator',desc:'Generate markdown tables quickly',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownTable();}});
+  }
+  if(ql && (ql==='composer' || ql==='php' || ql==='composer commands' || ql==='composer ref')){
+    items.unshift({title:'Composer/PHP Reference',desc:'Composer, Bundler, Rails cheatsheet',icon:'P',type:'action',action:()=>{closeCommandPalette();showComposerRef();}});
+  }
+  if(ql && (ql==='milestones' || ql==='achievements' || ql==='task milestones' || ql==='badges')){
+    items.unshift({title:'Milestones',desc:'Task completion milestone progress',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskMilestones();}});
+  }
+  if(ql && (ql==='placeholder image' || ql==='placeholder' || ql==='placeholder img' || ql==='dummy image')){
+    items.unshift({title:'Placeholder Image',desc:'Generate placeholder image URLs',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickPlaceholderImage();}});
+  }
+  if(ql && (ql==='ruby' || ql==='rails' || ql==='ruby commands' || ql==='gem')){
+    items.unshift({title:'Ruby/Rails Reference',desc:'Ruby, Gem, Rails cheatsheet',icon:'R',type:'action',action:()=>{closeCommandPalette();showRubyGemsRef();}});
+  }
+  if(ql && (ql==='focus score' || ql==='focus' || ql==='productivity score' || ql==='focus gauge')){
+    items.unshift({title:'Focus Score',desc:'Personal focus and workload score',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFocusScore();}});
+  }
+  if(ql && (ql==='slug' || ql==='slugify' || ql==='url slug' || ql==='camelcase')){
+    items.unshift({title:'Slug Generator',desc:'Generate URL slugs and camelCase',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSlugGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -28625,6 +28649,144 @@ function showQuickMarkdownTable(){
     document.getElementById('mt-output').textContent=md;
   };
   window._mtGenerate();
+}
+function showComposerRef(){
+  const d=document.createElement('div');d.id='composer-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Install':['composer install','composer require <pkg>','composer require --dev <pkg>','composer remove <pkg>','composer update'],
+    'Create':['composer init','composer create-project <pkg> <dir>'],
+    'Info':['composer show','composer show <pkg>','composer outdated','composer depends <pkg>','composer --version'],
+    'Scripts':['composer run-script <name>','composer dump-autoload','composer validate','composer check-platform-reqs'],
+    'Config':['composer config --list','composer global require <pkg>','composer global show','composer self-update'],
+    'Cache':['composer clear-cache','composer diagnose','composer licenses','composer fund']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Composer/PHP Reference</h3><button onclick="document.getElementById(\'composer-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskMilestones(){
+  const d=document.createElement('div');d.id='milestones-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const done=tasks.filter(t=>t.status==='done');
+  const milestones=[
+    {n:10,label:'Getting Started'},
+    {n:25,label:'Building Momentum'},
+    {n:50,label:'Halfway Hero'},
+    {n:100,label:'Century Club'},
+    {n:200,label:'Double Century'},
+    {n:500,label:'Task Legend'},
+    {n:1000,label:'Grandmaster'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Milestones</h3><button onclick="document.getElementById(\'milestones-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;color:#4ade80;font-weight:700">'+done.length+'</div><div style="font-size:12px;color:var(--text-muted)">tasks completed</div></div>';
+  milestones.forEach(m=>{
+    const reached=done.length>=m.n;const pct=Math.min(100,Math.round(done.length/m.n*100));
+    html+='<div style="margin-bottom:8px;padding:10px;background:var(--bg-surface);border-radius:6px;border-left:3px solid '+(reached?'#4ade80':'var(--border)')+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px;color:'+(reached?'#4ade80':'var(--text-primary)')+';font-weight:'+(reached?'600':'400')+'">'+m.label+' ('+m.n+')</span>';
+    html+='<span style="font-size:11px;color:'+(reached?'#4ade80':'var(--text-muted)')+'">'+(reached?'Achieved!':pct+'%')+'</span></div>';
+    html+='<div style="background:var(--bg-base);border-radius:3px;height:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+(reached?'#4ade80':'var(--border)')+';border-radius:3px"></div></div>';
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickPlaceholderImage(){
+  const d=document.createElement('div');d.id='placeholder-img-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Placeholder Image</h3><button onclick="document.getElementById(\'placeholder-img-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px"><div><label style="font-size:10px;color:var(--text-muted)">Width</label><input id="ph-w" type="number" value="400" style="width:100%;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box"/></div>';
+  html+='<div><label style="font-size:10px;color:var(--text-muted)">Height</label><input id="ph-h" type="number" value="300" style="width:100%;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box"/></div></div>';
+  html+='<input id="ph-text" type="text" placeholder="Custom text (optional)" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box;margin-bottom:8px"/>';
+  html+='<button onclick="window._phGenerate()" style="width:100%;padding:8px;background:#4ade80;color:#000;border:none;border-radius:4px;font-weight:600;cursor:pointer;font-size:12px;margin-bottom:8px">Generate URL</button>';
+  html+='<div id="ph-result" style="font-size:11px"></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._phGenerate=function(){
+    const w=document.getElementById('ph-w').value||400;const h=document.getElementById('ph-h').value||300;
+    const text=document.getElementById('ph-text').value;const resEl=document.getElementById('ph-result');
+    const url='https://placehold.co/'+w+'x'+h+'/1a1a2e/4ade80'+(text?'?text='+encodeURIComponent(text):'');
+    resEl.innerHTML='<div onclick="navigator.clipboard.writeText(\''+url+'\')" style="padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;cursor:pointer;word-break:break-all;color:#4ade80;font-family:monospace;margin-bottom:6px">'+url+'</div><img src="'+url+'" style="width:100%;border-radius:4px;margin-top:4px" alt="preview"/>';
+  };
+}
+function showRubyGemsRef(){
+  const d=document.createElement('div');d.id='ruby-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Gems':['gem install <name>','gem uninstall <name>','gem list','gem search <query>','gem update','gem info <name>'],
+    'Bundler':['bundle init','bundle install','bundle update','bundle exec <cmd>','bundle add <gem>','bundle lock'],
+    'Rails':['rails new <name>','rails server','rails console','rails generate <type> <name>','rails db:migrate','rails routes'],
+    'RVM/rbenv':['rbenv install <ver>','rbenv local <ver>','rbenv versions','rvm use <ver>','rvm list'],
+    'Other':['ruby --version','irb','gem --version','gem environment','rake --tasks']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Ruby/Rails Reference</h3><button onclick="document.getElementById(\'ruby-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskFocusScore(){
+  const d=document.createElement('div');d.id='focus-score-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  const withDue=tasks.filter(t=>t.due);
+  const overdue=tasks.filter(t=>t.due&&new Date(t.due)<new Date());
+  const p0p1=tasks.filter(t=>t.priority==='p0'||t.priority==='p1');
+  let score=100;
+  if(inProgress.length>5)score-=20;
+  if(inProgress.length>10)score-=15;
+  if(overdue.length>0)score-=overdue.length*5;
+  if(p0p1.length>3)score-=10;
+  if(tasks.length>20)score-=10;
+  score=Math.max(0,Math.min(100,score));
+  const col=score>=80?'#4ade80':score>=50?'#f59e0b':'#ef4444';
+  const circumference=2*Math.PI*70;const offset=circumference-(score/100)*circumference;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Focus Score</h3><button onclick="document.getElementById(\'focus-score-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  let svg='<svg width="180" height="180" viewBox="0 0 180 180" style="display:block;margin:0 auto 16px">';
+  svg+='<circle cx="90" cy="90" r="70" fill="none" stroke="var(--bg-surface)" stroke-width="10"/>';
+  svg+='<circle cx="90" cy="90" r="70" fill="none" stroke="'+col+'" stroke-width="10" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(-90 90 90)"/>';
+  svg+='<text x="90" y="85" text-anchor="middle" fill="'+col+'" font-size="36" font-weight="700">'+score+'</text>';
+  svg+='<text x="90" y="108" text-anchor="middle" fill="var(--text-muted)" font-size="11">'+(score>=80?'Focused':score>=50?'Distracted':'Overwhelmed')+'</text>';
+  svg+='</svg>';
+  html+=svg;
+  const factors=[];
+  if(inProgress.length>5)factors.push({text:'Too many WIP tasks ('+inProgress.length+')',bad:true});
+  if(overdue.length>0)factors.push({text:overdue.length+' overdue tasks',bad:true});
+  if(p0p1.length>3)factors.push({text:'Many critical tasks ('+p0p1.length+')',bad:true});
+  if(inProgress.length<=3)factors.push({text:'Good WIP limit',bad:false});
+  if(overdue.length===0)factors.push({text:'No overdue tasks',bad:false});
+  factors.forEach(f=>{
+    html+='<div style="padding:4px 8px;margin-bottom:3px;font-size:11px;color:'+(f.bad?'#ef4444':'#4ade80')+'">'+(f.bad?'- ':'+ ')+f.text+'</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickSlugGenerator(){
+  const d=document.createElement('div');d.id='slug-gen-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Slug Generator</h3><button onclick="document.getElementById(\'slug-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<input id="slug-input" type="text" placeholder="Enter text..." oninput="window._slugGen()" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-bottom:8px"/>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Slug:</div>';
+  html+='<div id="slug-output" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:13px;color:#4ade80;cursor:pointer;min-height:20px;word-break:break-all"></div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px;margin-bottom:8px">camelCase:</div>';
+  html+='<div id="camel-output" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:13px;color:#4ade80;cursor:pointer;min-height:20px"></div>';
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click to copy</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._slugGen=function(){
+    const input=document.getElementById('slug-input').value;
+    const slug=input.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/[\s]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+    document.getElementById('slug-output').textContent=slug;
+    const camel=input.trim().split(/\s+/).map((w,i)=>{const lower=w.toLowerCase();return i===0?lower:lower.charAt(0).toUpperCase()+lower.slice(1);}).join('');
+    document.getElementById('camel-output').textContent=camel;
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
