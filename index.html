@@ -6563,6 +6563,12 @@ function cmdGetItems(q) {
       ['python venv','Python virtual environment reference'],
       ['backlog grooming','Backlog health and grooming report'],
       ['markdown table','Markdown table generator'],
+      ['rust','Rust Cargo build and test reference'],
+      ['status timeline','Task status changes over 14 days'],
+      ['cron builder','Cron expression builder with presets'],
+      ['git bisect','Git bisect debugging reference'],
+      ['project summary','Cross-project summary report'],
+      ['html encoder','HTML encode decode strip tags'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10421,6 +10427,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='markdown table' || ql==='md table' || ql==='table generator' || ql==='table markdown')){
     items.unshift({title:'Markdown Table',desc:'Generate markdown table template',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownTable();}});
+  }
+  if(ql && (ql==='rust' || ql==='cargo' || ql==='rust ref' || ql==='cargo commands')){
+    items.unshift({title:'Rust Cargo Reference',desc:'Build, test, publish commands',icon:'R',type:'action',action:()=>{closeCommandPalette();showRustCargoRef();}});
+  }
+  if(ql && (ql==='status timeline' || ql==='status history' || ql==='status chart' || ql==='status over time')){
+    items.unshift({title:'Status Timeline',desc:'Task status distribution over 14 days',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStatusTimeline();}});
+  }
+  if(ql && (ql==='cron builder' || ql==='cron' || ql==='cron expression' || ql==='crontab builder')){
+    items.unshift({title:'Cron Builder',desc:'Build cron expressions with presets',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCronBuilder();}});
+  }
+  if(ql && (ql==='git bisect' || ql==='bisect' || ql==='git debug' || ql==='git bisect ref')){
+    items.unshift({title:'Git Bisect Reference',desc:'Binary search for bugs',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitBisectRef();}});
+  }
+  if(ql && (ql==='project summary' || ql==='summary report' || ql==='all projects' || ql==='project report')){
+    items.unshift({title:'Project Summary',desc:'Cross-project summary report',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectSummary();}});
+  }
+  if(ql && (ql==='html encoder' || ql==='html encode' || ql==='html decode' || ql==='html entities tool')){
+    items.unshift({title:'HTML Encoder',desc:'Encode, decode, strip HTML tags',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHtmlEncoder();}});
   }
   return items.slice(0, 20);
 }
@@ -35198,6 +35222,243 @@ function showQuickMarkdownTable(){
   };
   render();
   setTimeout(()=>window._mdtGen(),50);
+  document.body.appendChild(d);
+}
+function showRustCargoRef(){
+  const cmds={
+    'Project':{
+      'cargo new name':'Create new project',
+      'cargo init':'Init in current directory',
+      'cargo build':'Build project',
+      'cargo build --release':'Release build',
+      'cargo run':'Build and run',
+      'cargo check':'Check without building',
+      'cargo clean':'Remove target directory',
+      'cargo update':'Update dependencies'
+    },
+    'Testing':{
+      'cargo test':'Run all tests',
+      'cargo test name':'Run specific test',
+      'cargo test -- --nocapture':'Show println output',
+      'cargo test -- --test-threads=1':'Single threaded',
+      'cargo bench':'Run benchmarks',
+      'cargo doc --open':'Generate and open docs',
+      'cargo clippy':'Lint with clippy',
+      'cargo fmt':'Format code'
+    },
+    'Dependencies':{
+      'cargo add package':'Add dependency',
+      'cargo add package@1.0':'Add specific version',
+      'cargo add -D package':'Add dev dependency',
+      'cargo remove package':'Remove dependency',
+      'cargo tree':'Show dependency tree',
+      'cargo audit':'Security audit deps',
+      'cargo vendor':'Vendor dependencies',
+      'cargo install package':'Install binary'
+    },
+    'Publishing':{
+      'cargo login':'Authenticate with crates.io',
+      'cargo publish':'Publish to crates.io',
+      'cargo publish --dry-run':'Test publishing',
+      'cargo package':'Create distributable tarball',
+      'cargo search query':'Search crates.io',
+      'cargo owner --add user':'Add crate owner',
+      'cargo yank --vers 1.0':'Yank published version',
+      'cargo metadata':'Output project metadata JSON'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Rust Cargo Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskStatusTimeline(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const now=new Date();const days=14;const data=[];
+  const statuses=['backlog','todo','in-progress','review','done'];
+  const statusColors={'backlog':'#6b7280','todo':'#3b82f6','in-progress':'#f59e0b','review':'#8b5cf6','done':'#4ade80'};
+  for(let i=days;i>=0;i--){
+    const date=new Date(now);date.setDate(date.getDate()-i);
+    const dateStr=date.toDateString();
+    const counts={};
+    statuses.forEach(s=>{
+      counts[s]=tasks.filter(t=>{
+        const created=new Date(t.created||t.id);
+        if(created>date)return false;
+        if(t.status==='done'){const done=new Date(t.completedAt||t.updated||t.id);return done<=date?s==='done':s===(t.prevStatus||'todo');}
+        return(t.status||'todo')===s;
+      }).length;
+    });
+    data.push({day:date.getDate()+'/'+(date.getMonth()+1),counts});
+  }
+  const maxTotal=Math.max(...data.map(d2=>Object.values(d2.counts).reduce((a,b)=>a+b,0)),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Status Timeline (14 Days)</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:2px;align-items:flex-end;height:160px;margin-bottom:8px">';
+  data.forEach(d2=>{
+    const total=Object.values(d2.counts).reduce((a,b)=>a+b,0);
+    const h=Math.max((total/maxTotal)*140,2);
+    html+='<div style="flex:1;height:'+h+'px;display:flex;flex-direction:column-reverse;border-radius:2px 2px 0 0;overflow:hidden">';
+    statuses.forEach(s=>{
+      const sh=total?(d2.counts[s]/total)*h:0;
+      if(sh>0)html+='<div style="height:'+sh+'px;background:'+statusColors[s]+'" title="'+s+': '+d2.counts[s]+'"></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted)"><span>'+data[0].day+'</span><span>'+data[data.length-1].day+'</span></div>';
+  html+='<div style="display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap">';
+  statuses.forEach(s=>{html+='<span style="font-size:10px"><span style="display:inline-block;width:8px;height:8px;background:'+statusColors[s]+';border-radius:2px;margin-right:3px"></span>'+s+'</span>';});
+  html+='</div></div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickCronBuilder(){
+  let ex=document.getElementById('cron-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='cron-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+  const presets=[
+    {label:'Every minute',cron:'* * * * *'},
+    {label:'Every 5 min',cron:'*/5 * * * *'},
+    {label:'Every hour',cron:'0 * * * *'},
+    {label:'Every day 9am',cron:'0 9 * * *'},
+    {label:'Every Monday',cron:'0 9 * * 1'},
+    {label:'Every month 1st',cron:'0 0 1 * *'},
+    {label:'Every weekday',cron:'0 9 * * 1-5'},
+    {label:'Every 6 hours',cron:'0 */6 * * *'}
+  ];
+  let cron='0 9 * * *';
+  function explain(c){
+    const p=c.split(' ');if(p.length!==5)return 'Invalid cron';
+    const [min,hr,dom,mon,dow]=p;
+    let parts=[];
+    if(min==='*')parts.push('every minute');else if(min.startsWith('*/'))parts.push('every '+min.slice(2)+' minutes');else parts.push('at minute '+min);
+    if(hr==='*')parts.push('of every hour');else if(hr.startsWith('*/'))parts.push('every '+hr.slice(2)+' hours');else parts.push('at hour '+hr);
+    if(dom!=='*')parts.push('on day '+dom);
+    if(mon!=='*')parts.push('in month '+mon);
+    if(dow!=='*'){const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];if(dow.includes('-')){const[a,b]=dow.split('-');parts.push(days[a]+' to '+days[b]);}else parts.push('on '+days[dow]);}
+    return parts.join(', ');
+  }
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Cron Builder</span><button onclick="document.getElementById(\'cron-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<input id="cron-input" value="'+cron+'" oninput="window._cronUpdate(this.value)" style="width:100%;background:var(--bg-base);color:#4ade80;border:1px solid var(--border);border-radius:4px;padding:8px;font-size:16px;font-family:monospace;text-align:center;margin-bottom:6px">';
+    html+='<div style="font-size:11px;color:var(--text-secondary);text-align:center;margin-bottom:8px;min-height:30px">'+explain(cron)+'</div>';
+    html+='<div style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:10px">min hour day-of-month month day-of-week</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    presets.forEach(p=>{
+      html+='<button onclick="window._cronSet(\''+p.cron+'\')" style="background:'+(cron===p.cron?'#4ade8033':'var(--bg-surface)')+';color:'+(cron===p.cron?'#4ade80':'var(--text-muted)')+';border:1px solid '+(cron===p.cron?'#4ade80':'var(--border)')+';padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">'+p.label+'</button>';
+    });
+    html+='</div>';
+    html+='<button onclick="navigator.clipboard.writeText(\''+cron+'\');this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',500)" style="width:100%;margin-top:10px;background:#4ade80;color:#000;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Copy</button>';
+    d.innerHTML=html;
+  }
+  window._cronSet=(c)=>{cron=c;render();};
+  window._cronUpdate=(c)=>{cron=c;const el=d.querySelector('div[style*=text-align\\:center]');if(el)el.textContent=explain(c);};
+  render();
+  document.body.appendChild(d);
+}
+function showGitBisectRef(){
+  const cmds={
+    'Basic Bisect':{
+      'git bisect start':'Start bisect session',
+      'git bisect bad':'Mark current commit as bad',
+      'git bisect good <commit>':'Mark commit as good',
+      'git bisect reset':'End bisect, return to original',
+      'git bisect skip':'Skip current commit',
+      'git bisect log':'Show bisect log',
+      'git bisect visualize':'Visualize remaining range',
+      'git bisect replay log.txt':'Replay bisect from log'
+    },
+    'Automated Bisect':{
+      'git bisect run <script>':'Auto-bisect with script',
+      'git bisect run make test':'Auto-bisect with make test',
+      'git bisect run ./test.sh':'Auto-bisect with shell script',
+      'git bisect start HEAD v1.0':'Start with bad=HEAD, good=v1.0',
+      'git bisect terms':'Show current terms',
+      'git bisect terms --term-bad=broken':'Custom term for bad',
+      'git bisect terms --term-good=fixed':'Custom term for good',
+      'git bisect bad HEAD~5':'Mark range as bad'
+    },
+    'Related Commands':{
+      'git log --oneline --graph':'Visual commit log',
+      'git log --first-parent':'Follow first parent only',
+      'git log --ancestry-path A..B':'Commits between A and B',
+      'git blame file':'Line-by-line authorship',
+      'git log -S "string"':'Search for string in diffs',
+      'git log -G "regex"':'Search with regex in diffs',
+      'git log --follow file':'Follow file renames',
+      'git log --all --grep="pattern"':'Search all branch messages'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Git Bisect Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskProjectSummary(){
+  const projects=S.projects||[];const tasks=S.tasks||[];const content=S.content||[];const docs=S.writerDocs||[];
+  if(!projects.length){alert('No projects');return;}
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Project Summary Report</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  let totalTasks=0,totalDone=0,totalContent=0,totalDocs=0;
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const pContent=content.filter(c=>c.project===p.name||c.projectId===p.id).length;
+    const pDocs=docs.filter(d2=>d2.project===p.name||d2.projectId===p.id).length;
+    totalTasks+=pTasks.length;totalDone+=done;totalContent+=pContent;totalDocs+=pDocs;
+    const pct=pTasks.length?Math.round((done/pTasks.length)*100):0;
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;margin-bottom:6px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:#e2e8f0">'+esc(p.name)+'</span>';
+    html+='<span style="font-size:11px;color:#4ade80">'+pct+'%</span></div>';
+    html+='<div style="height:4px;background:var(--bg-base);border-radius:2px;margin-bottom:6px"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:2px"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    html+='<span>Tasks: '+pTasks.length+'</span><span>Done: '+done+'</span><span>Content: '+pContent+'</span><span>Docs: '+pDocs+'</span></div>';
+    html+='</div>';
+  });
+  html+='<div style="border-top:1px solid var(--border);padding-top:10px;display:flex;gap:16px;justify-content:center;font-size:11px;color:var(--text-muted)">';
+  html+='<span>Total Tasks: <strong style="color:#e2e8f0">'+totalTasks+'</strong></span>';
+  html+='<span>Done: <strong style="color:#4ade80">'+totalDone+'</strong></span>';
+  html+='<span>Content: <strong style="color:#e2e8f0">'+totalContent+'</strong></span>';
+  html+='<span>Docs: <strong style="color:#e2e8f0">'+totalDocs+'</strong></span></div>';
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickHtmlEncoder(){
+  let ex=document.getElementById('htmlenc-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='htmlenc-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:350px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">HTML Encoder</span><button onclick="document.getElementById(\'htmlenc-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<textarea id="htmlenc-input" style="width:100%;height:80px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;font-family:monospace;resize:none;margin-bottom:6px" placeholder="Paste HTML or text here..."></textarea>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+  html+='<button onclick="window._htmlEncode()" style="flex:1;background:#4ade80;color:#000;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Encode</button>';
+  html+='<button onclick="window._htmlDecode()" style="flex:1;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px;border-radius:4px;cursor:pointer;font-size:11px">Decode</button>';
+  html+='<button onclick="window._htmlStrip()" style="flex:1;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px;border-radius:4px;cursor:pointer;font-size:11px">Strip Tags</button>';
+  html+='</div>';
+  html+='<div id="htmlenc-output" style="background:var(--bg-base);padding:8px;border-radius:6px;font-size:11px;color:#4ade80;font-family:monospace;min-height:60px;max-height:100px;overflow-y:auto;word-break:break-all"></div>';
+  html+='<button onclick="const o=document.getElementById(\'htmlenc-output\');if(o)navigator.clipboard.writeText(o.textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',500)" style="width:100%;margin-top:6px;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:5px;border-radius:4px;cursor:pointer;font-size:11px">Copy</button>';
+  d.innerHTML=html;
+  window._htmlEncode=()=>{const inp=document.getElementById('htmlenc-input');const out=document.getElementById('htmlenc-output');if(!inp||!out)return;const el=document.createElement('div');el.textContent=inp.value;out.textContent=el.innerHTML;};
+  window._htmlDecode=()=>{const inp=document.getElementById('htmlenc-input');const out=document.getElementById('htmlenc-output');if(!inp||!out)return;const el=document.createElement('div');el.innerHTML=inp.value;out.textContent=el.textContent;};
+  window._htmlStrip=()=>{const inp=document.getElementById('htmlenc-input');const out=document.getElementById('htmlenc-output');if(!inp||!out)return;const el=document.createElement('div');el.innerHTML=inp.value;out.textContent=el.textContent;};
   document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
