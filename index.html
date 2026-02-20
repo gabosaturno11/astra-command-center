@@ -6320,6 +6320,12 @@ function cmdGetItems(q) {
       ['deno','Deno command reference'],
       ['completion calendar','Task completion heatmap calendar'],
       ['percentage','Percentage calculator'],
+      ['bun','Bun command reference'],
+      ['effort','Task effort distribution chart'],
+      ['time zones','World clock time zone converter'],
+      ['curl','curl command reference'],
+      ['project breakdown','Task breakdown by project'],
+      ['date diff','Date difference calculator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9449,6 +9455,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='percentage' || ql==='percent' || ql==='percentage calc' || ql==='pct calculator')){
     items.unshift({title:'Percentage Calculator',desc:'Calculate percentages quickly',icon:'%',type:'action',action:()=>{closeCommandPalette();showQuickPercentageCalc();}});
+  }
+  if(ql && (ql==='bun' || ql==='bun commands' || ql==='bun ref' || ql==='bun reference')){
+    items.unshift({title:'Bun Reference',desc:'Bun command cheatsheet by category',icon:'B',type:'action',action:()=>{closeCommandPalette();showBunCommandRef();}});
+  }
+  if(ql && (ql==='effort' || ql==='effort distribution' || ql==='estimate chart' || ql==='task effort')){
+    items.unshift({title:'Effort Distribution',desc:'Task estimate breakdown by duration',icon:'E',type:'action',action:()=>{closeCommandPalette();showTaskEffortDistribution();}});
+  }
+  if(ql && (ql==='time zones' || ql==='timezone' || ql==='world clock' || ql==='time zone converter')){
+    items.unshift({title:'Time Zones',desc:'Current time in major cities',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTimeZoneConverter();}});
+  }
+  if(ql && (ql==='curl' || ql==='curl commands' || ql==='curl ref' || ql==='curl reference')){
+    items.unshift({title:'curl Reference',desc:'curl command cheatsheet by category',icon:'C',type:'action',action:()=>{closeCommandPalette();showCurlCommandRef();}});
+  }
+  if(ql && (ql==='project breakdown' || ql==='project stats' || ql==='project tasks' || ql==='breakdown by project')){
+    items.unshift({title:'Project Breakdown',desc:'Task progress breakdown by project',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectBreakdown();}});
+  }
+  if(ql && (ql==='date diff' || ql==='date difference' || ql==='days between' || ql==='date calc')){
+    items.unshift({title:'Date Difference',desc:'Calculate days between two dates',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDateDiff();}});
   }
   return items.slice(0, 20);
 }
@@ -27404,6 +27428,159 @@ function showQuickPercentageCalc(){
   document.getElementById('pct-y').addEventListener('input',function(){const y=parseFloat(this.value);const x=parseFloat(document.getElementById('pct-x').value);if(!isNaN(x)&&!isNaN(y))document.getElementById('pct-result').textContent=(x/100*y).toFixed(2);});
   document.getElementById('pct-a').addEventListener('input',function(){const a=parseFloat(this.value);const b=parseFloat(document.getElementById('pct-b').value);if(!isNaN(a)&&!isNaN(b)&&b!==0)document.getElementById('pct-result2').textContent=(a/b*100).toFixed(2)+'%';});
   document.getElementById('pct-b').addEventListener('input',function(){const b=parseFloat(this.value);const a=parseFloat(document.getElementById('pct-a').value);if(!isNaN(a)&&!isNaN(b)&&b!==0)document.getElementById('pct-result2').textContent=(a/b*100).toFixed(2)+'%';});
+}
+function showBunCommandRef(){
+  const d=document.createElement('div');d.id='bun-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Run':['bun run <file>','bun run <script>','bun --watch <file>','bun --hot <file>','bunx <pkg>'],
+    'Install':['bun install','bun add <pkg>','bun add -d <pkg>','bun remove <pkg>','bun update'],
+    'Create':['bun init','bun create <template>','bun create vite','bun create next-app'],
+    'Test':['bun test','bun test --watch','bun test --coverage','bun test <pattern>'],
+    'Build':['bun build <file>','bun build --outdir <dir>','bun build --minify','bun build --target node'],
+    'Other':['bun --version','bun upgrade','bun pm ls','bun pm cache','bun repl']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Bun Reference</h3><button onclick="document.getElementById(\'bun-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskEffortDistribution(){
+  const d=document.createElement('div');d.id='effort-dist-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.estimate);
+  const buckets={'< 30m':0,'30m-1h':0,'1h-2h':0,'2h-4h':0,'4h+':0};
+  tasks.forEach(t=>{
+    const e=t.estimate.toLowerCase();let mins=0;
+    if(e.includes('h')){const h=parseFloat(e);mins=h*60;}else if(e.includes('m')){mins=parseFloat(e);}else{mins=parseFloat(e);}
+    if(isNaN(mins))return;
+    if(mins<30)buckets['< 30m']++;else if(mins<60)buckets['30m-1h']++;else if(mins<120)buckets['1h-2h']++;else if(mins<240)buckets['2h-4h']++;else buckets['4h+']++;
+  });
+  const labels=Object.keys(buckets);const vals=Object.values(buckets);const mx=Math.max(...vals,1);
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Effort Distribution</h3><button onclick="document.getElementById(\'effort-dist-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">'+tasks.length+' tasks with estimates</div>';
+  let svg='<svg width="420" height="180" viewBox="0 0 420 180">';
+  const bw=60;const gap=20;
+  labels.forEach((l,i)=>{
+    const x=20+i*(bw+gap);const h=(vals[i]/mx)*130;const y=150-h;
+    svg+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" fill="#4ade80" rx="4" opacity="0.8"/>';
+    svg+='<text x="'+(x+bw/2)+'" y="168" text-anchor="middle" fill="var(--text-muted)" font-size="9">'+l+'</text>';
+    svg+='<text x="'+(x+bw/2)+'" y="'+(y-5)+'" text-anchor="middle" fill="var(--text-secondary)" font-size="11">'+vals[i]+'</text>';
+  });
+  svg+='</svg>';
+  html+=svg;
+  if(!tasks.length)html+='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px">No tasks with estimates yet. Add estimates like "30m", "2h" to tasks.</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickTimeZoneConverter(){
+  const d=document.createElement('div');d.id='tz-converter-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  const zones=[
+    {name:'Local',tz:Intl.DateTimeFormat().resolvedOptions().timeZone},
+    {name:'UTC',tz:'UTC'},
+    {name:'New York',tz:'America/New_York'},
+    {name:'London',tz:'Europe/London'},
+    {name:'Tokyo',tz:'Asia/Tokyo'},
+    {name:'Sydney',tz:'Australia/Sydney'},
+    {name:'Dubai',tz:'Asia/Dubai'},
+    {name:'Los Angeles',tz:'America/Los_Angeles'}
+  ];
+  function rend(){
+    const now=new Date();
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Time Zones</h3><button onclick="document.getElementById(\'tz-converter-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+    zones.forEach(z=>{
+      const t=now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'2-digit',minute:'2-digit',hour12:true});
+      const dt=now.toLocaleDateString('en-US',{timeZone:z.tz,weekday:'short',month:'short',day:'numeric'});
+      const hr=parseInt(now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'numeric',hour12:false}));
+      const isNight=hr<6||hr>=21;
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">';
+      html+='<div><div style="font-size:12px;color:var(--text-primary)">'+(isNight?'&#9790; ':'')+''+z.name+'</div><div style="font-size:9px;color:var(--text-muted)">'+dt+'</div></div>';
+      html+='<div style="font-size:14px;color:#4ade80;font-weight:600;font-family:monospace">'+t+'</div></div>';
+    });
+    d.innerHTML=html;
+  }
+  rend();document.body.appendChild(d);
+  const iv=setInterval(()=>{if(!document.getElementById('tz-converter-panel')){clearInterval(iv);return;}rend();},30000);
+}
+function showCurlCommandRef(){
+  const d=document.createElement('div');d.id='curl-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Basic':['curl <url>','curl -o file.html <url>','curl -O <url>','curl -L <url>','curl -v <url>','curl -s <url>'],
+    'HTTP Methods':['curl -X GET <url>','curl -X POST <url>','curl -X PUT <url>','curl -X DELETE <url>','curl -X PATCH <url>'],
+    'Headers & Data':['curl -H "Content-Type: application/json" <url>','curl -H "Authorization: Bearer TOKEN" <url>','curl -d \'{"key":"val"}\' <url>','curl -F "file=@path" <url>'],
+    'Auth':['curl -u user:pass <url>','curl --negotiate -u : <url>','curl -b cookies.txt <url>','curl -c cookies.txt <url>'],
+    'Debug':['curl -w "%{http_code}" <url>','curl -w "%{time_total}" <url>','curl --trace-ascii - <url>','curl -I <url>'],
+    'SSL':['curl -k <url>','curl --cacert ca.pem <url>','curl --cert client.pem <url>','curl --key key.pem <url>']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">curl Reference</h3><button onclick="document.getElementById(\'curl-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskProjectBreakdown(){
+  const d=document.createElement('div');d.id='project-breakdown-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);
+  const byProject={};
+  tasks.forEach(t=>{
+    const pid=t.projectId||'none';
+    if(!byProject[pid])byProject[pid]={total:0,done:0,inProgress:0,todo:0,overdue:0};
+    byProject[pid].total++;
+    if(t.status==='done')byProject[pid].done++;
+    else if(t.status==='in-progress')byProject[pid].inProgress++;
+    else byProject[pid].todo++;
+    if(t.due&&new Date(t.due)<new Date()&&t.status!=='done')byProject[pid].overdue++;
+  });
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Project Breakdown</h3><button onclick="document.getElementById(\'project-breakdown-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  const entries=Object.entries(byProject).sort((a,b)=>b[1].total-a[1].total);
+  entries.forEach(([pid,data])=>{
+    const proj=projects.find(p=>p.id===pid);const name=proj?proj.name:'No Project';
+    const pct=data.total>0?Math.round(data.done/data.total*100):0;
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;color:var(--text-primary);font-weight:600">'+esc(name)+'</span><span style="font-size:11px;color:#4ade80">'+pct+'%</span></div>';
+    html+='<div style="background:var(--bg-base);border-radius:4px;height:6px;margin-bottom:8px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:4px;transition:width 0.3s"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px">';
+    html+='<span style="color:var(--text-muted)">Total: <span style="color:var(--text-primary)">'+data.total+'</span></span>';
+    html+='<span style="color:var(--text-muted)">Done: <span style="color:#4ade80">'+data.done+'</span></span>';
+    html+='<span style="color:var(--text-muted)">WIP: <span style="color:#3b82f6">'+data.inProgress+'</span></span>';
+    html+='<span style="color:var(--text-muted)">To Do: <span style="color:var(--text-secondary)">'+data.todo+'</span></span>';
+    if(data.overdue)html+='<span style="color:#ef4444">'+data.overdue+' overdue</span>';
+    html+='</div></div>';
+  });
+  if(!entries.length)html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No tasks found.</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickDateDiff(){
+  const d=document.createElement('div');d.id='date-diff-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  const today=new Date().toISOString().split('T')[0];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Date Difference</h3><button onclick="document.getElementById(\'date-diff-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">From</label><input id="dd-from" type="date" value="'+today+'" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box;margin-top:2px"/></div>';
+  html+='<div style="margin-bottom:10px"><label style="font-size:10px;color:var(--text-muted)">To</label><input id="dd-to" type="date" value="'+today+'" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box;margin-top:2px"/></div>';
+  html+='<div id="dd-result" style="background:var(--bg-surface);border-radius:6px;padding:12px;text-align:center"><div style="font-size:24px;color:#4ade80;font-weight:700">0</div><div style="font-size:11px;color:var(--text-muted)">days</div></div>';
+  html+='<div id="dd-detail" style="margin-top:8px;font-size:11px;color:var(--text-muted);text-align:center"></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  function calc(){
+    const from=new Date(document.getElementById('dd-from').value);const to=new Date(document.getElementById('dd-to').value);
+    if(isNaN(from)||isNaN(to))return;
+    const diff=Math.abs(to-from);const days=Math.floor(diff/86400000);
+    const weeks=Math.floor(days/7);const months=(days/30.44).toFixed(1);const years=(days/365.25).toFixed(2);
+    document.getElementById('dd-result').innerHTML='<div style="font-size:24px;color:#4ade80;font-weight:700">'+days+'</div><div style="font-size:11px;color:var(--text-muted)">days</div>';
+    document.getElementById('dd-detail').textContent=weeks+' weeks / '+months+' months / '+years+' years';
+  }
+  document.getElementById('dd-from').addEventListener('change',calc);
+  document.getElementById('dd-to').addEventListener('change',calc);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
