@@ -877,6 +877,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="alpha">A-Z</option>
             <option value="completed">Completed</option>
             <option value="project">By Project</option>
+            <option value="time">Time Spent</option>
           </select>
           <button class="btn btn-sm" onclick="exportTasks()" title="Copy tasks as markdown">Export</button>
           <span id="task-count-info" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
@@ -2472,7 +2473,7 @@ function contentInlineEdit(id,el,e){
 function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
 function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;['all','active','todo','progress','blocked','done'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',f===k);});renderTasks();}
 function filterTaskProject(p){taskProjectFilter=p;taskFilter='all';renderTasks();}
-function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');else if(taskFilter==='todo')items=items.filter(t=>t.status==='todo');else if(taskFilter==='progress')items=items.filter(t=>t.status==='progress');else if(taskFilter==='blocked')items=items.filter(t=>t.status==='blocked');else if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(sortVal==='completed')items.sort((a,b)=>new Date(b.completedAt||0)-new Date(a.completedAt||0));else if(sortVal==='project')items.sort((a,b)=>(a.project||'zzz').localeCompare(b.project||'zzz'));return items;}
+function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');else if(taskFilter==='todo')items=items.filter(t=>t.status==='todo');else if(taskFilter==='progress')items=items.filter(t=>t.status==='progress');else if(taskFilter==='blocked')items=items.filter(t=>t.status==='blocked');else if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(sortVal==='completed')items.sort((a,b)=>new Date(b.completedAt||0)-new Date(a.completedAt||0));else if(sortVal==='project')items.sort((a,b)=>(a.project||'zzz').localeCompare(b.project||'zzz'));else if(sortVal==='time')items.sort((a,b)=>(b.timeSpent||0)-(a.timeSpent||0));return items;}
 
 function renderTasks(){
   const items=getFilteredTasks();
@@ -2634,8 +2635,8 @@ function openTaskDetail(id) {
   document.getElementById('td-blocked-by').value = t.blockedBy || '';
   document.getElementById('td-estimate').value = t.estimate || '';
   document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
-  let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-  if(t.completedAt)timeText+=' | Done: '+new Date(t.completedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' ('+timeAgo(t.created)+')' : '';
+  if(t.completedAt)timeText+=' | Done: '+new Date(t.completedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' ('+timeAgo(t.completedAt)+')';
   if(t.timeSpent)timeText+=' | Time: '+formatTimeSpent(t.timeSpent);
   if(t.timeStarted)timeText+=' | Started: '+timeAgo(t.timeStarted);
   document.getElementById('td-created').textContent = timeText;
@@ -4970,6 +4971,7 @@ function cmdGetItems(q) {
   if(!ql || 'export tasks'.includes(ql)) items.push({title:'Export Tasks', desc:'Copy filtered tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportTasks();}});
   if(!ql || 'export links bookmarks'.includes(ql)) items.push({title:'Export Links', desc:'Copy all links as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportLinks();}});
   if(!ql || 'export week calendar summary'.includes(ql)) items.push({title:'Export Week', desc:'Copy this weeks tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportWeek();}});
+  if(!ql || 'projects all list'.includes(ql)){const ps=[...new Set(S.tasks.map(t=>t.project).filter(Boolean))].sort();if(ps.length)ps.forEach(p=>{const active=S.tasks.filter(t=>t.project===p&&t.status!=='done').length;const done=S.tasks.filter(t=>t.project===p&&t.status==='done').length;items.push({title:p,desc:active+' active, '+done+' done',icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p;const tpf=document.getElementById('task-project-filter');if(tpf)tpf.value=p;renderTasks();toast('Filtered: '+p);}});});}
   if(!ql || 'weekly report summary productivity'.includes(ql)) items.push({title:'Weekly Report', desc:'Copy weekly productivity report as markdown', icon:'W', type:'action', action:()=>{closeCommandPalette();weeklyReport();}});
   if(!ql || 'export month calendar'.includes(ql)) items.push({title:'Export Month', desc:'Copy current months tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportMonth();}});
   if(!ql || 'archive'.includes(ql)) items.push({title:'Archive Completed', desc:'Move done tasks to archive', icon:'A', type:'action', action:()=>{closeCommandPalette();archiveCompletedTasks();}});
