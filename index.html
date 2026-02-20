@@ -6695,6 +6695,12 @@ function cmdGetItems(q) {
       ['java','Java Gradle Maven build test ref'],
       ['mood','Mood tracker daily log with graph'],
       ['pomodoro','Simple pomodoro 25min timer'],
+      ['curl','curl HTTP request reference'],
+      ['habit','Habit tracker daily grid streaks'],
+      ['cron','Cron expression builder presets'],
+      ['sqlite','SQLite database reference'],
+      ['kanban metrics','Kanban WIP cycle time throughput'],
+      ['subnet','IP subnet calculator CIDR'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10949,6 +10955,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='pomodoro' || ql==='pom timer' || ql==='25 min' || ql==='pomodoro timer')){
     items.unshift({title:'Pomodoro Timer',desc:'25min work / 5min break cycle',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPomodoroSimple();}});
+  }
+  if(ql && (ql==='curl' || ql==='curl ref' || ql==='http request' || ql==='curl examples')){
+    items.unshift({title:'curl Reference',desc:'GET, POST, headers, auth, debug',icon:'C',type:'action',action:()=>{closeCommandPalette();showCurlRef();}});
+  }
+  if(ql && (ql==='habit' || ql==='habit tracker' || ql==='habits' || ql==='daily habit')){
+    items.unshift({title:'Habit Tracker',desc:'Daily habit grid with streaks',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskHabitTracker();}});
+  }
+  if(ql && (ql==='cron' || ql==='cron builder' || ql==='crontab' || ql==='cron expression')){
+    items.unshift({title:'Cron Builder',desc:'Build cron expressions with presets',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCronBuilder();}});
+  }
+  if(ql && (ql==='sqlite' || ql==='sqlite3' || ql==='sqlite ref' || ql==='sqlite commands')){
+    items.unshift({title:'SQLite Reference',desc:'Tables, CRUD, joins, backup',icon:'S',type:'action',action:()=>{closeCommandPalette();showSQLiteRef();}});
+  }
+  if(ql && (ql==='kanban metrics' || ql==='kanban' || ql==='wip limit' || ql==='cycle time')){
+    items.unshift({title:'Kanban Metrics',desc:'WIP, cycle time, throughput',icon:'K',type:'action',action:()=>{closeCommandPalette();showTaskKanbanMetrics();}});
+  }
+  if(ql && (ql==='subnet' || ql==='ip subnet' || ql==='cidr' || ql==='subnet calculator')){
+    items.unshift({title:'IP Subnet Calculator',desc:'Network, broadcast, hosts from CIDR',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIpSubnetCalc();}});
   }
   return items.slice(0, 20);
 }
@@ -39064,6 +39088,147 @@ function showQuickPomodoroSimple(){
   window._pomReset2=function(){if(window._pomInterval2)clearInterval(window._pomInterval2);window._pomRunning2=false;window._pomState2='work';window._pomTime2=25*60;document.getElementById('pom-btn2').textContent='Start';window._pomUpdate2();};
   window._pomSkip2=function(){if(window._pomInterval2)clearInterval(window._pomInterval2);window._pomRunning2=false;if(window._pomState2==='work'){window._pomSessions2++;window._pomState2='break';window._pomTime2=5*60;}else{window._pomState2='work';window._pomTime2=25*60;}document.getElementById('pom-btn2').textContent='Start';window._pomUpdate2();};
   window._pomUpdate2();
+}
+function showCurlRef(){
+  let p=document.getElementById('curl-ref-panel');if(p)p.remove();
+  const cmds={'Basic Requests':['curl https://example.com','curl -o file.html https://example.com','curl -O https://example.com/file.zip','curl -L https://short.url (follow redirects)','curl -I https://example.com (headers only)','curl -v https://example.com (verbose)','curl -s https://example.com (silent)','curl -w "%{http_code}" https://example.com'],'POST & Data':['curl -X POST https://api.example.com/data','curl -d "key=value" https://api.example.com','curl -d @data.json https://api.example.com','curl -X POST -H "Content-Type: application/json" -d \'{"key":"val"}\' URL','curl -F "file=@photo.jpg" https://upload.example.com','curl -X PUT -d "data" https://api.example.com/1','curl -X DELETE https://api.example.com/1','curl -X PATCH -d \'{"status":"done"}\' URL'],'Headers & Auth':['curl -H "Authorization: Bearer TOKEN" URL','curl -H "Content-Type: application/json" URL','curl -H "Accept: application/json" URL','curl -u user:pass https://api.example.com','curl --cookie "name=value" URL','curl --cookie-jar cookies.txt URL','curl -b cookies.txt URL','curl -H "X-Custom-Header: value" URL'],'Advanced':['curl --connect-timeout 5 URL','curl --max-time 30 URL','curl -x http://proxy:8080 URL','curl --retry 3 URL','curl -k https://self-signed.example.com (insecure)','curl --compressed URL','curl -C - -O URL (resume download)','curl --rate 10/m URL (rate limit)'],'Debug & Test':['curl -w "\\nTime: %{time_total}s\\nSize: %{size_download}b\\n" URL','curl -o /dev/null -s -w "%{http_code}" URL','curl --resolve example.com:443:1.2.3.4 https://example.com','curl --trace-ascii trace.txt URL','curl -D headers.txt URL']};
+  p=document.createElement('div');p.id='curl-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">curl Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskHabitTracker(){
+  let p=document.getElementById('habit-panel');if(p)p.remove();
+  if(!S._habits)S._habits=[];
+  p=document.createElement('div');p.id='habit-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderHabits=function(){
+    const today=new Date().toISOString().split('T')[0];
+    const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Habit Tracker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+    h+='<div style="display:grid;grid-template-columns:120px repeat(7,1fr) 30px;gap:2px;align-items:center;margin-bottom:12px">';
+    h+='<div></div>';
+    days.forEach(d=>{const dt=new Date(d+'T12:00:00');h+='<div style="text-align:center;font-size:9px;color:var(--text-muted)">'+dt.toLocaleDateString('en',{weekday:'short'}).slice(0,2)+'<br>'+dt.getDate()+'</div>';});
+    h+='<div></div>';
+    S._habits.forEach((habit,hi)=>{
+      h+='<div style="font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(habit.name)+'">'+esc(habit.name)+'</div>';
+      days.forEach(d=>{
+        const done=habit.log&&habit.log.includes(d);
+        h+='<div onclick="window._toggleHabit('+hi+',\''+d+'\')" style="width:20px;height:20px;margin:auto;border-radius:4px;cursor:pointer;background:'+(done?'#4ade80':'var(--bg-surface)')+';border:1px solid '+(done?'#4ade80':'var(--border)')+'"></div>';
+      });
+      h+='<button onclick="window._deleteHabit('+hi+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px">&times;</button>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;gap:6px"><input type="text" id="habit-input" placeholder="New habit..." onkeydown="if(event.key===\'Enter\')window._addHabit()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px"><button onclick="window._addHabit()" style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px 12px;font-size:11px;cursor:pointer">Add</button></div>';
+    if(S._habits.length>0){
+      h+='<div style="margin-top:12px;font-size:10px;color:var(--text-muted)">';
+      S._habits.forEach(hab=>{const streak=window._calcStreak(hab);if(streak>0)h+='<span style="margin-right:10px">'+esc(hab.name)+': <span style="color:#4ade80">'+streak+' day streak</span></span>';});
+      h+='</div>';
+    }
+    document.getElementById('habit-panel').innerHTML=h;
+  };
+  window._addHabit=function(){const input=document.getElementById('habit-input');if(!input||!input.value.trim())return;S._habits.push({name:input.value.trim(),log:[]});save();window._renderHabits();};
+  window._toggleHabit=function(hi,date){if(!S._habits[hi].log)S._habits[hi].log=[];const idx=S._habits[hi].log.indexOf(date);if(idx>=0)S._habits[hi].log.splice(idx,1);else S._habits[hi].log.push(date);save();window._renderHabits();};
+  window._deleteHabit=function(hi){S._habits.splice(hi,1);save();window._renderHabits();};
+  window._calcStreak=function(habit){if(!habit.log||!habit.log.length)return 0;let streak=0;const today=new Date();for(let i=0;i<30;i++){const d=new Date(today);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];if(habit.log.includes(ds))streak++;else break;}return streak;};
+  document.body.appendChild(p);
+  window._renderHabits();
+}
+function showQuickCronBuilder(){
+  let w=document.getElementById('cron-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='cron-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:340px';
+  const fields=[{label:'Minute',id:'cron-min',ph:'0-59, */5'},{label:'Hour',id:'cron-hour',ph:'0-23, */2'},{label:'Day',id:'cron-day',ph:'1-31, *'},{label:'Month',id:'cron-month',ph:'1-12, *'},{label:'Weekday',id:'cron-dow',ph:'0-6, *'}];
+  let fh='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Cron Builder</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div>';
+  fh+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:8px">';
+  fields.forEach(f=>{fh+='<div><label style="font-size:9px;color:var(--text-muted)">'+f.label+'</label><input type="text" id="'+f.id+'" value="*" oninput="window._buildCron()" placeholder="'+f.ph+'" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:11px;font-family:monospace;text-align:center"></div>';});
+  fh+='</div>';
+  fh+='<div id="cron-result" style="font-family:monospace;font-size:16px;padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center;color:var(--accent);margin-bottom:6px;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--accent)\',600)"></div>';
+  fh+='<div id="cron-desc" style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:8px"></div>';
+  fh+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Presets:</div><div style="display:flex;flex-wrap:wrap;gap:4px">';
+  const presets=[{label:'Every min','v':['*','*','*','*','*']},{label:'Hourly','v':['0','*','*','*','*']},{label:'Daily 9am','v':['0','9','*','*','*']},{label:'Weekly Mon','v':['0','9','*','*','1']},{label:'Monthly 1st','v':['0','0','1','*','*']},{label:'Every 5min','v':['*/5','*','*','*','*']}];
+  presets.forEach(pr=>{fh+='<button onclick="var ids=[\'cron-min\',\'cron-hour\',\'cron-day\',\'cron-month\',\'cron-dow\'];['+pr.v.map(v=>"'"+v+"'").join(',')+'].forEach((v,i)=>document.getElementById(ids[i]).value=v);window._buildCron()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:9px;cursor:pointer">'+pr.label+'</button>';});
+  fh+='</div>';
+  w.innerHTML=fh;document.body.appendChild(w);
+  window._buildCron=function(){
+    const parts=['cron-min','cron-hour','cron-day','cron-month','cron-dow'].map(id=>document.getElementById(id).value||'*');
+    const expr=parts.join(' ');
+    document.getElementById('cron-result').textContent=expr;
+    let desc='Runs ';
+    if(parts[0]==='*')desc+='every minute';else if(parts[0].startsWith('*/'))desc+='every '+parts[0].slice(2)+' minutes';else desc+='at minute '+parts[0];
+    if(parts[1]!=='*'){if(parts[1].startsWith('*/'))desc+=', every '+parts[1].slice(2)+' hours';else desc+=', at '+parts[1]+':00';}
+    document.getElementById('cron-desc').textContent=desc;
+  };
+  window._buildCron();
+}
+function showSQLiteRef(){
+  let p=document.getElementById('sqlite-ref-panel');if(p)p.remove();
+  const cmds={'Database':['sqlite3 mydb.db','sqlite3 :memory:','.open mydb.db','.databases','.tables','.schema tablename','.quit','.exit','.help','.mode column','.headers on','.mode csv'],'Table Operations':['CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, email TEXT UNIQUE);','ALTER TABLE users ADD COLUMN age INTEGER;','ALTER TABLE users RENAME TO customers;','DROP TABLE IF EXISTS users;','CREATE INDEX idx_email ON users(email);','VACUUM;','ANALYZE;'],'CRUD':['INSERT INTO users (name, email) VALUES (?, ?);','SELECT * FROM users;','SELECT * FROM users WHERE id = ?;','SELECT name, email FROM users ORDER BY name;','SELECT * FROM users LIMIT 10 OFFSET 20;','UPDATE users SET name = ? WHERE id = ?;','DELETE FROM users WHERE id = ?;','SELECT COUNT(*) FROM users;'],'Joins & Aggregates':['SELECT u.name, o.total FROM users u JOIN orders o ON u.id = o.user_id;','SELECT status, COUNT(*) FROM tasks GROUP BY status;','SELECT project, AVG(hours) FROM tasks GROUP BY project HAVING AVG(hours) > 2;','SELECT DISTINCT category FROM items;','SELECT * FROM t1 UNION SELECT * FROM t2;'],'Backup & Import':['.dump > backup.sql','.read backup.sql','.import data.csv tablename','.output result.csv','SELECT * FROM users; .output stdout','.backup mydb.db','ATTACH DATABASE "other.db" AS other;']};
+  p=document.createElement('div');p.id='sqlite-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">SQLite Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskKanbanMetrics(){
+  let p=document.getElementById('kanban-metrics-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const statuses=['backlog','todo','in-progress','review','done'];
+  const statusCounts={};statuses.forEach(s=>statusCounts[s]=0);
+  tasks.forEach(t=>{const s=t.status||'todo';statusCounts[s]=(statusCounts[s]||0)+1;});
+  const wip=statusCounts['in-progress']||0;
+  const doneTasks=tasks.filter(t=>t.status==='done'&&t.completedAt&&t.created);
+  let avgCycleTime=0;
+  if(doneTasks.length>0){const cycleTimes=doneTasks.map(t=>{const start=new Date(t.created);const end=new Date(t.completedAt);return(end-start)/(1000*60*60*24);}).filter(d=>d>=0&&d<365);if(cycleTimes.length>0)avgCycleTime=(cycleTimes.reduce((s,v)=>s+v,0)/cycleTimes.length).toFixed(1);}
+  const now=new Date();const weekAgo=new Date(now.getTime()-7*24*60*60*1000);
+  const weeklyThroughput=tasks.filter(t=>t.status==='done'&&new Date(t.completedAt||'')>=weekAgo).length;
+  p=document.createElement('div');p.id='kanban-metrics-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Kanban Metrics</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  h+='<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:28px;font-weight:700;color:'+(wip>5?'#f87171':'#4ade80')+'">'+wip+'</div><div style="font-size:10px;color:var(--text-muted)">WIP (In Progress)</div></div>';
+  h+='<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:28px;font-weight:700;color:#60a5fa">'+avgCycleTime+'</div><div style="font-size:10px;color:var(--text-muted)">Avg Cycle (days)</div></div>';
+  h+='<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:28px;font-weight:700;color:#fbbf24">'+weeklyThroughput+'</div><div style="font-size:10px;color:var(--text-muted)">Weekly Throughput</div></div>';
+  h+='</div>';
+  h+='<div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:8px">Status Distribution</div>';
+  const maxCount=Math.max(...Object.values(statusCounts),1);
+  const statusColors={'backlog':'#6b7280','todo':'#60a5fa','in-progress':'#fbbf24','review':'#a78bfa','done':'#4ade80'};
+  statuses.forEach(s=>{
+    const count=statusCounts[s]||0;
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:10px;color:var(--text-muted);width:70px;text-align:right">'+s+'</span><div style="flex:1;height:16px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="width:'+(count/maxCount*100)+'%;height:100%;background:'+(statusColors[s]||'#888')+';border-radius:3px"></div></div><span style="font-size:10px;color:var(--text-primary);width:24px">'+count+'</span></div>';
+  });
+  if(wip>5)h+='<div style="margin-top:12px;padding:8px;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);border-radius:6px;font-size:11px;color:#f87171">WIP limit exceeded! Consider finishing in-progress tasks before starting new ones.</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickIpSubnetCalc(){
+  let w=document.getElementById('subnet-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='subnet-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">IP Subnet Calculator</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="display:flex;gap:6px;margin-bottom:8px"><input type="text" id="subnet-ip" value="192.168.1.0" placeholder="IP Address" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;font-family:monospace"><span style="line-height:32px;color:var(--text-muted)">/</span><input type="number" id="subnet-cidr" value="24" min="0" max="32" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;text-align:center"></div><button onclick="window._calcSubnet()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer;margin-bottom:8px">Calculate</button><div id="subnet-result" style="display:grid;grid-template-columns:1fr 1fr;gap:4px"></div>';
+  document.body.appendChild(w);
+  window._calcSubnet=function(){
+    const ip=document.getElementById('subnet-ip').value.trim();const cidr=parseInt(document.getElementById('subnet-cidr').value)||24;
+    const parts=ip.split('.').map(Number);if(parts.length!==4||parts.some(p=>isNaN(p)||p<0||p>255)){document.getElementById('subnet-result').innerHTML='<div style="grid-column:1/-1;color:#f87171;font-size:11px">Invalid IP</div>';return;}
+    const ipNum=(parts[0]<<24)+(parts[1]<<16)+(parts[2]<<8)+parts[3];
+    const mask=cidr===0?0:(0xFFFFFFFF<<(32-cidr))>>>0;
+    const network=(ipNum&mask)>>>0;const broadcast=(network|(~mask>>>0))>>>0;
+    const first=(network+1)>>>0;const last=(broadcast-1)>>>0;
+    const hosts=cidr>=31?Math.pow(2,32-cidr):Math.pow(2,32-cidr)-2;
+    const toIP=n=>[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join('.');
+    const results=[['Network',toIP(network)],['Broadcast',toIP(broadcast)],['First Host',toIP(first)],['Last Host',toIP(last)],['Subnet Mask',toIP(mask)],['Hosts',hosts.toLocaleString()],['CIDR','/'+cidr],['Class',parts[0]<128?'A':parts[0]<192?'B':parts[0]<224?'C':'D/E']];
+    const el=document.getElementById('subnet-result');el.innerHTML='';
+    results.forEach(([label,val])=>{el.innerHTML+='<div style="padding:4px 6px;background:var(--bg-surface);border-radius:4px"><div style="font-size:9px;color:var(--text-muted)">'+label+'</div><div style="font-size:11px;font-family:monospace;color:var(--text-primary)">'+val+'</div></div>';});
+  };
+  window._calcSubnet();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
