@@ -6236,6 +6236,9 @@ function cmdGetItems(q) {
       ['docker compose','Docker Compose template generator'],
       ['creation trend','Task creation vs completion trend'],
       ['decision log','Decision tracking and logging'],
+      ['github actions','GitHub Actions workflow templates'],
+      ['done vs created','Task done vs created by project'],
+      ['win streak','Daily wins tracker with streak'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9113,6 +9116,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='decision log' || ql==='decisions' || ql==='decision tracker' || ql==='log decision')){
     items.unshift({title:'Decision Log',desc:'Track and review decisions made',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDecisionLog();}});
+  }
+  if(ql && (ql==='github actions' || ql==='actions' || ql==='ci cd' || ql==='workflow')){
+    items.unshift({title:'GitHub Actions',desc:'CI/CD workflow templates',icon:'G',type:'action',action:()=>{closeCommandPalette();showGithubActionsGen();}});
+  }
+  if(ql && (ql==='done vs created' || ql==='done vs' || ql==='project completion' || ql==='project stats')){
+    items.unshift({title:'Done vs Created',desc:'Completion rate by project',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDoneVsCreated();}});
+  }
+  if(ql && (ql==='win streak' || ql==='wins' || ql==='daily wins' || ql==='celebrate')){
+    items.unshift({title:'Win Streak',desc:'Track daily wins with streak counter',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWinStreak();}});
   }
   return items.slice(0, 20);
 }
@@ -24725,6 +24737,82 @@ function showQuickDecisionLog(){
       save();rend();
     };
     document.getElementById('dec-title').onkeydown=function(e){if(e.key==='Enter')document.getElementById('dec-add').click();};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showGithubActionsGen(){
+  let p=document.getElementById('gha-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='gha-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:540px;width:90vw;max-height:80vh;overflow-y:auto';
+  let presets=[
+    {name:'Node.js CI',code:'name: CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n    branches: [main]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        node-version: [18, 20, 22]\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: ${{ matrix.node-version }}\n          cache: npm\n      - run: npm ci\n      - run: npm test\n      - run: npm run build --if-present'},
+    {name:'Deploy to Vercel',code:'name: Deploy\n\non:\n  push:\n    branches: [main]\n\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: amondnet/vercel-action@v25\n        with:\n          vercel-token: ${{ secrets.VERCEL_TOKEN }}\n          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}\n          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}\n          vercel-args: --prod'},
+    {name:'Docker Build + Push',code:'name: Docker\n\non:\n  push:\n    branches: [main]\n    tags: [\"v*\"]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: docker/setup-buildx-action@v3\n      - uses: docker/login-action@v3\n        with:\n          username: ${{ secrets.DOCKER_USERNAME }}\n          password: ${{ secrets.DOCKER_PASSWORD }}\n      - uses: docker/build-push-action@v5\n        with:\n          push: true\n          tags: user/app:latest'},
+    {name:'Python Test',code:'name: Python CI\n\non:\n  push:\n    branches: [main]\n  pull_request:\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    strategy:\n      matrix:\n        python-version: [\"3.10\", \"3.11\", \"3.12\"]\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: ${{ matrix.python-version }}\n      - run: pip install -r requirements.txt\n      - run: pip install pytest\n      - run: pytest'},
+    {name:'Release',code:'name: Release\n\non:\n  push:\n    tags: [\"v*\"]\n\njobs:\n  release:\n    runs-on: ubuntu-latest\n    permissions:\n      contents: write\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/create-release@v1\n        env:\n          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n        with:\n          tag_name: ${{ github.ref_name }}\n          release_name: Release ${{ github.ref_name }}\n          draft: false\n          prerelease: false'}
+  ];
+  let selected=0;
+  function rend(){
+    let tabs=presets.map((pr,i)=>'<button data-ghi="'+i+'" style="padding:4px 8px;border-radius:var(--radius);border:1px solid '+(i===selected?'#4ade80':'var(--border)')+';background:'+(i===selected?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(i===selected?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:10px">'+pr.name+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">GitHub Actions Generator</span><button onclick="document.getElementById(\'gha-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">'+tabs+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.4;max-height:300px;overflow-y:auto">'+esc(presets[selected].code)+'</pre>'
+      +'<button id="gha-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy Workflow</button>';
+    p.querySelectorAll('[data-ghi]').forEach(b=>{b.onclick=function(){selected=parseInt(this.dataset.ghi);rend();};});
+    document.getElementById('gha-copy').onclick=function(){navigator.clipboard.writeText(presets[selected].code);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy Workflow';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskDoneVsCreated(){
+  let p=document.getElementById('done-vs-created-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='done-vs-created-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let projects=(S.projects||[]);
+  let projData=projects.map(pr=>{
+    let pTasks=tasks.filter(t=>t.projectId===pr.id);
+    let created=pTasks.length;
+    let done=pTasks.filter(t=>t.status==='done').length;
+    return {name:pr.name,created,done,pct:created>0?Math.round(done/created*100):0};
+  }).filter(p=>p.created>0).sort((a,b)=>b.created-a.created);
+  let maxC=Math.max(...projData.map(p=>p.created),1);
+  let rows=projData.map(pr=>{
+    let cW=Math.round(pr.created/maxC*100);
+    let dW=Math.round(pr.done/maxC*100);
+    return '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:11px;color:var(--text-primary);font-weight:600">'+esc(pr.name)+'</span><span style="font-size:10px;color:var(--text-muted)">'+pr.pct+'%</span></div><div style="position:relative;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="position:absolute;top:0;left:0;height:100%;width:'+cW+'%;background:#22d3ee30;border-radius:3px"></div><div style="position:absolute;top:0;left:0;height:100%;width:'+dW+'%;background:#4ade80;border-radius:3px"></div></div><div style="display:flex;gap:8px;margin-top:2px"><span style="font-size:9px;color:#22d3ee">Created: '+pr.created+'</span><span style="font-size:9px;color:#4ade80">Done: '+pr.done+'</span></div></div>';
+  }).join('');
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Done vs Created by Project</span><button onclick="document.getElementById(\'done-vs-created-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +(rows||'<div style="text-align:center;color:var(--text-muted);padding:20px">No project data available</div>');
+  document.body.appendChild(p);
+}
+function showQuickWinStreak(){
+  let p=document.getElementById('win-streak-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='win-streak-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  if(!S._wins)S._wins=[];
+  let today=new Date().toISOString().slice(0,10);
+  function rend(){
+    let todayWins=S._wins.filter(w=>w.date===today);
+    let streak=0;
+    let d=new Date();
+    while(true){
+      let ds=d.toISOString().slice(0,10);
+      if(S._wins.some(w=>w.date===ds)){streak++;d.setDate(d.getDate()-1);}
+      else break;
+    }
+    let list=todayWins.map(w=>'<div style="padding:4px 6px;background:var(--bg-surface);border-radius:3px;margin-bottom:3px;font-size:11px;color:var(--text-primary);border-left:2px solid #4ade80">'+esc(w.text)+'</div>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Win Streak</span><button onclick="document.getElementById(\'win-streak-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:8px"><div style="flex:1;padding:6px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">'+todayWins.length+'</div><div style="font-size:9px;color:var(--text-muted)">Today</div></div><div style="flex:1;padding:6px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:18px;font-weight:700;color:#fbbf24">'+streak+'</div><div style="font-size:9px;color:var(--text-muted)">Day Streak</div></div></div>'
+      +(list||'<div style="font-size:10px;color:var(--text-muted);text-align:center;padding:6px">Log your wins!</div>')
+      +'<div style="display:flex;gap:4px;margin-top:6px"><input id="win-input" placeholder="What did you win today?" style="flex:1;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:10px"><button id="win-add" style="padding:5px 10px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:10px">+</button></div>';
+    document.getElementById('win-add').onclick=function(){
+      let v=document.getElementById('win-input').value.trim();
+      if(!v)return;
+      S._wins.push({text:v,date:today,ts:Date.now()});save();rend();
+    };
+    document.getElementById('win-input').onkeydown=function(e){if(e.key==='Enter')document.getElementById('win-add').click();};
   }
   document.body.appendChild(p);
   rend();
