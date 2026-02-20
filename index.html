@@ -1020,6 +1020,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="writer-toolbar-btn" onclick="writerOutline()" title="Show document outline (headings)">Out</button>
               <button class="writer-toolbar-btn" onclick="writerWordFreq()" title="Word frequency analysis">Fq</button>
               <button class="writer-toolbar-btn" onclick="writerCompare()" title="Compare two documents side by side">Cmp</button>
+              <button class="writer-toolbar-btn" onclick="writerSplitDoc()" title="Split document at --- markers into multiple docs">Spl</button>
               <select class="writer-toolbar-select" id="writer-export-sel" onchange="writerExport(this.value);this.selectedIndex=0">
                 <option value="">Export</option>
                 <option value="md">Markdown</option>
@@ -1510,7 +1511,7 @@ textarea{resize:vertical;line-height:1.6}
   <div class="modal">
     <div class="modal-title" id="link-modal-title">Add Link</div>
     <div class="form-group"><label class="form-label">Title</label><input type="text" id="lm-title" placeholder="Saturno Vault"></div>
-    <div class="form-group"><label class="form-label">URL</label><div style="display:flex;gap:4px"><input type="text" id="lm-url" placeholder="https://..." onblur="suggestLinkTitle()" style="flex:1"><button class="btn btn-sm btn-ghost" onclick="fetchLinkTitle()" style="font-size:9px;white-space:nowrap" type="button">Fetch Title</button></div></div>
+    <div class="form-group"><label class="form-label">URL</label><div style="display:flex;gap:4px"><input type="text" id="lm-url" placeholder="https://..." onblur="suggestLinkTitle();suggestLinkCategory()" style="flex:1"><button class="btn btn-sm btn-ghost" onclick="fetchLinkTitle()" style="font-size:9px;white-space:nowrap" type="button">Fetch Title</button></div></div>
     <div class="form-group"><label class="form-label">Category</label><input type="text" id="lm-category" placeholder="deployment, repo, tool"></div>
     <div class="form-group"><label class="form-label">Description</label><input type="text" id="lm-desc" placeholder="Short description"></div>
     <div class="form-group"><label class="form-label">Project (optional)</label><select id="lm-project"><option value="">None</option></select></div>
@@ -3552,6 +3553,19 @@ function writerCompare(){
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Compare: ${esc(docA.title||'A')} vs ${esc(docB.title||'B')}</title><style>*{margin:0;box-sizing:border-box}body{font-family:system-ui;background:#0a0a0e;color:#e0e0e0;display:grid;grid-template-columns:1fr 1fr;height:100vh;overflow:hidden}.panel{padding:24px;overflow-y:auto;border-right:1px solid #222}.panel:last-child{border:none}h2{font-size:16px;color:#4ade80;margin-bottom:4px}.meta{font-size:11px;color:#888;margin-bottom:16px}.content{line-height:1.8;font-size:14px;white-space:pre-wrap}h1,h2,h3{color:#fff}</style></head><body><div class="panel"><h2>${esc(docA.title||'Untitled')}</h2><div class="meta">${countW(docA.body)} words | Updated: ${docA.updated?new Date(docA.updated).toLocaleDateString():'?'}</div><div class="content">${docA.body||'(empty)'}</div></div><div class="panel"><h2>${esc(docB.title||'Untitled')}</h2><div class="meta">${countW(docB.body)} words | Updated: ${docB.updated?new Date(docB.updated).toLocaleDateString():'?'}</div><div class="content">${docB.body||'(empty)'}</div></div></body></html>`);
   w.document.close();toast('Comparing: '+docA.title+' vs '+docB.title);
 }
+function writerSplitDoc(){
+  const doc=getActiveDoc();if(!doc){toast('No active doc');return;}
+  const body=doc.body||'';
+  const parts=body.split(/\n---\n|^---\n|\n---$/gm).map(p=>p.trim()).filter(Boolean);
+  if(parts.length<2){toast('No --- separators found (need at least 2 sections)');return;}
+  if(!confirm('Split into '+parts.length+' documents? The original will keep Part 1.')){return;}
+  doc.body=parts[0];doc.updated=new Date().toISOString();
+  for(let i=1;i<parts.length;i++){
+    const title=(doc.title||'Untitled')+' (Part '+(i+1)+')';
+    S.docs.push({id:Date.now()+i,title,body:parts[i],created:new Date().toISOString(),updated:new Date().toISOString()});
+  }
+  save();renderDocList();updateWS();toast('Split into '+parts.length+' docs');
+}
 function exportAllTasksHTML(){
   if(!S.tasks.length){toast('No tasks');return;}
   const today=new Date().toISOString().split('T')[0];const active=S.tasks.filter(t=>t.status!=='done');const done=S.tasks.filter(t=>t.status==='done');
@@ -3921,6 +3935,17 @@ function suggestLinkTitle(){
   let title=host;
   if(path.length)title=path[path.length-1].replace(/[-_]/g,' ').replace(/\.\w+$/,'');
   titleEl.value=title.charAt(0).toUpperCase()+title.slice(1);
+  }catch(e){}
+}
+function suggestLinkCategory(){
+  const urlEl=document.getElementById('lm-url'),catEl=document.getElementById('lm-category');
+  if(!urlEl||!catEl||catEl.value.trim())return;
+  const url=urlEl.value.trim();if(!url)return;
+  try{const u=new URL(url);const host=u.hostname.replace(/^www\./,'').toLowerCase();
+  const map={'github.com':'development','gitlab.com':'development','stackoverflow.com':'development','npmjs.com':'development','codepen.io':'development','dev.to':'development','medium.com':'articles','substack.com':'articles','blog':'articles','notion.so':'tools','figma.com':'design','dribbble.com':'design','behance.net':'design','youtube.com':'video','vimeo.com':'video','twitch.tv':'video','twitter.com':'social','x.com':'social','linkedin.com':'social','instagram.com':'social','facebook.com':'social','reddit.com':'social','docs.google.com':'docs','drive.google.com':'docs','dropbox.com':'docs','vercel.com':'hosting','netlify.com':'hosting','heroku.com':'hosting','aws.amazon.com':'cloud','cloud.google.com':'cloud','azure.microsoft.com':'cloud','openai.com':'ai','anthropic.com':'ai','huggingface.co':'ai'};
+  let cat='';for(const[domain,c]of Object.entries(map)){if(host.includes(domain)){cat=c;break;}}
+  if(!cat){const ext=host.split('.').pop();if(ext==='io'||ext==='dev')cat='development';else if(ext==='ai')cat='ai';}
+  if(cat)catEl.value=cat;
   }catch(e){}
 }
 async function fetchLinkTitle(){
@@ -5619,6 +5644,7 @@ function cmdGetItems(q) {
       ['clean:','Cleanup empty tasks, dup links, etc'],['dup: keyword','Find + duplicate tasks'],
       ['tag-tasks:','Browse tasks by tag'],['project-stats:','Per-project analytics'],
       ['export:','All export options'],['standup','Daily standup summary'],
+      ['search: keyword','Deep search across ALL sections'],['find: keyword','Alias for search:'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6524,6 +6550,19 @@ function cmdGetItems(q) {
     templates.forEach(tpl=>{
       items.unshift({title:'+ '+tpl.title,desc:tpl.priority.toUpperCase()+(tpl.recurrence?' ('+tpl.recurrence+')':''),icon:'+',type:'action',action:()=>{closeCommandPalette();S.tasks.unshift({id:Date.now(),title:tpl.title,description:'',subtasks:[],status:'todo',priority:tpl.priority,project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],recurrence:tpl.recurrence||'',created:new Date().toISOString()});save();if(currentSection==='tasks')renderTasks();toast('Created: '+tpl.title);}});
     });
+  }
+  // Deep search prefix — search across ALL sections
+  if(ql && (ql.startsWith('search:') || ql.startsWith('find:') || ql.startsWith('s:'))){
+    const sq=(ql.startsWith('search:')?q.substring(7):ql.startsWith('find:')?q.substring(5):q.substring(2)).trim().toLowerCase();
+    if(sq.length>=2){
+      S.tasks.forEach(t=>{if((t.title+' '+t.description+' '+(t.tags||[]).join(' ')+' '+t.project).toLowerCase().includes(sq)){items.unshift({title:esc(t.title||'Untitled'),desc:'Task | '+t.status+' | '+(t.priority||'p2').toUpperCase()+(t.project?' | '+t.project:''),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});}});
+      S.content.forEach(c=>{if((c.body+' '+(c.theme||'')+' '+(c.tags||[]).join(' ')).toLowerCase().includes(sq)){items.unshift({title:esc((c.body||'').substring(0,60)),desc:'Content | '+(c.theme||c.type||'uncategorized'),icon:'C',type:'action',action:()=>{closeCommandPalette();switchSection('content',null);}});}});
+      S.docs.forEach(d=>{if((d.title+' '+d.body).toLowerCase().includes(sq)){items.unshift({title:esc(d.title||'Untitled'),desc:'Doc | '+countW(d.body)+' words',icon:'W',type:'action',action:()=>{closeCommandPalette();switchDoc(d.id);switchSection('writer',null);}});}});
+      S.links.forEach(l=>{if((l.title+' '+l.url+' '+l.desc+' '+(l.tags||[]).join(' ')).toLowerCase().includes(sq)){items.unshift({title:esc(l.title||l.url),desc:'Link | '+(l.category||'uncategorized')+' | '+l.url.substring(0,40),icon:'L',type:'action',action:()=>{closeCommandPalette();window.open(l.url,'_blank');}});}});
+      (S.specs||[]).forEach(sp=>{const match=(sp.title||'').toLowerCase().includes(sq)||(sp.sections||[]).some(s=>(s.title+' '+s.body).toLowerCase().includes(sq));if(match){items.unshift({title:esc(sp.title||'Untitled Spec'),desc:'Spec | '+(sp.sections||[]).length+' sections',icon:'S',type:'action',action:()=>{closeCommandPalette();switchSpec(sp.id);switchSection('specs',null);}});}});
+      (S.repos||[]).forEach(r=>{if((r.name+' '+(r.desc||'')+' '+(r.techStack||[]).join(' ')+' '+(r.notes||'')).toLowerCase().includes(sq)){items.unshift({title:esc(r.name),desc:'Repo | '+(r.status||'')+(r.live?' | '+r.live.substring(0,30):''),icon:'R',type:'action',action:()=>{closeCommandPalette();switchSection('repos',null);}});}});
+      if(!items.length)items.unshift({title:'No results for "'+esc(sq)+'"',desc:'Searched tasks, content, docs, links, specs, repos',icon:'!',type:'info'});
+    }else{items.unshift({title:'Type 2+ characters after search:',desc:'Searches tasks, content, docs, links, specs, repos',icon:'?',type:'info'});}
   }
   return items.slice(0, 20);
 }
