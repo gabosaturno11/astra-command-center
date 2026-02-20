@@ -5799,6 +5799,9 @@ function cmdGetItems(q) {
       ['dependencies','Task dependency chains and blocked items'],
       ['weekly review','Comprehensive 7-day review with markdown export'],
       ['pomo history','Pomodoro session history by task and date'],
+      ['tag cloud','Visual tag cloud sized by frequency'],
+      ['priority grid','Quick priority reassignment for active tasks'],
+      ['content timeline','Chronological timeline of all content items'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7084,6 +7087,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='pomo history' || ql==='pomodoro history' || ql==='focus history' || ql==='pomo stats')){
     items.unshift({title:'Pomodoro History',desc:'Session history by task, best day, avg per day',icon:'P',type:'action',action:()=>{closeCommandPalette();showPomodoroHistory();}});
   }
+  // Tag cloud prefix
+  if(ql && (ql==='tag cloud' || ql==='tags' || ql==='tag visualization' || ql==='word cloud')){
+    items.unshift({title:'Tag Cloud',desc:'Visual cloud of all tags sized by frequency',icon:'T',type:'action',action:()=>{closeCommandPalette();showTagCloud();}});
+  }
+  // Priority grid prefix
+  if(ql && (ql==='priority grid' || ql==='priority reassign' || ql==='reprioritize' || ql==='triage')){
+    items.unshift({title:'Priority Grid',desc:'Quick-reassign priorities for all active tasks',icon:'P',type:'action',action:()=>{closeCommandPalette();showPriorityGrid();}});
+  }
+  // Content timeline prefix
+  if(ql && (ql==='content timeline' || ql==='content history' || ql==='content feed' || ql==='creation history')){
+    items.unshift({title:'Content Timeline',desc:'Chronological feed of all content items by date',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentTimeline();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7981,6 +7996,95 @@ function showPomodoroHistory(){
   }
   if(!sessions.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No Pomodoro sessions yet</div>';
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Pomodoro History</span><button onclick="document.getElementById('pomo-hist-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showTagCloud(){
+  let panel=document.getElementById('tag-cloud-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='tag-cloud-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tagCounts={};
+  S.content.forEach(c=>{(c.tags||[]).forEach(t=>{tagCounts[t]=(tagCounts[t]||0)+1;});});
+  S.tasks.forEach(t=>{(t.tags||[]).forEach(tg=>{tagCounts[tg]=(tagCounts[tg]||0)+1;});});
+  const sorted=Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]);
+  const maxCount=sorted.length?sorted[0][1]:1;
+  const colors=['#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#22c55e','#f97316','#14b8a6','#a855f7'];
+  let h='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:12px">';
+  sorted.forEach(([tag,count],i)=>{
+    const scale=0.7+(count/maxCount)*1.3;
+    const size=Math.round(9*scale);
+    const color=colors[i%colors.length];
+    h+=`<span onclick="document.getElementById('tag-cloud-panel').remove();switchSection('content');setTimeout(()=>{const si=document.getElementById('content-search');if(si){si.value='#'+\`${tag.replace(/'/g,"")}\`;si.dispatchEvent(new Event('input'));}},100)" style="font-size:${size}px;color:${color};cursor:pointer;padding:2px 6px;background:${color}15;border-radius:4px;transition:transform 0.2s" onmouseenter="this.style.transform='scale(1.15)'" onmouseleave="this.style.transform='scale(1)'" title="${count} items">${esc(tag)}<sup style="font-size:7px;color:var(--text-muted)">${count}</sup></span>`;
+  });
+  h+='</div>';
+  if(!sorted.length)h='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No tags found. Add tags to content and tasks to see a cloud.</div>';
+  const themes={};S.content.forEach(c=>{if(c.theme)themes[c.theme]=(themes[c.theme]||0)+1;});
+  const themesSorted=Object.entries(themes).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(themesSorted.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin:12px 0 6px">Content Themes</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px">';
+    themesSorted.forEach(([theme,count],i)=>{h+=`<span style="font-size:9px;color:${colors[i%colors.length]};padding:2px 8px;background:${colors[i%colors.length]}15;border-radius:10px">${esc(theme)} (${count})</span>`;});
+    h+='</div>';
+  }
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Tag Cloud (${sorted.length} tags)</span><button onclick="document.getElementById('tag-cloud-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showPriorityGrid(){
+  let panel=document.getElementById('priority-grid-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='priority-grid-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const priorities=['p0','p1','p2','p3'];
+  const pLabels={p0:'Critical',p1:'High',p2:'Medium',p3:'Low'};
+  const pColors={p0:'#ef4444',p1:'#f97316',p2:'#3b82f6',p3:'#6b7280'};
+  let h='';
+  priorities.forEach(pri=>{
+    const tasks=active.filter(t=>(t.priority||'p2')===pri);
+    h+=`<div style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="width:8px;height:8px;border-radius:2px;background:${pColors[pri]}"></span><span style="font-size:11px;font-weight:600;color:${pColors[pri]}">${pLabels[pri]} (${tasks.length})</span></div>`;
+    if(tasks.length){
+      tasks.forEach(t=>{
+        h+=`<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;margin:2px 0;border-left:2px solid ${pColors[pri]};font-size:10px" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="flex:1;color:var(--text-primary);cursor:pointer" onclick="document.getElementById('priority-grid-panel').remove();openTaskDetail(${t.id})">${esc(t.title||'Untitled')}</span>`;
+        priorities.forEach(np=>{
+          if(np===pri)return;
+          h+=`<button onclick="var tk=S.tasks.find(x=>x.id===${t.id});if(tk){tk.priority='${np}';save();showPriorityGrid();}" style="padding:1px 4px;background:${pColors[np]}30;border:1px solid ${pColors[np]}50;border-radius:3px;color:${pColors[np]};font-size:7px;cursor:pointer" title="Move to ${pLabels[np]}">${np.toUpperCase()}</button>`;
+        });
+        h+='</div>';
+      });
+    }else{
+      h+='<div style="font-size:9px;color:var(--text-muted);padding:4px 8px">No tasks</div>';
+    }
+    h+='</div>';
+  });
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Priority Grid (Quick Reassign)</span><button onclick="document.getElementById('priority-grid-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">Click priority buttons to quickly reassign task priority</div>${h}`;
+  document.body.appendChild(panel);
+}
+function showContentTimeline(){
+  let panel=document.getElementById('content-tl-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-tl-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const items=S.content.slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  const byDay={};
+  items.forEach(c=>{
+    const d=(c.createdAt||'').split('T')[0]||'Unknown';
+    if(!byDay[d])byDay[d]=[];
+    byDay[d].push(c);
+  });
+  const typeColors={idea:'#f59e0b',quote:'#8b5cf6',code:'#06b6d4',insight:'#3b82f6',todo:'#ef4444',book:'#ec4899',research:'#22c55e',thought:'#14b8a6'};
+  let h='';
+  Object.keys(byDay).sort().reverse().slice(0,30).forEach(day=>{
+    const d=new Date(day);
+    const label=day==='Unknown'?'No Date':d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    h+=`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--text-secondary);padding-bottom:4px;border-bottom:1px solid var(--border)">${label} (${byDay[day].length} items)</div>`;
+    byDay[day].forEach(c=>{
+      const color=typeColors[c.type]||'var(--text-muted)';
+      const time=(c.createdAt||'').split('T')[1]||'';
+      const timeStr=time?time.substring(0,5):'';
+      const words=(c.body||'').split(/\s+/).length;
+      h+=`<div onclick="document.getElementById('content-tl-panel').remove();openContentModal(${c.id})" style="display:flex;align-items:flex-start;gap:8px;padding:4px 6px;cursor:pointer;border-left:2px solid ${color};margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><div style="min-width:32px;font-size:8px;color:var(--text-muted);font-family:var(--mono)">${timeStr}</div><div style="flex:1"><div style="font-size:10px;color:var(--text-primary)">${esc((c.body||'').substring(0,80))}</div><div style="display:flex;gap:6px;font-size:8px;color:var(--text-muted);margin-top:2px"><span style="color:${color}">${c.type||'note'}</span>${c.theme?`<span>${esc(c.theme)}</span>`:''}<span>${words}w</span></div></div></div>`;
+    });
+    h+='</div>';
+  });
+  if(!items.length)h='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No content items yet</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Timeline (${items.length} items)</span><button onclick="document.getElementById('content-tl-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
