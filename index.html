@@ -6509,6 +6509,12 @@ function cmdGetItems(q) {
       ['tailwind','Tailwind CSS utility class reference'],
       ['scope creep','Are you adding tasks faster than completing'],
       ['bitwise','Bitwise AND OR XOR shift calculator'],
+      ['env','dotenv file reference and security'],
+      ['storage','localStorage usage by section'],
+      ['char counter','Character word line sentence counter'],
+      ['git flow','Git Flow branching strategy reference'],
+      ['quarterly goals','Set and track quarterly OKR goals'],
+      ['metronome','Audio metronome with BPM control'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10205,6 +10211,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='bitwise' || ql==='bit calc' || ql==='bitwise calc' || ql==='bit operations')){
     items.unshift({title:'Bitwise Calculator',desc:'AND, OR, XOR, shift operations',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBitwiseCalc();}});
+  }
+  if(ql && (ql==='env' || ql==='dotenv' || ql==='env file' || ql==='environment variables')){
+    items.unshift({title:'.env File Reference',desc:'dotenv, security, framework env vars',icon:'E',type:'action',action:()=>{closeCommandPalette();showEnvFileRef();}});
+  }
+  if(ql && (ql==='storage' || ql==='storage summary' || ql==='localstorage' || ql==='data size')){
+    items.unshift({title:'Storage Summary',desc:'localStorage usage by section',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStorageSummary();}});
+  }
+  if(ql && (ql==='char counter' || ql==='character count' || ql==='word count' || ql==='text stats')){
+    items.unshift({title:'Character Counter',desc:'Chars, words, lines, read time',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCharCounter();}});
+  }
+  if(ql && (ql==='git flow' || ql==='gitflow' || ql==='branching strategy' || ql==='git branching')){
+    items.unshift({title:'Git Flow Reference',desc:'Git Flow branching strategy guide',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitFlowRef();}});
+  }
+  if(ql && (ql==='quarterly goals' || ql==='okr' || ql==='objectives' || ql==='quarterly')){
+    items.unshift({title:'Quarterly Goals',desc:'Set and track quarterly OKR goals',icon:'Q',type:'action',action:()=>{closeCommandPalette();showTaskQuarterlyGoals();}});
+  }
+  if(ql && (ql==='metronome' || ql==='bpm' || ql==='tempo' || ql==='beat')){
+    items.unshift({title:'Metronome',desc:'Audio metronome with BPM control',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMetronome();}});
   }
   return items.slice(0, 20);
 }
@@ -32822,6 +32846,143 @@ function showQuickBitwiseCalc(){
     });
     r+='<div style="margin-top:6px;padding:4px 8px;background:var(--bg-surface);border-radius:3px;font-size:9px;color:var(--text-muted)">A = '+a+' (0b'+((a>>>0).toString(2)).slice(-16)+') | B = '+b+' (0b'+((b>>>0).toString(2)).slice(-16)+')</div>';
     out.innerHTML=r;
+  };
+}
+function showEnvFileRef(){
+  const cmds={
+    'dotenv Basics':{'Install dotenv':'npm install dotenv','Load in Node':'require("dotenv").config()','Load with path':'require("dotenv").config({ path: ".env.local" })','ES module':'import "dotenv/config"','Conditional load':'if (process.env.NODE_ENV !== "production") require("dotenv").config()'},
+    'File Naming':{'Default':'.env','Local override':'.env.local','Development':'.env.development','Production':'.env.production','Test':'.env.test'},
+    'Syntax':{'Basic var':'KEY=value','Quoted value':'KEY="value with spaces"','Multiline':'KEY="line1\\nline2"','Reference':'KEY=${OTHER_KEY}/path','Comment':'# This is a comment'},
+    'Security':{'Gitignore':'echo ".env*" >> .gitignore','Check not committed':'git status | grep .env','Remove from history':'git filter-branch --force --tree-filter "rm -f .env" HEAD','Encrypt secrets':'sops -e .env > .env.encrypted','Vault integration':'VAULT_TOKEN=xyz VAULT_ADDR=https://...'},
+    'Framework-Specific':{'Next.js public':'NEXT_PUBLIC_API_URL=https://...','Vite public':'VITE_API_URL=https://...','CRA public':'REACT_APP_API_URL=https://...','Vercel env':'vercel env pull .env.local','Docker':'docker run --env-file .env myapp'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">.env File Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskStorageSummary(){
+  const data={tasks:(S.tasks||[]).length,content:(S.content||[]).length,links:(S.links||[]).length,writerDocs:(S.writerDocs||[]).length,projects:(S.projects||[]).length,specs:(S.specs||[]).length,repos:(S.repos||[]).length,pipeHistory:(S.pipelineHistory||[]).length,bookmarks:(S._bookmarks||[]).length,snippets:(S._snippets||[]).length,clipHistory:(S._clipHistory||[]).length};
+  const jsonStr=JSON.stringify(S);const totalBytes=new Blob([jsonStr]).size;
+  const sectionSizes={};Object.keys(data).forEach(k=>{
+    try{const v=S[k]||S['_'+k]||[];const s=JSON.stringify(v);sectionSizes[k]=new Blob([s]).size;}catch(e){sectionSizes[k]=0;}
+  });
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Storage Summary</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="text-align:center;margin-bottom:16px;padding:12px;background:var(--bg-surface);border-radius:6px"><div style="font-size:28px;font-weight:700;color:#4ade80">'+(totalBytes/1024).toFixed(1)+' KB</div><div style="font-size:10px;color:var(--text-muted)">Total localStorage usage</div></div>';
+  const maxSize=Math.max(...Object.values(sectionSizes),1);
+  Object.entries(data).sort((a,b)=>sectionSizes[b[0]]-sectionSizes[a[0]]).forEach(([key,count])=>{
+    const size=sectionSizes[key]||0;const pct=Math.round(size/maxSize*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:80px;font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+key+'</span>';
+    html+='<div style="flex:1;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:3px"></div></div>';
+    html+='<span style="width:50px;font-size:9px;color:var(--text-muted);text-align:right">'+(size/1024).toFixed(1)+'KB</span>';
+    html+='<span style="width:30px;font-size:9px;color:var(--text-muted);text-align:right">'+count+'</span></div>';
+  });
+  html+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted)">localStorage limit: ~5-10MB | Used: '+(totalBytes/1024/1024).toFixed(2)+' MB</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickCharCounter(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Character Counter</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<textarea id="char-input" placeholder="Type or paste text here..." oninput="window._countChars()" style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:6px;font-size:12px;resize:vertical;box-sizing:border-box"></textarea>';
+  html+='<div id="char-output" style="margin-top:8px"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._countChars=function(){
+    const text=document.getElementById('char-input').value;const out=document.getElementById('char-output');
+    const chars=text.length;const words=text.trim()?text.trim().split(/\s+/).length:0;
+    const lines=text?text.split('\n').length:0;const sentences=text.trim()?text.split(/[.!?]+/).filter(s=>s.trim()).length:0;
+    const paragraphs=text.trim()?text.split(/\n\n+/).filter(p=>p.trim()).length:0;
+    const readTime=Math.ceil(words/200);
+    const stats=[['Characters',chars],['Words',words],['Lines',lines],['Sentences',sentences],['Paragraphs',paragraphs],['Read time','~'+readTime+' min']];
+    let r='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">';
+    stats.forEach(([label,val])=>{
+      r+='<div style="padding:4px 8px;background:var(--bg-surface);border-radius:3px;display:flex;justify-content:space-between"><span style="color:var(--text-muted);font-size:10px">'+label+'</span><span style="color:var(--text-primary);font-size:11px;font-weight:600">'+val+'</span></div>';
+    });
+    r+='</div>';
+    out.innerHTML=r;
+  };
+  window._countChars();
+}
+function showGitFlowRef(){
+  const cmds={
+    'Feature Branch':{'Start feature':'git checkout -b feature/name develop','Finish feature':'git checkout develop && git merge --no-ff feature/name','Delete branch':'git branch -d feature/name','Push feature':'git push -u origin feature/name','Pull feature':'git pull origin feature/name'},
+    'Release Branch':{'Start release':'git checkout -b release/1.0.0 develop','Finish release':'git checkout main && git merge --no-ff release/1.0.0 && git tag -a v1.0.0','Merge back':'git checkout develop && git merge --no-ff release/1.0.0','Delete release':'git branch -d release/1.0.0','Push tags':'git push --tags'},
+    'Hotfix Branch':{'Start hotfix':'git checkout -b hotfix/fix-name main','Finish hotfix':'git checkout main && git merge --no-ff hotfix/fix-name','Tag hotfix':'git tag -a v1.0.1 -m "hotfix"','Merge to develop':'git checkout develop && git merge --no-ff hotfix/fix-name','Delete hotfix':'git branch -d hotfix/fix-name'},
+    'Trunk-Based':{'Feature flag':'git checkout main && git checkout -b short-lived-branch','Quick merge':'git checkout main && git merge --squash short-lived','Push main':'git push origin main','Rebase':'git checkout feature && git rebase main','Interactive rebase':'git rebase -i main'},
+    'Conventions':{'Commit types':'feat: | fix: | docs: | style: | refactor: | test: | chore:','Branch naming':'feature/ | bugfix/ | hotfix/ | release/ | support/','Tag format':'v{major}.{minor}.{patch} (semver)','PR title':'type(scope): description','Changelog':'conventional-changelog -p angular -i CHANGELOG.md -s'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Git Flow Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskQuarterlyGoals(){
+  if(!S._quarterGoals)S._quarterGoals=[];
+  const now=new Date();const quarter=Math.floor(now.getMonth()/3)+1;const year=now.getFullYear();
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Q'+quarter+' '+year+' Goals</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:10px"><input id="goal-input" placeholder="Add a quarterly goal..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 10px;border-radius:4px;font-size:12px"/><button onclick="window._addGoal()" style="background:#4ade80;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Add</button></div>';
+  if(S._quarterGoals.length===0){
+    html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:11px">No quarterly goals set yet</div>';
+  } else {
+    S._quarterGoals.forEach((g,i)=>{
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:4px;background:var(--bg-surface);border-radius:4px">';
+      html+='<input type="checkbox" '+(g.done?'checked':'')+' onclick="S._quarterGoals['+i+'].done=this.checked;save();this.closest(\'div[style*=fixed]\').remove();showTaskQuarterlyGoals()" style="cursor:pointer"/>';
+      html+='<span style="flex:1;color:'+(g.done?'var(--text-muted)':'var(--text-primary)')+';font-size:12px;'+(g.done?'text-decoration:line-through':'')+'">'+esc(g.title)+'</span>';
+      html+='<button onclick="S._quarterGoals.splice('+i+',1);save();this.closest(\'div[style*=fixed]\').remove();showTaskQuarterlyGoals()" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px">x</button></div>';
+    });
+    const done=S._quarterGoals.filter(g=>g.done).length;const pct=Math.round(done/S._quarterGoals.length*100);
+    html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--text-secondary)">Progress</span><span style="font-size:11px;color:#4ade80;font-weight:600">'+done+'/'+S._quarterGoals.length+' ('+pct+'%)</span></div>';
+    html+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:3px"></div></div></div>';
+  }
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._addGoal=function(){
+    const inp=document.getElementById('goal-input');if(!inp||!inp.value.trim())return;
+    S._quarterGoals.push({title:inp.value.trim(),done:false,created:new Date().toISOString()});
+    save();document.querySelector('div[style*="fixed"][style*="translate"]').remove();showTaskQuarterlyGoals();
+  };
+}
+function showQuickMetronome(){
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Metronome</h3><button onclick="if(window._metInterval)clearInterval(window._metInterval);this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<div style="text-align:center;margin-bottom:12px"><div id="met-bpm" style="font-size:36px;font-weight:700;color:#4ade80">120</div><div style="color:var(--text-muted);font-size:10px">BPM</div></div>';
+  html+='<input id="met-range" type="range" min="40" max="240" value="120" oninput="document.getElementById(\'met-bpm\').textContent=this.value" style="width:100%;margin-bottom:12px;accent-color:#4ade80"/>';
+  html+='<div style="display:flex;gap:6px;justify-content:center">';
+  html+='<button id="met-start" onclick="window._startMet()" style="background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Start</button>';
+  html+='<button id="met-stop" onclick="window._stopMet()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px 20px;border-radius:4px;cursor:pointer;font-size:12px">Stop</button></div>';
+  html+='<div id="met-beat" style="text-align:center;margin-top:10px;font-size:24px;color:var(--text-muted)"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._metCtx=null;window._metInterval=null;window._metBeat=0;
+  window._startMet=function(){
+    if(window._metInterval)clearInterval(window._metInterval);
+    if(!window._metCtx)window._metCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const bpm=parseInt(document.getElementById('met-range').value);
+    const interval=60000/bpm;window._metBeat=0;
+    window._metInterval=setInterval(()=>{
+      window._metBeat=(window._metBeat%4)+1;
+      const beat=document.getElementById('met-beat');if(beat)beat.textContent='*'.repeat(window._metBeat)+'-'.repeat(4-window._metBeat);
+      const ctx=window._metCtx;const osc=ctx.createOscillator();const gain=ctx.createGain();
+      osc.connect(gain);gain.connect(ctx.destination);
+      osc.frequency.value=window._metBeat===1?880:660;
+      gain.gain.setValueAtTime(0.3,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
+      osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.1);
+    },interval);
+  };
+  window._stopMet=function(){
+    if(window._metInterval){clearInterval(window._metInterval);window._metInterval=null;}
+    const beat=document.getElementById('met-beat');if(beat)beat.textContent='';
   };
 }
 function showProjectRoadmap(filterProject){
