@@ -6179,6 +6179,9 @@ function cmdGetItems(q) {
       ['url encode','URL encode/decode tool'],
       ['workspace','Workspace summary with item counts'],
       ['metronome','Audio metronome with BPM control'],
+      ['html entities','HTML entity reference with click-to-copy'],
+      ['weekly digest','Weekly task completion digest'],
+      ['color blend','Color blend/interpolation tool'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8885,6 +8888,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='metronome' || ql==='bpm' || ql==='tempo' || ql==='beat')){
     items.unshift({title:'Metronome',desc:'Audio metronome with BPM control',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMetronome();}});
+  }
+  if(ql && (ql==='html entities' || ql==='entities' || ql==='html entity' || ql==='special characters')){
+    items.unshift({title:'HTML Entities',desc:'Entity reference with copy',icon:'H',type:'action',action:()=>{closeCommandPalette();showHtmlEntityRef();}});
+  }
+  if(ql && (ql==='weekly digest' || ql==='digest' || ql==='week digest' || ql==='week review')){
+    items.unshift({title:'Weekly Digest',desc:'Weekly task completion summary',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyDigest();}});
+  }
+  if(ql && (ql==='color blend' || ql==='blend' || ql==='color mix' || ql==='interpolate')){
+    items.unshift({title:'Color Blend',desc:'Color interpolation tool',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorBlend();}});
   }
   return items.slice(0, 20);
 }
@@ -22441,6 +22453,122 @@ function showQuickMetronome(){
   window._metBPM=function(b){bpm=b;if(running){window._metStop();window._metToggle();}else rend();};
   document.body.appendChild(d);
   rend();
+}
+function showHtmlEntityRef(){
+  var ex=document.getElementById('html-entity-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='html-entity-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  var entities=[
+    ['&amp;','&','Ampersand'],['&lt;','<','Less than'],['&gt;','>','Greater than'],
+    ['&quot;','"','Double quote'],['&apos;',"'",'Apostrophe'],['&nbsp;',' ','Non-breaking space'],
+    ['&copy;','\u00A9','Copyright'],['&reg;','\u00AE','Registered'],['&trade;','\u2122','Trademark'],
+    ['&euro;','\u20AC','Euro'],['&pound;','\u00A3','Pound'],['&yen;','\u00A5','Yen'],
+    ['&cent;','\u00A2','Cent'],['&mdash;','\u2014','Em dash'],['&ndash;','\u2013','En dash'],
+    ['&hellip;','\u2026','Ellipsis'],['&laquo;','\u00AB','Left guillemet'],['&raquo;','\u00BB','Right guillemet'],
+    ['&bull;','\u2022','Bullet'],['&larr;','\u2190','Left arrow'],['&rarr;','\u2192','Right arrow'],
+    ['&uarr;','\u2191','Up arrow'],['&darr;','\u2193','Down arrow'],['&times;','\u00D7','Multiplication'],
+    ['&divide;','\u00F7','Division'],['&infin;','\u221E','Infinity'],['&ne;','\u2260','Not equal'],
+    ['&le;','\u2264','Less or equal'],['&ge;','\u2265','Greater or equal'],['&deg;','\u00B0','Degree']
+  ];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">HTML Entity Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">';
+  entities.forEach(function(e,i){
+    h+='<div onclick="navigator.clipboard.writeText(\''+e[0].replace(/'/g,"\\'")+'\')" style="cursor:pointer;text-align:center;padding:8px 4px;background:var(--bg-surface);border-radius:6px" title="'+e[2]+': '+e[0]+'">'+
+      '<div style="font-size:18px;color:var(--text-primary);margin-bottom:2px">'+e[1]+'</div>'+
+      '<div style="font-size:8px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+e[0].replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</div></div>';
+  });
+  h+='</div><div style="color:var(--text-muted);font-size:10px;text-align:center;margin-top:8px">Click to copy entity code</div>';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showTaskWeeklyDigest(){
+  var ex=document.getElementById('weekly-digest-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var now=new Date();
+  var weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-weekStart.getDay());
+  weekStart.setHours(0,0,0,0);
+  var weekStr=weekStart.toISOString().split('T')[0];
+  var done=tasks.filter(function(t){return t.status==='done'&&t.completedAt&&t.completedAt>=weekStr;});
+  var created=tasks.filter(function(t){return t.createdAt&&t.createdAt>=weekStr;});
+  var inProgress=tasks.filter(function(t){return t.status==='in-progress';});
+  var overdue=tasks.filter(function(t){return t.due&&t.due<now.toISOString().split('T')[0]&&t.status!=='done';});
+  var byDay={};
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(function(d,i){byDay[d]=0;});
+  done.forEach(function(t){
+    var d=new Date(t.completedAt);
+    var day=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    byDay[day]++;
+  });
+  var maxDay=0;Object.values(byDay).forEach(function(v){if(v>maxDay)maxDay=v;});
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Weekly Digest</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  h+='<div style="display:flex;gap:4px;margin-bottom:16px;align-items:flex-end;height:80px">';
+  Object.keys(byDay).forEach(function(day){
+    var v=byDay[day];
+    var bh=maxDay?Math.round(v/maxDay*60):0;
+    h+='<div style="flex:1;text-align:center"><div style="height:'+bh+'px;background:#4ade80;border-radius:3px 3px 0 0;min-height:'+(v?'4':'0')+'px;margin-bottom:4px"></div><div style="font-size:9px;color:var(--text-muted)">'+day+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">'+
+    '<div style="padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:#4ade80">'+done.length+'</div><div style="font-size:9px;color:var(--text-muted)">Completed</div></div>'+
+    '<div style="padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:#3b82f6">'+created.length+'</div><div style="font-size:9px;color:var(--text-muted)">Created</div></div>'+
+    '<div style="padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:#f59e0b">'+inProgress.length+'</div><div style="font-size:9px;color:var(--text-muted)">In Progress</div></div>'+
+    '<div style="padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:#ef4444">'+overdue.length+'</div><div style="font-size:9px;color:var(--text-muted)">Overdue</div></div></div>';
+  if(done.length){
+    h+='<div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px">Completed This Week</div>';
+    done.slice(0,8).forEach(function(t){
+      h+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)">'+
+        '<span style="color:var(--text-primary);font-size:11px">'+esc((t.title||'').substring(0,35))+'</span>'+
+        '<span style="color:var(--text-muted);font-size:10px">'+(t.completedAt||'').split('T')[0]+'</span></div>';
+    });
+  }
+  var d=document.createElement('div');d.id='weekly-digest-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showQuickColorBlend(){
+  var ex=document.getElementById('color-blend-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='color-blend-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw;max-height:80vh;overflow-y:auto';
+  var c1='#4ade80',c2='#06b6d4',steps=5;
+  function hexToRgb(hex){var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return [r,g,b];}
+  function rgbToHex(r,g,b){return '#'+[r,g,b].map(function(x){return Math.round(x).toString(16).padStart(2,'0');}).join('');}
+  function blend(){
+    var rgb1=hexToRgb(c1),rgb2=hexToRgb(c2);
+    var colors=[];
+    for(var i=0;i<=steps+1;i++){
+      var t=i/(steps+1);
+      var r=rgb1[0]+(rgb2[0]-rgb1[0])*t;
+      var g=rgb1[1]+(rgb2[1]-rgb1[1])*t;
+      var b=rgb1[2]+(rgb2[2]-rgb1[2])*t;
+      colors.push(rgbToHex(r,g,b));
+    }
+    return colors;
+  }
+  function render(){
+    var colors=blend();
+    var swatches=d.querySelector('.blend-swatches');
+    if(swatches){
+      var h='';
+      colors.forEach(function(c){
+        h+='<div onclick="navigator.clipboard.writeText(\''+c+'\')" style="cursor:pointer;text-align:center;padding:8px 4px;background:var(--bg-surface);border-radius:6px;min-width:0"><div style="height:30px;background:'+c+';border-radius:4px;margin-bottom:4px"></div><div style="font-size:9px;color:var(--text-muted);font-family:monospace">'+c+'</div></div>';
+      });
+      swatches.innerHTML=h;
+    }
+  }
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Color Blend</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:11px">Start<br><input type="color" value="'+c1+'" id="blend-c1" style="width:50px;height:30px;border:none;cursor:pointer"></label>'+
+    '<label style="color:var(--text-muted);font-size:11px">End<br><input type="color" value="'+c2+'" id="blend-c2" style="width:50px;height:30px;border:none;cursor:pointer"></label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Steps<br><input type="number" value="'+steps+'" min="1" max="20" id="blend-steps" style="width:50px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:12px"></label>'+
+    '</div>'+
+    '<div class="blend-swatches" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(50px,1fr));gap:4px"></div>'+
+    '<div style="color:var(--text-muted);font-size:10px;text-align:center;margin-top:8px">Click swatch to copy hex</div>';
+  document.body.appendChild(d);
+  render();
+  d.querySelector('#blend-c1').oninput=function(e){c1=e.target.value;render();};
+  d.querySelector('#blend-c2').oninput=function(e){c2=e.target.value;render();};
+  d.querySelector('#blend-steps').oninput=function(e){steps=Math.max(1,parseInt(e.target.value)||1);render();};
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
