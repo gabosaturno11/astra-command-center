@@ -6557,6 +6557,12 @@ function cmdGetItems(q) {
       ['terraform','Terraform infrastructure as code reference'],
       ['done this week','Tasks completed this week summary'],
       ['css gradient','CSS gradient generator with preview'],
+      ['golang','Go programming language reference'],
+      ['priority matrix','Urgent vs important task matrix'],
+      ['aspect ratio','Aspect ratio calculator'],
+      ['python venv','Python virtual environment reference'],
+      ['backlog grooming','Backlog health and grooming report'],
+      ['markdown table','Markdown table generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10397,6 +10403,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='css gradient' || ql==='gradient' || ql==='gradient generator' || ql==='css background')){
     items.unshift({title:'CSS Gradient',desc:'Gradient generator with color picker',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickCssGradient();}});
+  }
+  if(ql && (ql==='golang' || ql==='go' || ql==='go ref' || ql==='go commands')){
+    items.unshift({title:'Go Reference',desc:'Go build, test, modules commands',icon:'G',type:'action',action:()=>{closeCommandPalette();showGolangRef();}});
+  }
+  if(ql && (ql==='priority matrix' || ql==='matrix view' || ql==='urgent important' || ql==='eisenhower')){
+    items.unshift({title:'Priority Matrix',desc:'Urgent vs important task matrix',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskMatrixView();}});
+  }
+  if(ql && (ql==='aspect ratio' || ql==='ratio calc' || ql==='resolution' || ql==='screen ratio')){
+    items.unshift({title:'Aspect Ratio',desc:'Aspect ratio calculator',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAspectRatio();}});
+  }
+  if(ql && (ql==='python venv' || ql==='venv' || ql==='pip' || ql==='python env')){
+    items.unshift({title:'Python Env Reference',desc:'venv, pip, poetry, conda commands',icon:'P',type:'action',action:()=>{closeCommandPalette();showPythonVenvRef();}});
+  }
+  if(ql && (ql==='backlog grooming' || ql==='backlog' || ql==='groom' || ql==='backlog health')){
+    items.unshift({title:'Backlog Grooming',desc:'Backlog health report and suggestions',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBacklogGrooming();}});
+  }
+  if(ql && (ql==='markdown table' || ql==='md table' || ql==='table generator' || ql==='table markdown')){
+    items.unshift({title:'Markdown Table',desc:'Generate markdown table template',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownTable();}});
   }
   return items.slice(0, 20);
 }
@@ -34930,6 +34954,250 @@ function showQuickCssGradient(){
   window._grAngle=(v)=>{angle=parseInt(v);render();};
   window._grCopy=()=>{const el=document.getElementById('gr-css-out');if(el)navigator.clipboard.writeText(el.textContent);const btn=d.querySelector('button:last-child');if(btn){btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy CSS',500);}};
   render();
+  document.body.appendChild(d);
+}
+function showGolangRef(){
+  const cmds={
+    'Commands':{
+      'go run main.go':'Run Go program',
+      'go build':'Build binary',
+      'go test ./...':'Run all tests',
+      'go test -v':'Verbose tests',
+      'go test -bench=.':'Run benchmarks',
+      'go test -cover':'Test coverage',
+      'go mod init module':'Initialize module',
+      'go mod tidy':'Clean up dependencies'
+    },
+    'Modules':{
+      'go get pkg@version':'Add dependency',
+      'go get -u ./...':'Update all dependencies',
+      'go mod download':'Download dependencies',
+      'go mod vendor':'Create vendor directory',
+      'go mod verify':'Verify dependencies',
+      'go mod graph':'Show dependency graph',
+      'go list -m all':'List all modules',
+      'go mod edit -replace=old=new':'Replace module'
+    },
+    'Tools':{
+      'go fmt ./...':'Format all files',
+      'go vet ./...':'Vet for suspicious code',
+      'go doc pkg':'Show package docs',
+      'go doc -all pkg':'Show all docs',
+      'go generate ./...':'Run go generate',
+      'go install pkg@latest':'Install binary',
+      'go env':'Show Go environment',
+      'go version':'Show Go version'
+    },
+    'Build Flags':{
+      'go build -o name':'Set output name',
+      'go build -ldflags="-s -w"':'Strip debug info',
+      'GOOS=linux go build':'Cross-compile for Linux',
+      'GOARCH=arm64 go build':'Cross-compile for ARM64',
+      'go build -race':'Race condition detector',
+      'go build -tags=prod':'Build with tags',
+      'go clean -cache':'Clean build cache',
+      'go clean -testcache':'Clean test cache'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Go (Golang) Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskMatrixView(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const active=tasks.filter(t=>t.status!=='done');
+  const urgent=t=>t.priority==='p0'||t.priority==='p1'||(t.due&&new Date(t.due)<new Date(Date.now()+3*24*60*60*1000));
+  const important=t=>t.priority==='p0'||t.priority==='p1';
+  const q1=active.filter(t=>urgent(t)&&important(t));
+  const q2=active.filter(t=>!urgent(t)&&important(t));
+  const q3=active.filter(t=>urgent(t)&&!important(t));
+  const q4=active.filter(t=>!urgent(t)&&!important(t));
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Priority Matrix</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const quads=[{title:'Do First',color:'#ef4444',items:q1},{title:'Schedule',color:'#3b82f6',items:q2},{title:'Delegate',color:'#f59e0b',items:q3},{title:'Eliminate',color:'#6b7280',items:q4}];
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  quads.forEach(q=>{
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;border-top:3px solid '+q.color+'">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;font-weight:600;color:'+q.color+'">'+q.title+'</span><span style="font-size:10px;color:var(--text-muted)">'+q.items.length+'</span></div>';
+    q.items.slice(0,5).forEach(t=>{
+      html+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</div>';
+    });
+    if(q.items.length>5)html+='<div style="font-size:10px;color:var(--text-muted)">+'+(q.items.length-5)+' more</div>';
+    if(!q.items.length)html+='<div style="font-size:10px;color:var(--text-muted);font-style:italic">Empty</div>';
+    html+='</div>';
+  });
+  html+='</div></div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickAspectRatio(){
+  let ex=document.getElementById('aspect-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='aspect-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  const presets=[{label:'16:9',w:16,h:9},{label:'4:3',w:4,h:3},{label:'1:1',w:1,h:1},{label:'21:9',w:21,h:9},{label:'9:16',w:9,h:16},{label:'3:2',w:3,h:2}];
+  let width=1920,ratio=presets[0];
+  function gcd(a,b){return b?gcd(b,a%b):a;}
+  function render(){
+    const height=Math.round(width*ratio.h/ratio.w);
+    const g=gcd(width,height);
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Aspect Ratio</span><button onclick="document.getElementById(\'aspect-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">';
+    presets.forEach(p=>{
+      html+='<button onclick="window._arPreset('+p.w+','+p.h+')" style="background:'+(ratio.w===p.w&&ratio.h===p.h?'#4ade8033':'var(--bg-surface)')+';color:'+(ratio.w===p.w&&ratio.h===p.h?'#4ade80':'var(--text-muted)')+';border:1px solid '+(ratio.w===p.w&&ratio.h===p.h?'#4ade80':'var(--border)')+';padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px">'+p.label+'</button>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><label style="font-size:10px;color:var(--text-muted);min-width:40px">Width</label>';
+    html+='<input type="number" value="'+width+'" onchange="window._arWidth(this.value)" style="flex:1;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:4px;font-size:12px"></div>';
+    html+='<div style="background:var(--bg-base);border-radius:8px;padding:12px;text-align:center">';
+    html+='<div style="font-size:24px;font-weight:700;color:#4ade80">'+width+' x '+height+'</div>';
+    html+='<div style="font-size:11px;color:var(--text-muted);margin-top:4px">Ratio: '+(width/g)+':'+(height/g)+'</div>';
+    html+='<div style="font-size:11px;color:var(--text-muted)">Pixels: '+(width*height).toLocaleString()+'</div>';
+    html+='</div>';
+    const maxDim=Math.max(ratio.w,ratio.h);
+    const pw=Math.round((ratio.w/maxDim)*100);const ph=Math.round((ratio.h/maxDim)*100);
+    html+='<div style="display:flex;justify-content:center;margin-top:10px"><div style="width:'+pw+'px;height:'+ph+'px;border:2px solid #4ade80;border-radius:4px;max-width:100px;max-height:80px"></div></div>';
+    d.innerHTML=html;
+  }
+  window._arPreset=(w,h)=>{ratio={w,h};render();};
+  window._arWidth=(v)=>{width=parseInt(v)||1920;render();};
+  render();
+  document.body.appendChild(d);
+}
+function showPythonVenvRef(){
+  const cmds={
+    'Virtual Environments':{
+      'python -m venv env':'Create virtual environment',
+      'source env/bin/activate':'Activate (macOS/Linux)',
+      'env\\Scripts\\activate':'Activate (Windows)',
+      'deactivate':'Deactivate environment',
+      'python -m venv --clear env':'Reset environment',
+      'python -m venv --system-site-packages env':'Include system packages',
+      'which python':'Check active Python path',
+      'python --version':'Check Python version'
+    },
+    'pip Commands':{
+      'pip install package':'Install package',
+      'pip install package==1.0':'Install specific version',
+      'pip install -r requirements.txt':'Install from requirements',
+      'pip freeze > requirements.txt':'Save requirements',
+      'pip list':'List installed packages',
+      'pip show package':'Show package info',
+      'pip uninstall package':'Remove package',
+      'pip install --upgrade package':'Upgrade package'
+    },
+    'Poetry':{
+      'poetry new project':'Create new project',
+      'poetry init':'Initialize in existing dir',
+      'poetry add package':'Add dependency',
+      'poetry add -D package':'Add dev dependency',
+      'poetry install':'Install dependencies',
+      'poetry update':'Update dependencies',
+      'poetry shell':'Activate shell',
+      'poetry build':'Build package'
+    },
+    'Conda':{
+      'conda create -n env python=3.11':'Create environment',
+      'conda activate env':'Activate environment',
+      'conda deactivate':'Deactivate',
+      'conda install package':'Install package',
+      'conda list':'List packages',
+      'conda env list':'List environments',
+      'conda env export > env.yml':'Export environment',
+      'conda env create -f env.yml':'Create from file'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Python Env Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskBacklogGrooming(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const active=tasks.filter(t=>t.status!=='done');
+  const noPriority=active.filter(t=>!t.priority||t.priority==='p3');
+  const noDue=active.filter(t=>!t.due);
+  const noProject=active.filter(t=>!t.projectId&&!t.project);
+  const noDesc=active.filter(t=>!t.description);
+  const stale=active.filter(t=>{const c=new Date(t.created||t.id);return(Date.now()-c)/(1000*60*60*24)>30;});
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Backlog Grooming</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="color:var(--text-muted);font-size:11px;margin-bottom:12px">'+active.length+' active tasks need attention</div>';
+  const items=[
+    {label:'No Priority Set',count:noPriority.length,color:'#ef4444',tasks:noPriority},
+    {label:'No Due Date',count:noDue.length,color:'#f59e0b',tasks:noDue},
+    {label:'No Project Assigned',count:noProject.length,color:'#8b5cf6',tasks:noProject},
+    {label:'No Description',count:noDesc.length,color:'#3b82f6',tasks:noDesc},
+    {label:'Stale (30+ days)',count:stale.length,color:'#6b7280',tasks:stale}
+  ];
+  items.forEach(item=>{
+    const pct=active.length?Math.round((item.count/active.length)*100):0;
+    html+='<div style="margin-bottom:10px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#e2e8f0">'+item.label+'</span>';
+    html+='<span style="font-size:11px;color:'+item.color+'">'+item.count+' ('+pct+'%)</span></div>';
+    html+='<div style="height:8px;background:var(--bg-base);border-radius:4px"><div style="height:100%;width:'+pct+'%;background:'+item.color+';border-radius:4px"></div></div>';
+    if(item.count&&item.tasks.length){
+      html+='<div style="margin-top:4px">';
+      item.tasks.slice(0,3).forEach(t=>{
+        html+='<div style="font-size:10px;color:var(--text-muted);padding:1px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">- '+esc(t.title)+'</div>';
+      });
+      if(item.tasks.length>3)html+='<div style="font-size:10px;color:var(--text-muted)">... and '+(item.tasks.length-3)+' more</div>';
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  const score=Math.round(100-((noPriority.length+noDue.length+noProject.length)/(active.length*3))*100);
+  html+='<div style="text-align:center;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:11px;color:var(--text-muted)">Backlog Health Score</div><div style="font-size:28px;font-weight:700;color:'+(score>=70?'#4ade80':score>=40?'#f59e0b':'#ef4444')+'">'+score+'%</div></div>';
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickMarkdownTable(){
+  let ex=document.getElementById('mdtable-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='mdtable-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:380px';
+  let rows=3,cols=3;
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Markdown Table</span><button onclick="document.getElementById(\'mdtable-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">';
+    html+='<label style="font-size:10px;color:var(--text-muted)">Cols</label><input type="number" value="'+cols+'" min="1" max="10" onchange="window._mdtCols(this.value)" style="width:50px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px">';
+    html+='<label style="font-size:10px;color:var(--text-muted)">Rows</label><input type="number" value="'+rows+'" min="1" max="20" onchange="window._mdtRows(this.value)" style="width:50px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px">';
+    html+='<button onclick="window._mdtGen()" style="background:#4ade80;color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Generate</button>';
+    html+='</div>';
+    html+='<textarea id="mdtable-output" style="width:100%;height:140px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;font-family:monospace;resize:vertical" readonly></textarea>';
+    html+='<button onclick="const ta=document.getElementById(\'mdtable-output\');if(ta)navigator.clipboard.writeText(ta.value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',500)" style="width:100%;margin-top:6px;background:#4ade80;color:#000;border:none;padding:5px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Copy</button>';
+    d.innerHTML=html;
+  }
+  window._mdtCols=(v)=>{cols=Math.max(1,parseInt(v)||1);render();};
+  window._mdtRows=(v)=>{rows=Math.max(1,parseInt(v)||1);render();};
+  window._mdtGen=()=>{
+    let md='| '+Array.from({length:cols},(_,i)=>'Header '+(i+1)).join(' | ')+' |\n';
+    md+='| '+Array.from({length:cols},()=>'---').join(' | ')+' |\n';
+    for(let r=0;r<rows;r++){
+      md+='| '+Array.from({length:cols},(_,c)=>'Cell '+(r+1)+'-'+(c+1)).join(' | ')+' |\n';
+    }
+    const ta=document.getElementById('mdtable-output');if(ta)ta.value=md;
+  };
+  render();
+  setTimeout(()=>window._mdtGen(),50);
   document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
