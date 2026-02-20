@@ -5834,6 +5834,8 @@ function cmdGetItems(q) {
       ['data tools','Manage/clear data by section, factory reset'],
       ['theme','Switch between dark theme variants'],
       ['status email','Generate weekly status email (copies to clipboard)'],
+      ['morning','Morning briefing panel with daily overview'],
+      ['shortcuts','Visual keyboard shortcut cheatsheet'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7262,6 +7264,14 @@ function cmdGetItems(q) {
   // Status email prefix
   if(ql && (ql==='status email' || ql==='status update' || ql==='weekly email' || ql==='email update')){
     items.unshift({title:'Generate Status Email',desc:'Copy weekly status update email to clipboard',icon:'E',type:'action',action:()=>{closeCommandPalette();generateStatusEmail();}});
+  }
+  // Morning briefing prefix
+  if(ql && (ql==='morning' || ql==='morning briefing' || ql==='good morning' || ql==='daily brief')){
+    items.unshift({title:'Morning Briefing',desc:'Daily overview: overdue, today tasks, in-progress, stats',icon:'M',type:'action',action:()=>{closeCommandPalette();showMorningBriefing();}});
+  }
+  // Shortcut cheatsheet prefix
+  if(ql && (ql==='shortcuts' || ql==='shortcut cheatsheet' || ql==='keyboard' || ql==='keys' || ql==='hotkeys')){
+    items.unshift({title:'Shortcut Cheatsheet',desc:'Visual keyboard shortcut reference',icon:'K',type:'action',action:()=>{closeCommandPalette();showShortcutCheatsheet();}});
   }
   return items.slice(0, 20);
 }
@@ -9153,6 +9163,83 @@ function generateStatusEmail(){
   email+='\nBest regards';
   navigator.clipboard.writeText(email);
   toast('Status email copied to clipboard');
+}
+function showMorningBriefing(){
+  let panel=document.getElementById('morning-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='morning-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:85vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const todayLabel=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const hour=new Date().getHours();
+  const greeting=hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+  const todayTasks=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+  const overdue=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+  const inProgress=S.tasks.filter(t=>t.status==='in-progress');
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);const yStr=yesterday.toISOString().split('T')[0];
+  const doneYesterday=S.tasks.filter(t=>t.completedAt&&t.completedAt.split('T')[0]===yStr);
+  const focusToday=(S.focusSessions||[]).filter(f=>f.date===today);
+  const focusMin=focusToday.reduce((s,x)=>s+(x.duration||0),0);
+  const todayContent=S.content.filter(c=>c.createdAt&&c.createdAt.split('T')[0]===today);
+  const todayWords=todayContent.reduce((s,c)=>s+((c.body||'').split(/\s+/).length),0);
+  let h=`<div style="font-size:12px;color:var(--accent);margin-bottom:4px;font-weight:600">${greeting}!</div>`;
+  h+=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:16px">${todayLabel}</div>`;
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:14px;font-weight:700;color:var(--accent)">${todayTasks.length}</div><div style="font-size:7px;color:var(--text-muted)">Due Today</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:14px;font-weight:700;color:#ef4444">${overdue.length}</div><div style="font-size:7px;color:var(--text-muted)">Overdue</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:14px;font-weight:700;color:#3b82f6">${inProgress.length}</div><div style="font-size:7px;color:var(--text-muted)">In Progress</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:14px;font-weight:700;color:#22c55e">${doneYesterday.length}</div><div style="font-size:7px;color:var(--text-muted)">Done Y-day</div></div>`;
+  h+='</div>';
+  if(overdue.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#ef4444;margin-bottom:4px">Overdue Tasks</div>';
+    overdue.slice(0,5).forEach(t=>{h+=`<div onclick="document.getElementById('morning-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:9px;color:var(--text-primary);cursor:pointer;border-left:2px solid #ef4444;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(t.title)} <span style="color:#ef4444">${t.due}</span></div>`;});
+    h+='<div style="height:8px"></div>';
+  }
+  if(todayTasks.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">Today\'s Tasks</div>';
+    todayTasks.forEach(t=>{const pc=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':'var(--text-muted)';h+=`<div onclick="document.getElementById('morning-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:9px;color:var(--text-primary);cursor:pointer;border-left:2px solid ${pc};margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(t.title)} <span style="color:${pc};font-size:8px">${(t.priority||'p2').toUpperCase()}</span></div>`;});
+    h+='<div style="height:8px"></div>';
+  }
+  if(inProgress.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#3b82f6;margin-bottom:4px">In Progress</div>';
+    inProgress.slice(0,5).forEach(t=>{h+=`<div onclick="document.getElementById('morning-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:9px;color:var(--text-primary);cursor:pointer;border-left:2px solid #3b82f6;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(t.title)}</div>`;});
+  }
+  h+=`<div style="margin-top:8px;display:flex;gap:8px;font-size:9px;color:var(--text-muted)"><span>Focus today: ${focusMin}m</span><span>Words today: ${todayWords}</span><span>Content: ${todayContent.length} items</span></div>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Morning Briefing</span><button onclick="document.getElementById('morning-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showShortcutCheatsheet(){
+  let panel=document.getElementById('shortcut-cheat-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='shortcut-cheat-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const groups=[
+    {name:'Navigation',shortcuts:[
+      ['Cmd+K','Command Palette'],['Cmd+1-9','Switch to section 1-9'],
+      ['Cmd+B / Cmd+E','Toggle sidebar'],['Cmd+\\\\','Toggle context panel'],
+    ]},
+    {name:'Tasks',shortcuts:[
+      ['Cmd+Shift+T','New task from anywhere'],['Cmd+Shift+N','New task'],
+      ['Cmd+Shift+D','Today view'],
+    ]},
+    {name:'Writer',shortcuts:[
+      ['Cmd+Shift+W','Open Zen Writer'],['Cmd+S','Save all'],
+      ['Cmd+Shift+F','Toggle focus mode'],
+    ]},
+    {name:'Quick Actions',shortcuts:[
+      ['Cmd+Shift+E','Export current section'],
+      ['Type "task: title"','Quick-create task in Cmd+K'],
+      ['Type "note: text"','Quick-save note in Cmd+K'],
+    ]},
+  ];
+  let h='';
+  groups.forEach(g=>{
+    h+=`<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">${g.name}</div>`;
+    g.shortcuts.forEach(([key,desc])=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:10px"><kbd style="padding:2px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;font-family:var(--mono);font-size:9px;color:var(--accent);min-width:100px;text-align:center">${key}</kbd><span style="color:var(--text-primary)">${desc}</span></div>`;
+    });
+    h+='</div>';
+  });
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Keyboard Shortcuts</span><button onclick="document.getElementById('shortcut-cheat-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
