@@ -6050,6 +6050,9 @@ function cmdGetItems(q) {
       ['link explorer','Browse links grouped by domain'],
       ['project summary','Executive summary for a project'],
       ['countdown','Floating countdown to custom dates'],
+      ['text transform','Text utilities - uppercase, slug, trim, reverse'],
+      ['link archive','Archive and restore links'],
+      ['merge docs','Merge two writer documents into one'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8348,6 +8351,18 @@ function cmdGetItems(q) {
   // Countdown prefix
   if(ql && (ql==='countdown' || ql==='count down' || ql==='deadline' || ql==='days until')){
     items.unshift({title:'Countdown',desc:'Floating date countdown widget',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdown();}});
+  }
+  // Text transform prefix
+  if(ql && (ql==='text transform' || ql==='transform' || ql==='text utility' || ql==='case convert')){
+    items.unshift({title:'Text Transformer',desc:'Uppercase, slug, trim, reverse',icon:'T',type:'action',action:()=>{closeCommandPalette();showTextTransformer();}});
+  }
+  // Link archive prefix
+  if(ql && (ql==='link archive' || ql==='archive links' || ql==='archived links' || ql==='link restore')){
+    items.unshift({title:'Link Archive',desc:'Archive and restore links',icon:'A',type:'action',action:()=>{closeCommandPalette();showLinkArchive();}});
+  }
+  // Merge docs prefix
+  if(ql && (ql==='merge docs' || ql==='merge documents' || ql==='doc merge' || ql==='combine docs')){
+    items.unshift({title:'Merge Documents',desc:'Merge two docs into one',icon:'M',type:'action',action:()=>{closeCommandPalette();showDocMerge();}});
   }
   return items.slice(0, 20);
 }
@@ -17345,6 +17360,97 @@ function showQuickCountdown(){
     });
     if(!S._countdowns.length)h+='<div style="font-size:10px;color:var(--text-muted);text-align:center;padding:8px">No countdowns. Add one above.</div>';
     panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showTextTransformer(){
+  let panel=document.getElementById('text-transform-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='text-transform-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Text Transformer</span><button onclick="this.closest(\'#text-transform-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="tt-input" placeholder="Paste or type text here..." style="width:100%;height:100px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;resize:vertical;box-sizing:border-box;font-family:inherit;margin-bottom:8px"></textarea>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+  const transforms=[
+    {label:'UPPERCASE',fn:'v.toUpperCase()'},
+    {label:'lowercase',fn:'v.toLowerCase()'},
+    {label:'Title Case',fn:'v.replace(/\\w\\S*/g,t=>t.charAt(0).toUpperCase()+t.substr(1).toLowerCase())'},
+    {label:'slug-case',fn:'v.toLowerCase().replace(/[^a-z0-9]+/g,\"-\").replace(/^-|-$/g,\"\")'},
+    {label:'camelCase',fn:'v.toLowerCase().replace(/[^a-z0-9]+(.)/g,(_,c)=>c.toUpperCase())'},
+    {label:'Trim',fn:'v.trim()'},
+    {label:'Remove Extra Spaces',fn:'v.replace(/\\s+/g,\" \").trim()'},
+    {label:'Reverse',fn:'v.split(\"\").reverse().join(\"\")'},
+  ];
+  transforms.forEach(t=>{
+    h+='<button onclick="const ta=document.getElementById(\'tt-input\');const v=ta.value;ta.value=(function(v){return '+t.fn+'})(v);document.getElementById(\'tt-stats\').textContent=ta.value.split(/\\s+/).filter(Boolean).length+\' words | \'+ta.value.length+\' chars\'" style="padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">'+t.label+'</button>';
+  });
+  h+='</div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+  h+='<span id="tt-stats" style="font-size:10px;color:var(--text-muted)">0 words | 0 chars</span>';
+  h+='<button onclick="const ta=document.getElementById(\'tt-input\');navigator.clipboard.writeText(ta.value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',1000)" style="padding:4px 12px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Copy</button>';
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  document.getElementById('tt-input').addEventListener('input',function(){document.getElementById('tt-stats').textContent=this.value.split(/\s+/).filter(Boolean).length+' words | '+this.value.length+' chars';});
+}
+function showLinkArchive(){
+  let panel=document.getElementById('link-archive-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='link-archive-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._linkArchive)S._linkArchive=[];
+  function render(){
+    const active=(S.links||[]);
+    const archived=S._linkArchive;
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Link Archive</span><button onclick="this.closest(\'#link-archive-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+active.length+' active | '+archived.length+' archived</div>';
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">Active Links</div>';
+    if(!active.length)h+='<div style="font-size:10px;color:var(--text-muted);padding:8px">No active links</div>';
+    active.slice(0,20).forEach(l=>{
+      h+='<div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+      h+='<span style="flex:1;font-size:11px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(l.title||l.url)+'</span>';
+      h+='<button onclick="if(!S._linkArchive)S._linkArchive=[];const idx=(S.links||[]).findIndex(x=>x.id===\''+l.id+'\');if(idx>=0){S._linkArchive.push(S.links.splice(idx,1)[0]);save();this.closest(\'#link-archive-panel\')._render()}" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px;padding:2px 6px">Archive</button>';
+      h+='</div>';
+    });
+    if(active.length>20)h+='<div style="font-size:10px;color:var(--text-muted);padding:4px">+'+(active.length-20)+' more</div>';
+    if(archived.length){
+      h+='<div style="font-size:11px;font-weight:700;color:#f59e0b;margin-top:12px;margin-bottom:6px">Archived</div>';
+      archived.forEach((l,i)=>{
+        h+='<div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+        h+='<span style="flex:1;font-size:11px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(l.title||l.url)+'</span>';
+        h+='<button onclick="if(!S.links)S.links=[];S.links.push(S._linkArchive.splice('+i+',1)[0]);save();this.closest(\'#link-archive-panel\')._render()" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:#4ade80;cursor:pointer;font-size:9px;padding:2px 6px">Restore</button>';
+        h+='</div>';
+      });
+    }
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showDocMerge(){
+  let panel=document.getElementById('doc-merge-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='doc-merge-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const docs=(S.writerDocs||[]);
+  let selA=docs.length?docs[0].id:'';
+  let selB=docs.length>1?docs[1].id:'';
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Merge Documents</span><button onclick="this.closest(\'#doc-merge-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Merge two documents into one. The second doc\'s content will be appended to the first.</div>';
+    h+='<div style="margin-bottom:8px"><span style="font-size:10px;color:var(--text-muted)">Base document:</span>';
+    h+='<select onchange="this.closest(\'#doc-merge-panel\')._selA=this.value;this.closest(\'#doc-merge-panel\')._render()" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-top:2px">';
+    docs.forEach(d=>{h+='<option value="'+d.id+'"'+(selA===d.id?' selected':'')+'>'+esc(d.title)+' ('+(d.body||'').split(/\s+/).filter(Boolean).length+' words)</option>';});
+    h+='</select></div>';
+    h+='<div style="margin-bottom:8px"><span style="font-size:10px;color:var(--text-muted)">Append from:</span>';
+    h+='<select onchange="this.closest(\'#doc-merge-panel\')._selB=this.value;this.closest(\'#doc-merge-panel\')._render()" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-top:2px">';
+    docs.forEach(d=>{h+='<option value="'+d.id+'"'+(selB===d.id?' selected':'')+'>'+esc(d.title)+' ('+(d.body||'').split(/\s+/).filter(Boolean).length+' words)</option>';});
+    h+='</select></div>';
+    const a=docs.find(d=>d.id===selA),b=docs.find(d=>d.id===selB);
+    if(a&&b&&a.id!==b.id){
+      const merged=(a.body||'')+'\n\n---\n\n'+(b.body||'');
+      const mergedWc=merged.split(/\s+/).filter(Boolean).length;
+      h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Result: '+mergedWc+' words</div>';
+      h+='<button onclick="const docs=(S.writerDocs||[]);const a=docs.find(d=>d.id===\''+selA+'\');const b=docs.find(d=>d.id===\''+selB+'\');if(a&&b&&a.id!==b.id){if(!confirm(\'Merge \\\"\'+b.title+\'\\\" into \\\"\'+a.title+\'\\\"?\'))return;a.body=(a.body||\'\')+\'\\n\\n---\\n\\n\'+(b.body||\'\');a.modified=new Date().toISOString();save();alert(\'Merged!\');this.closest(\'#doc-merge-panel\').remove();}" style="width:100%;padding:8px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:600">Merge Documents</button>';
+    } else if(a&&b&&a.id===b.id){
+      h+='<div style="font-size:11px;color:#ef4444;margin-top:8px">Select two different documents</div>';
+    }
+    panel.innerHTML=h;panel._render=render;panel._selA=selA;panel._selB=selB;
   }
   render();document.body.appendChild(panel);
 }
