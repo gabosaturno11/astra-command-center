@@ -835,6 +835,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="contentManageTags()" title="Rename or delete tags">Tags</button>
           <button class="btn btn-sm" onclick="batchImportContent()" title="Paste multiple items separated by ---">Batch</button>
           <button class="btn btn-sm" onclick="toggleAllContentCards()" title="Expand/collapse all cards">Exp/Col</button>
+          <button class="btn btn-sm" onclick="copyAllContent()" title="Copy all visible content to clipboard">Copy All</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -2404,6 +2405,17 @@ function toggleAllContentCards(){
   const anyExpanded=[...cards].some(c=>c.classList.contains('expanded'));
   cards.forEach(c=>{if(anyExpanded)c.classList.remove('expanded');else c.classList.add('expanded');});
   toast(anyExpanded?'All collapsed':'All expanded');
+}
+function copyAllContent(){
+  let items=[...S.content];
+  if(contentType!=='all')items=items.filter(c=>c.type===contentType);
+  if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
+  if(contentTagFilter)items=items.filter(c=>(c.tags||[]).includes(contentTagFilter));
+  const q=(document.getElementById('content-search')?.value||'').toLowerCase();
+  if(q)items=items.filter(c=>(c.body+' '+c.theme).toLowerCase().includes(q));
+  if(!items.length){toast('No content to copy');return;}
+  const text=items.map(c=>c.body).join('\n\n---\n\n');
+  navigator.clipboard.writeText(text).then(()=>toast(items.length+' items copied'));
 }
 function exportFilteredContent(){
   const q=(document.getElementById('content-search')?.value||'').toLowerCase();
@@ -5543,6 +5555,12 @@ document.addEventListener('keydown',e=>{
     if(activeProject) closeProjectPanel();
   }
   if(inInput) return;
+  // Priority shortcuts in task detail modal (1-4 for p0-p3)
+  if(document.getElementById('task-detail-modal').classList.contains('open')&&!e.metaKey&&!e.ctrlKey){
+    const pMap={'1':'p0','2':'p1','3':'p2','4':'p3'};
+    if(pMap[e.key]){document.getElementById('td-priority').value=pMap[e.key];toast('Priority: '+pMap[e.key].toUpperCase());return;}
+    if(e.key==='s'&&!e.shiftKey){saveTaskDetail();return;}
+  }
   // Cmd+number: switch sections
   if((e.metaKey||e.ctrlKey) && e.key>='1' && e.key<='9') {
     e.preventDefault();
