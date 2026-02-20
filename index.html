@@ -6368,6 +6368,12 @@ function cmdGetItems(q) {
       ['ruby','Ruby/Rails command reference'],
       ['focus score','Personal focus score gauge'],
       ['slug','URL slug and camelCase generator'],
+      ['gradle','Gradle command reference'],
+      ['scope creep','Project scope creep analysis'],
+      ['aspect ratio','Aspect ratio calculator'],
+      ['maven','Maven command reference'],
+      ['tag breakdown','Content tag usage breakdown'],
+      ['shadow','CSS box-shadow generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9641,6 +9647,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='slug' || ql==='slugify' || ql==='url slug' || ql==='camelcase')){
     items.unshift({title:'Slug Generator',desc:'Generate URL slugs and camelCase',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSlugGenerator();}});
+  }
+  if(ql && (ql==='gradle' || ql==='gradle commands' || ql==='gradle ref' || ql==='gradlew')){
+    items.unshift({title:'Gradle Reference',desc:'Gradle build tool cheatsheet',icon:'G',type:'action',action:()=>{closeCommandPalette();showGradleRef();}});
+  }
+  if(ql && (ql==='scope creep' || ql==='scope' || ql==='creep analysis' || ql==='project scope')){
+    items.unshift({title:'Scope Creep Analysis',desc:'How much scope was added per project',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskScopeCreep();}});
+  }
+  if(ql && (ql==='aspect ratio' || ql==='ratio' || ql==='aspect' || ql==='resolution')){
+    items.unshift({title:'Aspect Ratio',desc:'Calculate aspect ratios and resolutions',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAspectRatio();}});
+  }
+  if(ql && (ql==='maven' || ql==='mvn' || ql==='maven commands' || ql==='maven ref')){
+    items.unshift({title:'Maven Reference',desc:'Maven lifecycle and commands cheatsheet',icon:'M',type:'action',action:()=>{closeCommandPalette();showMavenRef();}});
+  }
+  if(ql && (ql==='tag breakdown' || ql==='tags' || ql==='tag stats' || ql==='tag usage')){
+    items.unshift({title:'Tag Breakdown',desc:'Content tag usage distribution',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTagBreakdown();}});
+  }
+  if(ql && (ql==='shadow' || ql==='box shadow' || ql==='shadow generator' || ql==='css shadow')){
+    items.unshift({title:'Shadow Generator',desc:'CSS box-shadow presets with preview',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickShadowGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -28787,6 +28811,150 @@ function showQuickSlugGenerator(){
     const camel=input.trim().split(/\s+/).map((w,i)=>{const lower=w.toLowerCase();return i===0?lower:lower.charAt(0).toUpperCase()+lower.slice(1);}).join('');
     document.getElementById('camel-output').textContent=camel;
   };
+}
+function showGradleRef(){
+  const d=document.createElement('div');d.id='gradle-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Build':['gradle build','gradle clean','gradle assemble','gradle jar','gradle bootRun'],
+    'Test':['gradle test','gradle check','gradle jacocoTestReport'],
+    'Dependencies':['gradle dependencies','gradle dependencyInsight --dependency <dep>','gradle refreshDependencies'],
+    'Info':['gradle tasks','gradle projects','gradle properties','gradle --version','gradle wrapper'],
+    'Android':['gradle assembleDebug','gradle assembleRelease','gradle installDebug','gradle connectedAndroidTest'],
+    'Other':['gradle init','gradle --daemon','gradle --stop','gradle --scan','gradle help --task <task>']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Gradle Reference</h3><button onclick="document.getElementById(\'gradle-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskScopeCreep(){
+  const d=document.createElement('div');d.id='scope-creep-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const projects=(S.projects||[]);
+  const byProject={};
+  tasks.forEach(t=>{
+    const pid=t.projectId||'none';
+    if(!byProject[pid])byProject[pid]={original:0,added:0};
+    const created=t.createdAt?new Date(t.createdAt):new Date();
+    const projCreated=projects.find(p=>p.id===pid);
+    const projDate=projCreated&&projCreated.createdAt?new Date(projCreated.createdAt):new Date(0);
+    const diff=(created-projDate)/86400000;
+    if(diff<1)byProject[pid].original++;else byProject[pid].added++;
+  });
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Scope Creep Analysis</h3><button onclick="document.getElementById(\'scope-creep-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">Compares original tasks (created same day as project) vs added later</div>';
+  const entries=Object.entries(byProject).sort((a,b)=>(b[1].original+b[1].added)-(a[1].original+a[1].added));
+  entries.forEach(([pid,data])=>{
+    const proj=projects.find(p=>p.id===pid);const name=proj?proj.name:'No Project';
+    const total=data.original+data.added;const creepPct=total?Math.round(data.added/total*100):0;
+    const col=creepPct>60?'#ef4444':creepPct>30?'#f59e0b':'#4ade80';
+    html+='<div style="padding:10px;background:var(--bg-surface);border-radius:6px;margin-bottom:6px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:12px;color:var(--text-primary);font-weight:600">'+esc(name)+'</span><span style="font-size:11px;color:'+col+'">'+creepPct+'% scope creep</span></div>';
+    html+='<div style="display:flex;height:8px;border-radius:4px;overflow:hidden"><div style="width:'+(100-creepPct)+'%;background:#4ade80"></div><div style="width:'+creepPct+'%;background:#ef4444"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted);margin-top:4px"><span>Original: '+data.original+'</span><span>Added: '+data.added+'</span></div></div>';
+  });
+  if(!entries.length)html+='<div style="text-align:center;padding:20px;color:var(--text-muted)">No tasks found.</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickAspectRatio(){
+  const d=document.createElement('div');d.id='aspect-ratio-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px';
+  const ratios=[
+    {label:'16:9',desc:'Widescreen',w:1920,h:1080},
+    {label:'4:3',desc:'Standard',w:1024,h:768},
+    {label:'1:1',desc:'Square',w:1080,h:1080},
+    {label:'9:16',desc:'Vertical/Stories',w:1080,h:1920},
+    {label:'21:9',desc:'Ultrawide',w:2560,h:1080},
+    {label:'3:2',desc:'Photography',w:1500,h:1000},
+    {label:'2:3',desc:'Pinterest',w:1000,h:1500}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Aspect Ratios</h3><button onclick="document.getElementById(\'aspect-ratio-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:10px"><input id="ar-width" type="number" placeholder="Width" value="1920" oninput="window._arCalc()" style="width:48%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box"/> x <input id="ar-height" type="number" placeholder="Height" value="1080" oninput="window._arCalc()" style="width:40%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box"/></div>';
+  html+='<div id="ar-result" style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:10px;font-size:18px;color:#4ade80;font-weight:700">16:9</div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Common ratios:</div>';
+  ratios.forEach(r=>{
+    html+='<div onclick="document.getElementById(\'ar-width\').value='+r.w+';document.getElementById(\'ar-height\').value='+r.h+';window._arCalc()" style="display:flex;justify-content:space-between;padding:4px 8px;font-size:11px;cursor:pointer;border-radius:3px;margin-bottom:1px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'"><span style="color:#4ade80;font-weight:600">'+r.label+'</span><span style="color:var(--text-muted)">'+r.desc+' ('+r.w+'x'+r.h+')</span></div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+  window._arCalc=function(){
+    const w=parseInt(document.getElementById('ar-width').value)||0;const h=parseInt(document.getElementById('ar-height').value)||0;
+    if(!w||!h)return;
+    function gcd(a,b){return b?gcd(b,a%b):a;}
+    const g=gcd(w,h);
+    document.getElementById('ar-result').textContent=(w/g)+':'+(h/g);
+  };
+}
+function showMavenRef(){
+  const d=document.createElement('div');d.id='maven-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Lifecycle':['mvn clean','mvn compile','mvn test','mvn package','mvn install','mvn deploy'],
+    'Build':['mvn clean install','mvn clean package -DskipTests','mvn clean install -U','mvn validate'],
+    'Dependencies':['mvn dependency:tree','mvn dependency:resolve','mvn versions:display-dependency-updates','mvn dependency:purge-local-repository'],
+    'Plugins':['mvn help:effective-pom','mvn help:effective-settings','mvn site','mvn javadoc:javadoc'],
+    'Create':['mvn archetype:generate','mvn archetype:generate -DgroupId=com.example','mvn wrapper:wrapper'],
+    'Other':['mvn --version','mvn -pl <module>','mvn -am -pl <module>','mvn -T 4 clean install']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Maven Reference</h3><button onclick="document.getElementById(\'maven-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskTagBreakdown(){
+  const d=document.createElement('div');d.id='tag-breakdown-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const tagCounts={};
+  content.forEach(c=>{
+    (c.tags||[]).forEach(t=>{tagCounts[t]=(tagCounts[t]||0)+1;});
+  });
+  const sorted=Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]);
+  const mx=sorted.length?sorted[0][1]:1;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Tag Breakdown</h3><button onclick="document.getElementById(\'tag-breakdown-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">'+sorted.length+' tags across '+content.length+' items</div>';
+  sorted.slice(0,20).forEach(([tag,count])=>{
+    const pct=Math.round(count/mx*100);
+    html+='<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:12px;color:var(--text-primary)">'+esc(tag)+'</span><span style="font-size:11px;color:var(--text-muted)">'+count+'</span></div>';
+    html+='<div style="background:var(--bg-surface);height:6px;border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#4ade80;border-radius:3px"></div></div></div>';
+  });
+  if(!sorted.length)html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">No tags found. Add tags to content items.</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickShadowGenerator(){
+  const d=document.createElement('div');d.id='shadow-gen-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  const presets=[
+    {label:'Subtle',val:'0 1px 3px rgba(0,0,0,0.12)'},
+    {label:'Medium',val:'0 4px 12px rgba(0,0,0,0.15)'},
+    {label:'Large',val:'0 8px 30px rgba(0,0,0,0.2)'},
+    {label:'XL',val:'0 12px 48px rgba(0,0,0,0.25)'},
+    {label:'Float',val:'0 20px 60px rgba(0,0,0,0.3)'},
+    {label:'Sharp',val:'4px 4px 0 rgba(0,0,0,0.2)'},
+    {label:'Glow Green',val:'0 0 20px rgba(74,222,128,0.3)'},
+    {label:'Glow Blue',val:'0 0 20px rgba(59,130,246,0.3)'},
+    {label:'Inner',val:'inset 0 2px 6px rgba(0,0,0,0.2)'},
+    {label:'Multi',val:'0 1px 3px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.15)'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Shadow Generator</h3><button onclick="document.getElementById(\'shadow-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div id="shadow-preview" style="width:120px;height:80px;background:var(--bg-surface);border-radius:8px;margin:0 auto 12px;box-shadow:0 4px 12px rgba(0,0,0,0.15)"></div>';
+  html+='<div id="shadow-css" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:10px;color:#4ade80;cursor:pointer;word-break:break-all;margin-bottom:10px">box-shadow: 0 4px 12px rgba(0,0,0,0.15);</div>';
+  presets.forEach(p=>{
+    html+='<div onclick="document.getElementById(\'shadow-preview\').style.boxShadow=\''+p.val+'\';document.getElementById(\'shadow-css\').textContent=\'box-shadow: '+p.val+';\';" style="display:flex;justify-content:space-between;padding:4px 8px;font-size:11px;cursor:pointer;border-radius:3px;margin-bottom:1px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'"><span style="color:var(--text-secondary)">'+p.label+'</span><span style="color:var(--text-muted);font-size:9px;font-family:monospace;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+p.val+'</span></div>';
+  });
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:6px;text-align:center">Click CSS to copy</div>';
+  d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
