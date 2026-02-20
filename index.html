@@ -5796,6 +5796,9 @@ function cmdGetItems(q) {
       ['snippets','Save and reuse text snippets'],
       ['heatmap full','365-day GitHub-style activity heatmap'],
       ['link dashboard','Link stats: domains, categories, counts'],
+      ['dependencies','Task dependency chains and blocked items'],
+      ['weekly review','Comprehensive 7-day review with markdown export'],
+      ['pomo history','Pomodoro session history by task and date'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7069,6 +7072,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='link dashboard' || ql==='link stats' || ql==='links overview' || ql==='link report')){
     items.unshift({title:'Link Dashboard',desc:'Stats: top domains, categories, read-later, pinned',icon:'L',type:'action',action:()=>{closeCommandPalette();showLinkDashboard();}});
   }
+  // Dependencies prefix
+  if(ql && (ql==='dependencies' || ql==='dependency graph' || ql==='blocked' || ql==='dep graph')){
+    items.unshift({title:'Task Dependency Graph',desc:'Visualize blocked-by chains across tasks',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDependencyGraph();}});
+  }
+  // Weekly review prefix
+  if(ql && (ql==='weekly review' || ql==='week review' || ql==='review week' || ql==='7 day review')){
+    items.unshift({title:'Weekly Review',desc:'Comprehensive 7-day review: completed, in-progress, overdue, content',icon:'W',type:'action',action:()=>{closeCommandPalette();showWeeklyReview();}});
+  }
+  // Pomodoro history prefix
+  if(ql && (ql==='pomo history' || ql==='pomodoro history' || ql==='focus history' || ql==='pomo stats')){
+    items.unshift({title:'Pomodoro History',desc:'Session history by task, best day, avg per day',icon:'P',type:'action',action:()=>{closeCommandPalette();showPomodoroHistory();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7842,6 +7857,130 @@ function showLinkDashboard(){
   h+='</div></div>';
   h+=`<div style="display:flex;gap:8px;font-size:9px;color:var(--text-muted)"><span>Pinned: ${pinned}</span><span>Read: ${read}</span></div>`;
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Link Dashboard</span><button onclick="document.getElementById('link-dash-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showTaskDependencyGraph(){
+  let panel=document.getElementById('dep-graph-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='dep-graph-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const blocked=active.filter(t=>t.blockedBy);
+  const blockers=active.filter(t=>t.blocking&&t.blocking.length);
+  const chains=[];
+  blocked.forEach(t=>{
+    const chain=[t];
+    let current=t;let depth=0;
+    while(current.blockedBy&&depth<10){
+      const blocker=S.tasks.find(x=>x.id===current.blockedBy||x.title===current.blockedBy);
+      if(blocker){chain.unshift(blocker);current=blocker;depth++;}else break;
+    }
+    if(chain.length>1)chains.push(chain);
+  });
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:var(--accent)">${active.length}</div><div style="font-size:8px;color:var(--text-muted)">Active Tasks</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#ef4444">${blocked.length}</div><div style="font-size:8px;color:var(--text-muted)">Blocked</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#f59e0b">${chains.length}</div><div style="font-size:8px;color:var(--text-muted)">Dep Chains</div></div>`;
+  h+='</div>';
+  if(chains.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Dependency Chains</div>';
+    chains.forEach((chain,ci)=>{
+      h+=`<div style="margin-bottom:10px;padding:8px;background:var(--bg-surface);border-radius:6px">`;
+      chain.forEach((t,i)=>{
+        const isLast=i===chain.length-1;
+        const statusColor=t.status==='in-progress'?'#3b82f6':t.status==='done'?'#22c55e':'var(--text-muted)';
+        h+=`<div onclick="document.getElementById('dep-graph-panel').remove();openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:6px;padding:3px 6px;cursor:pointer;border-left:2px solid ${statusColor}" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="font-size:9px;color:${statusColor}">${t.status==='done'?'DONE':t.status==='in-progress'?'WIP':'TODO'}</span><span style="font-size:10px;color:var(--text-primary);flex:1">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:${t.priority==='p0'?'var(--red)':t.priority==='p1'?'var(--orange)':'var(--text-muted)'}">${t.priority||'p2'}</span></div>`;
+        if(!isLast)h+=`<div style="padding-left:12px;font-size:8px;color:var(--text-muted)">blocks &#8595;</div>`;
+      });
+      h+='</div>';
+    });
+  }
+  if(blocked.length&&!chains.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:8px">Blocked Tasks</div>';
+    blocked.forEach(t=>{
+      h+=`<div onclick="document.getElementById('dep-graph-panel').remove();openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:6px;padding:4px 6px;cursor:pointer;border-left:2px solid #ef4444;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="font-size:10px;color:var(--text-primary);flex:1">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:var(--text-muted)">blocked by: ${esc(String(t.blockedBy))}</span></div>`;
+    });
+  }
+  if(!blocked.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No task dependencies found. Add blocked-by in task detail to create chains.</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Task Dependency Graph</span><button onclick="document.getElementById('dep-graph-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showWeeklyReview(){
+  let panel=document.getElementById('weekly-review-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='weekly-review-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();const weekAgo=new Date(now);weekAgo.setDate(weekAgo.getDate()-7);
+  const weekStr=weekAgo.toISOString().split('T')[0];const todayStr=now.toISOString().split('T')[0];
+  const completed=S.tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt.split('T')[0]>=weekStr);
+  const created=S.tasks.filter(t=>t.createdAt&&t.createdAt.split('T')[0]>=weekStr);
+  const overdue=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due<todayStr);
+  const inProgress=S.tasks.filter(t=>t.status==='in-progress');
+  const contentCreated=S.content.filter(c=>c.createdAt&&c.createdAt.split('T')[0]>=weekStr);
+  const docsEdited=(S.docs||[]).filter(d=>(d.updatedAt||'').split('T')[0]>=weekStr);
+  const focusMin=(S.focusSessions||[]).filter(f=>f.date>=weekStr).reduce((s,x)=>s+(x.duration||0),0);
+  const linksAdded=(S.links||[]).filter(l=>l.createdAt&&l.createdAt.split('T')[0]>=weekStr).length;
+  const totalWords=contentCreated.reduce((s,c)=>s+((c.body||'').split(/\s+/).length),0);
+  let md='# Weekly Review - '+todayStr+'\\n\\n';
+  md+='## Stats\\n';
+  md+=`- Completed: ${completed.length} tasks\\n`;
+  md+=`- Created: ${created.length} tasks\\n`;
+  md+=`- Overdue: ${overdue.length} tasks\\n`;
+  md+=`- In Progress: ${inProgress.length} tasks\\n`;
+  md+=`- Content Created: ${contentCreated.length} (${totalWords} words)\\n`;
+  md+=`- Docs Edited: ${docsEdited.length}\\n`;
+  md+=`- Focus Time: ${focusMin}min\\n`;
+  md+=`- Links Added: ${linksAdded}\\n\\n`;
+  md+='## Completed\\n';
+  completed.forEach(t=>{md+=`- [x] ${t.title}${t.project?' ('+t.project+')':''}\\n`;});
+  md+='\\n## In Progress\\n';
+  inProgress.forEach(t=>{md+=`- [ ] ${t.title}${t.project?' ('+t.project+')':''}\\n`;});
+  md+='\\n## Overdue\\n';
+  overdue.forEach(t=>{md+=`- [ ] ${t.title} (due ${t.due})\\n`;});
+  let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#22c55e">${completed.length}</div><div style="font-size:8px;color:var(--text-muted)">Completed</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#3b82f6">${created.length}</div><div style="font-size:8px;color:var(--text-muted)">Created</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#f59e0b">${focusMin}m</div><div style="font-size:8px;color:var(--text-muted)">Focus</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#ef4444">${overdue.length}</div><div style="font-size:8px;color:var(--text-muted)">Overdue</div></div>`;
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+  h+='<div><div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Completed This Week</div>';
+  completed.slice(0,10).forEach(t=>{h+=`<div style="font-size:9px;color:var(--text-primary);padding:2px 0;border-left:2px solid #22c55e;padding-left:6px;margin:2px 0">${esc(t.title||'Untitled')}</div>`;});
+  if(!completed.length)h+='<div style="font-size:9px;color:var(--text-muted)">No tasks completed</div>';
+  h+='</div>';
+  h+='<div><div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Still In Progress</div>';
+  inProgress.slice(0,10).forEach(t=>{h+=`<div style="font-size:9px;color:var(--text-primary);padding:2px 0;border-left:2px solid #3b82f6;padding-left:6px;margin:2px 0">${esc(t.title||'Untitled')}</div>`;});
+  if(!inProgress.length)h+='<div style="font-size:9px;color:var(--text-muted)">Nothing in progress</div>';
+  h+='</div></div>';
+  h+=`<div style="display:flex;gap:8px;font-size:9px;margin-bottom:8px"><span style="color:var(--text-muted)">Content: ${contentCreated.length} items (${totalWords} words)</span><span style="color:var(--text-muted)">Docs: ${docsEdited.length}</span><span style="color:var(--text-muted)">Links: ${linksAdded}</span></div>`;
+  h+=`<button onclick="navigator.clipboard.writeText(\`${md.replace(/`/g,"'")}\`);toast('Review copied as markdown')" style="padding:6px 12px;background:var(--accent);border:none;border-radius:4px;color:#000;font-size:10px;font-weight:600;cursor:pointer">Copy as Markdown</button>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Weekly Review</span><button onclick="document.getElementById('weekly-review-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showPomodoroHistory(){
+  let panel=document.getElementById('pomo-hist-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='pomo-hist-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto';
+  const sessions=(S.focusSessions||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const totalMin=sessions.reduce((s,x)=>s+(x.duration||0),0);
+  const totalSessions=sessions.length;
+  const byTask={};sessions.forEach(s=>{const n=s.taskName||s.task||'Untitled';if(!byTask[n])byTask[n]=0;byTask[n]+=(s.duration||0);});
+  const topTasks=Object.entries(byTask).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const byDate={};sessions.forEach(s=>{if(!s.date)return;if(!byDate[s.date])byDate[s.date]=0;byDate[s.date]+=(s.duration||0);});
+  const bestDay=Object.entries(byDate).sort((a,b)=>b[1]-a[1])[0];
+  const avgPerDay=Object.keys(byDate).length?Math.round(totalMin/Object.keys(byDate).length):0;
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:var(--accent)">${totalSessions}</div><div style="font-size:8px;color:var(--text-muted)">Sessions</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#f59e0b">${avgPerDay}m</div><div style="font-size:8px;color:var(--text-muted)">Avg/Day</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#22c55e">${bestDay?bestDay[1]+'m':'-'}</div><div style="font-size:8px;color:var(--text-muted)">Best Day${bestDay?' ('+bestDay[0].substring(5)+')':''}</div></div>`;
+  h+='</div>';
+  if(topTasks.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Most Focused Tasks</div>';
+    topTasks.forEach(([name,mins])=>{
+      const pct=Math.round(mins/totalMin*100);
+      h+=`<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:9px"><span style="color:var(--text-primary);flex:1">${esc(name)}</span><span style="color:var(--accent)">${mins}m</span><div style="width:60px;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--accent);border-radius:2px"></div></div></div>`;
+    });
+  }
+  if(!sessions.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No Pomodoro sessions yet</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Pomodoro History</span><button onclick="document.getElementById('pomo-hist-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
