@@ -6437,6 +6437,12 @@ function cmdGetItems(q) {
       ['vim','Vim editor command reference'],
       ['week over week','Compare task output across weeks'],
       ['focus timer','Pomodoro-style focus timer'],
+      ['sed awk','sed and awk text processing reference'],
+      ['task roi','Task ROI and completion rate by project'],
+      ['habits','Daily habit tracker with streaks'],
+      ['jq','jq JSON processor command reference'],
+      ['astra score','Overall ASTRA workspace health score'],
+      ['white noise','Ambient white/pink/brown noise generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9917,6 +9923,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='focus timer' || ql==='pomodoro' || ql==='focus' || ql==='deep work')){
     items.unshift({title:'Focus Timer',desc:'Pomodoro-style focus and break timer',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFocusTimer();}});
+  }
+  if(ql && (ql==='sed awk' || ql==='sed' || ql==='awk' || ql==='text processing')){
+    items.unshift({title:'sed & awk Reference',desc:'Text processing commands',icon:'S',type:'action',action:()=>{closeCommandPalette();showSedAwkRef();}});
+  }
+  if(ql && (ql==='task roi' || ql==='roi' || ql==='project roi' || ql==='effort')){
+    items.unshift({title:'Task ROI',desc:'Completion rate by project',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskROI();}});
+  }
+  if(ql && (ql==='habits' || ql==='habit tracker' || ql==='daily habits' || ql==='streak')){
+    items.unshift({title:'Daily Habits',desc:'Track daily habits with checkboxes',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHabitTracker();}});
+  }
+  if(ql && (ql==='jq' || ql==='jq ref' || ql==='json processor' || ql==='jq filter')){
+    items.unshift({title:'jq Reference',desc:'jq JSON processor cheatsheet',icon:'J',type:'action',action:()=>{closeCommandPalette();showJqRef();}});
+  }
+  if(ql && (ql==='astra score' || ql==='overall score' || ql==='workspace score' || ql==='score')){
+    items.unshift({title:'ASTRA Score',desc:'Overall workspace health score',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskOverallScore();}});
+  }
+  if(ql && (ql==='white noise' || ql==='noise' || ql==='pink noise' || ql==='ambient')){
+    items.unshift({title:'White Noise',desc:'Ambient noise generator for focus',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWhiteNoise();}});
   }
   return items.slice(0, 20);
 }
@@ -30791,6 +30815,162 @@ function showQuickFocusTimer(){
     document.getElementById('_ft-display').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
     document.getElementById('_ft-bar').style.width='0%';
     document.getElementById('_ft-toggle').textContent='Start';
+  };
+}
+function showSedAwkRef(){
+  const cmds={
+    'sed Basics':['sed "s/old/new/" file|Replace first occurrence per line','sed "s/old/new/g" file|Replace all occurrences','sed -i "s/old/new/g" file|In-place edit','sed "s/old/new/gi" file|Case-insensitive replace','sed -n "5p" file|Print only line 5','sed -n "5,10p" file|Print lines 5-10','sed "3d" file|Delete line 3','sed "/pattern/d" file|Delete lines matching pattern'],
+    'sed Advanced':['sed -n "/start/,/end/p" file|Print between patterns','sed "s/.*://" file|Delete everything before :','sed "s/:.*$//" file|Delete everything after :','sed "/^$/d" file|Remove blank lines','sed "s/^/  /" file|Add 2 spaces to start','sed = file | sed "N;s/\\n/\\t/"|Add line numbers'],
+    'awk Basics':['awk "{print}" file|Print all lines','awk "{print $1}" file|Print first field','awk "{print $1, $3}" file|Print fields 1 and 3','awk -F: "{print $1}" /etc/passwd|Custom delimiter','awk "NR==5" file|Print line 5','awk "NR>=5 && NR<=10" file|Print lines 5-10','awk "/pattern/" file|Print matching lines'],
+    'awk Fields':['awk "{print NF}" file|Number of fields per line','awk "{print NR, $0}" file|Add line numbers','awk "END{print NR}" file|Count total lines','awk "{sum+=$1} END{print sum}" file|Sum first column','awk "{sum+=$1} END{print sum/NR}" file|Average first column'],
+    'awk Formatting':['awk "{printf \"%-10s %5d\\n\", $1, $2}" file|Formatted output','awk "BEGIN{OFS=\",\"} {print $1,$2}" file|Change output separator','awk "{gsub(/old/,\"new\"); print}" file|Replace in awk','awk "!seen[$0]++" file|Remove duplicate lines','awk "length>80" file|Lines longer than 80 chars']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">sed & awk Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskROI(){
+  const tasks=(S.tasks||[]);
+  const projects=(S.projects||[]);
+  const projStats={};
+  tasks.forEach(t=>{
+    const p=t.project||'Unassigned';
+    if(!projStats[p])projStats[p]={total:0,done:0,timeSpent:0,estimated:0};
+    projStats[p].total++;
+    if(t.status==='done')projStats[p].done++;
+    if(t.timeTracked)projStats[p].timeSpent+=t.timeTracked;
+    if(t.estimate){const e=t.estimate.match(/(\d+)/);if(e)projStats[p].estimated+=parseInt(e[1]);}
+  });
+  const sorted=Object.entries(projStats).sort((a,b)=>b[1].done-a[1].done);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Task ROI by Project</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Completion rate and effort by project</div>';
+  sorted.forEach(([name,data])=>{
+    const rate=data.total>0?Math.round(data.done/data.total*100):0;
+    const color=rate>=70?'#4ade80':rate>=40?'#f59e0b':'#ef4444';
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:13px;color:var(--text-primary);font-weight:600">'+esc(name)+'</span><span style="font-size:12px;color:'+color+';font-weight:700">'+rate+'%</span></div>';
+    html+='<div style="background:var(--bg-elevated);border-radius:4px;height:6px;overflow:hidden;margin-bottom:6px"><div style="width:'+rate+'%;height:100%;background:'+color+';border-radius:4px"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)"><span>'+data.done+'/'+data.total+' done</span>';
+    if(data.timeSpent>0)html+='<span>'+Math.round(data.timeSpent/60)+'min tracked</span>';
+    html+='</div></div>';
+  });
+  if(sorted.length===0)html+='<div style="text-align:center;color:var(--text-muted);padding:20px">No tasks to analyze</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickHabitTracker(){
+  if(!S._habits)S._habits={items:['Exercise','Read','Meditate','Code','Write'],log:{}};
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._habits.log[today])S._habits.log[today]={};
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Daily Habits</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">'+today+'</div>';
+  S._habits.items.forEach((habit,i)=>{
+    const done=S._habits.log[today][habit]||false;
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">';
+    html+='<div onclick="S._habits.log[\''+today+'\'][\''+habit+'\']='+(done?'false':'true')+';save();showQuickHabitTracker();" style="width:20px;height:20px;border-radius:4px;border:2px solid '+(done?'#4ade80':'var(--border)')+';background:'+(done?'#4ade80':'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center">'+(done?'<span style="color:#000;font-size:12px;font-weight:700">V</span>':'')+'</div>';
+    html+='<span style="font-size:12px;color:'+(done?'#4ade80':'var(--text-secondary)')+';'+(done?'text-decoration:line-through':'')+'">'+esc(habit)+'</span></div>';
+  });
+  const completed=S._habits.items.filter(h=>S._habits.log[today][h]).length;
+  const pct=S._habits.items.length>0?Math.round(completed/S._habits.items.length*100):0;
+  html+='<div style="margin-top:10px;background:var(--bg-surface);border-radius:4px;height:8px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#4ade80;border-radius:4px"></div></div>';
+  html+='<div style="text-align:center;font-size:10px;color:var(--text-muted);margin-top:4px">'+completed+'/'+S._habits.items.length+' ('+pct+'%)</div>';
+  html+='</div>';
+  document.querySelectorAll('[data-habit-tracker]').forEach(e=>e.remove());
+  const d=document.createElement('div');d.setAttribute('data-habit-tracker','1');d.innerHTML=html;document.body.appendChild(d);
+}
+function showJqRef(){
+  const cmds={
+    'Basics':['jq "." file.json|Pretty-print JSON','jq ".key" file.json|Extract a key','jq ".nested.key" file.json|Extract nested key','jq ".array[0]" file.json|First array element','jq ".array[-1]" file.json|Last array element','jq ".array | length" file.json|Array length','jq "keys" file.json|Get all keys'],
+    'Filtering':['jq ".[] | .name" file.json|Extract field from each element','jq ".[] | select(.age > 30)" file.json|Filter by condition','jq ".[] | select(.name == \"Gabo\")" file.json|Filter by value','jq "[.[] | select(.active)]" file.json|Filter and wrap in array','jq "map(select(.price < 100))" file.json|Map with filter'],
+    'Transformation':['jq "{name, age}" file.json|Select specific fields','jq ".[] | {n: .name, a: .age}" file.json|Rename fields','jq "[.[] | .name]" file.json|Collect field into array','jq "group_by(.category)" file.json|Group by field','jq "sort_by(.date)" file.json|Sort by field','jq "unique_by(.id)" file.json|Deduplicate'],
+    'Aggregation':['jq "[.[].price] | add" file.json|Sum values','jq "[.[].score] | add / length" file.json|Average','jq "[.[].name] | join(\", \")" file.json|Join strings','jq "[.[] | .price] | min, max" file.json|Min and max'],
+    'Output':['jq -r ".name" file.json|Raw output (no quotes)','jq -c "." file.json|Compact output (one line)','jq -S "." file.json|Sort keys','jq --arg v "$VAR" ".key == $v" file.json|Use shell variable','cat file.json | jq "."|Pipe into jq','jq -n "{a:1, b:2}"|Create JSON from nothing']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">jq Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskOverallScore(){
+  const tasks=(S.tasks||[]);const content=(S.content||[]);const docs=(S.writerDocs||[]);
+  const total=tasks.length;const done=tasks.filter(t=>t.status==='done').length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<new Date().toISOString().split('T')[0]).length;
+  const hasPriority=tasks.filter(t=>t.priority).length;
+  const hasDue=tasks.filter(t=>t.due).length;
+  const hasDesc=tasks.filter(t=>t.description).length;
+  const contentCount=content.length;const docCount=docs.length;
+  const completionScore=total>0?Math.round(done/total*100):0;
+  const orgScore=total>0?Math.round(((hasPriority+hasDue+hasDesc)/(total*3))*100):0;
+  const healthScore=total>0?Math.max(0,100-overdue*10):100;
+  const overallScore=Math.round((completionScore*0.4+orgScore*0.3+healthScore*0.3));
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">ASTRA Score</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  const scoreColor=overallScore>=70?'#4ade80':overallScore>=40?'#f59e0b':'#ef4444';
+  html+='<svg viewBox="0 0 200 120" style="width:200px;display:block;margin:0 auto 16px">';
+  const sweep=Math.min(overallScore,100)*1.8;const sweepFlag=sweep>180?1:0;
+  const eX=100+70*Math.cos((sweep-180)*Math.PI/180);const eY=100+70*Math.sin((sweep-180)*Math.PI/180);
+  html+='<path d="M30,100 A70,70 0 0,1 170,100" fill="none" stroke="var(--bg-surface)" stroke-width="14" stroke-linecap="round"/>';
+  html+='<path d="M30,100 A70,70 0 '+sweepFlag+',1 '+eX+','+eY+'" fill="none" stroke="'+scoreColor+'" stroke-width="14" stroke-linecap="round"/>';
+  html+='<text x="100" y="80" fill="'+scoreColor+'" font-size="32" text-anchor="middle" font-weight="700">'+overallScore+'</text>';
+  html+='<text x="100" y="100" fill="var(--text-muted)" font-size="10" text-anchor="middle">Overall Score</text>';
+  html+='</svg>';
+  const metrics=[
+    {l:'Completion',v:completionScore,color:completionScore>=70?'#4ade80':completionScore>=40?'#f59e0b':'#ef4444'},
+    {l:'Organization',v:orgScore,color:orgScore>=70?'#4ade80':orgScore>=40?'#f59e0b':'#ef4444'},
+    {l:'Health',v:healthScore,color:healthScore>=70?'#4ade80':healthScore>=40?'#f59e0b':'#ef4444'}
+  ];
+  metrics.forEach(m=>{
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:90px;font-size:11px;color:var(--text-muted)">'+m.l+'</span>';
+    html+='<div style="flex:1;background:var(--bg-surface);border-radius:4px;height:10px;overflow:hidden"><div style="width:'+m.v+'%;height:100%;background:'+m.color+';border-radius:4px"></div></div>';
+    html+='<span style="width:36px;text-align:right;font-size:12px;color:'+m.color+';font-weight:600">'+m.v+'%</span></div>';
+  });
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px">';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Tasks</div><div style="font-size:14px;color:#4ade80;font-weight:700">'+total+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Content</div><div style="font-size:14px;color:#60a5fa;font-weight:700">'+contentCount+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Docs</div><div style="font-size:14px;color:#a78bfa;font-weight:700">'+docCount+'</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickWhiteNoise(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px;text-align:center">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">White Noise</h4><button onclick="if(window._wnCtx){window._wnCtx.close();}this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_wn-status" style="font-size:12px;color:var(--text-muted);margin-bottom:10px">Stopped</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">';
+  ['White','Pink','Brown','Rain'].forEach(type=>{
+    html+='<button onclick="window._playNoise(\''+type+'\')" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">'+type+'</button>';
+  });
+  html+='</div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Volume</label><input id="_wn-vol" type="range" min="0" max="100" value="30" style="width:100%;accent-color:#4ade80" oninput="if(window._wnGain)window._wnGain.gain.value=this.value/100"></div>';
+  html+='<button onclick="window._stopNoise()" style="width:100%;background:#ef4444;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Stop</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._playNoise=function(type){
+    if(window._wnCtx)window._wnCtx.close();
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    window._wnCtx=ctx;
+    const bufferSize=2*ctx.sampleRate;const noiseBuffer=ctx.createBuffer(1,bufferSize,ctx.sampleRate);
+    const output=noiseBuffer.getChannelData(0);
+    if(type==='White'){for(let i=0;i<bufferSize;i++)output[i]=Math.random()*2-1;}
+    else if(type==='Pink'){let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;for(let i=0;i<bufferSize;i++){const w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.969*b2+w*0.153852;b3=0.8665*b3+w*0.3104856;b4=0.55*b4+w*0.5329522;b5=-0.7616*b5-w*0.016898;output[i]=b0+b1+b2+b3+b4+b5+b6+w*0.5362;output[i]*=0.11;b6=w*0.115926;}}
+    else if(type==='Brown'){let last=0;for(let i=0;i<bufferSize;i++){const w=Math.random()*2-1;output[i]=(last+0.02*w)/1.02;last=output[i];output[i]*=3.5;}}
+    else{for(let i=0;i<bufferSize;i++){const base=Math.random()*2-1;const mod=Math.sin(i/400)*0.3;output[i]=base*0.3+mod*Math.random()*0.2;}}
+    const src=ctx.createBufferSource();src.buffer=noiseBuffer;src.loop=true;
+    const gain=ctx.createGain();gain.gain.value=(parseInt(document.getElementById('_wn-vol').value)||30)/100;
+    window._wnGain=gain;src.connect(gain);gain.connect(ctx.destination);src.start();
+    document.getElementById('_wn-status').textContent='Playing: '+type;
+    document.getElementById('_wn-status').style.color='#4ade80';
+  };
+  window._stopNoise=function(){
+    if(window._wnCtx){window._wnCtx.close();window._wnCtx=null;}
+    const s=document.getElementById('_wn-status');if(s){s.textContent='Stopped';s.style.color='var(--text-muted)';}
   };
 }
 function showProjectRoadmap(filterProject){
