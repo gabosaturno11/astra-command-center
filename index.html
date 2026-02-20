@@ -6266,6 +6266,12 @@ function cmdGetItems(q) {
       ['postcss','PostCSS config generator'],
       ['stale tasks','Find stale/old tasks'],
       ['color picker','Color picker with palettes'],
+      ['vite','Vite config generator'],
+      ['priority matrix','Urgent/important task matrix'],
+      ['stopwatch','Lap stopwatch timer'],
+      ['rollup','Rollup config generator'],
+      ['estimate accuracy','Task estimate vs actual'],
+      ['countdown','Countdown timer widget'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9233,6 +9239,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='color picker' || ql==='color' || ql==='colors' || ql==='colour picker')){
     items.unshift({title:'Color Picker',desc:'Pick colors with palettes and format conversion',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorPicker();}});
+  }
+  if(ql && (ql==='vite' || ql==='vite config' || ql==='vite.config' || ql==='vite setup')){
+    items.unshift({title:'Vite Config',desc:'Generate vite.config.js for React, Vue, Svelte, Library',icon:'V',type:'action',action:()=>{closeCommandPalette();showViteConfigGen();}});
+  }
+  if(ql && (ql==='priority matrix' || ql==='urgency matrix' || ql==='important urgent' || ql==='task matrix')){
+    items.unshift({title:'Priority Matrix',desc:'Urgent/important 2x2 task matrix',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityMatrix();}});
+  }
+  if(ql && (ql==='stopwatch' || ql==='lap timer' || ql==='stop watch' || ql==='elapsed time')){
+    items.unshift({title:'Stopwatch',desc:'Stopwatch with lap tracking',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
+  }
+  if(ql && (ql==='rollup' || ql==='rollup config' || ql==='rollup.config' || ql==='rollup bundler')){
+    items.unshift({title:'Rollup Config',desc:'Generate rollup.config.js for ESM, UMD, TypeScript',icon:'R',type:'action',action:()=>{closeCommandPalette();showRollupConfigGen();}});
+  }
+  if(ql && (ql==='estimate accuracy' || ql==='estimate' || ql==='time accuracy' || ql==='estimation')){
+    items.unshift({title:'Estimate Accuracy',desc:'Compare estimates vs actual time tracked',icon:'E',type:'action',action:()=>{closeCommandPalette();showTaskTimeEstimateAccuracy();}});
+  }
+  if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='count down' || ql==='timer countdown')){
+    items.unshift({title:'Countdown Timer',desc:'Countdown timer with preset durations',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
   }
   return items.slice(0, 20);
 }
@@ -25752,6 +25776,167 @@ function showQuickColorPicker(){
   function rgbToHsl(r,g,b){r/=255;g/=255;b/=255;const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h,s,l=(mx+mn)/2;if(mx===mn){h=s=0;}else{const d=mx-mn;s=l>0.5?d/(2-mx-mn):d/(mx+mn);switch(mx){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}h*=360;}return[h,s*100,l*100];}
   window._pickColor=(c)=>{hex=c;rend();};
   window._setColorPal=(p)=>{activePal=p;rend();};
+  document.body.appendChild(d);rend();
+}
+function showViteConfigGen(){
+  let ex=document.getElementById('vite-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'React':`import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\n\nexport default defineConfig({\n  plugins: [react()],\n  server: {\n    port: 3000,\n    open: true\n  },\n  build: {\n    outDir: 'dist',\n    sourcemap: true\n  }\n});`,
+    'Vue':`import { defineConfig } from 'vite';\nimport vue from '@vitejs/plugin-vue';\n\nexport default defineConfig({\n  plugins: [vue()],\n  server: {\n    port: 3000\n  },\n  resolve: {\n    alias: {\n      '@': '/src'\n    }\n  }\n});`,
+    'Svelte':`import { defineConfig } from 'vite';\nimport { svelte } from '@sveltejs/vite-plugin-svelte';\n\nexport default defineConfig({\n  plugins: [svelte()],\n  server: {\n    port: 5173\n  }\n});`,
+    'Library':`import { defineConfig } from 'vite';\nimport { resolve } from 'path';\n\nexport default defineConfig({\n  build: {\n    lib: {\n      entry: resolve(__dirname, 'src/index.ts'),\n      name: 'MyLib',\n      fileName: 'my-lib'\n    },\n    rollupOptions: {\n      external: ['react'],\n      output: {\n        globals: { react: 'React' }\n      }\n    }\n  }\n});`,
+    'Vanilla':`import { defineConfig } from 'vite';\n\nexport default defineConfig({\n  root: 'src',\n  build: {\n    outDir: '../dist',\n    emptyOutDir: true\n  },\n  server: {\n    port: 3000,\n    open: true\n  }\n});`
+  };
+  let sel='React';
+  const d=document.createElement('div');d.id='vite-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-vtpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-vtpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:580px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Vite Config Generator</span><span onclick="document.getElementById('vite-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#vite-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy vite.config.js',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy vite.config.js</button>
+    </div>`;
+    d.querySelectorAll('[data-vtpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.vtpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskPriorityMatrix(){
+  let ex=document.getElementById('priority-matrix-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const urgent=t=>t.priority==='p0'||t.priority==='p1';
+  const hasDue=t=>t.due&&new Date(t.due)<=new Date(Date.now()+7*86400000);
+  const q1=tasks.filter(t=>urgent(t)&&hasDue(t));
+  const q2=tasks.filter(t=>urgent(t)&&!hasDue(t));
+  const q3=tasks.filter(t=>!urgent(t)&&hasDue(t));
+  const q4=tasks.filter(t=>!urgent(t)&&!hasDue(t));
+  const renderQ=(items,label,color)=>{
+    const list=items.slice(0,5).map(t=>`<div style="font-size:10px;color:var(--text-secondary);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.title)}">${esc(t.title)}</div>`).join('');
+    return `<div style="background:var(--bg-surface);border-radius:6px;padding:10px;border-left:3px solid ${color}">
+      <div style="font-size:10px;font-weight:600;color:${color};margin-bottom:4px">${label} (${items.length})</div>
+      ${list||'<div style="font-size:10px;color:var(--text-muted);font-style:italic">None</div>'}
+      ${items.length>5?`<div style="font-size:9px;color:var(--text-muted)">+${items.length-5} more</div>`:''}
+    </div>`;
+  };
+  const d=document.createElement('div');d.id='priority-matrix-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Priority Matrix</span><span onclick="document.getElementById('priority-matrix-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${renderQ(q1,'Urgent + Soon','#f87171')}
+      ${renderQ(q2,'Urgent + Later','#fb923c')}
+      ${renderQ(q3,'Normal + Soon','#facc15')}
+      ${renderQ(q4,'Normal + Later','#6b7280')}
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:var(--text-muted)">${tasks.length} open tasks | "Soon" = due within 7 days</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickStopwatch(){
+  let ex=document.getElementById('stopwatch-float');if(ex){ex.remove();return;}
+  let elapsed=0,running=false,laps=[];
+  const d=document.createElement('div');d.id='stopwatch-float';
+  const fmt=(ms)=>{const s=Math.floor(ms/1000);const m=Math.floor(s/60);const h=Math.floor(m/60);return `${String(h).padStart(2,'0')}:${String(m%60).padStart(2,'0')}:${String(s%60).padStart(2,'0')}.${String(Math.floor((ms%1000)/100))}`};
+  const rend=()=>{
+    const lapList=laps.map((l,i)=>`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);padding:2px 0"><span>Lap ${i+1}</span><span style="font-family:monospace">${fmt(l)}</span></div>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:200px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Stopwatch</span><span onclick="if(window._swInt)clearInterval(window._swInt);document.getElementById('stopwatch-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="font-size:28px;font-weight:200;color:var(--text-primary);font-family:monospace;margin:8px 0">${fmt(elapsed)}</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px">
+        <button onclick="window._swToggle()" style="background:${running?'#f87171':'var(--accent)'};color:${running?'#fff':'#000'};border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">${running?'Stop':'Start'}</button>
+        <button onclick="window._swLap()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px" ${running?'':'disabled'}>Lap</button>
+        <button onclick="window._swReset()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px">Reset</button>
+      </div>
+      ${laps.length?`<div style="max-height:100px;overflow-y:auto;border-top:1px solid var(--border);padding-top:6px">${lapList}</div>`:''}
+    </div>`;
+  };
+  window._swToggle=()=>{
+    running=!running;
+    if(running){const start=Date.now()-elapsed;window._swInt=setInterval(()=>{elapsed=Date.now()-start;rend();},100);}
+    else{clearInterval(window._swInt);}
+    rend();
+  };
+  window._swLap=()=>{if(running)laps.push(elapsed);rend();};
+  window._swReset=()=>{clearInterval(window._swInt);running=false;elapsed=0;laps=[];rend();};
+  document.body.appendChild(d);rend();
+}
+function showRollupConfigGen(){
+  let ex=document.getElementById('rollup-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'ES Module':`import resolve from '@rollup/plugin-node-resolve';\nimport commonjs from '@rollup/plugin-commonjs';\n\nexport default {\n  input: 'src/index.js',\n  output: {\n    file: 'dist/bundle.mjs',\n    format: 'es',\n    sourcemap: true\n  },\n  plugins: [\n    resolve(),\n    commonjs()\n  ]\n};`,
+    'UMD Library':`import resolve from '@rollup/plugin-node-resolve';\nimport commonjs from '@rollup/plugin-commonjs';\nimport terser from '@rollup/plugin-terser';\n\nexport default {\n  input: 'src/index.js',\n  output: [\n    { file: 'dist/index.cjs.js', format: 'cjs', sourcemap: true },\n    { file: 'dist/index.esm.js', format: 'es', sourcemap: true },\n    { file: 'dist/index.umd.js', format: 'umd', name: 'MyLib', sourcemap: true }\n  ],\n  plugins: [\n    resolve(),\n    commonjs(),\n    terser()\n  ]\n};`,
+    'TypeScript':`import resolve from '@rollup/plugin-node-resolve';\nimport commonjs from '@rollup/plugin-commonjs';\nimport typescript from '@rollup/plugin-typescript';\n\nexport default {\n  input: 'src/index.ts',\n  output: [\n    { file: 'dist/index.cjs.js', format: 'cjs', sourcemap: true },\n    { file: 'dist/index.esm.js', format: 'es', sourcemap: true }\n  ],\n  plugins: [\n    resolve(),\n    commonjs(),\n    typescript({ tsconfig: './tsconfig.json' })\n  ],\n  external: ['react', 'react-dom']\n};`
+  };
+  let sel='ES Module';
+  const d=document.createElement('div');d.id='rollup-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-rupre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-rupre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Rollup Config Generator</span><span onclick="document.getElementById('rollup-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#rollup-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy rollup.config.js',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy rollup.config.js</button>
+    </div>`;
+    d.querySelectorAll('[data-rupre]').forEach(b=>b.onclick=()=>{sel=b.dataset.rupre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskTimeEstimateAccuracy(){
+  let ex=document.getElementById('estimate-accuracy-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.estimate&&t.timeTracked);
+  const parseEst=(e)=>{if(!e)return 0;const m=e.match(/(\d+)\s*(h|m)/i);if(!m)return 0;return m[2]==='h'?parseInt(m[1])*60:parseInt(m[1]);};
+  const data=tasks.map(t=>{
+    const est=parseEst(t.estimate);
+    const actual=Math.round((t.timeTracked||0)/60);
+    const ratio=est>0?actual/est:0;
+    return {title:t.title,est,actual,ratio};
+  }).filter(d=>d.est>0).slice(0,15);
+  const rows=data.map(d=>{
+    const col=d.ratio>1.5?'#f87171':d.ratio>1?'#fb923c':d.ratio>0.7?'#4ade80':'#22d3ee';
+    const label=d.ratio>1.5?'Over':'On Track';
+    return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.title)}</div>
+      <div style="font-size:10px;color:var(--text-muted);width:50px;text-align:right">${d.est}m est</div>
+      <div style="font-size:10px;color:${col};width:50px;text-align:right;font-weight:600">${d.actual}m act</div>
+      <div style="font-size:9px;color:${col};width:40px;text-align:right">${Math.round(d.ratio*100)}%</div>
+    </div>`;
+  }).join('');
+  const avgRatio=data.length?data.reduce((a,d)=>a+d.ratio,0)/data.length:0;
+  const d=document.createElement('div');d.id='estimate-accuracy-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Estimate Accuracy</span><span onclick="document.getElementById('estimate-accuracy-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    ${data.length?rows:'<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No tasks with both estimates and time tracking data</div>'}
+    ${data.length?`<div style="margin-top:10px;font-size:11px;color:var(--text-muted)">Average accuracy: <span style="color:var(--accent);font-weight:600">${Math.round(avgRatio*100)}%</span> across ${data.length} tasks</div>`:''}
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickCountdownTimer(){
+  let ex=document.getElementById('countdown-float');if(ex){ex.remove();return;}
+  let totalSec=300,remaining=300,running=false;
+  const d=document.createElement('div');d.id='countdown-float';
+  const fmt=(s)=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  const rend=()=>{
+    const pct=totalSec>0?Math.round((remaining/totalSec)*100):0;
+    d.innerHTML=`<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:200px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Countdown</span><span onclick="if(window._cdInt)clearInterval(window._cdInt);document.getElementById('countdown-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="font-size:32px;font-weight:200;color:${remaining<=30?'#f87171':'var(--text-primary)'};font-family:monospace;margin:8px 0">${fmt(remaining)}</div>
+      <div style="background:var(--bg-surface);border-radius:6px;height:6px;overflow:hidden;margin-bottom:10px"><div style="height:100%;width:${pct}%;background:${remaining<=30?'#f87171':'#4ade80'};border-radius:6px;transition:width 1s linear"></div></div>
+      <div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">
+        ${[1,5,10,15,25].map(m=>`<button onclick="window._cdSet(${m*60})" style="background:${totalSec===m*60?'var(--accent)':'var(--bg-surface)'};color:${totalSec===m*60?'#000':'var(--text-secondary)'};border:1px solid var(--border);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">${m}m</button>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center">
+        <button onclick="window._cdToggle()" style="background:${running?'#f87171':'var(--accent)'};color:${running?'#fff':'#000'};border:none;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">${running?'Pause':'Start'}</button>
+        <button onclick="window._cdReset()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px">Reset</button>
+      </div>
+    </div>`;
+  };
+  window._cdSet=(s)=>{clearInterval(window._cdInt);running=false;totalSec=s;remaining=s;rend();};
+  window._cdToggle=()=>{
+    running=!running;
+    if(running){window._cdInt=setInterval(()=>{remaining--;if(remaining<=0){clearInterval(window._cdInt);running=false;remaining=0;}rend();},1000);}
+    else{clearInterval(window._cdInt);}
+    rend();
+  };
+  window._cdReset=()=>{clearInterval(window._cdInt);running=false;remaining=totalSec;rend();};
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
