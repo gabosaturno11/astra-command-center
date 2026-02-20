@@ -5832,6 +5832,8 @@ function cmdGetItems(q) {
       ['deep focus','Full-screen dimming overlay for distraction-free work'],
       ['estimation','Compare estimated vs actual time on tasks'],
       ['data tools','Manage/clear data by section, factory reset'],
+      ['theme','Switch between dark theme variants'],
+      ['status email','Generate weekly status email (copies to clipboard)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7252,6 +7254,14 @@ function cmdGetItems(q) {
   // Data tools prefix
   if(ql && (ql==='data tools' || ql==='data management' || ql==='clear data' || ql==='factory reset')){
     items.unshift({title:'Data Management',desc:'Clear individual sections, factory reset, storage info',icon:'X',type:'action',action:()=>{closeCommandPalette();showDataTools();}});
+  }
+  // Theme switcher prefix
+  if(ql && (ql==='theme' || ql==='theme switcher' || ql==='dark theme' || ql==='color scheme')){
+    items.unshift({title:'Theme Switcher',desc:'6 dark theme variants: Cosmic, Ocean, Forest, Sunset, Purple, Ember',icon:'T',type:'action',action:()=>{closeCommandPalette();showThemeSwitcher();}});
+  }
+  // Status email prefix
+  if(ql && (ql==='status email' || ql==='status update' || ql==='weekly email' || ql==='email update')){
+    items.unshift({title:'Generate Status Email',desc:'Copy weekly status update email to clipboard',icon:'E',type:'action',action:()=>{closeCommandPalette();generateStatusEmail();}});
   }
   return items.slice(0, 20);
 }
@@ -9094,6 +9104,55 @@ function showDataTools(){
   h+=`<div style="margin-top:12px"><button onclick="if(confirm('Reset ALL data? This will clear everything!')){localStorage.removeItem('astra-state');location.reload()}" style="padding:6px 12px;background:#ef4444;border:none;border-radius:4px;color:#fff;font-size:10px;font-weight:600;cursor:pointer;width:100%">Factory Reset</button></div>`;
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Data Management</span><button onclick="document.getElementById('data-tools-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
+}
+function showThemeSwitcher(){
+  let panel=document.getElementById('theme-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='theme-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  const themes=[
+    {name:'Cosmic (Default)',bg:'#050508',surface:'#0a0a0f',elevated:'#0f0f17',accent:'#4ade80',border:'#1a1a2e'},
+    {name:'Ocean Depths',bg:'#030a12',surface:'#061420',elevated:'#0a1e2e',accent:'#06b6d4',border:'#0e2940'},
+    {name:'Forest Night',bg:'#050a05',surface:'#0a140a',elevated:'#0f1e0f',accent:'#22c55e',border:'#1a2e1a'},
+    {name:'Sunset',bg:'#0a0505',surface:'#140a08',elevated:'#1e0f0c',accent:'#f97316',border:'#2e1a14'},
+    {name:'Royal Purple',bg:'#080510',surface:'#0e0a18',elevated:'#140f22',accent:'#a855f7',border:'#221a36'},
+    {name:'Ember',bg:'#0a0404',surface:'#140808',elevated:'#1e0c0c',accent:'#ef4444',border:'#2e1414'},
+  ];
+  const current=S._theme||'Cosmic (Default)';
+  let h='';
+  themes.forEach(t=>{
+    const isActive=current===t.name;
+    h+=`<div onclick="applyTheme('${t.name}','${t.bg}','${t.surface}','${t.elevated}','${t.accent}','${t.border}')" style="display:flex;align-items:center;gap:10px;padding:10px;cursor:pointer;border-radius:6px;margin:2px 0;border:1px solid ${isActive?t.accent:'transparent'}" onmouseenter="this.style.background='${t.surface}'" onmouseleave="this.style.background='transparent'"><div style="display:flex;gap:2px"><span style="width:12px;height:12px;border-radius:3px;background:${t.bg}"></span><span style="width:12px;height:12px;border-radius:3px;background:${t.surface}"></span><span style="width:12px;height:12px;border-radius:3px;background:${t.accent}"></span></div><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text-primary)">${t.name}</div></div>${isActive?'<span style="font-size:10px;color:var(--accent);font-weight:600">Active</span>':''}</div>`;
+  });
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Theme Switcher</span><button onclick="document.getElementById('theme-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function applyTheme(name,bg,surface,elevated,accent,border){
+  document.documentElement.style.setProperty('--bg-base',bg);
+  document.documentElement.style.setProperty('--bg-surface',surface);
+  document.documentElement.style.setProperty('--bg-elevated',elevated);
+  document.documentElement.style.setProperty('--accent',accent);
+  document.documentElement.style.setProperty('--border',border);
+  S._theme=name;save();toast('Theme: '+name);showThemeSwitcher();
+}
+function generateStatusEmail(){
+  const today=new Date().toISOString().split('T')[0];
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);const weekStr=weekAgo.toISOString().split('T')[0];
+  const completed=S.tasks.filter(t=>t.completedAt&&t.completedAt.split('T')[0]>=weekStr);
+  const inProgress=S.tasks.filter(t=>t.status==='in-progress');
+  const overdue=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+  const upNext=S.tasks.filter(t=>t.status==='todo'&&t.due&&t.due>=today&&t.due<=new Date(Date.now()+7*86400000).toISOString().split('T')[0]).sort((a,b)=>(a.due||'').localeCompare(b.due||''));
+  let email='Subject: Status Update - '+today+'\n\n';
+  email+='Hi,\n\nHere is my weekly status update.\n\n';
+  email+='COMPLETED ('+completed.length+'):\n';
+  completed.forEach(t=>{email+='- '+t.title+(t.project?' ['+t.project+']':'')+'\n';});
+  email+='\nIN PROGRESS ('+inProgress.length+'):\n';
+  inProgress.forEach(t=>{email+='- '+t.title+(t.project?' ['+t.project+']':'')+'\n';});
+  if(overdue.length){email+='\nBLOCKERS/OVERDUE ('+overdue.length+'):\n';overdue.forEach(t=>{email+='- '+t.title+' (due '+t.due+')\n';});}
+  email+='\nUP NEXT:\n';
+  upNext.slice(0,5).forEach(t=>{email+='- '+t.title+' (due '+t.due+')\n';});
+  email+='\nBest regards';
+  navigator.clipboard.writeText(email);
+  toast('Status email copied to clipboard');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
