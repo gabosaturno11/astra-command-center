@@ -6593,6 +6593,12 @@ function cmdGetItems(q) {
       ['cicd','CI/CD pipeline reference (GH Actions Vercel)'],
       ['project comparison','Side-by-side project metrics'],
       ['timezone','Timezone converter with 12 zones'],
+      ['postgres','PostgreSQL query reference'],
+      ['time of day','Task activity by time of day'],
+      ['char frequency','Character frequency analyzer'],
+      ['ansible','Ansible playbook and CLI reference'],
+      ['due calendar','Due date calendar view mini'],
+      ['readability','Readability score analyzer'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10541,6 +10547,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='timezone' || ql==='timezone converter' || ql==='tz' || ql==='time zones')){
     items.unshift({title:'Timezone Converter',desc:'Convert time across 12 zones',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTimezoneConverter();}});
+  }
+  if(ql && (ql==='postgres' || ql==='postgresql' || ql==='pg ref' || ql==='psql')){
+    items.unshift({title:'PostgreSQL Reference',desc:'Tables, CRUD, joins, admin',icon:'P',type:'action',action:()=>{closeCommandPalette();showPostgresRef();}});
+  }
+  if(ql && (ql==='time of day' || ql==='activity hours' || ql==='time activity' || ql==='peak hours')){
+    items.unshift({title:'Time of Day Activity',desc:'When tasks get done by hour',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTimeOfDayActivity();}});
+  }
+  if(ql && (ql==='char frequency' || ql==='character frequency' || ql==='char count' || ql==='letter frequency')){
+    items.unshift({title:'Char Frequency',desc:'Character frequency analyzer',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCharFrequency();}});
+  }
+  if(ql && (ql==='ansible' || ql==='ansible ref' || ql==='ansible playbook' || ql==='ansible commands')){
+    items.unshift({title:'Ansible Reference',desc:'Playbooks, modules, CLI',icon:'A',type:'action',action:()=>{closeCommandPalette();showAnsibleRef();}});
+  }
+  if(ql && (ql==='due calendar' || ql==='due dates calendar' || ql==='due date view' || ql==='due date mini')){
+    items.unshift({title:'Due Date Calendar',desc:'Mini calendar with due dates',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDueDateCalendar();}});
+  }
+  if(ql && (ql==='readability' || ql==='readability score' || ql==='flesch' || ql==='reading level')){
+    items.unshift({title:'Readability Score',desc:'Flesch readability analyzer',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickReadabilityScore();}});
   }
   return items.slice(0, 20);
 }
@@ -36248,6 +36272,176 @@ function showQuickTimezoneConverter(){
     out.innerHTML=r;
   };
   window._tzConvert();
+}
+function showPostgresRef(){
+  let d=document.getElementById('pg-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='pg-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Database':['CREATE DATABASE mydb;','DROP DATABASE mydb;','\\l (list databases)','\\c mydb (connect)','\\dt (list tables)','\\d tablename (describe)'],
+    'Tables':['CREATE TABLE users (id SERIAL PRIMARY KEY, name TEXT NOT NULL);','ALTER TABLE users ADD COLUMN email VARCHAR(255);','ALTER TABLE users DROP COLUMN email;','DROP TABLE users;','TRUNCATE TABLE users;','CREATE INDEX idx_name ON users(name);'],
+    'CRUD':['INSERT INTO users (name) VALUES (\'Alice\');','SELECT * FROM users WHERE id = 1;','UPDATE users SET name = \'Bob\' WHERE id = 1;','DELETE FROM users WHERE id = 1;','SELECT * FROM users ORDER BY name LIMIT 10 OFFSET 20;'],
+    'Joins & Agg':['SELECT * FROM users u JOIN orders o ON u.id = o.user_id;','SELECT * FROM users u LEFT JOIN orders o ON u.id = o.user_id;','SELECT status, COUNT(*) FROM tasks GROUP BY status;','SELECT project_id, AVG(estimate) FROM tasks GROUP BY project_id HAVING COUNT(*) > 5;'],
+    'Advanced':['WITH cte AS (SELECT * FROM users) SELECT * FROM cte;','SELECT * FROM users WHERE name ILIKE \'%search%\';','CREATE VIEW active_users AS SELECT * FROM users WHERE active = true;','EXPLAIN ANALYZE SELECT * FROM users WHERE id = 1;','COPY users TO \'/tmp/users.csv\' CSV HEADER;'],
+    'Admin':['pg_dump mydb > backup.sql','psql mydb < backup.sql','SELECT pg_size_pretty(pg_database_size(\'mydb\'));','SELECT * FROM pg_stat_activity;','VACUUM ANALYZE;']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">PostgreSQL Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskTimeOfDayActivity(){
+  let d=document.getElementById('tod-activity-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='tod-activity-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const hours=new Array(24).fill(0);
+  tasks.forEach(t=>{
+    const ts=t.completedAt||t.doneAt||t.createdAt||'';
+    if(!ts)return;
+    const h2=new Date(ts).getHours();
+    if(!isNaN(h2))hours[h2]++;
+  });
+  const maxV=Math.max(...hours,1);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Time of Day Activity</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<svg viewBox="0 0 480 160" style="width:100%;margin:8px 0">';
+  const bw=480/24;
+  hours.forEach((count,i)=>{
+    const bh=Math.round((count/maxV)*120);
+    const color=i>=6&&i<12?'#4ade80':i>=12&&i<18?'#38bdf8':i>=18&&i<22?'#a78bfa':'#94a3b8';
+    h+='<rect x="'+(i*bw+2)+'" y="'+(130-bh)+'" width="'+(bw-4)+'" height="'+bh+'" fill="'+color+'" rx="2"/>';
+    if(i%3===0)h+='<text x="'+(i*bw+bw/2)+'" y="150" text-anchor="middle" fill="var(--text-muted)" style="font-size:9px">'+i+':00</text>';
+  });
+  h+='</svg>';
+  h+='<div style="display:flex;gap:12px;justify-content:center;font-size:10px;margin-top:4px"><span style="color:#4ade80">Morning</span><span style="color:#38bdf8">Afternoon</span><span style="color:#a78bfa">Evening</span><span style="color:#94a3b8">Night</span></div>';
+  const peakHour=hours.indexOf(Math.max(...hours));
+  h+='<div style="margin-top:12px;padding:8px;background:var(--bg-surface);border-radius:6px;font-size:12px;color:var(--text-secondary);text-align:center">Peak productivity: <span style="color:var(--accent);font-weight:600">'+peakHour+':00 - '+(peakHour+1)+':00</span></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickCharFrequency(){
+  let d=document.getElementById('char-freq-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='char-freq-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Char Frequency</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<textarea id="cf-input" placeholder="Paste text to analyze..." style="width:100%;height:60px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;resize:none;box-sizing:border-box;margin-bottom:6px" oninput="window._cfAnalyze()"></textarea>';
+  h+='<div id="cf-output" style="max-height:180px;overflow-y:auto"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._cfAnalyze=function(){
+    const text=document.getElementById('cf-input').value;
+    const out=document.getElementById('cf-output');if(!out)return;
+    if(!text){out.innerHTML='';return;}
+    const freq={};
+    for(const c of text.toLowerCase()){if(c.trim())freq[c]=(freq[c]||0)+1;}
+    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,20);
+    const maxV=sorted.length>0?sorted[0][1]:1;
+    let r='';
+    sorted.forEach(([ch,count])=>{
+      const pct=Math.round((count/maxV)*100);
+      r+='<div style="display:flex;align-items:center;gap:6px;margin:2px 0;font-size:11px"><span style="width:16px;text-align:center;font-family:monospace;color:var(--accent);font-weight:700">'+ch+'</span><div style="flex:1;height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:3px"></div></div><span style="color:var(--text-muted);width:24px;text-align:right">'+count+'</span></div>';
+    });
+    out.innerHTML=r;
+  };
+}
+function showAnsibleRef(){
+  let d=document.getElementById('ansible-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='ansible-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['ansible all -m ping','ansible-playbook site.yml','ansible-playbook site.yml -i inventory','ansible-playbook site.yml --check','ansible-playbook site.yml --tags "deploy"','ansible-vault encrypt secrets.yml','ansible-vault decrypt secrets.yml','ansible-galaxy install geerlingguy.docker'],
+    'Playbook':['- hosts: webservers','  become: yes','  vars: app_port: 3000','  tasks:','    - name: Install nginx','      apt: name=nginx state=present','    - name: Copy config','      template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf'],
+    'Modules':['apt: name=package state=present','copy: src=file dest=/path/ mode=0644','template: src=tmpl.j2 dest=/etc/conf','service: name=nginx state=started enabled=yes','file: path=/dir state=directory mode=0755','git: repo=https://github.com/... dest=/app','docker_container: name=app image=myimage:latest'],
+    'Inventory':['[webservers]','web1 ansible_host=192.168.1.10','web2 ansible_host=192.168.1.11','[all:vars]','ansible_user=deploy','ansible_ssh_private_key_file=~/.ssh/key']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Ansible Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskDueDateCalendar(){
+  let d=document.getElementById('due-cal-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='due-cal-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.due&&t.status!=='done');
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleDateString('en',{month:'long',year:'numeric'});
+  const tasksByDay={};
+  tasks.forEach(t=>{
+    const dd=t.due.split('T')[0];
+    const parts=dd.split('-');
+    if(parseInt(parts[0])===year&&parseInt(parts[1])-1===month){
+      const day=parseInt(parts[2]);
+      if(!tasksByDay[day])tasksByDay[day]=[];
+      tasksByDay[day].push(t);
+    }
+  });
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Due Date Calendar: '+monthName+'</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center">';
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d2=>{h+='<div style="font-size:10px;color:var(--text-muted);padding:4px;font-weight:600">'+d2+'</div>';});
+  for(let i=0;i<firstDay;i++)h+='<div></div>';
+  const today=now.getDate();
+  for(let day=1;day<=daysInMonth;day++){
+    const hasTasks=tasksByDay[day];
+    const isToday=day===today;
+    const count=hasTasks?hasTasks.length:0;
+    const bg=isToday?'rgba(74,222,128,0.2)':count>0?'rgba(56,189,248,0.1)':'var(--bg-surface)';
+    const border=isToday?'1px solid var(--accent)':'1px solid transparent';
+    h+='<div style="padding:4px;background:'+bg+';border:'+border+';border-radius:4px;min-height:32px;position:relative" title="'+(count>0?count+' task(s) due':'')+'">';
+    h+='<div style="font-size:11px;color:'+(isToday?'var(--accent)':'var(--text-secondary)')+'">'+day+'</div>';
+    if(count>0)h+='<div style="font-size:8px;color:#38bdf8;font-weight:700">'+count+'</div>';
+    h+='</div>';
+  }
+  h+='</div>';
+  const upcoming=tasks.filter(t=>t.due>=now.toISOString().split('T')[0]).sort((a,b)=>a.due.localeCompare(b.due)).slice(0,8);
+  if(upcoming.length>0){
+    h+='<div style="font-size:11px;color:var(--accent);margin:16px 0 8px;font-weight:600">Upcoming</div>';
+    upcoming.forEach(t=>{
+      h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;font-size:12px"><span style="color:var(--text-secondary)">'+esc(t.title)+'</span><span style="color:var(--text-muted)">'+t.due+'</span></div>';
+    });
+  }
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickReadabilityScore(){
+  let d=document.getElementById('readability-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='readability-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Readability Score</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<textarea id="rd-input" placeholder="Paste text to analyze readability..." style="width:100%;height:80px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;resize:none;box-sizing:border-box;margin-bottom:6px"></textarea>';
+  h+='<button onclick="window._rdAnalyze()" style="width:100%;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;margin-bottom:8px">Analyze</button>';
+  h+='<div id="rd-output"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._rdAnalyze=function(){
+    const text=document.getElementById('rd-input').value.trim();
+    const out=document.getElementById('rd-output');if(!out||!text)return;
+    const sentences=text.split(/[.!?]+/).filter(s=>s.trim());
+    const words=text.split(/\s+/).filter(w=>w);
+    const syllables=words.reduce((a,w)=>{
+      w=w.toLowerCase().replace(/[^a-z]/g,'');
+      if(w.length<=3)return a+1;
+      let s=w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'').replace(/^y/,'');
+      const m=s.match(/[aeiouy]{1,2}/g);
+      return a+(m?m.length:1);
+    },0);
+    const avgWordsPerSent=sentences.length>0?(words.length/sentences.length):0;
+    const avgSyllPerWord=words.length>0?(syllables/words.length):0;
+    const flesch=206.835-(1.015*avgWordsPerSent)-(84.6*avgSyllPerWord);
+    const fk=0.39*avgWordsPerSent+11.8*avgSyllPerWord-15.59;
+    const level=flesch>=90?'Very Easy':flesch>=80?'Easy':flesch>=70?'Fairly Easy':flesch>=60?'Standard':flesch>=50?'Fairly Hard':flesch>=30?'Hard':'Very Hard';
+    const color=flesch>=70?'#4ade80':flesch>=50?'#fbbf24':'#f87171';
+    let r='<div style="text-align:center;margin-bottom:10px"><div style="font-size:32px;font-weight:700;color:'+color+'">'+Math.round(flesch)+'</div><div style="font-size:11px;color:var(--text-muted)">Flesch Score ('+level+')</div></div>';
+    r+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px">';
+    r+='<div style="padding:6px;background:var(--bg-surface);border-radius:4px;text-align:center"><div style="color:var(--text-primary);font-weight:600">'+words.length+'</div><div style="color:var(--text-muted)">Words</div></div>';
+    r+='<div style="padding:6px;background:var(--bg-surface);border-radius:4px;text-align:center"><div style="color:var(--text-primary);font-weight:600">'+sentences.length+'</div><div style="color:var(--text-muted)">Sentences</div></div>';
+    r+='<div style="padding:6px;background:var(--bg-surface);border-radius:4px;text-align:center"><div style="color:var(--text-primary);font-weight:600">'+avgWordsPerSent.toFixed(1)+'</div><div style="color:var(--text-muted)">Words/Sent</div></div>';
+    r+='<div style="padding:6px;background:var(--bg-surface);border-radius:4px;text-align:center"><div style="color:var(--text-primary);font-weight:600">'+Math.round(fk)+'</div><div style="color:var(--text-muted)">Grade Level</div></div>';
+    r+='</div>';
+    out.innerHTML=r;
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
