@@ -5892,6 +5892,8 @@ function cmdGetItems(q) {
       ['suggestions','Smart next-action suggestions based on current state'],
       ['link categories','Visual breakdown of link categories'],
       ['priority distribution','Bar chart of task priority levels'],
+      ['mood','Daily mood tracker with trend chart'],
+      ['repo timeline','Overview of all repos with status'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7558,6 +7560,14 @@ function cmdGetItems(q) {
   // Priority distribution prefix
   if(ql && (ql==='priority distribution' || ql==='priority chart' || ql==='priority stats' || ql==='task priority')){
     items.unshift({title:'Priority Distribution',desc:'Bar chart showing P0/P1/P2/P3 distribution',icon:'P',type:'action',action:()=>{closeCommandPalette();showPriorityDistribution();}});
+  }
+  // Mood tracker prefix
+  if(ql && (ql==='mood' || ql==='mood tracker' || ql==='how am i feeling' || ql==='feeling')){
+    items.unshift({title:'Mood Tracker',desc:'Log daily mood with trend visualization',icon:'M',type:'action',action:()=>{closeCommandPalette();showMoodTracker();}});
+  }
+  // Repo timeline prefix
+  if(ql && (ql==='repo timeline' || ql==='repo overview' || ql==='repos overview' || ql==='all repos')){
+    items.unshift({title:'Repo Overview',desc:'All repos with status, URLs, and last commit',icon:'R',type:'action',action:()=>{closeCommandPalette();showRepoTimeline();}});
   }
   return items.slice(0, 20);
 }
@@ -11492,6 +11502,76 @@ function showPriorityDistribution(){
     h+=`</div>`;
   });
   h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showMoodTracker(){
+  if(!S._moods)S._moods=[];
+  const today=new Date().toISOString().split('T')[0];
+  const moods=[
+    {emoji:'Great',value:5,color:'#4ade80'},
+    {emoji:'Good',value:4,color:'#22d3ee'},
+    {emoji:'Okay',value:3,color:'#f59e0b'},
+    {emoji:'Low',value:2,color:'#f97316'},
+    {emoji:'Bad',value:1,color:'#ef4444'},
+  ];
+  const todayMood=S._moods.find(m=>m.date===today);
+  const panel=document.createElement('div');panel.id='mood-tracker-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Mood Tracker</span><button onclick="document.getElementById('mood-tracker-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="font-size:11px;color:var(--accent);margin-bottom:12px">How are you feeling today?</div>`;
+  h+=`<div style="display:flex;gap:8px;justify-content:center;margin-bottom:20px">`;
+  moods.forEach(m=>{
+    const selected=todayMood&&todayMood.value===m.value;
+    h+=`<button onclick="logMood(${m.value})" style="padding:10px 14px;border-radius:8px;border:2px solid ${selected?m.color:'var(--border)'};background:${selected?m.color+'20':'var(--bg-surface)'};color:${m.color};cursor:pointer;font-size:11px;font-weight:${selected?'700':'400'};min-width:55px">${m.emoji}</button>`;
+  });
+  h+=`</div>`;
+  const recent=S._moods.slice(0,14);
+  if(recent.length){
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Last 14 Days</div>`;
+    h+=`<div style="display:flex;align-items:end;gap:4px;height:60px;margin-bottom:8px">`;
+    recent.reverse().forEach(m=>{
+      const mood=moods.find(x=>x.value===m.value)||moods[2];
+      const height=m.value*12;
+      h+=`<div title="${m.date}: ${mood.emoji}" style="flex:1;height:${height}px;background:${mood.color};border-radius:3px 3px 0 0;min-width:4px"></div>`;
+    });
+    h+=`</div>`;
+    const avg=S._moods.reduce((a,m)=>a+m.value,0)/S._moods.length;
+    const avgMood=moods.find(m=>m.value===Math.round(avg))||moods[2];
+    h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center">Average: <span style="color:${avgMood.color}">${avgMood.emoji}</span> (${avg.toFixed(1)}/5) | ${S._moods.length} entries</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function logMood(value){
+  if(!S._moods)S._moods=[];
+  const today=new Date().toISOString().split('T')[0];
+  const existing=S._moods.findIndex(m=>m.date===today);
+  if(existing>=0){S._moods[existing].value=value;}
+  else{S._moods.unshift({date:today,value});}
+  if(S._moods.length>365)S._moods=S._moods.slice(0,365);
+  save();const p=document.getElementById('mood-tracker-panel');if(p)p.remove();showMoodTracker();showToast('Mood logged');
+}
+function showRepoTimeline(){
+  const repos=S.repos||[];
+  if(!repos.length){showToast('No repos configured');return;}
+  const panel=document.createElement('div');panel.id='repo-timeline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6'];
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Repo Overview (${repos.length})</span><button onclick="document.getElementById('repo-timeline-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;gap:8px">`;
+  repos.forEach((r,i)=>{
+    const color=colors[i%colors.length];
+    const statusColor=r.status==='active'?'#4ade80':r.status==='complete'?'#3b82f6':'#6b7280';
+    h+=`<div style="padding:12px;background:var(--bg-surface);border-radius:8px;border-left:3px solid ${color}">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">`;
+    h+=`<span style="font-size:12px;font-weight:600;color:${color}">${esc(r.name)}</span>`;
+    h+=`<span style="font-size:9px;padding:2px 8px;border-radius:10px;background:${statusColor}20;color:${statusColor}">${r.status||'unknown'}</span></div>`;
+    if(r.live)h+=`<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">${esc(r.live)}</div>`;
+    if(r.url)h+=`<div style="font-size:9px;color:var(--text-muted)">${esc(r.url)}</div>`;
+    if(r.lastCommit)h+=`<div style="font-size:9px;color:var(--accent);margin-top:4px">Last commit: ${esc(r.lastCommit)}</div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:12px">${repos.filter(r=>r.status==='active').length} active | ${repos.filter(r=>r.status==='complete').length} complete</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
