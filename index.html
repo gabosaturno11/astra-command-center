@@ -6350,6 +6350,12 @@ function cmdGetItems(q) {
       ['railway','Railway CLI command reference'],
       ['streak','Task completion streak tracker'],
       ['qr code','QR code generator'],
+      ['claude code','Claude Code CLI reference'],
+      ['status overview','Task status distribution overview'],
+      ['hash','SHA hash generator'],
+      ['pip','Python pip command reference'],
+      ['daily goal','Daily task completion goal tracker'],
+      ['uuid','UUID generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9569,6 +9575,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='qr code' || ql==='qr' || ql==='qr generator' || ql==='generate qr')){
     items.unshift({title:'QR Code Generator',desc:'Generate QR codes from text or URLs',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickQrGen();}});
+  }
+  if(ql && (ql==='claude code' || ql==='claude cli' || ql==='claude ref' || ql==='claude reference')){
+    items.unshift({title:'Claude Code Reference',desc:'Claude Code CLI commands and tips',icon:'C',type:'action',action:()=>{closeCommandPalette();showClaudeCodeRef();}});
+  }
+  if(ql && (ql==='status overview' || ql==='status chart' || ql==='status bar' || ql==='status breakdown')){
+    items.unshift({title:'Status Overview',desc:'Task distribution by status',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStatusTimeline();}});
+  }
+  if(ql && (ql==='hash' || ql==='sha' || ql==='hash generator' || ql==='sha256')){
+    items.unshift({title:'Hash Generator',desc:'Generate SHA-1/256/384/512 hashes',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHashGenerator();}});
+  }
+  if(ql && (ql==='pip' || ql==='pip commands' || ql==='python pip' || ql==='pip ref')){
+    items.unshift({title:'Python/pip Reference',desc:'pip and poetry cheatsheet',icon:'P',type:'action',action:()=>{closeCommandPalette();showPythonPipRef();}});
+  }
+  if(ql && (ql==='daily goal' || ql==='daily target' || ql==='task goal' || ql==='goal tracker')){
+    items.unshift({title:'Daily Goal',desc:'Daily task completion goal with gauge',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskDailyGoal();}});
+  }
+  if(ql && (ql==='uuid' || ql==='uuid generator' || ql==='generate uuid' || ql==='guid')){
+    items.unshift({title:'UUID Generator',desc:'Generate and copy UUIDs',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUuidGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -28287,6 +28311,145 @@ function showQuickQrGen(){
     const url='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(text);
     resEl.innerHTML='<img src="'+url+'" alt="QR Code" style="width:200px;height:200px;border-radius:4px;background:#fff;padding:8px"/><div style="font-size:10px;color:var(--text-muted);margin-top:6px">Right-click to save image</div>';
   };
+}
+function showClaudeCodeRef(){
+  const d=document.createElement('div');d.id='claude-code-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Commands':['claude','claude code','claude --model opus','claude --resume','claude --continue','claude --print'],
+    'Slash Commands':['/help','/compact','/clear','/commit','/review-pr','/model <name>','/cost','/memory'],
+    'Keyboard':['Cmd+C — cancel','Cmd+K — clear','Tab — autocomplete','Shift+Tab — reject','Esc — cancel'],
+    'Files':['CLAUDE.md — project instructions','.claude/settings.json — user settings','.claude/projects/ — project memory'],
+    'MCP':['MCP servers for external tools','Configure in settings.json','Notion, Slack, GitHub integrations','Custom tool servers'],
+    'Tips':['Use /compact to save context','Put rules in CLAUDE.md','Commit often with /commit','Use Task agents for parallel work']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Claude Code Reference</h3><button onclick="document.getElementById(\'claude-code-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskStatusTimeline(){
+  const d=document.createElement('div');d.id='status-timeline-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const statusColors={'todo':'#6b7280','in-progress':'#3b82f6','blocked':'#ef4444','done':'#4ade80'};
+  const byStatus={};
+  Object.keys(statusColors).forEach(s=>{byStatus[s]=tasks.filter(t=>t.status===s).length;});
+  const total=tasks.length||1;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Status Overview</h3><button onclick="document.getElementById(\'status-timeline-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;height:24px;border-radius:6px;overflow:hidden;margin-bottom:16px">';
+  Object.entries(byStatus).forEach(([status,count])=>{
+    const pct=(count/total*100).toFixed(1);
+    if(count>0)html+='<div style="width:'+pct+'%;background:'+statusColors[status]+';display:flex;align-items:center;justify-content:center;font-size:10px;color:#000;font-weight:600" title="'+status+': '+count+'">'+count+'</div>';
+  });
+  html+='</div>';
+  Object.entries(byStatus).forEach(([status,count])=>{
+    const pct=Math.round(count/total*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px;background:var(--bg-surface);border-radius:6px">';
+    html+='<div style="width:14px;height:14px;border-radius:3px;background:'+statusColors[status]+'"></div>';
+    html+='<span style="font-size:12px;color:var(--text-primary);flex:1;text-transform:capitalize">'+status.replace('-',' ')+'</span>';
+    html+='<span style="font-size:14px;color:var(--text-primary);font-weight:600">'+count+'</span>';
+    html+='<span style="font-size:11px;color:var(--text-muted)">'+pct+'%</span>';
+    html+='<div style="width:80px;height:6px;background:var(--bg-base);border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+statusColors[status]+';border-radius:3px"></div></div>';
+    html+='</div>';
+  });
+  html+='<div style="text-align:center;font-size:11px;color:var(--text-muted);margin-top:12px">'+tasks.length+' total tasks</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickHashGenerator(){
+  const d=document.createElement('div');d.id='hash-gen-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Hash Generator</h3><button onclick="document.getElementById(\'hash-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<textarea id="hash-input" placeholder="Enter text to hash..." rows="3" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-bottom:8px"></textarea>';
+  html+='<button onclick="window._hashGenerate()" style="width:100%;padding:8px;background:#4ade80;color:#000;border:none;border-radius:4px;font-weight:600;cursor:pointer;font-size:12px;margin-bottom:10px">Generate Hashes</button>';
+  html+='<div id="hash-results"></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._hashGenerate=async function(){
+    const input=document.getElementById('hash-input').value;const resEl=document.getElementById('hash-results');
+    if(!input){resEl.innerHTML='';return;}
+    const algos=['SHA-1','SHA-256','SHA-384','SHA-512'];
+    let rhtml='';
+    for(const algo of algos){
+      try{
+        const encoder=new TextEncoder();const data=encoder.encode(input);
+        const hashBuf=await crypto.subtle.digest(algo,data);
+        const hashArr=Array.from(new Uint8Array(hashBuf));
+        const hex=hashArr.map(b=>b.toString(16).padStart(2,'0')).join('');
+        rhtml+='<div onclick="navigator.clipboard.writeText(\''+hex+'\');this.style.borderColor=\'#4ade80\';setTimeout(()=>this.style.borderColor=\'var(--border)\',600)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;margin-bottom:4px;cursor:pointer"><div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">'+algo+'</div><div style="font-size:9px;color:#4ade80;font-family:monospace;word-break:break-all">'+hex+'</div></div>';
+      }catch(e){rhtml+='<div style="padding:4px;color:#ef4444;font-size:10px">'+algo+': Error</div>';}
+    }
+    resEl.innerHTML=rhtml;
+  };
+}
+function showPythonPipRef(){
+  const d=document.createElement('div');d.id='pip-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Install':['pip install <pkg>','pip install -r requirements.txt','pip install --upgrade <pkg>','pip install -e .','pip uninstall <pkg>'],
+    'Info':['pip list','pip show <pkg>','pip freeze','pip check','pip --version'],
+    'Search':['pip index versions <pkg>','pip install <pkg>==<ver>','pip install "<pkg>>=1.0,<2.0"'],
+    'Venv':['python -m venv .venv','source .venv/bin/activate','deactivate','python -m venv --clear .venv'],
+    'Export':['pip freeze > requirements.txt','pip install --target ./lib <pkg>','pip download <pkg>','pip cache purge'],
+    'Poetry':['poetry init','poetry add <pkg>','poetry install','poetry run <cmd>','poetry build','poetry publish']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Python/pip Reference</h3><button onclick="document.getElementById(\'pip-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskDailyGoal(){
+  const d=document.createElement('div');d.id='daily-goal-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:75vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._dailyGoal)S._dailyGoal={target:5,history:{}};
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&t.updatedAt&&t.updatedAt.startsWith(today));
+  const done=tasks.length;const target=S._dailyGoal.target;const pct=Math.min(100,Math.round(done/target*100));
+  function rend(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Daily Goal</h3><button onclick="document.getElementById(\'daily-goal-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+    const circumference=2*Math.PI*70;const offset=circumference-(pct/100)*circumference;
+    const col=pct>=100?'#4ade80':pct>=50?'#f59e0b':'#ef4444';
+    let svg='<svg width="180" height="180" viewBox="0 0 180 180" style="display:block;margin:0 auto 16px">';
+    svg+='<circle cx="90" cy="90" r="70" fill="none" stroke="var(--bg-surface)" stroke-width="10"/>';
+    svg+='<circle cx="90" cy="90" r="70" fill="none" stroke="'+col+'" stroke-width="10" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(-90 90 90)"/>';
+    svg+='<text x="90" y="80" text-anchor="middle" fill="'+col+'" font-size="32" font-weight="700">'+done+'</text>';
+    svg+='<text x="90" y="100" text-anchor="middle" fill="var(--text-muted)" font-size="12">of '+target+'</text>';
+    svg+='<text x="90" y="120" text-anchor="middle" fill="var(--text-muted)" font-size="10">tasks today</text>';
+    svg+='</svg>';
+    html+=svg;
+    if(pct>=100)html+='<div style="text-align:center;padding:10px;background:rgba(74,222,128,0.1);border-radius:6px;color:#4ade80;font-weight:600;font-size:13px;margin-bottom:12px">Goal reached!</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px;justify-content:center"><span style="font-size:11px;color:var(--text-muted)">Daily target:</span>';
+    html+='<input type="number" value="'+target+'" min="1" max="50" onchange="window._setDailyGoal(this.value)" style="width:50px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;text-align:center"/></div>';
+    d.innerHTML=html;
+  }
+  window._setDailyGoal=function(val){S._dailyGoal.target=parseInt(val)||5;save();rend();};
+  rend();document.body.appendChild(d);
+}
+function showQuickUuidGenerator(){
+  const d=document.createElement('div');d.id='uuid-gen-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  function genUuid(){return crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16);});}
+  function rend(){
+    const ids=[];for(let i=0;i<5;i++)ids.push(genUuid());
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">UUID Generator</h3><button onclick="document.getElementById(\'uuid-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+    ids.forEach(id=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+id+'\');this.style.borderColor=\'#4ade80\';setTimeout(()=>this.style.borderColor=\'var(--border)\',600)" style="padding:6px 8px;border:1px solid var(--border);border-radius:4px;margin-bottom:4px;cursor:pointer;font-family:monospace;font-size:11px;color:#4ade80;word-break:break-all">'+id+'</div>';
+    });
+    html+='<button onclick="window._uuidRegen()" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary);font-size:11px;cursor:pointer;margin-top:4px">Regenerate</button>';
+    html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click any UUID to copy</div>';
+    d.innerHTML=html;
+  }
+  window._uuidRegen=rend;
+  rend();document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
