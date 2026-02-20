@@ -6743,6 +6743,12 @@ function cmdGetItems(q) {
       ['apache','Apache httpd virtualhost reference'],
       ['workload','Workload balance across projects'],
       ['char counter','Character word sentence counter'],
+      ['elasticsearch','Elasticsearch query index reference'],
+      ['priority matrix','Eisenhower priority matrix'],
+      ['base64','Base64 encode decode tool'],
+      ['redis','Redis commands reference'],
+      ['streak','Daily task completion streak'],
+      ['json formatter','JSON prettify minify tool'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -11141,6 +11147,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='char counter' || ql==='character count' || ql==='word count' || ql==='text stats')){
     items.unshift({title:'Character Counter',desc:'Chars, words, sentences with limit bar',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCharCounter();}});
+  }
+  if(ql && (ql==='elasticsearch' || ql==='elastic' || ql==='es ref' || ql==='elasticsearch ref')){
+    items.unshift({title:'Elasticsearch Reference',desc:'Index, search, aggregation queries',icon:'E',type:'action',action:()=>{closeCommandPalette();showElasticsearchRef();}});
+  }
+  if(ql && (ql==='priority matrix' || ql==='eisenhower' || ql==='matrix' || ql==='urgent important')){
+    items.unshift({title:'Priority Matrix',desc:'Eisenhower urgent/important grid',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityMatrix();}});
+  }
+  if(ql && (ql==='base64' || ql==='encode' || ql==='decode' || ql==='base64 encode')){
+    items.unshift({title:'Base64 Tool',desc:'Encode and decode Base64 strings',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBase64();}});
+  }
+  if(ql && (ql==='redis' || ql==='redis ref' || ql==='redis commands' || ql==='cache')){
+    items.unshift({title:'Redis Reference',desc:'Strings, hash, list, set, sorted set',icon:'R',type:'action',action:()=>{closeCommandPalette();showRedisRef();}});
+  }
+  if(ql && (ql==='streak' || ql==='daily streak' || ql==='streak tracker' || ql==='task streak')){
+    items.unshift({title:'Streak Tracker',desc:'Daily task completion streak calendar',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStreakTracker();}});
+  }
+  if(ql && (ql==='json formatter' || ql==='json' || ql==='prettify json' || ql==='minify json')){
+    items.unshift({title:'JSON Formatter',desc:'Prettify and minify JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonFormatter();}});
   }
   return items.slice(0, 20);
 }
@@ -40391,6 +40415,144 @@ function showQuickCharCounter(){
     bar.style.width=Math.min(100,pct)+'%';
     bar.style.background=pct>100?'#ef4444':pct>80?'#fbbf24':'#4ade80';
   };
+}
+function showElasticsearchRef(){
+  const cmds={
+    'Index':['PUT /my-index','DELETE /my-index','GET /my-index/_mapping','GET /_cat/indices?v','POST /my-index/_refresh'],
+    'Document':['POST /idx/_doc {"field":"val"}','GET /idx/_doc/id','PUT /idx/_doc/id {"field":"val"}','DELETE /idx/_doc/id','POST /idx/_bulk'],
+    'Search':['GET /idx/_search {"query":{"match_all":{}}}','GET /idx/_search {"query":{"match":{"field":"val"}}}','GET /idx/_search {"query":{"bool":{"must":[...],"filter":[...]}}}','GET /idx/_search {"query":{"range":{"date":{"gte":"now-1d"}}}}'],
+    'Aggregation':['{"aggs":{"name":{"terms":{"field":"status"}}}}','{"aggs":{"avg_price":{"avg":{"field":"price"}}}}','{"aggs":{"by_date":{"date_histogram":{"field":"ts","interval":"1d"}}}}'],
+    'Cluster':['GET /_cluster/health','GET /_cat/nodes?v','GET /_cat/shards?v','GET /_cluster/stats']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Elasticsearch Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{html+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.background=\'#4ade8022\';setTimeout(()=>this.style.background=\'\',400)" style="font-family:monospace;font-size:11px;color:var(--text-primary);padding:4px 8px;cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all">'+c+'</div>';});
+    html+='</div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showTaskPriorityMatrix(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const urgent=[],important=[],delegate=[],eliminate=[];
+  tasks.forEach(t=>{
+    const isUrgent=t.priority==='p0'||t.priority==='p1';
+    const isImportant=t.priority==='p0'||t.priority==='p2';
+    if(isUrgent&&isImportant)urgent.push(t);
+    else if(!isUrgent&&isImportant)important.push(t);
+    else if(isUrgent&&!isImportant)delegate.push(t);
+    else eliminate.push(t);
+  });
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Eisenhower Priority Matrix</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  const quadrants=[
+    {title:'DO FIRST',subtitle:'Urgent + Important',items:urgent,bg:'#ef444422',color:'#ef4444'},
+    {title:'SCHEDULE',subtitle:'Important, Not Urgent',items:important,bg:'#3b82f622',color:'#3b82f6'},
+    {title:'DELEGATE',subtitle:'Urgent, Not Important',items:delegate,bg:'#f9731622',color:'#f97316'},
+    {title:'ELIMINATE',subtitle:'Neither',items:eliminate,bg:'#6b728022',color:'#6b7280'}
+  ];
+  quadrants.forEach(q=>{
+    html+='<div style="background:'+q.bg+';border:1px solid '+q.color+'33;border-radius:8px;padding:10px;min-height:100px">';
+    html+='<div style="font-size:11px;font-weight:700;color:'+q.color+';margin-bottom:2px">'+q.title+' ('+q.items.length+')</div>';
+    html+='<div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">'+q.subtitle+'</div>';
+    q.items.slice(0,5).forEach(t=>{
+      html+='<div style="font-size:11px;color:var(--text-primary);padding:2px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</div>';
+    });
+    if(q.items.length>5)html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px">+'+(q.items.length-5)+' more</div>';
+    html+='</div>';
+  });
+  html+='</div></div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showQuickBase64(){
+  let w=document.getElementById('base64-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='base64-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:340px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Base64 Encode/Decode</h4><button onclick="document.getElementById(\'base64-widget\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  h+='<textarea id="_b64-input" rows="3" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:8px;font-size:12px;font-family:monospace;resize:vertical;margin-bottom:6px" placeholder="Enter text or base64..."></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+  h+='<button onclick="try{document.getElementById(\'_b64-output\').value=btoa(document.getElementById(\'_b64-input\').value)}catch(e){document.getElementById(\'_b64-output\').value=\'Error: \'+e.message}" style="flex:1;background:#4ade80;border:none;color:#000;padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Encode</button>';
+  h+='<button onclick="try{document.getElementById(\'_b64-output\').value=atob(document.getElementById(\'_b64-input\').value.trim())}catch(e){document.getElementById(\'_b64-output\').value=\'Error: \'+e.message}" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Decode</button>';
+  h+='</div>';
+  h+='<textarea id="_b64-output" rows="3" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:#4ade80;padding:8px;border-radius:8px;font-size:12px;font-family:monospace;resize:vertical;margin-bottom:6px" placeholder="Result..."></textarea>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_b64-output\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Result\',600)" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Copy Result</button>';
+  w.innerHTML=h;
+  document.body.appendChild(w);
+}
+function showRedisRef(){
+  const cmds={
+    'Strings':['SET key value','GET key','MSET k1 v1 k2 v2','MGET k1 k2','INCR key','DECR key','APPEND key value','SETEX key 3600 value'],
+    'Hash':['HSET key field value','HGET key field','HGETALL key','HDEL key field','HINCRBY key field 1'],
+    'List':['LPUSH key value','RPUSH key value','LPOP key','RPOP key','LRANGE key 0 -1','LLEN key'],
+    'Set':['SADD key member','SREM key member','SMEMBERS key','SINTER k1 k2','SUNION k1 k2','SCARD key'],
+    'Sorted Set':['ZADD key score member','ZRANGE key 0 -1 WITHSCORES','ZRANGEBYSCORE key min max','ZREM key member','ZCARD key'],
+    'Keys':['KEYS pattern','EXISTS key','DEL key','EXPIRE key 3600','TTL key','TYPE key','SCAN 0 MATCH pattern COUNT 100'],
+    'Server':['INFO','DBSIZE','FLUSHDB','FLUSHALL','CONFIG GET maxmemory','MONITOR','SLOWLOG GET 10']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Redis Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8022\';setTimeout(()=>this.style.background=\'\',400)" style="font-family:monospace;font-size:12px;color:var(--text-primary);padding:4px 8px;cursor:pointer;border-radius:4px;margin-bottom:2px">'+c+'</div>';});
+    html+='</div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showTaskStreakTracker(){
+  const tasks=S.tasks||[];
+  const now=new Date();
+  const days=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const done=tasks.filter(t=>t.status==='done'&&(t.completedAt||t.updatedAt||'').startsWith(ds)).length;
+    days.push({date:ds,done,day:d.getDay()});
+  }
+  let currentStreak=0;
+  for(let i=days.length-1;i>=0;i--){
+    if(days[i].done>0)currentStreak++;else break;
+  }
+  let bestStreak=0,tempStreak=0;
+  days.forEach(d=>{if(d.done>0){tempStreak++;if(tempStreak>bestStreak)bestStreak=tempStreak;}else tempStreak=0;});
+  const totalDone=days.reduce((s,d)=>s+d.done,0);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Daily Streak Tracker</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  html+='<div style="display:flex;gap:16px;margin-bottom:16px">';
+  html+='<div style="text-align:center;flex:1;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:28px;font-weight:700;color:'+(currentStreak>0?'#4ade80':'#ef4444')+'">'+currentStreak+'</div><div style="font-size:10px;color:var(--text-muted)">Current Streak</div></div>';
+  html+='<div style="text-align:center;flex:1;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:28px;font-weight:700;color:#06b6d4">'+bestStreak+'</div><div style="font-size:10px;color:var(--text-muted)">Best Streak</div></div>';
+  html+='<div style="text-align:center;flex:1;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:28px;font-weight:700;color:var(--text-primary)">'+totalDone+'</div><div style="font-size:10px;color:var(--text-muted)">30-Day Total</div></div>';
+  html+='</div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center">';
+  const maxDone=Math.max(...days.map(d=>d.done),1);
+  days.forEach(d=>{
+    const opacity=d.done>0?0.3+0.7*(d.done/maxDone):0.1;
+    const bg=d.done>0?'rgba(74,222,128,'+opacity+')':'var(--bg-surface)';
+    const label=d.date.split('-').slice(1).join('/')+'  '+d.done+' done';
+    html+='<div title="'+label+'" style="width:28px;height:28px;background:'+bg+';border-radius:4px;border:1px solid '+(d.done>0?'#4ade8033':'var(--border)')+';display:flex;align-items:center;justify-content:center;font-size:8px;color:'+(d.done>0?'#4ade80':'var(--text-muted)')+'">'+((d.done>0)?d.done:'')+'</div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px">Last 30 days - complete at least 1 task daily to maintain streak</div>';
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showQuickJsonFormatter(){
+  let w=document.getElementById('json-fmt-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='json-fmt-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:360px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">JSON Formatter</h4><button onclick="document.getElementById(\'json-fmt-widget\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  h+='<textarea id="_jf-input" rows="6" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:8px;font-size:11px;font-family:monospace;resize:vertical;margin-bottom:6px" placeholder="Paste JSON here..."></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+  h+='<button onclick="try{const j=JSON.parse(document.getElementById(\'_jf-input\').value);document.getElementById(\'_jf-input\').value=JSON.stringify(j,null,2);document.getElementById(\'_jf-status\').textContent=\'Valid JSON\';document.getElementById(\'_jf-status\').style.color=\'#4ade80\'}catch(e){document.getElementById(\'_jf-status\').textContent=e.message;document.getElementById(\'_jf-status\').style.color=\'#ef4444\'}" style="flex:1;background:#4ade80;border:none;color:#000;padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Prettify</button>';
+  h+='<button onclick="try{const j=JSON.parse(document.getElementById(\'_jf-input\').value);document.getElementById(\'_jf-input\').value=JSON.stringify(j);document.getElementById(\'_jf-status\').textContent=\'Minified\';document.getElementById(\'_jf-status\').style.color=\'#4ade80\'}catch(e){document.getElementById(\'_jf-status\').textContent=e.message;document.getElementById(\'_jf-status\').style.color=\'#ef4444\'}" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Minify</button>';
+  h+='</div>';
+  h+='<div id="_jf-status" style="font-size:10px;color:var(--text-muted);margin-bottom:6px"></div>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_jf-input\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Copy</button>';
+  w.innerHTML=h;
+  document.body.appendChild(w);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
