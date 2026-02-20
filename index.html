@@ -6533,6 +6533,12 @@ function cmdGetItems(q) {
       ['jq','jq JSON processor reference'],
       ['tag cloud','Visual tag cloud from tasks and content'],
       ['lorem','Lorem ipsum placeholder text generator'],
+      ['vim advanced','Vim macros marks registers text objects'],
+      ['burndown','Task burndown chart over 14 days'],
+      ['notepad','Quick scratch notepad with auto-save'],
+      ['docker compose','Docker Compose commands and config'],
+      ['kanban metrics','Kanban board metrics and cycle time'],
+      ['url bookmarks','Save and organize URL bookmarks'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10301,6 +10307,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='lorem' || ql==='lorem ipsum' || ql==='placeholder text' || ql==='dummy text')){
     items.unshift({title:'Lorem Generator',desc:'Generate placeholder text',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLoremGenerator();}});
+  }
+  if(ql && (ql==='vim advanced' || ql==='vim macros' || ql==='vim registers' || ql==='vim marks')){
+    items.unshift({title:'Vim Advanced',desc:'Macros, marks, registers, text objects',icon:'V',type:'action',action:()=>{closeCommandPalette();showVimAdvancedRef();}});
+  }
+  if(ql && (ql==='burndown' || ql==='burndown chart' || ql==='task burndown' || ql==='sprint burndown')){
+    items.unshift({title:'Task Burndown',desc:'14-day burndown chart',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBurndown();}});
+  }
+  if(ql && (ql==='notepad' || ql==='quick note' || ql==='scratch pad' || ql==='scratchpad')){
+    items.unshift({title:'Quick Notepad',desc:'Scratch notepad with auto-save',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNotepad();}});
+  }
+  if(ql && (ql==='docker compose' || ql==='compose' || ql==='docker-compose' || ql==='compose ref')){
+    items.unshift({title:'Docker Compose Ref',desc:'Docker Compose commands and config',icon:'D',type:'action',action:()=>{closeCommandPalette();showDockerComposeRef();}});
+  }
+  if(ql && (ql==='kanban metrics' || ql==='kanban' || ql==='board metrics' || ql==='cycle time')){
+    items.unshift({title:'Kanban Metrics',desc:'Board metrics and cycle time',icon:'K',type:'action',action:()=>{closeCommandPalette();showTaskKanbanMetrics();}});
+  }
+  if(ql && (ql==='url bookmarks' || ql==='bookmarks' || ql==='url manager' || ql==='quick urls')){
+    items.unshift({title:'URL Bookmarks',desc:'Save and organize URL bookmarks',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUrlShortener();}});
   }
   return items.slice(0, 20);
 }
@@ -33806,6 +33830,259 @@ function showQuickLoremGenerator(){
   window._loremMode=(m)=>{mode=m;render();};
   window._loremCount=(v)=>{count=Math.max(1,parseInt(v)||1);render();};
   window._loremRegen=()=>{render();};
+  render();
+  document.body.appendChild(d);
+}
+function showVimAdvancedRef(){
+  const cmds={
+    'Macros':{
+      'qa ... q':'Record macro into register a',
+      '@a':'Play macro a',
+      '@@':'Repeat last macro',
+      '5@a':'Play macro a 5 times',
+      ':reg a':'Show contents of register a',
+      'qA ... q':'Append to macro a',
+      ':normal @a':'Run macro on selected lines',
+      ':let @a=""':'Clear macro register'
+    },
+    'Marks & Jumps':{
+      'ma':'Set mark a at cursor',
+      '`a':'Jump to exact position of mark a',
+      '\'a':'Jump to line of mark a',
+      ':marks':'List all marks',
+      'Ctrl+o':'Jump to older position',
+      'Ctrl+i':'Jump to newer position',
+      '`.':'Jump to last edit position',
+      'gi':'Jump to last insert position and enter insert mode'
+    },
+    'Registers':{
+      '"ay':'Yank into register a',
+      '"ap':'Paste from register a',
+      '"0p':'Paste last yank (not delete)',
+      '"+y':'Yank to system clipboard',
+      '"+p':'Paste from system clipboard',
+      '":p':'Paste last ex command',
+      '"/p':'Paste last search pattern',
+      'Ctrl+r a':'Insert register a in insert mode'
+    },
+    'Text Objects':{
+      'ciw':'Change inner word',
+      'ci"':'Change inside quotes',
+      'ci(':'Change inside parens',
+      'ci{':'Change inside braces',
+      'cit':'Change inside XML tag',
+      'da"':'Delete around quotes',
+      'vi[':'Select inside brackets',
+      'vat':'Select around tag'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Vim Advanced Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskBurndown(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const now=new Date();
+  const days=14;const data=[];
+  for(let i=days;i>=0;i--){
+    const date=new Date(now);date.setDate(date.getDate()-i);
+    const dateStr=date.toDateString();
+    const created=tasks.filter(t=>{const c=new Date(t.created||t.id);return c.toDateString()===dateStr;}).length;
+    const completed=tasks.filter(t=>{if(t.status!=='done')return false;const c=new Date(t.completedAt||t.updated||t.id);return c.toDateString()===dateStr;}).length;
+    const remaining=tasks.filter(t=>{const c=new Date(t.created||t.id);return c<=date&&(t.status!=='done'||(t.completedAt&&new Date(t.completedAt)>date)||(t.updated&&new Date(t.updated)>date));}).length;
+    data.push({day:date.getDate()+'/'+(date.getMonth()+1),created,completed,remaining});
+  }
+  const maxR=Math.max(...data.map(d=>d.remaining),1);
+  const chartH=180;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Task Burndown (14 Days)</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<svg width="100%" height="'+chartH+'" viewBox="0 0 600 '+chartH+'" preserveAspectRatio="none">';
+  let path='M';
+  data.forEach((d,i)=>{
+    const x=(i/(data.length-1))*580+10;
+    const y=chartH-((d.remaining/maxR)*(chartH-20))-10;
+    path+=(i===0?'':'L')+x+','+y;
+  });
+  html+='<path d="'+path+'" fill="none" stroke="#4ade80" stroke-width="2"/>';
+  let areaPath=path+'L590,'+(chartH-10)+'L10,'+(chartH-10)+'Z';
+  html+='<path d="'+areaPath+'" fill="rgba(74,222,128,0.1)"/>';
+  data.forEach((d,i)=>{
+    const x=(i/(data.length-1))*580+10;
+    const y=chartH-((d.remaining/maxR)*(chartH-20))-10;
+    html+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="#4ade80"/>';
+  });
+  html+='</svg>';
+  html+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:4px"><span>'+data[0].day+'</span><span>'+data[data.length-1].day+'</span></div>';
+  const totalCreated=data.reduce((s,d)=>s+d.created,0);
+  const totalCompleted=data.reduce((s,d)=>s+d.completed,0);
+  html+='<div style="display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:11px;color:var(--text-muted)">';
+  html+='<span>Created: <strong style="color:#f97316">'+totalCreated+'</strong></span>';
+  html+='<span>Completed: <strong style="color:#4ade80">'+totalCompleted+'</strong></span>';
+  html+='<span>Remaining: <strong style="color:#e2e8f0">'+data[data.length-1].remaining+'</strong></span>';
+  html+='</div></div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickNotepad(){
+  let ex=document.getElementById('notepad-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='notepad-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:350px';
+  const saved=localStorage.getItem('astra_quicknote')||'';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Quick Notepad</span><button onclick="document.getElementById(\'notepad-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<textarea id="qnote-area" style="width:100%;height:200px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:10px;font-size:12px;font-family:monospace;resize:vertical;line-height:1.6" placeholder="Quick notes... auto-saved">'+esc(saved)+'</textarea>';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">';
+  html+='<span id="qnote-status" style="font-size:10px;color:var(--text-muted)">Saved</span>';
+  html+='<div style="display:flex;gap:6px">';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'qnote-area\').value);this.textContent=\'OK\';setTimeout(()=>this.textContent=\'Copy\',500)" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Copy</button>';
+  html+='<button onclick="document.getElementById(\'qnote-area\').value=\'\';localStorage.setItem(\'astra_quicknote\',\'\')" style="background:var(--bg-surface);color:var(--text-muted);border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Clear</button>';
+  html+='</div></div>';
+  d.innerHTML=html;
+  document.body.appendChild(d);
+  const ta=document.getElementById('qnote-area');
+  let timer;
+  ta.addEventListener('input',()=>{
+    const st=document.getElementById('qnote-status');if(st)st.textContent='Typing...';
+    clearTimeout(timer);timer=setTimeout(()=>{localStorage.setItem('astra_quicknote',ta.value);if(st)st.textContent='Saved';},500);
+  });
+}
+function showDockerComposeRef(){
+  const cmds={
+    'Commands':{
+      'docker compose up':'Create and start containers',
+      'docker compose up -d':'Start in detached mode',
+      'docker compose down':'Stop and remove containers',
+      'docker compose build':'Build/rebuild services',
+      'docker compose pull':'Pull service images',
+      'docker compose logs -f':'Follow logs',
+      'docker compose ps':'List containers',
+      'docker compose exec svc sh':'Shell into service'
+    },
+    'Lifecycle':{
+      'docker compose start':'Start existing containers',
+      'docker compose stop':'Stop running containers',
+      'docker compose restart':'Restart services',
+      'docker compose pause':'Pause services',
+      'docker compose unpause':'Unpause services',
+      'docker compose kill':'Force stop services',
+      'docker compose rm':'Remove stopped containers',
+      'docker compose create':'Create containers without starting'
+    },
+    'Config Keys':{
+      'image: name:tag':'Use pre-built image',
+      'build: ./dir':'Build from Dockerfile',
+      'ports: ["3000:3000"]':'Port mapping',
+      'volumes: ["./:/app"]':'Volume mount',
+      'environment: [KEY=val]':'Environment variables',
+      'env_file: .env':'Load env from file',
+      'depends_on: [db]':'Service dependency',
+      'restart: unless-stopped':'Restart policy'
+    },
+    'Networking':{
+      'networks: [frontend]':'Assign to network',
+      'expose: ["3000"]':'Expose port internally',
+      'links: [db]':'Link to other service (legacy)',
+      'extra_hosts: ["host:ip"]':'Add host entries',
+      'dns: 8.8.8.8':'Custom DNS server',
+      'healthcheck: test: curl':'Health check config',
+      'deploy: replicas: 3':'Swarm deploy config',
+      'profiles: [debug]':'Assign profile for selective start'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Docker Compose Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskKanbanMetrics(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const statuses=['backlog','todo','in-progress','review','done'];
+  const statusLabels={'backlog':'Backlog','todo':'To Do','in-progress':'In Progress','review':'Review','done':'Done'};
+  const statusColors={'backlog':'#6b7280','todo':'#3b82f6','in-progress':'#f59e0b','review':'#8b5cf6','done':'#4ade80'};
+  const counts={};statuses.forEach(s=>counts[s]=tasks.filter(t=>(t.status||'todo')===s).length);
+  const total=tasks.length;
+  const wipLimit=5;
+  const inProg=counts['in-progress']||0;
+  const avgCycleTime=tasks.filter(t=>t.status==='done'&&t.created).map(t=>{
+    const created=new Date(t.created||t.id);const completed=new Date(t.completedAt||t.updated||Date.now());
+    return(completed-created)/(1000*60*60*24);
+  });
+  const avgDays=avgCycleTime.length?Math.round(avgCycleTime.reduce((a,b)=>a+b,0)/avgCycleTime.length*10)/10:0;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Kanban Metrics</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:16px">';
+  statuses.forEach(s=>{
+    const c=counts[s]||0;const pct=total?Math.round((c/total)*100):0;
+    html+='<div style="flex:1;text-align:center;background:var(--bg-surface);border-radius:8px;padding:10px;border-top:3px solid '+statusColors[s]+'">';
+    html+='<div style="font-size:20px;font-weight:700;color:'+statusColors[s]+'">'+c+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">'+statusLabels[s]+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">'+pct+'%</div></div>';
+  });
+  html+='</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">WIP Status</div><div style="font-size:18px;font-weight:700;color:'+(inProg>wipLimit?'#ef4444':'#4ade80')+'">'+inProg+'/'+wipLimit+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--text-muted)">Avg Cycle Time</div><div style="font-size:18px;font-weight:700;color:#4ade80">'+avgDays+'d</div></div>';
+  html+='</div>';
+  html+='<div style="height:20px;background:var(--bg-base);border-radius:10px;display:flex;overflow:hidden">';
+  statuses.forEach(s=>{const pct=total?((counts[s]||0)/total)*100:0;if(pct>0)html+='<div style="width:'+pct+'%;background:'+statusColors[s]+'" title="'+statusLabels[s]+': '+(counts[s]||0)+'"></div>';});
+  html+='</div>';
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickUrlShortener(){
+  let ex=document.getElementById('urlshort-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='urlshort-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+  if(!S._shortUrls)S._shortUrls=[];
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">URL Bookmarks</span><button onclick="document.getElementById(\'urlshort-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="display:flex;gap:6px;margin-bottom:10px">';
+    html+='<input id="urlshort-input" placeholder="Paste URL..." style="flex:1;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:12px">';
+    html+='<input id="urlshort-alias" placeholder="Alias" style="width:70px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px;font-size:12px">';
+    html+='<button onclick="window._addShortUrl()" style="background:#4ade80;color:#000;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">+</button>';
+    html+='</div>';
+    if(S._shortUrls.length){
+      html+='<div style="max-height:200px;overflow-y:auto">';
+      S._shortUrls.forEach((u,i)=>{
+        html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">';
+        html+='<span style="color:#4ade80;font-size:11px;font-weight:600;min-width:50px">'+esc(u.alias)+'</span>';
+        html+='<a href="'+esc(u.url)+'" target="_blank" style="flex:1;color:var(--text-secondary);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none">'+esc(u.url)+'</a>';
+        html+='<button onclick="navigator.clipboard.writeText(\''+u.url.replace(/'/g,"\\'")+'\');this.textContent=\'OK\';setTimeout(()=>this.textContent=\'C\',300)" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:2px 6px;border-radius:3px;cursor:pointer;font-size:10px">C</button>';
+        html+='<button onclick="window._delShortUrl('+i+')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px">x</button>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }else{
+      html+='<div style="color:var(--text-muted);font-size:11px;text-align:center;padding:16px">No bookmarks yet. Add URLs with aliases.</div>';
+    }
+    d.innerHTML=html;
+  }
+  window._addShortUrl=()=>{
+    const url=document.getElementById('urlshort-input')?.value.trim();
+    const alias=document.getElementById('urlshort-alias')?.value.trim()||'link'+(S._shortUrls.length+1);
+    if(!url)return;
+    S._shortUrls.push({url,alias,created:new Date().toISOString()});save();render();
+  };
+  window._delShortUrl=(i)=>{S._shortUrls.splice(i,1);save();render();};
   render();
   document.body.appendChild(d);
 }
