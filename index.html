@@ -5937,6 +5937,9 @@ function cmdGetItems(q) {
       ['export hub','All-in-one export: JSON, CSV, Markdown, HTML'],
       ['dependencies','Visual task dependency graph (blocking/blocked)'],
       ['inbox zero','Triage panel for uncategorized/incomplete items'],
+      ['reading list','Read/unread tracking for saved links'],
+      ['project status','Status board for all projects (on-track, at-risk, blocked)'],
+      ['dashboard','ASTRA dashboard with stats, overdue, quick actions'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7783,6 +7786,18 @@ function cmdGetItems(q) {
   // Inbox zero prefix
   if(ql && (ql==='inbox zero' || ql==='inbox' || ql==='triage' || ql==='unprocessed')){
     items.unshift({title:'Inbox Zero Triage',desc:'Find uncategorized/incomplete items',icon:'I',type:'action',action:()=>{closeCommandPalette();showInboxZero();}});
+  }
+  // Reading list prefix
+  if(ql && (ql==='reading list' || ql==='read list' || ql==='to read' || ql==='unread links')){
+    items.unshift({title:'Reading List',desc:'Track read/unread links',icon:'R',type:'action',action:()=>{closeCommandPalette();showReadingList();}});
+  }
+  // Project status prefix
+  if(ql && (ql==='project status' || ql==='status board' || ql==='project health' || ql==='status update')){
+    items.unshift({title:'Project Status Board',desc:'Status for all projects (on-track/at-risk/blocked)',icon:'S',type:'action',action:()=>{closeCommandPalette();showProjectStatusBoard();}});
+  }
+  // Dashboard prefix
+  if(ql && (ql==='dashboard' || ql==='astra dashboard' || ql==='home' || ql==='main dashboard')){
+    items.unshift({title:'ASTRA Dashboard',desc:'Stats, overdue, and quick actions',icon:'H',type:'action',action:()=>{closeCommandPalette();showCustomDashboard();}});
   }
   return items.slice(0, 20);
 }
@@ -13217,6 +13232,108 @@ function showInboxZero(){
     if(items.length>10)h+=`<div style="font-size:10px;color:var(--text-muted)">+${items.length-10} more</div>`;
     h+=`</div>`;
   });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showReadingList(){
+  let panel=document.getElementById('reading-list-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='reading-list-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._readingList)S._readingList={};
+  const links=(S.links||[]).filter(l=>l.category==='learning'||l.category==='reference'||l.category==='reading');
+  const allLinks=[...(S.links||[])];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Reading List</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const readCount=allLinks.filter(l=>S._readingList[l.id]).length;
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${readCount} read / ${allLinks.length} total links</div>`;
+  const unread=allLinks.filter(l=>!S._readingList[l.id]);
+  const read=allLinks.filter(l=>S._readingList[l.id]);
+  if(unread.length){
+    h+='<div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:6px">Unread</div>';
+    unread.slice(0,20).forEach(l=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px;border-bottom:1px solid var(--border)">`;
+      h+=`<input type="checkbox" onchange="S._readingList['${l.id}']=this.checked;save();showReadingList();" style="cursor:pointer">`;
+      h+=`<a href="${esc(l.url||'')}" target="_blank" style="flex:1;font-size:11px;color:var(--text-primary);text-decoration:none">${esc((l.title||l.url||'').substring(0,45))}</a>`;
+      h+=`<span style="font-size:9px;color:var(--text-muted)">${l.category||''}</span>`;
+      h+=`</div>`;
+    });
+    if(unread.length>20)h+=`<div style="font-size:10px;color:var(--text-muted);margin-top:4px">+${unread.length-20} more</div>`;
+  }
+  if(read.length){
+    h+=`<div style="font-size:11px;color:var(--text-muted);font-weight:600;margin:12px 0 6px;padding-top:8px;border-top:1px solid var(--border)">Read (${read.length})</div>`;
+    read.slice(0,10).forEach(l=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;opacity:0.5">`;
+      h+=`<input type="checkbox" checked onchange="delete S._readingList['${l.id}'];save();showReadingList();" style="cursor:pointer">`;
+      h+=`<span style="font-size:11px;color:var(--text-muted);text-decoration:line-through">${esc((l.title||l.url||'').substring(0,40))}</span>`;
+      h+=`</div>`;
+    });
+  }
+  if(!allLinks.length)h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No links saved yet</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectStatusBoard(){
+  let panel=document.getElementById('proj-status-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='proj-status-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._projectStatus)S._projectStatus={};
+  const projects=(S.projects||[]);
+  const statuses=['on-track','at-risk','blocked','completed','paused'];
+  const statusColors={'on-track':'#4ade80','at-risk':'#facc15','blocked':'#f87171','completed':'#60a5fa','paused':'#6b7280'};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Project Status Board</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!projects.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No projects found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  projects.forEach(p=>{
+    const status=S._projectStatus[p.id]||'on-track';
+    const tasks=(S.tasks||[]).filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=tasks.filter(t=>t.status==='done').length;
+    const pct=tasks.length?Math.round(done/tasks.length*100):0;
+    h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;margin-bottom:8px;border-left:3px solid ${statusColors[status]}">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">`;
+    h+=`<span style="font-size:13px;color:var(--text-primary);font-weight:600">${esc(p.name||'Untitled')}</span>`;
+    h+=`<select onchange="S._projectStatus['${p.id}']=this.value;save();showProjectStatusBoard();" style="background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:10px">`;
+    statuses.forEach(s=>{h+=`<option value="${s}" ${s===status?'selected':''}>${s}</option>`;});
+    h+=`</select></div>`;
+    h+=`<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:${pct}%;background:${statusColors[status]};border-radius:3px"></div></div>`;
+    h+=`<div style="font-size:10px;color:var(--text-muted)">${done}/${tasks.length} tasks (${pct}%)</div>`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showCustomDashboard(){
+  let panel=document.getElementById('custom-dash-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='custom-dash-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const content=(S.content||[]);const links=(S.links||[]);const docs=(S.writerDocs||[]);
+  const now=new Date();const todayStr=now.toISOString().split('T')[0];
+  const doneTasks=tasks.filter(t=>t.status==='done').length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now).length;
+  const todayDue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due.startsWith(todayStr)).length;
+  const wip=tasks.filter(t=>t.status==='in-progress').length;
+  const totalWords=content.reduce((s,c)=>s+(c.body||'').trim().split(/\s+/).filter(Boolean).length,0)+docs.reduce((s,d)=>s+(d.content||'').trim().split(/\s+/).filter(Boolean).length,0);
+  const storageKB=(JSON.stringify(S).length/1024).toFixed(1);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">ASTRA Dashboard</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  // Stats row
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#4ade80">${tasks.length}</div><div style="font-size:9px;color:var(--text-muted)">Tasks</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#a78bfa">${content.length}</div><div style="font-size:9px;color:var(--text-muted)">Content</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#38bdf8">${links.length}</div><div style="font-size:9px;color:var(--text-muted)">Links</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#fbbf24">${docs.length}</div><div style="font-size:9px;color:var(--text-muted)">Docs</div></div>`;
+  h+='</div>';
+  // Quick info
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--text-muted)">Today</div><div style="font-size:12px;color:var(--text-primary)">${todayDue} due | ${wip} in progress</div></div>`;
+  h+=`<div style="background:${overdue>0?'rgba(248,113,113,0.1)':'var(--bg-surface)'};padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--text-muted)">Overdue</div><div style="font-size:12px;color:${overdue>0?'#f87171':'var(--text-primary)'}">${overdue} tasks need attention</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--text-muted)">Total Words</div><div style="font-size:12px;color:var(--text-primary)">${totalWords.toLocaleString()}</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--text-muted)">Storage</div><div style="font-size:12px;color:var(--text-primary)">${storageKB} KB</div></div>`;
+  h+='</div>';
+  // Quick actions
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Quick Actions</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+  const actions=[
+    ['New Task','showQuickTask()'],['New Note','showQuickNote()'],['New Link','showQuickLink()'],
+    ['Daily Planner','showDailyPlanner()'],['Weekly Review','showWeeklyReview()'],['Focus Timer','startQuickTimer()'],
+  ];
+  actions.forEach(([label,fn])=>{
+    h+=`<button onclick="${fn}" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:10px;cursor:pointer">${label}</button>`;
+  });
+  h+='</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
