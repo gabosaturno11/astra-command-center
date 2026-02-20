@@ -6242,6 +6242,12 @@ function cmdGetItems(q) {
       ['license','LICENSE file generator'],
       ['blocked time','Blocked time analysis for tasks'],
       ['reading log','Book reading tracker'],
+      ['cron','Cron expression generator'],
+      ['sprint','Sprint board with task assignment'],
+      ['morning routine','Morning routine checklist'],
+      ['makefile','Makefile generator'],
+      ['overdue chart','Overdue tasks distribution'],
+      ['water intake','Daily water intake tracker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9137,6 +9143,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='reading log' || ql==='books' || ql==='reading' || ql==='book tracker')){
     items.unshift({title:'Reading Log',desc:'Track books you are reading',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickReadingLog();}});
+  }
+  if(ql && (ql==='cron' || ql==='cron job' || ql==='crontab' || ql==='schedule')){
+    items.unshift({title:'Cron Generator',desc:'Build cron expressions visually',icon:'C',type:'action',action:()=>{closeCommandPalette();showCronJobGen();}});
+  }
+  if(ql && (ql==='sprint' || ql==='sprint board' || ql==='sprint planning' || ql==='scrum')){
+    items.unshift({title:'Sprint Board',desc:'2-week sprint with task tracking',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSprintBoard();}});
+  }
+  if(ql && (ql==='morning routine' || ql==='morning' || ql==='routine' || ql==='morning checklist')){
+    items.unshift({title:'Morning Routine',desc:'Daily morning checklist with streak',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMorningRoutine();}});
+  }
+  if(ql && (ql==='makefile' || ql==='make' || ql==='makefile generator' || ql==='build system')){
+    items.unshift({title:'Makefile Generator',desc:'Generate Makefiles for C, Node, Python, Docker, Go',icon:'M',type:'action',action:()=>{closeCommandPalette();showMakefileGen();}});
+  }
+  if(ql && (ql==='overdue chart' || ql==='overdue' || ql==='overdue distribution' || ql==='late tasks')){
+    items.unshift({title:'Overdue Chart',desc:'Distribution of overdue tasks by time',icon:'O',type:'action',action:()=>{closeCommandPalette();showTaskOverdueChart();}});
+  }
+  if(ql && (ql==='water intake' || ql==='water' || ql==='hydration tracker' || ql==='drink water')){
+    items.unshift({title:'Water Intake',desc:'Track daily water glasses',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWaterIntake();}});
   }
   return items.slice(0, 20);
 }
@@ -24899,6 +24923,217 @@ function showQuickReadingLog(){
   }
   document.body.appendChild(p);
   rend();
+}
+function showCronJobGen(){
+  let p=document.getElementById('cron-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='cron-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  let cfg=S._cronCfg||{min:'0',hr:'*',dom:'*',mon:'*',dow:'*'};
+  let presets=[
+    {label:'Every minute',v:{min:'*',hr:'*',dom:'*',mon:'*',dow:'*'}},
+    {label:'Every hour',v:{min:'0',hr:'*',dom:'*',mon:'*',dow:'*'}},
+    {label:'Daily midnight',v:{min:'0',hr:'0',dom:'*',mon:'*',dow:'*'}},
+    {label:'Daily 9 AM',v:{min:'0',hr:'9',dom:'*',mon:'*',dow:'*'}},
+    {label:'Weekly Monday',v:{min:'0',hr:'0',dom:'*',mon:'*',dow:'1'}},
+    {label:'Monthly 1st',v:{min:'0',hr:'0',dom:'1',mon:'*',dow:'*'}},
+    {label:'Every 5 min',v:{min:'*/5',hr:'*',dom:'*',mon:'*',dow:'*'}},
+    {label:'Every 30 min',v:{min:'*/30',hr:'*',dom:'*',mon:'*',dow:'*'}},
+    {label:'Weekdays 8 AM',v:{min:'0',hr:'8',dom:'*',mon:'*',dow:'1-5'}},
+    {label:'Every 6 hours',v:{min:'0',hr:'*/6',dom:'*',mon:'*',dow:'*'}}
+  ];
+  function getCron(){return cfg.min+' '+cfg.hr+' '+cfg.dom+' '+cfg.mon+' '+cfg.dow;}
+  function describe(){
+    let c=getCron();
+    if(c==='* * * * *')return 'Every minute';
+    if(c==='0 * * * *')return 'Every hour at minute 0';
+    if(c.match(/^0 0 \* \* \*$/))return 'Daily at midnight';
+    if(c.match(/^0 \d+ \* \* \*$/))return 'Daily at '+cfg.hr+':00';
+    if(c.match(/^\*\/(\d+) \* \* \* \*$/))return 'Every '+cfg.min.split('/')[1]+' minutes';
+    return c;
+  }
+  function rend(){
+    let fields=[
+      {k:'min',label:'Minute',placeholder:'0-59, */5'},
+      {k:'hr',label:'Hour',placeholder:'0-23, */2'},
+      {k:'dom',label:'Day (month)',placeholder:'1-31'},
+      {k:'mon',label:'Month',placeholder:'1-12'},
+      {k:'dow',label:'Day (week)',placeholder:'0-6 (Sun=0)'}
+    ];
+    let fieldHtml=fields.map(f=>'<div style="text-align:center"><label style="font-size:9px;color:var(--text-muted);display:block;margin-bottom:2px">'+f.label+'</label><input data-ck="'+f.k+'" value="'+esc(cfg[f.k])+'" placeholder="'+f.placeholder+'" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:#4ade80;font-family:monospace;font-size:14px;text-align:center;box-sizing:border-box"></div>').join('');
+    let presetBtns=presets.map(pr=>'<button data-cp="'+esc(JSON.stringify(pr.v))+'" style="padding:3px 8px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg-surface);color:var(--text-muted);cursor:pointer;font-size:10px">'+pr.label+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Cron Job Generator</span><button onclick="document.getElementById(\'cron-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px">'+fieldHtml+'</div>'
+      +'<div style="text-align:center;margin-bottom:10px"><div style="font-family:monospace;font-size:18px;font-weight:700;color:#4ade80;margin-bottom:4px">'+getCron()+'</div><div style="font-size:11px;color:var(--text-muted)">'+describe()+'</div></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px;justify-content:center">'+presetBtns+'</div>'
+      +'<button id="cron-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy Cron Expression</button>';
+    p.querySelectorAll('[data-ck]').forEach(inp=>{inp.oninput=function(){cfg[this.dataset.ck]=this.value;S._cronCfg=cfg;save();rend();};});
+    p.querySelectorAll('[data-cp]').forEach(b=>{b.onclick=function(){cfg=JSON.parse(this.dataset.cp);S._cronCfg=cfg;save();rend();};});
+    document.getElementById('cron-copy').onclick=function(){navigator.clipboard.writeText(getCron());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy Cron Expression';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskSprintBoard(){
+  let p=document.getElementById('sprint-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='sprint-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._sprints)S._sprints=[];
+  let now=new Date();
+  let current=S._sprints.find(s=>new Date(s.end)>=now&&new Date(s.start)<=now);
+  if(!current){
+    let start=new Date(now);start.setDate(start.getDate()-start.getDay()+1);
+    let end=new Date(start);end.setDate(end.getDate()+13);
+    current={id:Date.now(),name:'Sprint '+(S._sprints.length+1),start:start.toISOString().slice(0,10),end:end.toISOString().slice(0,10),tasks:[]};
+    S._sprints.push(current);save();
+  }
+  let tasks=(S.tasks||[]);
+  let sprintTasks=tasks.filter(t=>current.tasks.includes(t.id));
+  let available=tasks.filter(t=>t.status!=='done'&&!current.tasks.includes(t.id));
+  let done=sprintTasks.filter(t=>t.status==='done').length;
+  let total=sprintTasks.length;
+  let pct=total>0?Math.round(done/total*100):0;
+  let daysLeft=Math.max(Math.ceil((new Date(current.end)-now)/86400000),0);
+  function rend(){
+    sprintTasks=tasks.filter(t=>current.tasks.includes(t.id));
+    done=sprintTasks.filter(t=>t.status==='done').length;
+    total=sprintTasks.length;
+    pct=total>0?Math.round(done/total*100):0;
+    let taskRows=sprintTasks.map(t=>{
+      let statusColor=t.status==='done'?'#4ade80':t.status==='in-progress'?'#22d3ee':'#fbbf24';
+      return '<div style="display:flex;align-items:center;gap:6px;padding:4px;background:var(--bg-surface);border-radius:3px;margin-bottom:3px"><span style="width:6px;height:6px;border-radius:50%;background:'+statusColor+'"></span><span style="flex:1;font-size:11px;color:var(--text-primary);'+(t.status==='done'?'text-decoration:line-through;opacity:0.5':'')+'">'+esc(t.title)+'</span><span style="font-size:9px;color:'+statusColor+'">'+t.status+'</span></div>';
+    }).join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">'+esc(current.name)+'</span><button onclick="document.getElementById(\'sprint-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">'+current.start+' to '+current.end+' | '+daysLeft+' days left</div>'
+      +'<div style="height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:#4ade80;transition:width 0.3s"></div></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">'+done+'/'+total+' tasks done ('+pct+'%)</div>'
+      +(taskRows||'<div style="text-align:center;color:var(--text-muted);padding:10px;font-size:11px">No tasks in sprint. Add from below.</div>')
+      +'<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Add to sprint ('+available.length+' available)</div><select id="sprint-add-sel" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;margin-bottom:4px">'+available.slice(0,20).map(t=>'<option value="'+t.id+'">'+esc(t.title)+'</option>').join('')+'</select><button id="sprint-add-btn" style="width:100%;padding:6px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:11px">Add to Sprint</button></div>';
+    document.getElementById('sprint-add-btn').onclick=function(){
+      let sel=document.getElementById('sprint-add-sel');
+      if(!sel.value)return;
+      current.tasks.push(sel.value);save();rend();
+    };
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showQuickMorningRoutine(){
+  let p=document.getElementById('morning-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='morning-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  let today=new Date().toISOString().slice(0,10);
+  if(!S._morningRoutine)S._morningRoutine={items:[
+    {id:1,text:'Drink water',emoji:''},
+    {id:2,text:'5 min stretch',emoji:''},
+    {id:3,text:'Review today tasks',emoji:''},
+    {id:4,text:'Set top 3 priorities',emoji:''},
+    {id:5,text:'Clear inbox',emoji:''}
+  ],log:{}};
+  let routine=S._morningRoutine;
+  if(!routine.log[today])routine.log[today]=[];
+  function rend(){
+    let checked=routine.log[today]||[];
+    let items=routine.items.map(item=>{
+      let isDone=checked.includes(item.id);
+      return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)"><input type="checkbox" data-mi="'+item.id+'" '+(isDone?'checked':'')+' style="cursor:pointer"><span style="flex:1;font-size:11px;color:var(--text-primary);'+(isDone?'text-decoration:line-through;opacity:0.5':'')+'">'+esc(item.text)+'</span></div>';
+    }).join('');
+    let done=checked.length;
+    let total=routine.items.length;
+    let pct=total>0?Math.round(done/total*100):0;
+    let streak=0;let d=new Date();
+    while(true){
+      let ds=d.toISOString().slice(0,10);
+      let dayLog=routine.log[ds]||[];
+      if(dayLog.length===routine.items.length){streak++;d.setDate(d.getDate()-1);}
+      else break;
+    }
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Morning Routine</span><button onclick="document.getElementById(\'morning-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:'+pct+'%;background:#4ade80;transition:width 0.3s"></div></div>'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:10px;color:var(--text-muted)"><span>'+done+'/'+total+' ('+pct+'%)</span><span>Streak: '+streak+' days</span></div>'
+      +items;
+    p.querySelectorAll('[data-mi]').forEach(cb=>{
+      cb.onchange=function(){
+        let id=parseInt(this.dataset.mi);
+        if(this.checked){if(!routine.log[today].includes(id))routine.log[today].push(id);}
+        else{routine.log[today]=routine.log[today].filter(i=>i!==id);}
+        S._morningRoutine=routine;save();rend();
+      };
+    });
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showMakefileGen(){
+  let ex=document.getElementById('makefile-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'C Project':`CC=gcc\nCFLAGS=-Wall -Wextra -std=c11\nSRC=$(wildcard src/*.c)\nOBJ=$(SRC:.c=.o)\nTARGET=app\n\nall: $(TARGET)\n\n$(TARGET): $(OBJ)\n\t$(CC) $(CFLAGS) -o $@ $^\n\n%.o: %.c\n\t$(CC) $(CFLAGS) -c $< -o $@\n\nclean:\n\trm -f $(OBJ) $(TARGET)\n\n.PHONY: all clean`,
+    'Node.js':`NODE=node\nNPM=npm\n\ninstall:\n\t$(NPM) install\n\ndev:\n\t$(NPM) run dev\n\nbuild:\n\t$(NPM) run build\n\ntest:\n\t$(NPM) test\n\nlint:\n\t$(NPM) run lint\n\nclean:\n\trm -rf node_modules dist\n\n.PHONY: install dev build test lint clean`,
+    'Python':`PYTHON=python3\nVENV=.venv\nPIP=$(VENV)/bin/pip\n\nvenv:\n\t$(PYTHON) -m venv $(VENV)\n\ninstall: venv\n\t$(PIP) install -r requirements.txt\n\nrun:\n\t$(VENV)/bin/python main.py\n\ntest:\n\t$(VENV)/bin/pytest tests/\n\nlint:\n\t$(VENV)/bin/flake8 src/\n\nclean:\n\trm -rf $(VENV) __pycache__ .pytest_cache\n\n.PHONY: venv install run test lint clean`,
+    'Docker':`IMAGE=myapp\nTAG=latest\n\nbuild:\n\tdocker build -t $(IMAGE):$(TAG) .\n\nrun:\n\tdocker run -d -p 8080:8080 $(IMAGE):$(TAG)\n\nstop:\n\tdocker stop $$(docker ps -q --filter ancestor=$(IMAGE):$(TAG))\n\npush:\n\tdocker push $(IMAGE):$(TAG)\n\nclean:\n\tdocker rmi $(IMAGE):$(TAG)\n\n.PHONY: build run stop push clean`,
+    'Go':`BINARY=app\nGO=go\n\nbuild:\n\t$(GO) build -o $(BINARY) ./cmd/...\n\nrun: build\n\t./$(BINARY)\n\ntest:\n\t$(GO) test ./...\n\nlint:\n\tgolangci-lint run\n\nclean:\n\trm -f $(BINARY)\n\n.PHONY: build run test lint clean`
+  };
+  let sel='C Project';
+  const d=document.createElement('div');d.id='makefile-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-mkpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-mkpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Makefile Generator</span><span onclick="document.getElementById('makefile-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#makefile-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Makefile',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Makefile</button>
+    </div>`;
+    d.querySelectorAll('[data-mkpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.mkpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskOverdueChart(){
+  let ex=document.getElementById('overdue-chart-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&t.due);
+  const now=new Date();now.setHours(0,0,0,0);
+  const buckets={'On Time':0,'1 day':0,'2-3 days':0,'4-7 days':0,'1-2 weeks':0,'2+ weeks':0};
+  tasks.forEach(t=>{
+    const dd=new Date(t.due);dd.setHours(0,0,0,0);
+    const diff=Math.floor((now-dd)/(1000*60*60*24));
+    if(diff<=0) buckets['On Time']++;
+    else if(diff===1) buckets['1 day']++;
+    else if(diff<=3) buckets['2-3 days']++;
+    else if(diff<=7) buckets['4-7 days']++;
+    else if(diff<=14) buckets['1-2 weeks']++;
+    else buckets['2+ weeks']++;
+  });
+  const keys=Object.keys(buckets);const vals=Object.values(buckets);
+  const mx=Math.max(...vals,1);
+  const colors=['#4ade80','#facc15','#fb923c','#f87171','#ef4444','#dc2626'];
+  const bars=keys.map((k,i)=>{const h=Math.round((vals[i]/mx)*120);return `<rect x="${i*50+10}" y="${140-h}" width="36" height="${h}" rx="3" fill="${colors[i]}" opacity="0.85"/><text x="${i*50+28}" y="${155}" text-anchor="middle" fill="var(--text-muted)" font-size="8">${k}</text><text x="${i*50+28}" y="${138-h}" text-anchor="middle" fill="var(--text-primary)" font-size="10" font-weight="600">${vals[i]}</text>`;}).join('');
+  const d=document.createElement('div');d.id='overdue-chart-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Overdue Distribution</span><span onclick="document.getElementById('overdue-chart-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <svg width="320" height="165" viewBox="0 0 320 165">${bars}</svg>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">${tasks.length} tasks with due dates | ${vals.slice(1).reduce((a,b)=>a+b,0)} overdue</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickWaterIntake(){
+  let ex=document.getElementById('water-intake-float');if(ex){ex.remove();return;}
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._waterLog) S._waterLog={};
+  if(!S._waterLog[today]) S._waterLog[today]=0;
+  const goal=8;
+  const d=document.createElement('div');d.id='water-intake-float';
+  const rend=()=>{
+    const ct=S._waterLog[today]||0;
+    const pct=Math.min(Math.round((ct/goal)*100),100);
+    const drops=Array.from({length:goal},(_, i)=>`<div onclick="window._waterTap(${i})" style="width:28px;height:36px;border-radius:0 50% 50% 50%;transform:rotate(45deg);cursor:pointer;${i<ct?'background:linear-gradient(135deg,#22d3ee,#06b6d4)':'background:var(--bg-surface);border:1px solid var(--border)'};transition:all 0.2s" title="Glass ${i+1}"></div>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:220px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Water Intake</span><span onclick="document.getElementById('water-intake-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px">${drops}</div>
+      <div style="background:var(--bg-surface);border-radius:6px;height:8px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#22d3ee,#4ade80);border-radius:6px;transition:width 0.3s"></div></div>
+      <div style="text-align:center;font-size:11px;color:var(--text-muted)">${ct}/${goal} glasses (${pct}%)</div>
+      ${ct>=goal?'<div style="text-align:center;margin-top:6px;font-size:11px;color:#4ade80;font-weight:600">Goal reached!</div>':''}
+    </div>`;
+  };
+  window._waterTap=(i)=>{S._waterLog[today]=i+1;save();rend();};
+  document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
