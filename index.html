@@ -5790,6 +5790,9 @@ function cmdGetItems(q) {
       ['settings','App preferences and configuration'],
       ['impact','Task impact-effort matrix (2x2)'],
       ['export content','Export all content as markdown'],
+      ['focus stats','Focus/Pomodoro session history and stats'],
+      ['eisenhower','Urgent vs Important task matrix (4 quadrants)'],
+      ['content calendar','Calendar view of content creation dates'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7039,6 +7042,18 @@ function cmdGetItems(q) {
     items.unshift({title:'Export All Content as Markdown',desc:'Download '+S.content.length+' items as a single .md file',icon:'C',type:'action',action:()=>{closeCommandPalette();exportAllContent();}});
     items.unshift({title:'Export All Content as JSON',desc:'Download raw content data',icon:'C',type:'action',action:()=>{closeCommandPalette();exportContentJSON();}});
   }
+  // Focus stats prefix
+  if(ql && (ql==='focus stats' || ql==='focus history' || ql==='pomodoro stats' || ql==='focus sessions')){
+    items.unshift({title:'Focus Session Stats',desc:'Total time, streaks, weekly breakdown, session history',icon:'F',type:'action',action:()=>{closeCommandPalette();showFocusStats();}});
+  }
+  // Eisenhower matrix prefix
+  if(ql && (ql==='eisenhower' || ql==='eisenhower matrix' || ql==='urgent important' || ql==='4 quadrants')){
+    items.unshift({title:'Eisenhower Matrix',desc:'Urgent vs Important: Do First, Schedule, Delegate, Eliminate',icon:'E',type:'action',action:()=>{closeCommandPalette();showEisenhowerMatrix();}});
+  }
+  // Content calendar prefix
+  if(ql && (ql==='content calendar' || ql==='creation calendar' || ql==='content dates' || ql==='writing calendar')){
+    items.unshift({title:'Content Calendar',desc:'Calendar view showing when content was created',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentCalendar();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7587,6 +7602,118 @@ function exportContentJSON(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='content-'+new Date().toISOString().split('T')[0]+'.json';
   a.click();toast('Exported '+S.content.length+' items as JSON');
+}
+function showFocusStats(){
+  let panel=document.getElementById('focus-stats-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='focus-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto';
+  const sessions=(S.focusSessions||[]).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const totalMin=sessions.reduce((s,x)=>s+(x.duration||0),0);
+  const totalSessions=sessions.length;
+  const today=new Date().toISOString().split('T')[0];
+  const todaySessions=sessions.filter(s=>s.date===today);
+  const todayMin=todaySessions.reduce((s,x)=>s+(x.duration||0),0);
+  const thisWeek=new Date();thisWeek.setDate(thisWeek.getDate()-7);const weekStr=thisWeek.toISOString().split('T')[0];
+  const weekSessions=sessions.filter(s=>s.date>=weekStr);
+  const weekMin=weekSessions.reduce((s,x)=>s+(x.duration||0),0);
+  const avgPerSession=totalSessions?Math.round(totalMin/totalSessions):0;
+  let streak=0;const d=new Date();
+  for(let i=0;i<365;i++){const ds=d.toISOString().split('T')[0];if(sessions.some(s=>s.date===ds)){streak++;}else if(i>0){break;}d.setDate(d.getDate()-1);}
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:20px;font-weight:700;color:var(--accent)">${Math.round(totalMin/60)}h ${totalMin%60}m</div><div style="font-size:9px;color:var(--text-muted)">Total Focus Time</div></div>`;
+  h+=`<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:20px;font-weight:700;color:var(--accent)">${totalSessions}</div><div style="font-size:9px;color:var(--text-muted)">Total Sessions</div></div>`;
+  h+=`<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:20px;font-weight:700;color:var(--accent)">${avgPerSession}m</div><div style="font-size:9px;color:var(--text-muted)">Avg per Session</div></div>`;
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:600;color:#f59e0b">${todayMin}m</div><div style="font-size:8px;color:var(--text-muted)">Today</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:600;color:#3b82f6">${weekMin}m</div><div style="font-size:8px;color:var(--text-muted)">This Week</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:600;color:#8b5cf6">${streak}d</div><div style="font-size:8px;color:var(--text-muted)">Streak</div></div>`;
+  h+='</div>';
+  const days=[];for(let i=6;i>=0;i--){const dd=new Date();dd.setDate(dd.getDate()-i);days.push(dd.toISOString().split('T')[0]);}
+  const dayMins=days.map(d=>sessions.filter(s=>s.date===d).reduce((s,x)=>s+(x.duration||0),0));
+  const maxMin=Math.max(...dayMins,1);
+  h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Last 7 Days</div>';
+  h+='<div style="display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:16px">';
+  days.forEach((d,i)=>{const pct=dayMins[i]/maxMin*100;h+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:100%;height:${Math.max(pct,3)}%;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px"></div><span style="font-size:7px;color:var(--text-muted)">${d.substring(8)}</span></div>`;});
+  h+='</div>';
+  h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Recent Sessions</div>';
+  sessions.slice(0,15).forEach(s=>{
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 6px;font-size:10px;border-left:2px solid var(--accent);margin:2px 0"><span style="color:var(--text-muted);font-family:var(--mono);min-width:65px">${s.date||'?'}</span><span style="color:var(--accent);min-width:30px">${s.duration||0}m</span><span style="color:var(--text-primary);flex:1">${esc(s.taskName||s.task||'Untitled')}</span></div>`;
+  });
+  if(!sessions.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No focus sessions yet. Start one from task detail!</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Focus Session Stats</span><button onclick="document.getElementById('focus-stats-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showEisenhowerMatrix(){
+  let panel=document.getElementById('eisenhower-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='eisenhower-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const today=new Date().toISOString().split('T')[0];
+  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+3);const soonStr=tomorrow.toISOString().split('T')[0];
+  function isUrgent(t){return t.due&&t.due<=soonStr;}
+  function isImportant(t){return t.priority==='p0'||t.priority==='p1';}
+  const q1=active.filter(t=>isUrgent(t)&&isImportant(t));
+  const q2=active.filter(t=>!isUrgent(t)&&isImportant(t));
+  const q3=active.filter(t=>isUrgent(t)&&!isImportant(t));
+  const q4=active.filter(t=>!isUrgent(t)&&!isImportant(t));
+  function renderQ(tasks,label,color,advice){
+    let h=`<div style="padding:4px 8px;font-size:10px;font-weight:600;color:${color};margin-bottom:4px">${label} (${tasks.length})</div>`;
+    h+=`<div style="font-size:8px;color:var(--text-muted);padding:0 8px 6px;font-style:italic">${advice}</div>`;
+    tasks.slice(0,8).forEach(t=>{
+      const overdue=t.due&&t.due<today;
+      h+=`<div onclick="document.getElementById('eisenhower-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:6px;border-left:2px solid ${color}" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="flex:1">${esc(t.title||'Untitled')}</span>${t.due?`<span style="font-size:8px;font-family:var(--mono);color:${overdue?'var(--red)':'var(--text-muted)'}">${t.due.substring(5)}</span>`:''}<span style="font-size:8px;color:${t.priority==='p0'?'var(--red)':t.priority==='p1'?'var(--orange)':'var(--text-muted)'}">${t.priority||'p2'}</span></div>`;
+    });
+    if(tasks.length>8)h+=`<div style="padding:3px 8px;font-size:8px;color:var(--text-muted)">+${tasks.length-8} more</div>`;
+    if(!tasks.length)h+=`<div style="padding:8px;font-size:9px;color:var(--text-muted);text-align:center">None</div>`;
+    return h;
+  }
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Eisenhower Matrix</span><button onclick="document.getElementById('eisenhower-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">Urgent = due within 3 days | Important = P0 or P1</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:var(--bg-surface);border-radius:8px;padding:8px;border:1px solid rgba(239,68,68,0.3)">${renderQ(q1,'DO FIRST','#ef4444','Urgent + Important: Do immediately')}</div><div style="background:var(--bg-surface);border-radius:8px;padding:8px;border:1px solid rgba(59,130,246,0.3)">${renderQ(q2,'SCHEDULE','#3b82f6','Important but not urgent: Plan ahead')}</div><div style="background:var(--bg-surface);border-radius:8px;padding:8px;border:1px solid rgba(245,158,11,0.3)">${renderQ(q3,'DELEGATE','#f59e0b','Urgent but not important: Batch or delegate')}</div><div style="background:var(--bg-surface);border-radius:8px;padding:8px;border:1px solid rgba(107,114,128,0.3)">${renderQ(q4,'ELIMINATE','#6b7280','Not urgent or important: Drop or defer')}</div></div>`;
+  document.body.appendChild(panel);
+}
+function showContentCalendar(){
+  let panel=document.getElementById('content-cal-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-cal-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const byDate={};
+  S.content.forEach(c=>{
+    if(!c.createdAt)return;
+    const d=c.createdAt.split('T')[0];
+    if(!byDate[d])byDate[d]=[];
+    byDate[d].push(c);
+  });
+  (S.docs||[]).forEach(d=>{
+    const dt=(d.updatedAt||d.createdAt||'').split('T')[0];
+    if(dt&&!byDate[dt])byDate[dt]=[];
+    if(dt)byDate[dt].push({body:d.title||'Doc',type:'doc',theme:'writer'});
+  });
+  const todayStr=now.toISOString().split('T')[0];
+  let h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px">';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{h+=`<div style="text-align:center;font-size:9px;color:var(--text-muted);padding:4px 0;font-weight:600">${d}</div>`;});
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px">';
+  for(let i=0;i<firstDay;i++){h+='<div style="padding:4px;min-height:60px;background:var(--bg-surface);border-radius:4px;opacity:0.3"></div>';}
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const items=byDate[ds]||[];
+    const isToday=ds===todayStr;
+    h+=`<div style="padding:3px;min-height:60px;background:var(--bg-surface);border-radius:4px;${isToday?'border:1px solid var(--accent);':''}"><div style="font-size:9px;font-weight:600;color:${isToday?'var(--accent)':'var(--text-muted)'};">${d}</div>`;
+    items.slice(0,3).forEach(c=>{
+      const typeColor=c.theme==='writer'?'var(--accent)':c.type==='idea'?'#f59e0b':c.type==='quote'?'#8b5cf6':c.type==='code'?'#06b6d4':'#3b82f6';
+      h+=`<div style="font-size:7px;color:${typeColor};padding:1px 3px;background:${typeColor}15;border-radius:2px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc((c.body||'').substring(0,20))}</div>`;
+    });
+    if(items.length>3)h+=`<div style="font-size:7px;color:var(--text-muted);padding:1px 3px">+${items.length-3}</div>`;
+    h+='</div>';
+  }
+  h+='</div>';
+  const totalThisMonth=Object.keys(byDate).filter(d=>d.startsWith(`${year}-${String(month+1).padStart(2,'0')}`)).reduce((s,d)=>s+byDate[d].length,0);
+  const activeDays=Object.keys(byDate).filter(d=>d.startsWith(`${year}-${String(month+1).padStart(2,'0')}`)).length;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Calendar - ${monthName}</span><button onclick="document.getElementById('content-cal-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;gap:12px;margin-bottom:12px;font-size:10px"><span style="color:var(--text-muted)">${totalThisMonth} items this month</span><span style="color:var(--text-muted)">${activeDays} active days</span></div>${h}`;
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
