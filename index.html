@@ -5793,6 +5793,9 @@ function cmdGetItems(q) {
       ['focus stats','Focus/Pomodoro session history and stats'],
       ['eisenhower','Urgent vs Important task matrix (4 quadrants)'],
       ['content calendar','Calendar view of content creation dates'],
+      ['snippets','Save and reuse text snippets'],
+      ['heatmap full','365-day GitHub-style activity heatmap'],
+      ['link dashboard','Link stats: domains, categories, counts'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7054,6 +7057,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='content calendar' || ql==='creation calendar' || ql==='content dates' || ql==='writing calendar')){
     items.unshift({title:'Content Calendar',desc:'Calendar view showing when content was created',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentCalendar();}});
   }
+  // Snippet manager prefix
+  if(ql && (ql==='snippets' || ql==='snippet' || ql==='snippet manager' || ql==='text snippets')){
+    items.unshift({title:'Snippet Manager',desc:'Save and reuse text snippets quickly',icon:'S',type:'action',action:()=>{closeCommandPalette();showSnippetManager();}});
+  }
+  // Heatmap full prefix
+  if(ql && (ql==='heatmap full' || ql==='activity heatmap' || ql==='github heatmap' || ql==='365 heatmap')){
+    items.unshift({title:'Activity Heatmap (365 Days)',desc:'GitHub-style grid of daily activity across all sections',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskHeatmap();}});
+  }
+  // Link dashboard prefix
+  if(ql && (ql==='link dashboard' || ql==='link stats' || ql==='links overview' || ql==='link report')){
+    items.unshift({title:'Link Dashboard',desc:'Stats: top domains, categories, read-later, pinned',icon:'L',type:'action',action:()=>{closeCommandPalette();showLinkDashboard();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7713,6 +7728,120 @@ function showContentCalendar(){
   const totalThisMonth=Object.keys(byDate).filter(d=>d.startsWith(`${year}-${String(month+1).padStart(2,'0')}`)).reduce((s,d)=>s+byDate[d].length,0);
   const activeDays=Object.keys(byDate).filter(d=>d.startsWith(`${year}-${String(month+1).padStart(2,'0')}`)).length;
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Calendar - ${monthName}</span><button onclick="document.getElementById('content-cal-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;gap:12px;margin-bottom:12px;font-size:10px"><span style="color:var(--text-muted)">${totalThisMonth} items this month</span><span style="color:var(--text-muted)">${activeDays} active days</span></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showSnippetManager(){
+  if(!S._snippets)S._snippets=[];
+  let panel=document.getElementById('snippet-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='snippet-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="margin-bottom:12px"><input id="snip-name" placeholder="Snippet name..." style="width:48%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;margin-right:2%"><button onclick="addSnippet()" style="padding:6px 12px;background:var(--accent);border:none;border-radius:4px;color:#000;font-size:11px;font-weight:600;cursor:pointer">Add</button></div>';
+  h+='<textarea id="snip-text" placeholder="Snippet text..." style="width:100%;height:60px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;font-family:var(--mono);resize:vertical;margin-bottom:12px;box-sizing:border-box"></textarea>';
+  if(S._snippets.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Saved Snippets ('+S._snippets.length+')</div>';
+    S._snippets.forEach((s,i)=>{
+      h+=`<div style="padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:2px solid var(--accent)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:10px;font-weight:600;color:var(--text-primary)">${esc(s.name)}</span><div style="display:flex;gap:4px"><button onclick="navigator.clipboard.writeText(S._snippets[${i}].text);toast('Copied!')" style="padding:2px 6px;background:var(--accent);border:none;border-radius:3px;color:#000;font-size:8px;cursor:pointer">Copy</button><button onclick="S._snippets.splice(${i},1);save();showSnippetManager()" style="padding:2px 6px;background:var(--red);border:none;border-radius:3px;color:#fff;font-size:8px;cursor:pointer">Del</button></div></div><div style="font-size:9px;color:var(--text-muted);font-family:var(--mono);white-space:pre-wrap;max-height:60px;overflow-y:auto">${esc(s.text.substring(0,200))}</div></div>`;
+    });
+  }else{
+    h+='<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px">No snippets yet. Add your first reusable text snippet above.</div>';
+  }
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Snippet Manager</span><button onclick="document.getElementById('snippet-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function addSnippet(){
+  const nameEl=document.getElementById('snip-name');const textEl=document.getElementById('snip-text');
+  if(!nameEl||!textEl)return;
+  const name=nameEl.value.trim();const text=textEl.value.trim();
+  if(!name||!text){toast('Name and text required');return;}
+  if(!S._snippets)S._snippets=[];
+  S._snippets.unshift({name,text,createdAt:new Date().toISOString()});
+  save();showSnippetManager();toast('Snippet saved');
+}
+function showTaskHeatmap(){
+  let panel=document.getElementById('heatmap-full-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='heatmap-full-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:95vw;max-height:80vh;overflow-y:auto';
+  const today=new Date();const days=[];
+  for(let i=364;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+  const activity={};
+  S.tasks.forEach(t=>{
+    if(t.createdAt){const d=t.createdAt.split('T')[0];activity[d]=(activity[d]||0)+1;}
+    if(t.completedAt){const d=t.completedAt.split('T')[0];activity[d]=(activity[d]||0)+2;}
+    if(t.status==='done'&&t.due){activity[t.due]=(activity[t.due]||0)+1;}
+  });
+  S.content.forEach(c=>{if(c.createdAt){const d=c.createdAt.split('T')[0];activity[d]=(activity[d]||0)+1;}});
+  (S.focusSessions||[]).forEach(f=>{if(f.date){activity[f.date]=(activity[f.date]||0)+1;}});
+  const maxAct=Math.max(...Object.values(activity),1);
+  function getColor(count){
+    if(!count)return'var(--bg-surface)';
+    const intensity=count/maxAct;
+    if(intensity>0.75)return'#22c55e';
+    if(intensity>0.5)return'#16a34a';
+    if(intensity>0.25)return'#15803d';
+    return'#166534';
+  }
+  const weeks=Math.ceil(days.length/7);
+  let h='<div style="display:flex;gap:1px;overflow-x:auto">';
+  const startDow=new Date(days[0]).getDay();
+  let dayIdx=0;
+  for(let w=0;w<53;w++){
+    h+='<div style="display:flex;flex-direction:column;gap:1px">';
+    for(let d=0;d<7;d++){
+      if(w===0&&d<startDow){h+='<div style="width:10px;height:10px"></div>';continue;}
+      if(dayIdx>=days.length){h+='<div style="width:10px;height:10px"></div>';continue;}
+      const ds=days[dayIdx];const count=activity[ds]||0;
+      h+=`<div title="${ds}: ${count} activities" style="width:10px;height:10px;border-radius:2px;background:${getColor(count)}" onmouseenter="this.style.outline='1px solid var(--text-primary)'" onmouseleave="this.style.outline='none'"></div>`;
+      dayIdx++;
+    }
+    h+='</div>';
+  }
+  h+='</div>';
+  const monthLabels=[];let prevMonth='';
+  days.forEach((d,i)=>{const m=d.substring(0,7);if(m!==prevMonth){monthLabels.push({idx:Math.floor(i/7),label:new Date(d).toLocaleDateString('en-US',{month:'short'})});prevMonth=m;}});
+  let monthBar='<div style="display:flex;gap:1px;margin-bottom:4px;padding-left:0">';
+  let lastIdx=-1;
+  monthLabels.forEach(m=>{const gap=(m.idx-lastIdx-1)*11;if(gap>0)monthBar+=`<span style="width:${gap}px"></span>`;monthBar+=`<span style="font-size:8px;color:var(--text-muted)">${m.label}</span>`;lastIdx=m.idx;});
+  monthBar+='</div>';
+  const totalAct=Object.values(activity).reduce((s,v)=>s+v,0);
+  const activeDays=Object.keys(activity).length;
+  let streak=0;const dd=new Date();
+  for(let i=0;i<365;i++){const ds=dd.toISOString().split('T')[0];if(activity[ds]){streak++;}else if(i>0){break;}dd.setDate(dd.getDate()-1);}
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Activity Heatmap (365 Days)</span><button onclick="document.getElementById('heatmap-full-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;gap:16px;margin-bottom:12px;font-size:10px"><span style="color:var(--text-muted)">${totalAct} total activities</span><span style="color:var(--text-muted)">${activeDays} active days</span><span style="color:var(--accent)">${streak}d streak</span></div>${monthBar}<div style="overflow-x:auto;padding:4px 0">${h}</div><div style="display:flex;align-items:center;gap:4px;margin-top:8px;font-size:8px;color:var(--text-muted)">Less <div style="width:10px;height:10px;border-radius:2px;background:var(--bg-surface)"></div><div style="width:10px;height:10px;border-radius:2px;background:#166534"></div><div style="width:10px;height:10px;border-radius:2px;background:#15803d"></div><div style="width:10px;height:10px;border-radius:2px;background:#16a34a"></div><div style="width:10px;height:10px;border-radius:2px;background:#22c55e"></div> More</div>`;
+  document.body.appendChild(panel);
+}
+function showLinkDashboard(){
+  let panel=document.getElementById('link-dash-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='link-dash-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto';
+  const links=S.links||[];
+  const total=links.length;
+  const pinned=links.filter(l=>l.pinned).length;
+  const readLater=links.filter(l=>l.readLater).length;
+  const read=links.filter(l=>l.isRead).length;
+  const cats={};links.forEach(l=>{const c=l.category||'Uncategorized';cats[c]=(cats[c]||0)+1;});
+  const domains={};links.forEach(l=>{try{const u=new URL(l.url);domains[u.hostname]=(domains[u.hostname]||0)+1;}catch(e){}});
+  const topDomains=Object.entries(domains).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const thisWeek=new Date();thisWeek.setDate(thisWeek.getDate()-7);const weekStr=thisWeek.toISOString().split('T')[0];
+  const recentLinks=links.filter(l=>l.createdAt&&l.createdAt.split('T')[0]>=weekStr).length;
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:var(--accent)">${total}</div><div style="font-size:8px;color:var(--text-muted)">Total Links</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#f59e0b">${readLater}</div><div style="font-size:8px;color:var(--text-muted)">Read Later</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#22c55e">${recentLinks}</div><div style="font-size:8px;color:var(--text-muted)">This Week</div></div>`;
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+  h+='<div><div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">By Category</div>';
+  Object.entries(cats).sort((a,b)=>b[1]-a[1]).forEach(([c,n])=>{
+    const pct=Math.round(n/total*100);
+    h+=`<div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:9px"><span style="color:var(--text-primary);flex:1">${esc(c)}</span><span style="color:var(--accent)">${n}</span><div style="width:40px;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--accent);border-radius:2px"></div></div></div>`;
+  });
+  h+='</div>';
+  h+='<div><div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Top Domains</div>';
+  topDomains.forEach(([d,n])=>{
+    h+=`<div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:9px"><span style="color:var(--text-primary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d)}</span><span style="color:var(--accent)">${n}</span></div>`;
+  });
+  h+='</div></div>';
+  h+=`<div style="display:flex;gap:8px;font-size:9px;color:var(--text-muted)"><span>Pinned: ${pinned}</span><span>Read: ${read}</span></div>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Link Dashboard</span><button onclick="document.getElementById('link-dash-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
