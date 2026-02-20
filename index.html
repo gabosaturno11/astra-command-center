@@ -6503,6 +6503,12 @@ function cmdGetItems(q) {
       ['railway','Railway.app CLI reference'],
       ['eisenhower','Eisenhower urgency importance matrix'],
       ['jwt','JWT token decoder and inspector'],
+      ['netstat','Network ports and connections reference'],
+      ['labels overview','Cross-section tag usage analysis'],
+      ['epoch','Unix timestamp epoch converter'],
+      ['tailwind','Tailwind CSS utility class reference'],
+      ['scope creep','Are you adding tasks faster than completing'],
+      ['bitwise','Bitwise AND OR XOR shift calculator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10181,6 +10187,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='jwt' || ql==='jwt decoder' || ql==='decode token' || ql==='token inspect')){
     items.unshift({title:'JWT Decoder',desc:'Decode and inspect JWT tokens',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJwtDecoder();}});
+  }
+  if(ql && (ql==='netstat' || ql==='ports' || ql==='network ports' || ql==='lsof')){
+    items.unshift({title:'Network/Ports Reference',desc:'netstat, ss, lsof, DNS, traffic',icon:'N',type:'action',action:()=>{closeCommandPalette();showNetstatRef();}});
+  }
+  if(ql && (ql==='labels' || ql==='labels overview' || ql==='all tags' || ql==='cross section tags')){
+    items.unshift({title:'Labels Overview',desc:'Tag usage across tasks, content, docs',icon:'L',type:'action',action:()=>{closeCommandPalette();showTaskLabelsOverview();}});
+  }
+  if(ql && (ql==='epoch' || ql==='epoch converter' || ql==='unix timestamp' || ql==='timestamp convert')){
+    items.unshift({title:'Epoch Converter',desc:'Unix timestamp to date and back',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEpochConverter();}});
+  }
+  if(ql && (ql==='tailwind' || ql==='tailwind css' || ql==='tw classes' || ql==='utility classes')){
+    items.unshift({title:'Tailwind CSS Reference',desc:'Spacing, flex, grid, typography, colors',icon:'T',type:'action',action:()=>{closeCommandPalette();showTailwindRef();}});
+  }
+  if(ql && (ql==='scope creep' || ql==='scope' || ql==='task growth' || ql==='backlog growth')){
+    items.unshift({title:'Scope Creep Monitor',desc:'Task creation vs completion rate',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskScopeCreep();}});
+  }
+  if(ql && (ql==='bitwise' || ql==='bit calc' || ql==='bitwise calc' || ql==='bit operations')){
+    items.unshift({title:'Bitwise Calculator',desc:'AND, OR, XOR, shift operations',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBitwiseCalc();}});
   }
   return items.slice(0, 20);
 }
@@ -32664,6 +32688,140 @@ function showQuickJwtDecoder(){
       r+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Signature: '+parts[2].substring(0,30)+'... (not verified client-side)</div>';
       out.innerHTML=r;
     }catch(e){out.innerHTML='<span style="color:#ef4444;font-size:11px">Error: '+esc(e.message)+'</span>';}
+  };
+}
+function showNetstatRef(){
+  const cmds={
+    'Active Connections':{'All connections':'netstat -an','Listening ports':'netstat -tlnp','UDP ports':'netstat -ulnp','TCP connections':'netstat -tn','Statistics':'netstat -s'},
+    'macOS / ss':{'All sockets (ss)':'ss -tunap','Listening (ss)':'ss -tlnp','TCP established':'ss -tn state established','By process':'ss -tlnp | grep node','Socket summary':'ss -s'},
+    'Port Checking':{'Check specific port':'lsof -i :3000','Kill process on port':'kill -9 $(lsof -t -i :3000)','Find PID on port':'fuser 3000/tcp','Open ports scan':'nmap -sT localhost','Port range':'nmap -p 1-1000 localhost'},
+    'DNS & Network':{'DNS lookup':'nslookup example.com','Dig query':'dig example.com','Trace route':'traceroute example.com','Ping host':'ping -c 4 example.com','Network interfaces':'ifconfig (macOS) / ip addr (Linux)'},
+    'Traffic & Debug':{'Packet capture':'tcpdump -i any port 80','HTTP traffic':'tcpdump -A -s0 port 80','Bandwidth monitor':'iftop','Connection count':'ss -s | head -5','Route table':'netstat -rn'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Network/Ports Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskLabelsOverview(){
+  const tasks=S.tasks||[];const content=S.content||[];const docs=S.writerDocs||[];
+  const allTags={};
+  tasks.forEach(t=>{if(t.tags)t.tags.forEach(tag=>{if(!allTags[tag])allTags[tag]={tasks:0,content:0,docs:0};allTags[tag].tasks++;});});
+  content.forEach(c=>{if(c.tags)c.tags.forEach(tag=>{if(!allTags[tag])allTags[tag]={tasks:0,content:0,docs:0};allTags[tag].content++;});});
+  docs.forEach(d=>{if(d.tags)d.tags.forEach(tag=>{if(!allTags[tag])allTags[tag]={tasks:0,content:0,docs:0};allTags[tag].docs++;});});
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Labels Overview</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const sorted=Object.entries(allTags).sort((a,b)=>(b[1].tasks+b[1].content+b[1].docs)-(a[1].tasks+a[1].content+a[1].docs));
+  if(sorted.length===0){
+    html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No tags found across tasks, content, or docs.</div>';
+  } else {
+    html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+    html+='<tr><th style="padding:6px 8px;text-align:left;border-bottom:1px solid var(--border);color:var(--text-muted)">Tag</th><th style="padding:6px;text-align:center;border-bottom:1px solid var(--border);color:#4ade80">Tasks</th><th style="padding:6px;text-align:center;border-bottom:1px solid var(--border);color:#06b6d4">Content</th><th style="padding:6px;text-align:center;border-bottom:1px solid var(--border);color:#f59e0b">Docs</th><th style="padding:6px;text-align:center;border-bottom:1px solid var(--border);color:var(--text-muted)">Total</th></tr>';
+    sorted.slice(0,20).forEach(([tag,data])=>{
+      const total=data.tasks+data.content+data.docs;
+      html+='<tr><td style="padding:4px 8px;border-bottom:1px solid var(--border);color:var(--text-primary)">'+esc(tag)+'</td>';
+      html+='<td style="padding:4px;text-align:center;border-bottom:1px solid var(--border);color:#4ade80">'+(data.tasks||'-')+'</td>';
+      html+='<td style="padding:4px;text-align:center;border-bottom:1px solid var(--border);color:#06b6d4">'+(data.content||'-')+'</td>';
+      html+='<td style="padding:4px;text-align:center;border-bottom:1px solid var(--border);color:#f59e0b">'+(data.docs||'-')+'</td>';
+      html+='<td style="padding:4px;text-align:center;border-bottom:1px solid var(--border);color:var(--text-primary);font-weight:600">'+total+'</td></tr>';
+    });
+    html+='</table></div>';
+    html+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted)">'+sorted.length+' unique tags across all sections</div>';
+  }
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickEpochConverter(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Epoch Converter</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  const now=Math.floor(Date.now()/1000);
+  html+='<div style="margin-bottom:10px;padding:8px;background:var(--bg-surface);border-radius:4px"><div style="color:var(--text-muted);font-size:9px">Current Epoch</div><div style="color:#4ade80;font-size:16px;font-family:monospace;font-weight:600;cursor:pointer" onclick="navigator.clipboard.writeText(\''+now+'\');this.style.color=\'#fff\';setTimeout(()=>this.style.color=\'#4ade80\',500)">'+now+'</div></div>';
+  html+='<input id="epoch-input" type="number" placeholder="Enter epoch timestamp" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:4px;font-family:monospace;font-size:12px;box-sizing:border-box;margin-bottom:6px"/>';
+  html+='<button onclick="window._convertEpoch()" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;width:100%;margin-bottom:8px">Convert to Date</button>';
+  html+='<div id="epoch-output"></div>';
+  html+='<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px"><div style="color:var(--text-muted);font-size:9px;margin-bottom:4px">Date to Epoch</div>';
+  html+='<input id="date-input" type="datetime-local" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:4px;font-size:11px;box-sizing:border-box;margin-bottom:6px"/>';
+  html+='<button onclick="window._dateToEpoch()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;width:100%">Convert to Epoch</button>';
+  html+='<div id="date-epoch-output" style="margin-top:6px"></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._convertEpoch=function(){
+    const epoch=parseInt(document.getElementById('epoch-input').value);const out=document.getElementById('epoch-output');
+    if(isNaN(epoch)){out.innerHTML='';return;}
+    const ms=epoch>1e12?epoch:epoch*1000;const d2=new Date(ms);
+    out.innerHTML='<div style="padding:6px 8px;background:var(--bg-surface);border-radius:4px"><div style="color:var(--text-muted);font-size:9px">Local</div><div style="color:var(--text-primary);font-size:11px;font-family:monospace">'+d2.toLocaleString()+'</div><div style="color:var(--text-muted);font-size:9px;margin-top:4px">ISO 8601</div><div style="color:var(--text-primary);font-size:11px;font-family:monospace">'+d2.toISOString()+'</div></div>';
+  };
+  window._dateToEpoch=function(){
+    const val=document.getElementById('date-input').value;const out=document.getElementById('date-epoch-output');
+    if(!val){out.innerHTML='';return;}
+    const epoch=Math.floor(new Date(val).getTime()/1000);
+    out.innerHTML='<div style="padding:6px 8px;background:var(--bg-surface);border-radius:4px;font-family:monospace;font-size:12px;color:#4ade80;cursor:pointer" onclick="navigator.clipboard.writeText(\''+epoch+'\')">'+epoch+' <span style="color:var(--text-muted);font-size:9px">(click to copy)</span></div>';
+  };
+}
+function showTailwindRef(){
+  const cmds={
+    'Spacing':{'Padding':'p-{0-96} | px-4 py-2 | pt-4 pb-8 pl-2 pr-6','Margin':'m-{0-96} | mx-auto my-4 | mt-2 mb-8 | -m-2 (negative)','Space Between':'space-x-4 space-y-2 | space-x-reverse','Gap':'gap-{0-96} | gap-x-4 gap-y-2','Width/Height':'w-{0-96} w-full w-screen w-auto | h-{0-96} h-full h-screen'},
+    'Flexbox':{'Display':'flex inline-flex','Direction':'flex-row flex-col flex-row-reverse flex-col-reverse','Wrap':'flex-wrap flex-nowrap flex-wrap-reverse','Justify':'justify-start justify-center justify-between justify-around justify-evenly','Align':'items-start items-center items-end items-stretch items-baseline'},
+    'Grid':{'Grid cols':'grid-cols-{1-12} grid-cols-none','Grid rows':'grid-rows-{1-6} grid-rows-none','Col span':'col-span-{1-12} col-span-full','Row span':'row-span-{1-6} row-span-full','Auto flow':'grid-flow-row grid-flow-col grid-flow-dense'},
+    'Typography':{'Font size':'text-xs text-sm text-base text-lg text-xl text-2xl text-3xl','Font weight':'font-thin font-light font-normal font-medium font-semibold font-bold','Color':'text-gray-500 text-red-600 text-blue-400','Alignment':'text-left text-center text-right text-justify','Decoration':'underline line-through no-underline'},
+    'Colors & BG':{'Background':'bg-{color}-{100-900} | bg-transparent bg-white bg-black','Opacity':'opacity-{0-100} | bg-opacity-50','Border':'border border-2 border-{color}-500 | rounded rounded-lg rounded-full','Shadow':'shadow shadow-md shadow-lg shadow-xl shadow-2xl shadow-none','Gradient':'bg-gradient-to-r from-{color}-500 to-{color}-700'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Tailwind CSS Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskScopeCreep(){
+  const tasks=S.tasks||[];const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(now.getDate()-7);
+  const twoWeeksAgo=new Date(now);twoWeeksAgo.setDate(now.getDate()-14);
+  const thisWeekCreated=tasks.filter(t=>{const d=new Date(t.created||t.createdAt||0);return d>=weekAgo;}).length;
+  const lastWeekCreated=tasks.filter(t=>{const d=new Date(t.created||t.createdAt||0);return d>=twoWeeksAgo&&d<weekAgo;}).length;
+  const thisWeekDone=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=weekAgo).length;
+  const totalOpen=tasks.filter(t=>t.status!=='done').length;
+  const growthRate=lastWeekCreated>0?Math.round((thisWeekCreated-lastWeekCreated)/lastWeekCreated*100):0;
+  const netFlow=thisWeekCreated-thisWeekDone;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Scope Creep Monitor</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const alertLevel=netFlow>5?'#ef4444':netFlow>2?'#f59e0b':'#4ade80';
+  const alertText=netFlow>5?'HIGH SCOPE CREEP':netFlow>2?'MODERATE SCOPE CREEP':'HEALTHY';
+  html+='<div style="text-align:center;margin-bottom:16px;padding:16px;background:'+alertLevel+'15;border:1px solid '+alertLevel+'33;border-radius:8px"><div style="font-size:14px;font-weight:700;color:'+alertLevel+'">'+alertText+'</div><div style="color:var(--text-muted);font-size:11px;margin-top:4px">Net flow this week: '+(netFlow>0?'+':'')+netFlow+' tasks</div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:#06b6d4">'+thisWeekCreated+'</div><div style="font-size:10px;color:var(--text-muted)">Created this week</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:#4ade80">'+thisWeekDone+'</div><div style="font-size:10px;color:var(--text-muted)">Done this week</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--text-primary)">'+totalOpen+'</div><div style="font-size:10px;color:var(--text-muted)">Total open</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:20px;font-weight:700;color:'+(growthRate>0?'#ef4444':'#4ade80')+'">'+(growthRate>0?'+':'')+growthRate+'%</div><div style="font-size:10px;color:var(--text-muted)">Growth vs last week</div></div>';
+  html+='</div>';
+  html+='<div style="padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">Tip: If net flow is consistently positive, you are adding tasks faster than completing them. Consider prioritizing completion or reducing new task creation.</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickBitwiseCalc(){
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Bitwise Calculator</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px"><input id="bit-a" type="number" placeholder="A" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:4px;font-family:monospace;font-size:12px"/>';
+  html+='<input id="bit-b" type="number" placeholder="B" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:4px;font-family:monospace;font-size:12px"/></div>';
+  html+='<button onclick="window._calcBitwise()" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;width:100%;margin-bottom:8px">Calculate</button>';
+  html+='<div id="bit-output"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._calcBitwise=function(){
+    const a=parseInt(document.getElementById('bit-a').value);const b=parseInt(document.getElementById('bit-b').value);const out=document.getElementById('bit-output');
+    if(isNaN(a)||isNaN(b)){out.innerHTML='<span style="color:var(--text-muted);font-size:11px">Enter two numbers</span>';return;}
+    const ops=[['AND (A & B)',(a&b)],['OR (A | B)',(a|b)],['XOR (A ^ B)',(a^b)],['NOT A (~A)',(~a)],['Left Shift (A << 1)',(a<<1)],['Right Shift (A >> 1)',(a>>1)]];
+    let r='';ops.forEach(([label,val])=>{
+      r+='<div style="display:flex;justify-content:space-between;padding:4px 8px;margin-bottom:2px;background:var(--bg-surface);border-radius:3px"><span style="color:var(--text-muted);font-size:10px">'+label+'</span><span style="color:var(--text-primary);font-size:11px;font-family:monospace">'+val+' <span style="color:var(--text-muted);font-size:9px">(0b'+(val>>>0).toString(2).slice(-16)+')</span></span></div>';
+    });
+    r+='<div style="margin-top:6px;padding:4px 8px;background:var(--bg-surface);border-radius:3px;font-size:9px;color:var(--text-muted)">A = '+a+' (0b'+((a>>>0).toString(2)).slice(-16)+') | B = '+b+' (0b'+((b>>>0).toString(2)).slice(-16)+')</div>';
+    out.innerHTML=r;
   };
 }
 function showProjectRoadmap(filterProject){
