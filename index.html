@@ -888,6 +888,8 @@ textarea{resize:vertical;line-height:1.6}
             <select id="task-bulk-priority" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Priority</option><option value="p0">P0</option><option value="p1">P1</option><option value="p2">P2</option><option value="p3">P3</option></select>
             <button class="btn btn-sm btn-danger" onclick="taskBulkDelete()">Delete</button>
             <button class="btn btn-sm" onclick="taskBulkApply()">Apply</button>
+            <button class="btn btn-sm" onclick="taskBulkSelectAll()">All</button>
+            <button class="btn btn-sm" onclick="taskSelected.clear();renderTasks()">None</button>
             <button class="btn btn-sm" onclick="toggleTaskBulk()">Cancel</button>
           </div>
           <button class="btn btn-sm" onclick="archiveCompletedTasks()" title="Archive all completed tasks">Archive Done</button>
@@ -2567,6 +2569,7 @@ function showArchivedTasks(){
   document.getElementById('task-board-view').classList.remove('active');
   rows.innerHTML='<div style="padding:8px 0;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:8px"><span>Archived Tasks ('+archived.length+')</span><button class="btn btn-sm btn-ghost" onclick="renderTasks()" style="font-size:8px;padding:1px 6px">Back to active</button></div>'+archived.slice(0,50).map(t=>`<div class="task-row completed priority-${t.priority||'p2'}" style="opacity:0.6"><div class="task-checkbox checked"></div><div><span style="font-size:12px;color:var(--text-secondary);text-decoration:line-through">${esc(t.title||'Untitled')}</span></div><div><span style="font-size:10px;color:var(--text-muted)">${t.project||''}</span></div><div><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':'muted'}" style="font-size:8px">${t.priority||'p3'}</span></div><div><span style="font-size:9px;color:var(--text-muted)">${t.due||''}</span></div><div><span style="font-size:8px;color:var(--text-muted)">${t.created?new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'?'}</span></div><div class="task-actions" style="opacity:1"><button class="task-action-btn" onclick="restoreArchivedTask(${t.id})" title="Restore" style="font-size:10px;color:var(--accent)">+</button></div></div>`).join('')+(archived.length>50?'<div style="padding:8px;font-size:10px;color:var(--text-muted)">Showing first 50 of '+archived.length+'</div>':'');
 }
+function taskBulkSelectAll(){const items=getFilteredTasks();items.forEach(t=>taskSelected.add(t.id));renderTasks();}
 function restoreArchivedTask(id){
   const idx=(S.archivedTasks||[]).findIndex(t=>t.id===id);
   if(idx<0)return;
@@ -5093,6 +5096,16 @@ function cmdGetItems(q) {
       S.tasks.filter(t=>t.status!=='done'&&t.title&&t.title.toLowerCase().includes(fq)).slice(0,5).forEach(t=>{
         items.unshift({title:'Focus: '+t.title,desc:'Start 25min Pomodoro + time tracking',icon:'F',type:'action',action:()=>{closeCommandPalette();ftStartForTask(t.id);toast('Focus started: '+t.title);}});
       });
+    }
+  }
+  // Priority filter from Cmd+K
+  if(ql && ql.startsWith('priority:') || ql && ql.startsWith('p:')) {
+    const pq=q.includes(':')?q.substring(q.indexOf(':')+1).trim().toLowerCase():'';
+    const pMap={'0':'p0','1':'p1','2':'p2','3':'p3','p0':'p0','p1':'p1','p2':'p2','p3':'p3','critical':'p0','high':'p1','medium':'p2','low':'p3'};
+    const p=pMap[pq];
+    if(p){
+      const cnt=S.tasks.filter(t=>t.priority===p&&t.status!=='done').length;
+      items.unshift({title:'Priority: '+p.toUpperCase()+' ('+cnt+' active)',desc:'Show '+p+' tasks',icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='priority';renderTasks();toast('Sorted by priority');}});
     }
   }
   // Status filter from Cmd+K
