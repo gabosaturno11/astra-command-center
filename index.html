@@ -6254,6 +6254,12 @@ function cmdGetItems(q) {
       ['babel','Babel config generator'],
       ['completion rate','Task completion rate donut'],
       ['box breathing','Box breathing exercise'],
+      ['editorconfig','EditorConfig file generator'],
+      ['due date calendar','Due date mini calendar'],
+      ['focus timer','Pomodoro focus timer widget'],
+      ['jest','Jest config generator'],
+      ['workload','Workload balance by project'],
+      ['daily quote','Quote of the day'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9185,6 +9191,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='box breathing' || ql==='box breath' || ql==='breathing box' || ql==='square breathing')){
     items.unshift({title:'Box Breathing',desc:'4-4-4-4 box breathing exercise',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBreathingBox();}});
+  }
+  if(ql && (ql==='editorconfig' || ql==='editor config' || ql==='indent' || ql==='code style')){
+    items.unshift({title:'EditorConfig',desc:'Generate .editorconfig for consistent code style',icon:'E',type:'action',action:()=>{closeCommandPalette();showEditorConfigGen();}});
+  }
+  if(ql && (ql==='due date calendar' || ql==='due calendar' || ql==='due dates' || ql==='deadline calendar')){
+    items.unshift({title:'Due Date Calendar',desc:'Mini calendar showing task due dates',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDueDateCalendar();}});
+  }
+  if(ql && (ql==='focus timer' || ql==='pomodoro timer' || ql==='timer widget' || ql==='work timer')){
+    items.unshift({title:'Focus Timer',desc:'25/5 Pomodoro timer widget',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFocusTimer();}});
+  }
+  if(ql && (ql==='jest' || ql==='jest config' || ql==='testing config' || ql==='test setup')){
+    items.unshift({title:'Jest Config',desc:'Generate jest.config.js for JS, TS, React, Next',icon:'J',type:'action',action:()=>{closeCommandPalette();showJestConfigGen();}});
+  }
+  if(ql && (ql==='workload' || ql==='workload balance' || ql==='project balance' || ql==='task distribution')){
+    items.unshift({title:'Workload Balance',desc:'Task distribution by project with priorities',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWorkloadBalance();}});
+  }
+  if(ql && (ql==='daily quote' || ql==='quote' || ql==='quote of the day' || ql==='inspiration')){
+    items.unshift({title:'Daily Quote',desc:'Programming quote of the day',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickDailyQuote();}});
   }
   return items.slice(0, 20);
 }
@@ -25333,6 +25357,195 @@ function showQuickBreathingBox(){
     rend();
   };
   document.body.appendChild(d);rend();
+}
+function showEditorConfigGen(){
+  let ex=document.getElementById('editorconfig-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'Standard':`root = true\n\n[*]\nindent_style = space\nindent_size = 2\nend_of_line = lf\ncharset = utf-8\ntrim_trailing_whitespace = true\ninsert_final_newline = true\n\n[*.md]\ntrim_trailing_whitespace = false\n\n[Makefile]\nindent_style = tab`,
+    'Tabs (4)':`root = true\n\n[*]\nindent_style = tab\nindent_size = 4\nend_of_line = lf\ncharset = utf-8\ntrim_trailing_whitespace = true\ninsert_final_newline = true\n\n[*.md]\ntrim_trailing_whitespace = false`,
+    'Python':`root = true\n\n[*]\nindent_style = space\nindent_size = 4\nend_of_line = lf\ncharset = utf-8\ntrim_trailing_whitespace = true\ninsert_final_newline = true\n\n[*.py]\nindent_size = 4\nmax_line_length = 88\n\n[Makefile]\nindent_style = tab`,
+    'Go':`root = true\n\n[*]\nindent_style = tab\nend_of_line = lf\ncharset = utf-8\ntrim_trailing_whitespace = true\ninsert_final_newline = true\n\n[*.go]\nindent_style = tab\n\n[*.{yml,yaml}]\nindent_style = space\nindent_size = 2`
+  };
+  let sel='Standard';
+  const d=document.createElement('div');d.id='editorconfig-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-ecpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-ecpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">.editorconfig Generator</span><span onclick="document.getElementById('editorconfig-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#editorconfig-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy .editorconfig',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy .editorconfig</button>
+    </div>`;
+    d.querySelectorAll('[data-ecpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.ecpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskDueDateCalendar(){
+  let ex=document.getElementById('duedate-cal-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.due&&t.status!=='done');
+  const now=new Date();
+  const yr=now.getFullYear();const mo=now.getMonth();
+  const first=new Date(yr,mo,1);const last=new Date(yr,mo+1,0);
+  const startDay=first.getDay()||7;
+  const dayNames=['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let cells='';
+  for(let i=1;i<startDay;i++) cells+=`<div style="padding:4px;font-size:10px"></div>`;
+  for(let d=1;d<=last.getDate();d++){
+    const ds=`${yr}-${String(mo+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayTasks=tasks.filter(t=>t.due&&t.due.startsWith(ds));
+    const isToday=d===now.getDate()&&mo===now.getMonth();
+    const dots=dayTasks.slice(0,3).map(t=>{
+      const col=t.priority==='p0'?'#f87171':t.priority==='p1'?'#fb923c':t.priority==='p2'?'#22d3ee':'#6b7280';
+      return `<div style="width:4px;height:4px;border-radius:50%;background:${col}" title="${esc(t.title)}"></div>`;
+    }).join('');
+    cells+=`<div style="padding:4px;font-size:10px;text-align:center;${isToday?'background:var(--accent);color:#000;border-radius:4px;font-weight:700':'color:var(--text-secondary)'}"><div>${d}</div>${dayTasks.length?`<div style="display:flex;gap:2px;justify-content:center;margin-top:2px">${dots}</div>`:''}</div>`;
+  }
+  const d=document.createElement('div');d.id='duedate-cal-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:360px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Due Date Calendar</span><span onclick="document.getElementById('duedate-cal-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="text-align:center;margin-bottom:8px;font-size:13px;color:var(--text-secondary);font-weight:600">${monthNames[mo]} ${yr}</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">${dayNames.map(n=>`<div style="text-align:center;font-size:9px;color:var(--text-muted);font-weight:600;padding:4px">${n}</div>`).join('')}${cells}</div>
+    <div style="margin-top:10px;font-size:10px;color:var(--text-muted)">${tasks.length} open tasks with due dates this month</div>
+    <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:#f87171"></span>P0</span>
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:#fb923c"></span>P1</span>
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:#22d3ee"></span>P2</span>
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:6px;height:6px;border-radius:50%;background:#6b7280"></span>P3</span>
+    </div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickFocusTimer(){
+  let ex=document.getElementById('focus-timer-float');if(ex){ex.remove();return;}
+  let mins=25,secs=0,running=false,mode='work';
+  const workMins=25,breakMins=5;
+  const d=document.createElement('div');d.id='focus-timer-float';
+  const rend=()=>{
+    const totalSec=mode==='work'?workMins*60:breakMins*60;
+    const elapsed=totalSec-(mins*60+secs);
+    const pct=Math.round((elapsed/totalSec)*100);
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:200px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Focus Timer</span><span onclick="if(window._focusTimerInt)clearInterval(window._focusTimerInt);document.getElementById('focus-timer-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="font-size:10px;color:${mode==='work'?'#4ade80':'#22d3ee'};font-weight:600;margin-bottom:6px;text-transform:uppercase">${mode==='work'?'Work Session':'Break Time'}</div>
+      <div style="font-size:36px;font-weight:200;color:var(--text-primary);letter-spacing:2px">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</div>
+      <div style="background:var(--bg-surface);border-radius:6px;height:6px;overflow:hidden;margin:10px 0"><div style="height:100%;width:${pct}%;background:${mode==='work'?'#4ade80':'#22d3ee'};border-radius:6px;transition:width 1s linear"></div></div>
+      <div style="display:flex;gap:6px;justify-content:center">
+        <button onclick="window._toggleFocusTimer()" style="background:${running?'#f87171':'var(--accent)'};color:${running?'#fff':'#000'};border:none;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">${running?'Pause':'Start'}</button>
+        <button onclick="window._resetFocusTimer()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px">Reset</button>
+      </div>
+    </div>`;
+  };
+  window._toggleFocusTimer=()=>{
+    running=!running;
+    if(running){
+      window._focusTimerInt=setInterval(()=>{
+        if(secs===0){if(mins===0){clearInterval(window._focusTimerInt);running=false;mode=mode==='work'?'break':'work';mins=mode==='work'?workMins:breakMins;secs=0;rend();return;}mins--;secs=59;}else{secs--;}
+        rend();
+      },1000);
+    } else {clearInterval(window._focusTimerInt);}
+    rend();
+  };
+  window._resetFocusTimer=()=>{clearInterval(window._focusTimerInt);running=false;mins=mode==='work'?workMins:breakMins;secs=0;rend();};
+  document.body.appendChild(d);rend();
+}
+function showJestConfigGen(){
+  let ex=document.getElementById('jest-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'JavaScript':`module.exports = {\n  testEnvironment: 'node',\n  roots: ['<rootDir>/src'],\n  testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],\n  collectCoverageFrom: ['src/**/*.js', '!src/**/*.test.js'],\n  coverageDirectory: 'coverage',\n  coverageThreshold: {\n    global: {\n      branches: 80,\n      functions: 80,\n      lines: 80,\n      statements: 80\n    }\n  }\n};`,
+    'TypeScript':`module.exports = {\n  preset: 'ts-jest',\n  testEnvironment: 'node',\n  roots: ['<rootDir>/src'],\n  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],\n  moduleNameMapper: {\n    '^@/(.*)$': '<rootDir>/src/$1'\n  },\n  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],\n  coverageDirectory: 'coverage'\n};`,
+    'React':`module.exports = {\n  testEnvironment: 'jsdom',\n  setupFilesAfterSetup: ['@testing-library/jest-dom'],\n  roots: ['<rootDir>/src'],\n  testMatch: ['**/__tests__/**/*.{js,jsx}', '**/?(*.)+(spec|test).{js,jsx}'],\n  moduleNameMapper: {\n    '\\\\.(css|less|scss)$': 'identity-obj-proxy',\n    '\\\\.(jpg|jpeg|png|svg)$': '<rootDir>/__mocks__/fileMock.js'\n  },\n  transform: {\n    '^.+\\\\.jsx?$': 'babel-jest'\n  },\n  collectCoverageFrom: ['src/**/*.{js,jsx}']\n};`,
+    'Next.js':`const nextJest = require('next/jest');\n\nconst createJestConfig = nextJest({ dir: './' });\n\nconst config = {\n  testEnvironment: 'jsdom',\n  setupFilesAfterSetup: ['<rootDir>/jest.setup.js'],\n  moduleNameMapper: {\n    '^@/(.*)$': '<rootDir>/src/$1'\n  },\n  testPathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/.next/']\n};\n\nmodule.exports = createJestConfig(config);`
+  };
+  let sel='JavaScript';
+  const d=document.createElement('div');d.id='jest-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-jpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-jpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Jest Config Generator</span><span onclick="document.getElementById('jest-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#jest-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy jest.config.js',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy jest.config.js</button>
+    </div>`;
+    d.querySelectorAll('[data-jpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.jpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskWorkloadBalance(){
+  let ex=document.getElementById('workload-balance-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const projects=S.projects||[];
+  const projMap={};
+  projects.forEach(p=>{projMap[p.id]={name:p.name,count:0,p0:0,p1:0,p2:0,p3:0};});
+  projMap['_none']={name:'No Project',count:0,p0:0,p1:0,p2:0,p3:0};
+  tasks.forEach(t=>{
+    const pid=t.projectId||'_none';
+    if(!projMap[pid]) projMap[pid]={name:pid,count:0,p0:0,p1:0,p2:0,p3:0};
+    projMap[pid].count++;
+    const pr=t.priority||'p3';
+    if(projMap[pid][pr]!==undefined) projMap[pid][pr]++;
+  });
+  const entries=Object.values(projMap).filter(e=>e.count>0).sort((a,b)=>b.count-a.count);
+  const mx=entries.length?entries[0].count:1;
+  const rows=entries.map(e=>{
+    const w=Math.round((e.count/mx)*100);
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <div style="width:100px;font-size:11px;color:var(--text-secondary);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(e.name)}">${esc(e.name)}</div>
+      <div style="flex:1;display:flex;height:18px;border-radius:3px;overflow:hidden">
+        ${e.p0?`<div style="width:${(e.p0/e.count)*w}%;background:#f87171;height:100%" title="P0: ${e.p0}"></div>`:''}
+        ${e.p1?`<div style="width:${(e.p1/e.count)*w}%;background:#fb923c;height:100%" title="P1: ${e.p1}"></div>`:''}
+        ${e.p2?`<div style="width:${(e.p2/e.count)*w}%;background:#22d3ee;height:100%" title="P2: ${e.p2}"></div>`:''}
+        ${e.p3?`<div style="width:${(e.p3/e.count)*w}%;background:#6b7280;height:100%" title="P3: ${e.p3}"></div>`:''}
+      </div>
+      <div style="width:30px;font-size:11px;color:var(--text-muted);font-weight:600">${e.count}</div>
+    </div>`;
+  }).join('');
+  const d=document.createElement('div');d.id='workload-balance-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Workload Balance</span><span onclick="document.getElementById('workload-balance-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    ${rows||'<div style="color:var(--text-muted);font-size:12px">No open tasks</div>'}
+    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#f87171"></span>P0</span>
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#fb923c"></span>P1</span>
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#22d3ee"></span>P2</span>
+      <span style="font-size:9px;color:var(--text-muted);display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#6b7280"></span>P3</span>
+    </div>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">${tasks.length} open tasks across ${entries.length} projects</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickDailyQuote(){
+  let ex=document.getElementById('daily-quote-float');if(ex){ex.remove();return;}
+  const quotes=[
+    {q:'The only way to do great work is to love what you do.',a:'Steve Jobs'},
+    {q:'Done is better than perfect.',a:'Sheryl Sandberg'},
+    {q:'First, solve the problem. Then, write the code.',a:'John Johnson'},
+    {q:'Simplicity is the ultimate sophistication.',a:'Leonardo da Vinci'},
+    {q:'Talk is cheap. Show me the code.',a:'Linus Torvalds'},
+    {q:'The best error message is the one that never shows up.',a:'Thomas Fuchs'},
+    {q:'Make it work, make it right, make it fast.',a:'Kent Beck'},
+    {q:'Code is like humor. When you have to explain it, it is bad.',a:'Cory House'},
+    {q:'The most powerful tool we have as developers is automation.',a:'Scott Hanselman'},
+    {q:'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',a:'Martin Fowler'},
+    {q:'Programs must be written for people to read, and only incidentally for machines to execute.',a:'Harold Abelson'},
+    {q:'Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away.',a:'Antoine de Saint-Exupery'},
+    {q:'The impediment to action advances action. What stands in the way becomes the way.',a:'Marcus Aurelius'},
+    {q:'We are what we repeatedly do. Excellence is not an act but a habit.',a:'Aristotle'},
+    {q:'Stay hungry, stay foolish.',a:'Steve Jobs'}
+  ];
+  const dayOfYear=Math.floor((new Date()-new Date(new Date().getFullYear(),0,0))/(1000*60*60*24));
+  const pick=quotes[dayOfYear%quotes.length];
+  const d=document.createElement('div');d.id='daily-quote-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:32px 28px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;text-align:center">
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;letter-spacing:2px;text-transform:uppercase">Quote of the Day</div>
+    <div style="font-size:18px;color:var(--text-primary);line-height:1.6;font-weight:300;margin-bottom:16px;font-style:italic">"${esc(pick.q)}"</div>
+    <div style="font-size:13px;color:var(--accent);font-weight:600">- ${esc(pick.a)}</div>
+    <div style="margin-top:20px;display:flex;gap:8px;justify-content:center">
+      <button onclick="navigator.clipboard.writeText('"'+${JSON.stringify(pick.q)}+'" - '+${JSON.stringify(pick.a)});this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy</button>
+      <button onclick="document.getElementById('daily-quote-float').remove()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px">Close</button>
+    </div>
+  </div>`;
+  document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
