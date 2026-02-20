@@ -5842,6 +5842,12 @@ function cmdGetItems(q) {
       ['reading progress','Track read/unread status of content items'],
       ['project timeline','Visual timeline of project milestones'],
       ['math','Quick calculator - type math: expression'],
+      ['focus score','Daily productivity score based on activity'],
+      ['archive','Browse and restore archived tasks'],
+      ['word cloud','Visual word cloud from all content'],
+      ['habits','Daily habit tracker with streaks'],
+      ['knowledge graph','Wiki-link stats and most referenced items'],
+      ['random','Resurface random content for review'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7305,6 +7311,30 @@ function cmdGetItems(q) {
     if(result!==null){
       items.unshift({title:'= '+result,desc:'Math: '+expr,icon:'#',type:'action',action:()=>{navigator.clipboard.writeText(String(result));showToast('Copied: '+result);closeCommandPalette();}});
     }
+  }
+  // Focus score prefix
+  if(ql && (ql==='focus score' || ql==='daily score' || ql==='productivity score' || ql==='score')){
+    items.unshift({title:'Daily Focus Score',desc:'Productivity grade based on tasks, content, focus time, words',icon:'S',type:'action',action:()=>{closeCommandPalette();showFocusScore();}});
+  }
+  // Archive browser prefix
+  if(ql && (ql==='archive' || ql==='archive browser' || ql==='archived' || ql==='restore task')){
+    items.unshift({title:'Archive Browser',desc:'Browse and restore archived tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();showArchiveBrowser();}});
+  }
+  // Content word cloud prefix
+  if(ql && (ql==='word cloud' || ql==='wordcloud' || ql==='content cloud' || ql==='content words')){
+    items.unshift({title:'Content Word Cloud',desc:'Visual word cloud from all content and docs',icon:'W',type:'action',action:()=>{closeCommandPalette();showContentWordCloud();}});
+  }
+  // Habit tracker prefix
+  if(ql && (ql==='habits' || ql==='habit tracker' || ql==='daily habits' || ql==='habit')){
+    items.unshift({title:'Habit Tracker',desc:'Track daily habits with streaks and history',icon:'H',type:'action',action:()=>{closeCommandPalette();showHabitTracker();}});
+  }
+  // Knowledge graph stats prefix
+  if(ql && (ql==='knowledge graph' || ql==='wiki links' || ql==='backlinks' || ql==='graph stats')){
+    items.unshift({title:'Knowledge Graph Stats',desc:'Wiki-link analysis and most referenced items',icon:'G',type:'action',action:()=>{closeCommandPalette();showKnowledgeGraphStats();}});
+  }
+  // Random content prefix
+  if(ql && (ql==='random' || ql==='random content' || ql==='surprise' || ql==='resurface')){
+    items.unshift({title:'Random Content',desc:'Resurface a random content item for review',icon:'?',type:'action',action:()=>{closeCommandPalette();showRandomContent();}});
   }
   return items.slice(0, 20);
 }
@@ -9461,6 +9491,214 @@ function quickMath(expr){
     if(typeof result==='number'&&isFinite(result))return result;
     return null;
   }catch(e){return null;}
+}
+function showFocusScore(){
+  const now=new Date();const today=now.toISOString().split('T')[0];
+  const tasks=S.tasks||[];const content=S.content||[];
+  const todayDone=tasks.filter(t=>t.status==='done'&&t.created&&t.created.startsWith(today)).length;
+  const todayCreated=content.filter(c=>c.created&&c.created.startsWith(today)).length;
+  const focusSessions=(S._focusSessions||[]).filter(f=>f.date&&f.date.startsWith(today));
+  const focusMins=focusSessions.reduce((a,f)=>a+(f.duration||0),0);
+  const todayWords=content.filter(c=>c.created&&c.created.startsWith(today)).reduce((a,c)=>a+((c.body||'').split(/\s+/).filter(w=>w).length),0);
+  let score=0;
+  score+=Math.min(todayDone*15,45);
+  score+=Math.min(todayCreated*10,30);
+  score+=Math.min(Math.floor(focusMins/5),25);
+  score+=Math.min(Math.floor(todayWords/100)*5,20);
+  score=Math.min(score,100);
+  const grade=score>=90?'A+':score>=80?'A':score>=70?'B':score>=60?'C':score>=40?'D':'F';
+  const gradeColor=score>=80?'#4ade80':score>=60?'#f59e0b':'#ef4444';
+  const panel=document.createElement('div');panel.id='focus-score-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Daily Focus Score</span><button onclick="document.getElementById('focus-score-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="text-align:center;margin-bottom:20px"><div style="font-size:64px;font-weight:800;color:${gradeColor}">${score}</div><div style="font-size:20px;font-weight:700;color:${gradeColor};margin-top:-8px">Grade: ${grade}</div></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent)">${todayDone}</div><div style="font-size:9px;color:var(--text-muted)">Tasks Done (+15ea, max 45)</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#3b82f6">${todayCreated}</div><div style="font-size:9px;color:var(--text-muted)">Content Created (+10ea, max 30)</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#f59e0b">${focusMins}m</div><div style="font-size:9px;color:var(--text-muted)">Focus Time (+5/5min, max 25)</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#8b5cf6">${todayWords}</div><div style="font-size:9px;color:var(--text-muted)">Words Written (+5/100w, max 20)</div></div>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showArchiveBrowser(){
+  const archived=S._archivedTasks||[];
+  const panel=document.createElement('div');panel.id='archive-browser-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Archive Browser (${archived.length} tasks)</span><button onclick="document.getElementById('archive-browser-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  if(!archived.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No archived tasks. Use "Archive Done" in the task toolbar to archive completed tasks.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    archived.slice(0,50).forEach(t=>{
+      const date=t.created?new Date(t.created).toLocaleDateString():'';
+      const pColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f59e0b':t.priority==='p2'?'#3b82f6':'#6b7280';
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;border-left:3px solid ${pColor}">`;
+      h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title)}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">${t.priority||'p3'} | ${date}</div></div>`;
+      h+=`<button onclick="restoreArchivedTask('${t.id}')" style="font-size:9px;padding:3px 8px;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;color:var(--accent);cursor:pointer">Restore</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function restoreArchivedTask(id){
+  const archived=S._archivedTasks||[];const idx=archived.findIndex(t=>t.id===id);
+  if(idx===-1)return;
+  const task=archived.splice(idx,1)[0];task.status='todo';
+  if(!S.tasks)S.tasks=[];S.tasks.unshift(task);save();
+  const p=document.getElementById('archive-browser-panel');if(p)p.remove();
+  showArchiveBrowser();showToast('Task restored: '+task.title);
+}
+function showContentWordCloud(){
+  const content=S.content||[];const docs=(S.writerDocs||[]);
+  let allText='';
+  content.forEach(c=>{allText+=' '+(c.body||'');});
+  docs.forEach(d=>{allText+=' '+(d.body||'');});
+  const stops=new Set(['the','a','an','and','or','but','in','on','at','to','for','of','is','it','that','this','was','are','be','has','had','have','with','as','by','from','not','will','can','would','could','should','all','their','there','been','its','my','your','our','they','them','we','he','she','you','i','do','did','so','if','no','up','out','one','about','what','which','when','how','who','more','than','just','also','into','over','such','after','then','any','only','these','some','other','new','like','very','may','most','even']);
+  const words=allText.toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).filter(w=>w.length>2&&!stops.has(w));
+  const freq={};words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,60);
+  if(!sorted.length){showToast('No content to analyze');return;}
+  const maxFreq=sorted[0][1];
+  const cloudColors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#a855f7','#22d3ee'];
+  const panel=document.createElement('div');panel.id='content-wordcloud-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Word Cloud (${sorted.length} words)</span><button onclick="document.getElementById('content-wordcloud-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:16px;background:var(--bg-surface);border-radius:8px;margin-bottom:12px">`;
+  sorted.forEach(([word,count],i)=>{
+    const size=Math.max(10,Math.round((count/maxFreq)*32));
+    const color=cloudColors[i%cloudColors.length];
+    h+=`<span title="${count} occurrences" style="font-size:${size}px;color:${color};padding:2px 4px;cursor:default;line-height:1.3">${word}</span>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center">${words.length} total words analyzed from ${content.length} content items + ${docs.length} docs</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showHabitTracker(){
+  if(!S._habits)S._habits=[];
+  const habits=S._habits;
+  const today=new Date().toISOString().split('T')[0];
+  const panel=document.createElement('div');panel.id='habit-tracker-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Habit Tracker</span><div><button onclick="addHabit()" style="font-size:10px;padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;cursor:pointer;font-weight:600;margin-right:8px">+ Habit</button><button onclick="document.getElementById('habit-tracker-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`;
+  if(!habits.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No habits yet. Click "+ Habit" to start tracking.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:8px">`;
+    habits.forEach((hab,i)=>{
+      const checkedToday=hab.history&&hab.history.includes(today);
+      let streak=0;
+      if(hab.history&&hab.history.length){
+        const sorted=[...hab.history].sort().reverse();
+        const d=new Date();
+        for(let j=0;j<sorted.length;j++){
+          const expected=new Date(d);expected.setDate(expected.getDate()-j);
+          const eStr=expected.toISOString().split('T')[0];
+          if(sorted[j]===eStr)streak++;else break;
+        }
+      }
+      h+=`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-surface);border-radius:8px;border-left:3px solid ${checkedToday?'var(--accent)':'var(--border)'}">`;
+      h+=`<button onclick="toggleHabitDay(${i})" style="width:24px;height:24px;border-radius:4px;border:2px solid ${checkedToday?'var(--accent)':'var(--border)'};background:${checkedToday?'var(--accent)':'transparent'};cursor:pointer;display:flex;align-items:center;justify-content:center;color:#000;font-size:14px;font-weight:700">${checkedToday?'v':''}</button>`;
+      h+=`<div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text-primary)">${esc(hab.name)}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">${streak} day streak | ${(hab.history||[]).length} total</div></div>`;
+      h+=`<button onclick="deleteHabit(${i})" style="font-size:14px;background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  const last7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);last7.push(d.toISOString().split('T')[0]);}
+  if(habits.length){
+    h+=`<div style="margin-top:12px;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:10px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Last 7 Days</div>`;
+    h+=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center">`;
+    last7.forEach(d=>{
+      const dayName=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date(d).getDay()];
+      const completed=habits.filter(hab=>(hab.history||[]).includes(d)).length;
+      const pct=Math.round((completed/habits.length)*100);
+      const color=pct>=80?'var(--accent)':pct>=50?'#f59e0b':pct>0?'#ef4444':'var(--bg-base)';
+      h+=`<div><div style="font-size:8px;color:var(--text-muted)">${dayName}</div><div style="width:20px;height:20px;border-radius:4px;background:${color};margin:2px auto;opacity:${pct>0?1:0.3}"></div><div style="font-size:8px;color:var(--text-muted)">${completed}/${habits.length}</div></div>`;
+    });
+    h+=`</div></div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function addHabit(){
+  const name=prompt('Habit name:');if(!name||!name.trim())return;
+  if(!S._habits)S._habits=[];
+  S._habits.push({name:name.trim(),history:[],created:new Date().toISOString()});
+  save();const p=document.getElementById('habit-tracker-panel');if(p)p.remove();showHabitTracker();
+}
+function toggleHabitDay(idx){
+  const hab=S._habits[idx];if(!hab)return;
+  if(!hab.history)hab.history=[];
+  const today=new Date().toISOString().split('T')[0];
+  const i=hab.history.indexOf(today);
+  if(i>=0)hab.history.splice(i,1);else hab.history.push(today);
+  save();const p=document.getElementById('habit-tracker-panel');if(p)p.remove();showHabitTracker();
+}
+function deleteHabit(idx){
+  if(!confirm('Delete this habit?'))return;
+  S._habits.splice(idx,1);save();
+  const p=document.getElementById('habit-tracker-panel');if(p)p.remove();showHabitTracker();
+}
+function showKnowledgeGraphStats(){
+  const specs=[];(S.projects||[]).forEach(p=>{(p.specs||[]).forEach(s=>{specs.push(s);});});
+  let totalLinks=0;const linkMap={};
+  specs.forEach(s=>{
+    (s.sections||[]).forEach(sec=>{
+      const matches=(sec.body||'').match(/\[\[([^\]]+)\]\]/g)||[];
+      totalLinks+=matches.length;
+      matches.forEach(m=>{const name=m.replace(/[\[\]]/g,'');linkMap[name]=(linkMap[name]||0)+1;});
+    });
+  });
+  const content=S.content||[];
+  content.forEach(c=>{
+    const matches=(c.body||'').match(/\[\[([^\]]+)\]\]/g)||[];
+    totalLinks+=matches.length;
+    matches.forEach(m=>{const name=m.replace(/[\[\]]/g,'');linkMap[name]=(linkMap[name]||0)+1;});
+  });
+  const topLinks=Object.entries(linkMap).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const panel=document.createElement('div');panel.id='kg-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Knowledge Graph Stats</span><button onclick="document.getElementById('kg-stats-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--accent)">${totalLinks}</div><div style="font-size:10px;color:var(--text-muted)">Wiki-Links</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#3b82f6">${Object.keys(linkMap).length}</div><div style="font-size:10px;color:var(--text-muted)">Unique Targets</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#8b5cf6">${specs.length}</div><div style="font-size:10px;color:var(--text-muted)">Living Docs</div></div>`;
+  h+=`</div>`;
+  if(topLinks.length){
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Most Referenced</div>`;
+    h+=`<div style="display:grid;gap:4px">`;
+    const max=topLinks[0][1];
+    topLinks.forEach(([name,count])=>{
+      const pct=Math.round((count/max)*100);
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg-surface);border-radius:6px">`;
+      h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary)">${esc(name)}</div>`;
+      h+=`<div style="height:3px;background:var(--bg-base);border-radius:2px;margin-top:3px"><div style="height:100%;width:${pct}%;background:var(--accent);border-radius:2px"></div></div></div>`;
+      h+=`<span style="font-size:10px;color:var(--text-muted);flex-shrink:0">${count}</span>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showRandomContent(){
+  const content=S.content||[];
+  if(!content.length){showToast('No content to pick from');return;}
+  const item=content[Math.floor(Math.random()*content.length)];
+  const words=(item.body||'').split(/\s+/).filter(w=>w).length;
+  const date=item.created?new Date(item.created).toLocaleDateString():'Unknown';
+  const panel=document.createElement('div');panel.id='random-content-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Random Content</span><div><button onclick="document.getElementById('random-content-panel').remove();showRandomContent()" style="font-size:10px;padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;cursor:pointer;font-weight:600;margin-right:8px">Shuffle</button><button onclick="document.getElementById('random-content-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`;
+  h+=`<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">`;
+  if(item.theme)h+=`<span style="font-size:9px;padding:2px 8px;background:var(--bg-surface);border-radius:10px;color:var(--accent)">${esc(item.theme)}</span>`;
+  h+=`<span style="font-size:9px;padding:2px 8px;background:var(--bg-surface);border-radius:10px;color:var(--text-muted)">${date}</span>`;
+  h+=`<span style="font-size:9px;padding:2px 8px;background:var(--bg-surface);border-radius:10px;color:var(--text-muted)">${words} words</span>`;
+  (item.tags||[]).forEach(t=>{h+=`<span style="font-size:9px;padding:2px 8px;background:var(--bg-surface);border-radius:10px;color:#8b5cf6">${esc(t)}</span>`;});
+  h+=`</div>`;
+  h+=`<div style="background:var(--bg-surface);padding:16px;border-radius:8px;font-size:12px;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;max-height:400px;overflow-y:auto">${esc(item.body||'(empty)')}</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
