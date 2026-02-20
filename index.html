@@ -5990,6 +5990,9 @@ function cmdGetItems(q) {
       ['pomodoro stats','Pomodoro session stats with 7-day chart'],
       ['content gallery','Visual card gallery of all content items'],
       ['task flow','Visual flow of tasks through statuses'],
+      ['weekly digest','Full weekly summary with highlights and priorities'],
+      ['task tags','Task-specific tag cloud with completion rates'],
+      ['calculator','Quick floating calculator with live evaluation'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8048,6 +8051,18 @@ function cmdGetItems(q) {
   // Task flow prefix
   if(ql && (ql==='task flow' || ql==='flow' || ql==='status flow' || ql==='task pipeline')){
     items.unshift({title:'Task Flow',desc:'Visual flow of tasks through statuses',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFlow();}});
+  }
+  // Weekly digest prefix
+  if(ql && (ql==='weekly digest' || ql==='digest' || ql==='week summary' || ql==='weekly summary')){
+    items.unshift({title:'Weekly Digest',desc:'Full weekly summary with copy',icon:'W',type:'action',action:()=>{closeCommandPalette();showWeeklyDigest();}});
+  }
+  // Task tags prefix
+  if(ql && (ql==='task tags' || ql==='task tag cloud' || ql==='tags cloud' || ql==='tag stats')){
+    items.unshift({title:'Task Tag Cloud',desc:'Visual tag cloud with completion rates',icon:'#',type:'action',action:()=>{closeCommandPalette();showTaskTagCloud();}});
+  }
+  // Calculator prefix
+  if(ql && (ql==='calculator' || ql==='calc' || ql==='calculate' || ql==='math')){
+    items.unshift({title:'Quick Calculator',desc:'Floating calculator with live evaluation',icon:'=',type:'action',action:()=>{closeCommandPalette();showQuickCalculator();}});
   }
   return items.slice(0, 20);
 }
@@ -15090,6 +15105,77 @@ function showTaskFlow(){
     });
   }
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWeeklyDigest(){
+  let panel=document.getElementById('weekly-digest-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='weekly-digest-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
+  const weekKey=weekStart.toISOString().split('T')[0];
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];const docs=S.writerDocs||[];
+  const weekTasks=tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt>=weekKey);
+  const weekContent=content.filter(c=>c.created&&c.created>=weekKey);
+  const weekLinks=links.filter(l=>l.created&&l.created>=weekKey);
+  const weekWords=weekContent.reduce((s,c)=>s+(c.body||'').split(/\s+/).filter(w=>w).length,0);
+  const active=tasks.filter(t=>t.status!=='done').length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<now.toISOString().split('T')[0]).length;
+  let digest='# Weekly Digest - Week of '+weekKey+'\n\n';
+  digest+='## Highlights\n';
+  digest+='- Tasks completed: '+weekTasks.length+'\n';
+  digest+='- Content created: '+weekContent.length+' ('+weekWords+' words)\n';
+  digest+='- Links saved: '+weekLinks.length+'\n';
+  digest+='- Active tasks remaining: '+active+'\n';
+  digest+='- Overdue tasks: '+overdue+'\n\n';
+  if(weekTasks.length>0){digest+='## Completed Tasks\n';weekTasks.forEach(t=>{digest+='- '+t.title+(t.projectId?' ['+((S.projects||[]).find(p=>p.id===t.projectId)||{}).name+']':'')+(t.priority?' ('+t.priority+')':'')+'\n';});digest+='\n';}
+  if(weekContent.length>0){digest+='## New Content\n';weekContent.forEach(c=>{digest+='- '+c.title+' ('+((c.body||'').split(/\s+/).filter(w=>w).length)+' words)\n';});digest+='\n';}
+  const p0p1=tasks.filter(t=>t.status!=='done'&&(t.priority==='p0'||t.priority==='p1'));
+  if(p0p1.length>0){digest+='## Priority Focus Next Week\n';p0p1.forEach(t=>{digest+='- ['+t.priority.toUpperCase()+'] '+t.title+'\n';});digest+='\n';}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Weekly Digest</h3><div><button onclick="(function(){navigator.clipboard.writeText(document.getElementById(\'weekly-digest-text\').textContent);if(typeof showNotification===\'function\')showNotification(\'Digest copied!\');})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  h+='<pre id="weekly-digest-text" style="font-size:11px;color:var(--text-primary);background:var(--bg-surface);padding:16px;border-radius:8px;white-space:pre-wrap;font-family:inherit;line-height:1.6;max-height:60vh;overflow-y:auto">'+esc(digest)+'</pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskTagCloud(){
+  let panel=document.getElementById('task-tag-cloud-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-tag-cloud-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=S.tasks||[];
+  const tagMap={};
+  tasks.forEach(t=>{(t.tags||[]).forEach(tag=>{if(!tagMap[tag])tagMap[tag]={total:0,done:0,active:0};tagMap[tag].total++;if(t.status==='done')tagMap[tag].done++;else tagMap[tag].active++;});});
+  const sorted=Object.entries(tagMap).sort((a,b)=>b[1].total-a[1].total);
+  const maxCount=sorted.length>0?sorted[0][1].total:1;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Tag Cloud</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  if(sorted.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No tags found on tasks.</div>';}
+  else{
+    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px">';
+    sorted.forEach(([tag,info])=>{
+      const size=Math.max(11,Math.min(28,11+info.total/maxCount*17));
+      const opacity=0.4+info.total/maxCount*0.6;
+      h+='<span onclick="this.parentElement.parentElement.remove();switchSection(\'tasks\')" style="font-size:'+size+'px;color:var(--accent);opacity:'+opacity+';cursor:pointer;padding:4px" title="'+info.total+' tasks ('+info.active+' active, '+info.done+' done)">'+esc(tag)+'</span>';
+    });
+    h+='</div>';
+    h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Tag Details</h4>';
+    sorted.slice(0,15).forEach(([tag,info])=>{
+      const pct=info.total>0?Math.round(info.done/info.total*100):0;
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:11px;width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(tag)+'</span>';
+      h+='<div style="flex:1;height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--accent);width:'+pct+'%"></div></div>';
+      h+='<span style="font-size:10px;color:var(--text-muted);width:60px;text-align:right">'+info.done+'/'+info.total+'</span></div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickCalculator(){
+  let panel=document.getElementById('quick-calc-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-calc-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Quick Calculator</h4><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<div id="calc-display" style="padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;font-size:16px;color:var(--text-primary);text-align:right;margin-bottom:8px;min-height:20px;font-family:monospace">0</div>';
+  h+='<input id="calc-input" placeholder="Type expression (e.g. 2+2, 100*0.15)" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px;box-sizing:border-box;font-family:monospace" oninput="(function(v){try{if(!v){document.getElementById(\'calc-display\').textContent=\'0\';return;}const r=Function(\'return \'+v)();document.getElementById(\'calc-display\').textContent=r;}catch(e){document.getElementById(\'calc-display\').textContent=\'...\';}})(this.value)">';
+  h+='<div style="display:flex;gap:4px;margin-bottom:8px">';
+  h+='<button onclick="(function(){const v=document.getElementById(\'calc-display\').textContent;navigator.clipboard.writeText(v);if(typeof showNotification===\'function\')showNotification(\'Copied: \'+v);})()" style="flex:1;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-size:10px">Copy Result</button>';
+  h+='<button onclick="document.getElementById(\'calc-input\').value=\'\';document.getElementById(\'calc-display\').textContent=\'0\'" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;cursor:pointer;font-size:10px">Clear</button></div>';
+  h+='<div style="font-size:9px;color:var(--text-muted)">Supports: +, -, *, /, %, Math.sqrt(), Math.PI</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const i=document.getElementById('calc-input');if(i)i.focus();},100);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
