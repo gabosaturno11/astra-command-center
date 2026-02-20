@@ -5770,6 +5770,8 @@ function cmdGetItems(q) {
       ['journal','Open/create today\'s journal entry'],
       ['writing','Writing stats and daily word streak'],
       ['cleanup','Find orphans, dupes, and empty items'],
+      ['report','Monthly productivity report'],
+      ['stickies','Floating sticky notes on workspace'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6920,6 +6922,15 @@ function cmdGetItems(q) {
   if(ql && (ql==='cleanup' || ql==='clean' || ql==='prune' || ql==='data cleanup')){
     items.unshift({title:'Data Cleanup Report',desc:'Find empty items, duplicates, orphaned data',icon:'X',type:'action',action:()=>{closeCommandPalette();showDataCleanup();}});
   }
+  // Report prefix
+  if(ql && (ql==='report' || ql==='monthly report' || ql==='productivity report' || ql==='month report')){
+    items.unshift({title:'Monthly Productivity Report',desc:'Comprehensive report with stats, charts, and insights',icon:'R',type:'action',action:()=>{closeCommandPalette();showProductivityReport();}});
+  }
+  // Stickies prefix
+  if(ql && (ql==='stickies' || ql==='sticky' || ql==='sticky notes' || ql==='sticky note')){
+    items.unshift({title:'Add Sticky Note',desc:'Create a floating sticky note on workspace',icon:'S',type:'action',action:()=>{closeCommandPalette();addStickyNote();}});
+    items.unshift({title:'Clear All Sticky Notes',desc:'Remove all sticky notes',icon:'S',type:'action',action:()=>{closeCommandPalette();clearStickyNotes();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7105,6 +7116,56 @@ function showDataCleanup(){
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Data Cleanup</span><button onclick="document.getElementById('cleanup-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`+(issues.length?issues.map(i=>`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:4px;margin-bottom:4px;border-left:3px solid ${clr[i.type]}"><div style="flex:1;font-size:10px;color:var(--text-primary)">${esc(i.msg)}</div>${i.action?`<button onclick="document.getElementById('cleanup-panel').remove();(${i.fn.toString()})()" class="btn btn-sm btn-ghost" style="font-size:8px;white-space:nowrap">${i.action}</button>`:''}</div>`).join('')+'<div style="margin-top:12px;text-align:center;font-size:9px;color:var(--text-muted)">'+issues.length+' issues found</div>':'<div style="padding:20px;text-align:center;color:var(--accent)">No issues found. Data is clean.</div>');
   document.body.appendChild(panel);
 }
+function showProductivityReport(){
+  let panel=document.getElementById('report-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='report-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();const monthStart=new Date(now.getFullYear(),now.getMonth(),1).toISOString().split('T')[0];
+  const monthName=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const mTasks=S.tasks.filter(t=>t.created&&t.created>=monthStart);
+  const mDone=S.tasks.filter(t=>t.completedAt&&t.completedAt>=monthStart);
+  const mContent=S.content.filter(c=>c.created&&c.created>=monthStart);
+  const mDocs=S.docs.filter(d=>(d.updated||d.created||'')>=monthStart);
+  const mLinks=S.links.filter(l=>l.created&&l.created>=monthStart);
+  const mFocus=(S.focusSessions||[]).filter(f=>f.date&&f.date>=monthStart);
+  const focusMins=mFocus.reduce((a,f)=>a+(f.minutes||0),0);
+  const totalWords=mDocs.reduce((s,d)=>(d.body||'').replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(x=>x.length).length+s,0);
+  const contentWords=mContent.reduce((s,c)=>(c.body||'').trim().split(/\s+/).filter(x=>x.length).length+s,0);
+  // project breakdown
+  const byProject={};mDone.forEach(t=>{const p=t.project||'No Project';byProject[p]=(byProject[p]||0)+1;});
+  const projectRows=Object.entries(byProject).sort((a,b)=>b[1]-a[1]).map(([p,c])=>`<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:10px"><span style="color:var(--text-primary)">${esc(p)}</span><span style="color:var(--accent);font-family:var(--mono)">${c} done</span></div>`).join('');
+  // priority breakdown
+  const byPriority={p0:0,p1:0,p2:0,p3:0};mDone.forEach(t=>byPriority[t.priority||'p2']++);
+  const completionRate=mTasks.length?Math.round(mDone.length/mTasks.length*100):0;
+  let md=`# Productivity Report: ${monthName}\n\n## Summary\n- Tasks created: ${mTasks.length}\n- Tasks completed: ${mDone.length} (${completionRate}% completion rate)\n- Content added: ${mContent.length} items (${contentWords.toLocaleString()} words)\n- Documents edited: ${mDocs.length} (${totalWords.toLocaleString()} words)\n- Links saved: ${mLinks.length}\n- Focus sessions: ${mFocus.length} (${formatTimeSpent(focusMins)})\n\n## By Project\n${Object.entries(byProject).map(([p,c])=>'- '+p+': '+c+' completed').join('\n')}\n\n## By Priority\n- P0: ${byPriority.p0} | P1: ${byPriority.p1} | P2: ${byPriority.p2} | P3: ${byPriority.p3}`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Productivity Report: ${monthName}</span><div style="display:flex;gap:6px"><button onclick="navigator.clipboard.writeText(\`${md.replace(/`/g,'\\`')}\`);toast('Copied as Markdown')" class="btn btn-sm btn-ghost" style="font-size:9px">Copy MD</button><button onclick="document.getElementById('report-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px"><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:var(--accent)">${mDone.length}</div><div style="font-size:9px;color:var(--text-muted)">Completed</div></div><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:var(--accent-cyan)">${(totalWords+contentWords).toLocaleString()}</div><div style="font-size:9px;color:var(--text-muted)">Words</div></div><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:var(--green)">${formatTimeSpent(focusMins)}</div><div style="font-size:9px;color:var(--text-muted)">Focus Time</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px"><div><div style="font-size:10px;font-weight:600;color:var(--text-primary);margin-bottom:6px">By Project</div>${projectRows||'<div style="font-size:9px;color:var(--text-muted)">No completions</div>'}</div><div><div style="font-size:10px;font-weight:600;color:var(--text-primary);margin-bottom:6px">By Priority</div><div style="font-size:10px;display:flex;flex-direction:column;gap:2px"><span style="color:var(--red)">P0 Critical: ${byPriority.p0}</span><span style="color:var(--orange)">P1 High: ${byPriority.p1}</span><span style="color:var(--accent-cyan)">P2 Medium: ${byPriority.p2}</span><span style="color:var(--text-muted)">P3 Low: ${byPriority.p3}</span></div></div></div><div style="margin-bottom:12px;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:10px;font-weight:600;margin-bottom:4px;color:var(--text-primary)">Completion Rate</div><div style="width:100%;height:8px;background:var(--border);border-radius:4px"><div style="width:${completionRate}%;height:100%;background:${completionRate>=70?'var(--green)':completionRate>=40?'var(--yellow)':'var(--red)'};border-radius:4px;transition:width 0.3s"></div></div><div style="font-size:9px;color:var(--text-muted);margin-top:2px">${completionRate}% (${mDone.length}/${mTasks.length})</div></div><div style="font-size:9px;color:var(--text-muted)">${mContent.length} content items | ${mLinks.length} links | ${mFocus.length} focus sessions</div>`;
+  document.body.appendChild(panel);
+}
+function addStickyNote(){
+  const colors=['#fef08a','#bbf7d0','#bfdbfe','#fecaca','#e9d5ff','#fed7aa'];
+  const color=colors[Math.floor(Math.random()*colors.length)];
+  if(!S._stickies)S._stickies=[];
+  const id=Date.now();
+  const x=100+Math.random()*200;const y=100+Math.random()*200;
+  S._stickies.push({id,text:'',color,x,y});save();
+  renderStickyNotes();
+}
+function renderStickyNotes(){
+  document.querySelectorAll('.sticky-note-float').forEach(el=>el.remove());
+  (S._stickies||[]).forEach(s=>{
+    const el=document.createElement('div');el.className='sticky-note-float';el.dataset.id=s.id;
+    el.style.cssText=`position:fixed;left:${s.x}px;top:${s.y}px;width:160px;min-height:100px;background:${s.color};border-radius:4px;padding:8px;z-index:900;box-shadow:0 4px 16px rgba(0,0,0,0.3);cursor:move;display:flex;flex-direction:column;font-family:var(--font)`;
+    el.innerHTML=`<div style="display:flex;justify-content:flex-end;gap:4px;margin-bottom:4px"><button onclick="removeStickyNote(${s.id})" style="background:none;border:none;color:#666;cursor:pointer;font-size:12px;padding:0;line-height:1">&times;</button></div><textarea oninput="updateStickyNote(${s.id},this.value)" style="flex:1;background:transparent;border:none;color:#333;font-size:10px;resize:none;outline:none;font-family:inherit;line-height:1.4">${esc(s.text||'')}</textarea>`;
+    let isDragging=false,offsetX,offsetY;
+    el.addEventListener('mousedown',e=>{if(e.target.tagName==='TEXTAREA'||e.target.tagName==='BUTTON')return;isDragging=true;offsetX=e.clientX-el.offsetLeft;offsetY=e.clientY-el.offsetTop;e.preventDefault();});
+    document.addEventListener('mousemove',e=>{if(!isDragging)return;el.style.left=(e.clientX-offsetX)+'px';el.style.top=(e.clientY-offsetY)+'px';});
+    document.addEventListener('mouseup',()=>{if(isDragging){isDragging=false;const st=S._stickies.find(x=>x.id===s.id);if(st){st.x=parseInt(el.style.left);st.y=parseInt(el.style.top);save();}}});
+    document.body.appendChild(el);
+  });
+}
+function updateStickyNote(id,text){const s=(S._stickies||[]).find(x=>x.id===id);if(s){s.text=text;save();}}
+function removeStickyNote(id){S._stickies=(S._stickies||[]).filter(x=>x.id!==id);save();const el=document.querySelector(`.sticky-note-float[data-id="${id}"]`);if(el)el.remove();}
+function clearStickyNotes(){if(!S._stickies||!S._stickies.length){toast('No sticky notes');return;}S._stickies=[];save();document.querySelectorAll('.sticky-note-float').forEach(el=>el.remove());toast('Cleared');}
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
   panel=document.createElement('div');panel.id='roadmap-panel';
@@ -7666,6 +7727,7 @@ document.getElementById('sidebar-date').textContent=new Date().toLocaleDateStrin
 setTimeout(function(){ cloudSave(true); }, 3000);
 setTimeout(function(){ if(S._notificationsEnabled) checkOverdueNotify(); }, 5000);
 if(S._autoBackup) scheduleAutoBackup();
+if(S._stickies&&S._stickies.length) renderStickyNotes();
 // Whiteboard drop handler for KB items
 document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
 document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
