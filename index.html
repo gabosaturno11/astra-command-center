@@ -6314,6 +6314,12 @@ function cmdGetItems(q) {
       ['yarn','Yarn command reference'],
       ['velocity','Task completion velocity trend'],
       ['unit converter','Unit converter (length, weight, temp)'],
+      ['pnpm','pnpm command reference'],
+      ['blocked report','Blocked and at-risk task report'],
+      ['bmi','BMI calculator'],
+      ['deno','Deno command reference'],
+      ['completion calendar','Task completion heatmap calendar'],
+      ['percentage','Percentage calculator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9425,6 +9431,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='unit converter' || ql==='convert' || ql==='units' || ql==='conversion')){
     items.unshift({title:'Unit Converter',desc:'Convert length, weight, temperature',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUnitConverter();}});
+  }
+  if(ql && (ql==='pnpm' || ql==='pnpm commands' || ql==='pnpm ref' || ql==='pnpm reference')){
+    items.unshift({title:'pnpm Reference',desc:'pnpm command cheatsheet by category',icon:'P',type:'action',action:()=>{closeCommandPalette();showPnpmCommandRef();}});
+  }
+  if(ql && (ql==='blocked report' || ql==='blocked' || ql==='at risk' || ql==='risk report')){
+    items.unshift({title:'Blocked Report',desc:'Blocked, overdue, and stale task report',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBlockedReport();}});
+  }
+  if(ql && (ql==='bmi' || ql==='bmi calculator' || ql==='body mass' || ql==='bmi calc')){
+    items.unshift({title:'BMI Calculator',desc:'Calculate body mass index',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBmiCalc();}});
+  }
+  if(ql && (ql==='deno' || ql==='deno commands' || ql==='deno ref' || ql==='deno reference')){
+    items.unshift({title:'Deno Reference',desc:'Deno command cheatsheet by category',icon:'D',type:'action',action:()=>{closeCommandPalette();showDenoCommandRef();}});
+  }
+  if(ql && (ql==='completion calendar' || ql==='completion heatmap' || ql==='done calendar' || ql==='done heatmap')){
+    items.unshift({title:'Completion Calendar',desc:'90-day task completion heatmap',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCompletionCalendar();}});
+  }
+  if(ql && (ql==='percentage' || ql==='percent' || ql==='percentage calc' || ql==='pct calculator')){
+    items.unshift({title:'Percentage Calculator',desc:'Calculate percentages quickly',icon:'%',type:'action',action:()=>{closeCommandPalette();showQuickPercentageCalc();}});
   }
   return items.slice(0, 20);
 }
@@ -27244,6 +27268,142 @@ function showQuickUnitConverter(){
   window._ucRend=function(){selCat=window._ucCat||'Length';rend();};
   rend();
   document.body.appendChild(d);
+}
+function showPnpmCommandRef(){
+  const d=document.createElement('div');d.id='pnpm-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Install':['pnpm install','pnpm add <pkg>','pnpm add -D <pkg>','pnpm remove <pkg>','pnpm update','pnpm update --latest'],
+    'Scripts':['pnpm run <script>','pnpm start','pnpm test','pnpm build','pnpm exec <cmd>','pnpm dlx <pkg>'],
+    'Workspace':['pnpm -r run build','pnpm --filter <pkg> add <dep>','pnpm -r exec -- <cmd>','pnpm --filter <pkg> run test'],
+    'Store':['pnpm store status','pnpm store prune','pnpm store path'],
+    'Info':['pnpm list','pnpm why <pkg>','pnpm outdated','pnpm audit','pnpm --version']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">pnpm Reference</h3><button onclick="document.getElementById(\'pnpm-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskBlockedReport(){
+  const d=document.createElement('div');d.id='blocked-report-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const blocked=tasks.filter(t=>t.blockedBy);
+  const overdue=tasks.filter(t=>{if(!t.due)return false;return new Date(t.due)<new Date()&&t.status!=='done';});
+  const stale=tasks.filter(t=>{if(!t.updatedAt)return false;return(Date.now()-new Date(t.updatedAt).getTime())>7*86400000;});
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Blocked & At-Risk Report</h3><button onclick="document.getElementById(\'blocked-report-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);padding:10px 16px;border-radius:6px;text-align:center;flex:1"><div style="font-size:22px;color:#ef4444;font-weight:700">'+blocked.length+'</div><div style="font-size:10px;color:var(--text-muted)">Blocked</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:10px 16px;border-radius:6px;text-align:center;flex:1"><div style="font-size:22px;color:#f59e0b;font-weight:700">'+overdue.length+'</div><div style="font-size:10px;color:var(--text-muted)">Overdue</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:10px 16px;border-radius:6px;text-align:center;flex:1"><div style="font-size:22px;color:#6366f1;font-weight:700">'+stale.length+'</div><div style="font-size:10px;color:var(--text-muted)">Stale (7d+)</div></div></div>';
+  if(blocked.length){
+    html+='<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">Blocked Tasks</div>';
+    blocked.forEach(t=>{
+      html+='<div style="padding:6px 8px;background:var(--bg-surface);border-radius:4px;margin-bottom:4px;border-left:3px solid #ef4444"><div style="font-size:12px;color:var(--text-primary)">'+esc(t.title)+'</div><div style="font-size:10px;color:var(--text-muted)">Blocked by: '+esc(t.blockedBy)+'</div></div>';
+    });
+  }
+  if(overdue.length){
+    html+='<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin:12px 0 6px">Overdue Tasks</div>';
+    overdue.forEach(t=>{
+      const days=Math.floor((Date.now()-new Date(t.due).getTime())/86400000);
+      html+='<div style="padding:6px 8px;background:var(--bg-surface);border-radius:4px;margin-bottom:4px;border-left:3px solid #f59e0b"><div style="font-size:12px;color:var(--text-primary)">'+esc(t.title)+'</div><div style="font-size:10px;color:var(--text-muted)">'+days+'d overdue</div></div>';
+    });
+  }
+  if(!blocked.length&&!overdue.length&&!stale.length){html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">All clear! No blocked or at-risk tasks.</div>';}
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickBmiCalc(){
+  const d=document.createElement('div');d.id='bmi-calc-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px';
+  function rend(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">BMI Calculator</h3><button onclick="document.getElementById(\'bmi-calc-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+    html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Weight (kg)</label><input id="bmi-w" type="number" placeholder="70" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-top:2px"/></div>';
+    html+='<div style="margin-bottom:10px"><label style="font-size:10px;color:var(--text-muted)">Height (cm)</label><input id="bmi-h" type="number" placeholder="175" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-top:2px"/></div>';
+    html+='<button onclick="window._calcBmi()" style="width:100%;padding:8px;background:#4ade80;color:#000;border:none;border-radius:4px;font-weight:600;cursor:pointer;font-size:12px">Calculate</button>';
+    html+='<div id="bmi-result" style="margin-top:10px"></div>';
+    d.innerHTML=html;
+  }
+  window._calcBmi=function(){
+    const w=parseFloat(document.getElementById('bmi-w').value);const h=parseFloat(document.getElementById('bmi-h').value);
+    const resEl=document.getElementById('bmi-result');if(!w||!h||!resEl)return;
+    const hm=h/100;const bmi=(w/(hm*hm)).toFixed(1);
+    let cat,col;
+    if(bmi<18.5){cat='Underweight';col='#60a5fa';}else if(bmi<25){cat='Normal';col='#4ade80';}else if(bmi<30){cat='Overweight';col='#f59e0b';}else{cat='Obese';col='#ef4444';}
+    resEl.innerHTML='<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:28px;color:'+col+';font-weight:700">'+bmi+'</div><div style="font-size:12px;color:'+col+'">'+cat+'</div></div>';
+  };
+  rend();document.body.appendChild(d);
+}
+function showDenoCommandRef(){
+  const d=document.createElement('div');d.id='deno-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Run':['deno run <file>','deno run --allow-net <file>','deno run --allow-read <file>','deno run --allow-all <file>','deno task <name>'],
+    'Tools':['deno fmt','deno lint','deno test','deno bench','deno check <file>','deno doc <file>'],
+    'Manage':['deno install <url>','deno uninstall <name>','deno compile <file>','deno info <url>','deno upgrade'],
+    'Permissions':['--allow-net','--allow-read','--allow-write','--allow-env','--allow-run','--allow-ffi','--allow-sys'],
+    'Config':['deno.json','deno.lock','import_map.json','deno init','deno add <pkg>']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Deno Reference</h3><button onclick="document.getElementById(\'deno-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskCompletionCalendar(){
+  const d=document.createElement('div');d.id='completion-cal-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&t.updatedAt);
+  const dayCounts={};
+  tasks.forEach(t=>{const day=new Date(t.updatedAt).toISOString().split('T')[0];dayCounts[day]=(dayCounts[day]||0)+1;});
+  const today=new Date();const startDate=new Date(today);startDate.setDate(startDate.getDate()-90);
+  const mx=Math.max(...Object.values(dayCounts),1);
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Completion Calendar (90 days)</h3><button onclick="document.getElementById(\'completion-cal-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  const weeks=Math.ceil(91/7);
+  let svg='<svg width="'+(weeks*14+20)+'" height="120" viewBox="0 0 '+(weeks*14+20)+' 120">';
+  const dayLabels=['Mon','','Wed','','Fri','','Sun'];
+  dayLabels.forEach((l,i)=>{if(l)svg+='<text x="0" y="'+(20+i*14+10)+'" fill="var(--text-muted)" font-size="9">'+l+'</text>';});
+  const cursor=new Date(startDate);
+  let wk=0;
+  while(cursor<=today){
+    const dow=cursor.getDay();const adjDow=(dow===0?6:dow-1);
+    const key=cursor.toISOString().split('T')[0];const cnt=dayCounts[key]||0;
+    const intensity=cnt>0?Math.max(0.2,cnt/mx):0;
+    const x=20+wk*14;const y=20+adjDow*14;
+    svg+='<rect x="'+x+'" y="'+y+'" width="12" height="12" rx="2" fill="'+(cnt>0?'rgba(74,222,128,'+intensity+')':'var(--bg-surface)')+'" stroke="var(--border)" stroke-width="0.5"><title>'+key+': '+cnt+' tasks</title></rect>';
+    if(adjDow===6)wk++;
+    cursor.setDate(cursor.getDate()+1);
+  }
+  svg+='</svg>';
+  const totalDone=tasks.length;const daysActive=Object.keys(dayCounts).length;
+  html+='<div style="display:flex;gap:12px;margin-bottom:14px"><div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:18px;color:#4ade80;font-weight:700">'+totalDone+'</div><div style="font-size:10px;color:var(--text-muted)">completed</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:18px;color:#4ade80;font-weight:700">'+daysActive+'</div><div style="font-size:10px;color:var(--text-muted)">active days</div></div></div>';
+  html+='<div style="overflow-x:auto">'+svg+'</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickPercentageCalc(){
+  const d=document.createElement('div');d.id='pct-calc-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Percentage Calculator</h3><button onclick="document.getElementById(\'pct-calc-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:10px;font-size:11px;color:var(--text-muted)">What is X% of Y?</div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px"><input id="pct-x" type="number" placeholder="X" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px"/><span style="color:var(--text-muted);padding-top:6px">% of</span><input id="pct-y" type="number" placeholder="Y" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px"/></div>';
+  html+='<div id="pct-result" style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px;margin-bottom:10px;font-size:22px;color:#4ade80;font-weight:700">—</div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">X is what % of Y?</div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px"><input id="pct-a" type="number" placeholder="X" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px"/><span style="color:var(--text-muted);padding-top:6px">of</span><input id="pct-b" type="number" placeholder="Y" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px"/></div>';
+  html+='<div id="pct-result2" style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:22px;color:#4ade80;font-weight:700">—</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  document.getElementById('pct-x').addEventListener('input',function(){const x=parseFloat(this.value);const y=parseFloat(document.getElementById('pct-y').value);if(!isNaN(x)&&!isNaN(y))document.getElementById('pct-result').textContent=(x/100*y).toFixed(2);});
+  document.getElementById('pct-y').addEventListener('input',function(){const y=parseFloat(this.value);const x=parseFloat(document.getElementById('pct-x').value);if(!isNaN(x)&&!isNaN(y))document.getElementById('pct-result').textContent=(x/100*y).toFixed(2);});
+  document.getElementById('pct-a').addEventListener('input',function(){const a=parseFloat(this.value);const b=parseFloat(document.getElementById('pct-b').value);if(!isNaN(a)&&!isNaN(b)&&b!==0)document.getElementById('pct-result2').textContent=(a/b*100).toFixed(2)+'%';});
+  document.getElementById('pct-b').addEventListener('input',function(){const b=parseFloat(this.value);const a=parseFloat(document.getElementById('pct-a').value);if(!isNaN(a)&&!isNaN(b)&&b!==0)document.getElementById('pct-result2').textContent=(a/b*100).toFixed(2)+'%';});
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
