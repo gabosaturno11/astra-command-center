@@ -6293,6 +6293,9 @@ function cmdGetItems(q) {
       ['api endpoint','REST API endpoint generator'],
       ['cycle time','Task cycle time distribution'],
       ['tip calculator','Tip calculator with split'],
+      ['graphql','GraphQL schema generator'],
+      ['throughput','Weekly task throughput chart'],
+      ['text diff','Side-by-side text comparison'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9341,6 +9344,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='tip calculator' || ql==='tip' || ql==='calculate tip' || ql==='tip calc')){
     items.unshift({title:'Tip Calculator',desc:'Calculate tip with bill split',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTipCalculator();}});
+  }
+  if(ql && (ql==='graphql' || ql==='gql' || ql==='graphql schema' || ql==='gql schema')){
+    items.unshift({title:'GraphQL Schema',desc:'Generate GraphQL types and resolvers',icon:'G',type:'action',action:()=>{closeCommandPalette();showGraphqlSchemaGen();}});
+  }
+  if(ql && (ql==='throughput' || ql==='weekly throughput' || ql==='task throughput' || ql==='velocity chart')){
+    items.unshift({title:'Throughput Chart',desc:'Weekly completed vs created tasks',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskThroughput();}});
+  }
+  if(ql && (ql==='text diff' || ql==='diff' || ql==='compare text' || ql==='text compare')){
+    items.unshift({title:'Text Diff',desc:'Compare two texts side by side',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickTextDiff();}});
   }
   return items.slice(0, 20);
 }
@@ -26555,6 +26567,97 @@ function showQuickTipCalculator(){
   };
   window._tipBill=bill;window._tipPct=tipPct;window._tipSplit=split;
   window._tipRend=()=>{bill=window._tipBill;tipPct=window._tipPct;split=window._tipSplit;rend();};
+  document.body.appendChild(d);rend();
+}
+function showGraphqlSchemaGen(){
+  let ex=document.getElementById('gql-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'User + Auth':`type User {\n  id: ID!\n  email: String!\n  name: String\n  role: Role!\n  posts: [Post!]!\n  createdAt: DateTime!\n  updatedAt: DateTime!\n}\n\ntype AuthPayload {\n  token: String!\n  user: User!\n}\n\nenum Role {\n  USER\n  ADMIN\n}\n\ntype Query {\n  me: User\n  user(id: ID!): User\n  users(limit: Int, offset: Int): [User!]!\n}\n\ntype Mutation {\n  signup(email: String!, password: String!, name: String): AuthPayload!\n  login(email: String!, password: String!): AuthPayload!\n  updateUser(id: ID!, name: String, role: Role): User!\n  deleteUser(id: ID!): Boolean!\n}\n\nscalar DateTime`,
+    'Blog':`type Post {\n  id: ID!\n  title: String!\n  slug: String!\n  content: String\n  published: Boolean!\n  author: User!\n  tags: [String!]\n  comments: [Comment!]!\n  createdAt: DateTime!\n}\n\ntype Comment {\n  id: ID!\n  body: String!\n  author: User!\n  post: Post!\n  createdAt: DateTime!\n}\n\ntype Query {\n  posts(published: Boolean, limit: Int): [Post!]!\n  post(slug: String!): Post\n  searchPosts(query: String!): [Post!]!\n}\n\ntype Mutation {\n  createPost(title: String!, content: String, tags: [String]): Post!\n  updatePost(id: ID!, title: String, content: String, published: Boolean): Post!\n  deletePost(id: ID!): Boolean!\n  addComment(postId: ID!, body: String!): Comment!\n}`,
+    'E-commerce':`type Product {\n  id: ID!\n  name: String!\n  description: String\n  price: Float!\n  images: [String!]\n  category: Category\n  inStock: Boolean!\n  reviews: [Review!]!\n}\n\ntype Order {\n  id: ID!\n  items: [OrderItem!]!\n  total: Float!\n  status: OrderStatus!\n  user: User!\n  createdAt: DateTime!\n}\n\ntype OrderItem {\n  product: Product!\n  quantity: Int!\n  price: Float!\n}\n\ntype Review {\n  id: ID!\n  rating: Int!\n  comment: String\n  user: User!\n}\n\nenum OrderStatus {\n  PENDING\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n}\n\ntype Query {\n  products(category: ID, search: String): [Product!]!\n  product(id: ID!): Product\n  orders: [Order!]!\n}\n\ntype Mutation {\n  createOrder(items: [OrderItemInput!]!): Order!\n  addReview(productId: ID!, rating: Int!, comment: String): Review!\n}\n\ninput OrderItemInput {\n  productId: ID!\n  quantity: Int!\n}`
+  };
+  let sel='User + Auth';
+  const d=document.createElement('div');d.id='gql-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-gqlpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-gqlpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">GraphQL Schema Generator</span><span onclick="document.getElementById('gql-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#gql-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Schema',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Schema</button>
+    </div>`;
+    d.querySelectorAll('[data-gqlpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.gqlpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskThroughput(){
+  let ex=document.getElementById('throughput-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const weeks=8;const now=new Date();
+  const data=[];
+  for(let i=weeks-1;i>=0;i--){
+    const start=new Date(now);start.setDate(start.getDate()-i*7-6);
+    const end=new Date(now);end.setDate(end.getDate()-i*7);
+    const completed=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=start&&new Date(t.completedAt)<=end).length;
+    const created=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=start&&new Date(t.createdAt)<=end).length;
+    const label=`W${weeks-i}`;
+    data.push({label,completed,created});
+  }
+  const mx=Math.max(...data.map(d=>Math.max(d.completed,d.created)),1);
+  const w=300,h=120;
+  const compPts=data.map((d,i)=>`${Math.round((i/(data.length-1||1))*w)},${Math.round(h-(d.completed/mx)*h)}`).join(' ');
+  const creatPts=data.map((d,i)=>`${Math.round((i/(data.length-1||1))*w)},${Math.round(h-(d.created/mx)*h)}`).join(' ');
+  const labels=data.map((d,i)=>`<text x="${Math.round((i/(data.length-1||1))*w)}" y="${h+14}" text-anchor="middle" fill="var(--text-muted)" font-size="8">${d.label}</text>`).join('');
+  const avgThru=data.length?Math.round(data.reduce((s,d)=>s+d.completed,0)/data.length*10)/10:0;
+  const d=document.createElement('div');d.id='throughput-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Weekly Throughput</span><span onclick="document.getElementById('throughput-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <svg width="${w}" height="${h+20}" viewBox="0 0 ${w} ${h+20}">
+      <polyline points="${creatPts}" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="4 2" opacity="0.6"/>
+      <polyline points="${compPts}" fill="none" stroke="#4ade80" stroke-width="2"/>
+      ${labels}
+    </svg>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <span style="font-size:10px;color:#4ade80;display:flex;align-items:center;gap:4px"><span style="width:12px;height:2px;background:#4ade80;display:inline-block"></span>Completed</span>
+      <span style="font-size:10px;color:#22d3ee;display:flex;align-items:center;gap:4px"><span style="width:12px;height:2px;background:#22d3ee;display:inline-block;border-top:1px dashed #22d3ee"></span>Created</span>
+    </div>
+    <div style="margin-top:6px;font-size:10px;color:var(--text-muted)">Avg throughput: ${avgThru} tasks/week over ${weeks} weeks</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickTextDiff(){
+  let ex=document.getElementById('text-diff-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='text-diff-float';
+  const rend=(t1,t2)=>{
+    t1=t1||'';t2=t2||'';
+    let diff='';
+    if(t1&&t2){
+      const lines1=t1.split('\n');const lines2=t2.split('\n');
+      const maxLen=Math.max(lines1.length,lines2.length);
+      for(let i=0;i<maxLen;i++){
+        const l1=lines1[i]||'';const l2=lines2[i]||'';
+        if(l1===l2) diff+=`<div style="font-size:10px;color:var(--text-muted);padding:1px 4px;font-family:monospace">${esc(l1)||'&nbsp;'}</div>`;
+        else{
+          if(l1) diff+=`<div style="font-size:10px;color:#f87171;background:rgba(248,113,113,0.1);padding:1px 4px;font-family:monospace">- ${esc(l1)}</div>`;
+          if(l2) diff+=`<div style="font-size:10px;color:#4ade80;background:rgba(74,222,128,0.1);padding:1px 4px;font-family:monospace">+ ${esc(l2)}</div>`;
+        }
+      }
+    }
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Text Diff</span><span onclick="document.getElementById('text-diff-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <div><label style="font-size:10px;color:var(--text-muted)">Original</label><textarea id="diff-t1" rows="6" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-top:4px">${esc(t1)}</textarea></div>
+        <div><label style="font-size:10px;color:var(--text-muted)">Modified</label><textarea id="diff-t2" rows="6" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-top:4px">${esc(t2)}</textarea></div>
+      </div>
+      <button onclick="window._runDiff()" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:10px">Compare</button>
+      ${diff?`<div style="border:1px solid var(--border);border-radius:6px;padding:8px;max-height:200px;overflow-y:auto">${diff}</div>`:''}
+    </div>`;
+  };
+  window._runDiff=()=>{
+    const t1=document.getElementById('diff-t1').value;
+    const t2=document.getElementById('diff-t2').value;
+    rend(t1,t2);
+  };
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
