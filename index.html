@@ -6635,6 +6635,12 @@ function cmdGetItems(q) {
       ['auth','Auth JWT OAuth security reference'],
       ['estimate accuracy','How accurate are task estimates'],
       ['date diff','Date difference calculator'],
+      ['ssh','SSH connections keys tunneling'],
+      ['daily digest','Daily task summary digest'],
+      ['string escape','Escape strings for JSON URL HTML'],
+      ['git hooks','Git hooks and commit conventions'],
+      ['project health','Project health dashboard'],
+      ['box shadow','CSS box shadow generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10709,6 +10715,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='date diff' || ql==='date difference' || ql==='days between' || ql==='date calculator')){
     items.unshift({title:'Date Difference',desc:'Calculate days between dates',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDateDiff();}});
+  }
+  if(ql && (ql==='ssh' || ql==='ssh ref' || ql==='ssh commands' || ql==='ssh keys')){
+    items.unshift({title:'SSH Reference',desc:'Connections, keys, tunneling',icon:'S',type:'action',action:()=>{closeCommandPalette();showSSHRef();}});
+  }
+  if(ql && (ql==='daily digest' || ql==='digest' || ql==='today digest' || ql==='daily summary')){
+    items.unshift({title:'Daily Digest',desc:'Today task summary',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDailyDigest();}});
+  }
+  if(ql && (ql==='string escape' || ql==='escape' || ql==='escape string' || ql==='encode string')){
+    items.unshift({title:'String Escape',desc:'JSON, URL, HTML, regex escaping',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStringEscape();}});
+  }
+  if(ql && (ql==='git hooks' || ql==='hooks' || ql==='pre commit' || ql==='husky')){
+    items.unshift({title:'Git Hooks Reference',desc:'Pre-commit, lint-staged, husky',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitHooksRef();}});
+  }
+  if(ql && (ql==='project health' || ql==='health dashboard' || ql==='project status' || ql==='project health dashboard')){
+    items.unshift({title:'Project Health',desc:'Health dashboard for all projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectHealth2();}});
+  }
+  if(ql && (ql==='box shadow' || ql==='shadow gen' || ql==='css shadow' || ql==='box shadow generator')){
+    items.unshift({title:'Box Shadow Generator',desc:'Visual CSS box-shadow builder',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBoxShadowGen();}});
   }
   return items.slice(0, 20);
 }
@@ -37508,6 +37532,160 @@ function showQuickDateDiff(){
     out.innerHTML=r;
   };
   window._ddCalc();
+}
+function showSSHRef(){
+  let d=document.getElementById('ssh-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='ssh-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Connection':['ssh user@host','ssh -p 2222 user@host','ssh -i ~/.ssh/key.pem user@host','ssh -v user@host (verbose)','ssh -J jump@bastion user@target','ssh -N -f user@host (background)'],
+    'Key Management':['ssh-keygen -t ed25519 -C "email"','ssh-keygen -t rsa -b 4096','ssh-copy-id user@host','ssh-add ~/.ssh/id_ed25519','ssh-add -l (list keys)','eval "$(ssh-agent -s)"'],
+    'Tunneling':['ssh -L 8080:localhost:80 user@host (local forward)','ssh -R 9090:localhost:3000 user@host (remote forward)','ssh -D 1080 user@host (SOCKS proxy)','ssh -L 5432:db-host:5432 user@bastion'],
+    'File Transfer':['scp file.txt user@host:/path/','scp -r dir/ user@host:/path/','scp user@host:/remote/file.txt ./local/','rsync -avz --progress src/ user@host:dest/'],
+    'Config (~/.ssh/config)':['Host myserver','  HostName 192.168.1.10','  User deploy','  Port 22','  IdentityFile ~/.ssh/mykey','  ForwardAgent yes','  ServerAliveInterval 60'],
+    'Troubleshoot':['ssh -vvv user@host','chmod 700 ~/.ssh','chmod 600 ~/.ssh/id_ed25519','chmod 644 ~/.ssh/id_ed25519.pub','chmod 600 ~/.ssh/config']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">SSH Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskDailyDigest(){
+  let d=document.getElementById('daily-digest-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='daily-digest-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const now=new Date();const today=now.toISOString().split('T')[0];
+  const yesterday=new Date(now-86400000).toISOString().split('T')[0];
+  const doneToday=tasks.filter(t=>{const dd=(t.completedAt||t.doneAt||'').split('T')[0];return dd===today;});
+  const doneYesterday=tasks.filter(t=>{const dd=(t.completedAt||t.doneAt||'').split('T')[0];return dd===yesterday;});
+  const dueToday=tasks.filter(t=>t.due===today&&t.status!=='done');
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Daily Digest</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+now.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'})+'</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px">';
+  h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">'+doneToday.length+'</div><div style="font-size:9px;color:var(--text-muted)">Done Today</div></div>';
+  h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:18px;font-weight:700;color:#38bdf8">'+dueToday.length+'</div><div style="font-size:9px;color:var(--text-muted)">Due Today</div></div>';
+  h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:18px;font-weight:700;color:#a78bfa">'+inProgress.length+'</div><div style="font-size:9px;color:var(--text-muted)">In Progress</div></div>';
+  h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:18px;font-weight:700;color:'+(overdue.length>0?'#f87171':'#94a3b8')+'">'+overdue.length+'</div><div style="font-size:9px;color:var(--text-muted)">Overdue</div></div>';
+  h+='</div>';
+  const sections=[
+    {title:'Due Today',items:dueToday,color:'#38bdf8'},
+    {title:'In Progress',items:inProgress,color:'#a78bfa'},
+    {title:'Done Today',items:doneToday,color:'#4ade80'},
+    {title:'Overdue',items:overdue.slice(0,5),color:'#f87171'}
+  ];
+  sections.forEach(s=>{
+    if(s.items.length===0)return;
+    h+='<div style="font-size:11px;color:'+s.color+';margin:10px 0 4px;font-weight:600">'+s.title+'</div>';
+    s.items.forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0">'+esc(t.title)+'</div>';});
+  });
+  h+='<div style="margin-top:12px;padding:8px;background:var(--bg-surface);border-radius:6px;font-size:11px;text-align:center;color:var(--text-muted)">Yesterday: '+doneYesterday.length+' completed</div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickStringEscape(){
+  let d=document.getElementById('str-escape-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='str-escape-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">String Escape</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<textarea id="se-input" placeholder="Enter string to escape..." style="width:100%;height:60px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;resize:none;box-sizing:border-box;font-family:monospace;margin-bottom:6px"></textarea>';
+  h+='<div id="se-output" style="font-size:11px;max-height:160px;overflow-y:auto"></div>';
+  h+='<button onclick="window._seEscape()" style="width:100%;margin-top:6px;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px">Escape All</button>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._seEscape=function(){
+    const inp=document.getElementById('se-input').value;
+    const out=document.getElementById('se-output');if(!out)return;
+    const escapes=[
+      {label:'JSON',value:JSON.stringify(inp)},
+      {label:'URL',value:encodeURIComponent(inp)},
+      {label:'HTML',value:inp.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')},
+      {label:'Regex',value:inp.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')},
+      {label:'Shell',value:"'"+inp.replace(/'/g,"'\\''")+"'"},
+      {label:'CSS',value:inp.replace(/([\\!"#$%&'()*+,./:;<=>?@[\]^`{|}~])/g,'\\$1')},
+    ];
+    let r='';escapes.forEach(e=>{
+      r+='<div style="margin:4px 0;padding:4px 6px;background:var(--bg-surface);border-radius:4px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">'+e.label+'</div><div style="font-family:monospace;color:var(--text-primary);font-size:11px;cursor:pointer;word-break:break-all" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-primary)\',600)">'+esc(e.value)+'</div></div>';
+    });
+    out.innerHTML=r;
+  };
+}
+function showGitHooksRef(){
+  let d=document.getElementById('git-hooks-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='git-hooks-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Client Hooks':['pre-commit: runs before commit message prompt','prepare-commit-msg: template for commit message','commit-msg: validate commit message format','post-commit: runs after commit is made','pre-push: runs before push to remote','pre-rebase: runs before rebase starts','post-checkout: runs after checkout completes','post-merge: runs after merge completes'],
+    'Server Hooks':['pre-receive: runs before push is accepted','update: runs per-branch before update','post-receive: runs after push is fully accepted'],
+    'Setup':['chmod +x .git/hooks/pre-commit','#!/bin/sh (shebang for hook scripts)','npx husky init','npx husky add .husky/pre-commit "npm test"','npx lint-staged'],
+    'Common Pre-commit':['npm test','npx eslint --fix .','npx prettier --check .','git diff --cached --name-only | xargs eslint','exit 1 (abort commit)','exit 0 (allow commit)'],
+    'Commit Message':['commitlint --edit $1','Pattern: type(scope): description','Types: feat, fix, docs, style, refactor, test, chore','git commit -m "feat(auth): add JWT verification"']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Git Hooks Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskProjectHealth2(){
+  let d=document.getElementById('proj-health2-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='proj-health2-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=(S.projects||[]);const tasks=(S.tasks||[]);
+  const now=new Date().toISOString().split('T')[0];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Project Health Dashboard</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id);
+    const total=pTasks.length;const done=pTasks.filter(t=>t.status==='done').length;
+    const overdue=pTasks.filter(t=>t.status!=='done'&&t.due&&t.due<now).length;
+    const inProgress=pTasks.filter(t=>t.status==='in-progress').length;
+    const pct=total>0?Math.round((done/total)*100):0;
+    const health=overdue>3?'Critical':overdue>0?'Warning':pct>=50?'Healthy':'Starting';
+    const hColor=health==='Critical'?'#f87171':health==='Warning'?'#fbbf24':health==='Healthy'?'#4ade80':'#94a3b8';
+    h+='<div style="margin:8px 0;padding:12px;background:var(--bg-surface);border-radius:6px;border-left:3px solid '+hColor+'">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">'+esc(p.name)+'</span><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+hColor+'22;color:'+hColor+';font-weight:600">'+health+'</span></div>';
+    h+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:6px"><div style="height:100%;width:'+pct+'%;background:'+hColor+';border-radius:3px"></div></div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)"><span>'+done+'/'+total+' done ('+pct+'%)</span><span style="color:#a78bfa">'+inProgress+' WIP</span>'+(overdue>0?'<span style="color:#f87171">'+overdue+' overdue</span>':'')+'</div></div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickBoxShadowGen(){
+  let d=document.getElementById('shadow-gen-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='shadow-gen-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Box Shadow Gen</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div id="bs-preview" style="width:100%;height:60px;background:var(--bg-surface);border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.5)"><div style="width:50%;height:30px;background:var(--accent);border-radius:4px;box-shadow:inherit"></div></div>';
+  const sliders=[
+    {id:'bs-x',label:'X Offset',min:-50,max:50,val:0},
+    {id:'bs-y',label:'Y Offset',min:-50,max:50,val:4},
+    {id:'bs-blur',label:'Blur',min:0,max:100,val:12},
+    {id:'bs-spread',label:'Spread',min:-50,max:50,val:0},
+    {id:'bs-opacity',label:'Opacity',min:0,max:100,val:50}
+  ];
+  sliders.forEach(s=>{
+    h+='<div style="display:flex;align-items:center;gap:6px;margin:4px 0"><span style="font-size:10px;color:var(--text-muted);width:55px">'+s.label+'</span><input id="'+s.id+'" type="range" min="'+s.min+'" max="'+s.max+'" value="'+s.val+'" style="flex:1;accent-color:var(--accent)" oninput="window._bsUpdate()"><span id="'+s.id+'-val" style="font-size:10px;color:var(--text-secondary);width:25px;text-align:right">'+s.val+'</span></div>';
+  });
+  h+='<div id="bs-css" style="font-family:monospace;font-size:11px;padding:6px;background:var(--bg-surface);border-radius:4px;color:var(--accent);margin-top:8px;cursor:pointer;word-break:break-all" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--accent)\',600)">box-shadow: 0px 4px 12px 0px rgba(0,0,0,0.5)</div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._bsUpdate=function(){
+    const x=document.getElementById('bs-x').value;
+    const y=document.getElementById('bs-y').value;
+    const blur=document.getElementById('bs-blur').value;
+    const spread=document.getElementById('bs-spread').value;
+    const opacity=document.getElementById('bs-opacity').value;
+    document.getElementById('bs-x-val').textContent=x;
+    document.getElementById('bs-y-val').textContent=y;
+    document.getElementById('bs-blur-val').textContent=blur;
+    document.getElementById('bs-spread-val').textContent=spread;
+    document.getElementById('bs-opacity-val').textContent=opacity;
+    const shadow=x+'px '+y+'px '+blur+'px '+spread+'px rgba(0,0,0,'+(opacity/100).toFixed(2)+')';
+    const preview=document.getElementById('bs-preview');
+    if(preview)preview.style.boxShadow=shadow;
+    const css=document.getElementById('bs-css');
+    if(css)css.textContent='box-shadow: '+shadow;
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
