@@ -1711,6 +1711,8 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm" id="td-timer-btn" onclick="toggleTaskTimer()" title="Start/stop time tracking"></button>
       <button class="btn btn-sm" onclick="ftStartForTask(taskDetailId)" title="Start 25min focus timer for this task" style="color:var(--accent)">Focus</button>
       <button class="btn btn-sm" onclick="copyTaskAsMarkdown()" title="Copy task as markdown">Copy MD</button>
+      <button class="btn btn-sm" onclick="snoozeTask(1)" title="Push due date +1 day" style="color:var(--yellow)">+1d</button>
+      <button class="btn btn-sm" onclick="snoozeTask(7)" title="Push due date +1 week" style="color:var(--yellow)">+1w</button>
       <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
     </div>
   </div>
@@ -2742,6 +2744,14 @@ function copyTaskAsMarkdown(){
   md+='\n*Created: '+(t.created||'unknown')+'*\n';
   if(t.completedAt)md+='*Completed: '+t.completedAt+'*\n';
   navigator.clipboard.writeText(md).then(()=>toast('Task copied as markdown'));
+}
+function snoozeTask(days){
+  const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
+  const base=t.due?new Date(t.due+'T12:00:00'):new Date();
+  base.setDate(base.getDate()+days);
+  t.due=base.toISOString().split('T')[0];
+  document.getElementById('td-due').value=t.due;
+  save();renderCalendar();renderTasks();toast('Snoozed to '+t.due);
 }
 function toggleTaskTimer(){
   const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
@@ -4994,7 +5004,7 @@ function cmdGetItems(q) {
   if(!ql || 'overdue late past due'.includes(ql)){const ot=new Date().toISOString().split('T')[0];const od=S.tasks.filter(t=>t.due&&t.due<ot&&t.status!=='done');if(od.length)items.push({title:'Overdue Tasks ('+od.length+')',desc:od.slice(0,3).map(t=>t.title).join(', '),icon:'!',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='due';renderTasks();toast(od.length+' overdue tasks');}});}
   if(!ql || 'archive archived completed old'.includes(ql)){const ac=(S.archivedTasks||[]).length;if(ac)items.push({title:'View Archived Tasks ('+ac+')',desc:'Browse and restore archived tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);showArchivedTasks();}});}
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
-  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all:', icon:'?', type:'info'});
+  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due:', icon:'?', type:'info'});
   if(!ql || 'clear reset filters'.includes(ql)) items.push({title:'Clear All Filters', desc:'Reset search, filters, and sort to defaults', icon:'X', type:'action', action:()=>{closeCommandPalette();taskFilter='all';taskProjectFilter=null;contentType='all';contentTheme='all';contentTagFilter=null;contentShowAll=false;const ts=document.getElementById('task-search');if(ts)ts.value='';const cs=document.getElementById('content-search');if(cs)cs.value='';const tsort=document.getElementById('task-sort');if(tsort)tsort.value='manual';renderTasks();renderContent();renderLinks();toast('All filters cleared');}});
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
@@ -5069,6 +5079,15 @@ function cmdGetItems(q) {
       S.tasks.filter(t=>t.status!=='done'&&t.title&&t.title.toLowerCase().includes(fq)).slice(0,5).forEach(t=>{
         items.unshift({title:'Focus: '+t.title,desc:'Start 25min Pomodoro + time tracking',icon:'F',type:'action',action:()=>{closeCommandPalette();ftStartForTask(t.id);toast('Focus started: '+t.title);}});
       });
+    }
+  }
+  // Due date filter from Cmd+K
+  if(ql && ql.startsWith('due:')) {
+    const dq=q.substring(4).trim();
+    const parsed=parseNaturalDate(dq);
+    if(parsed&&/^\d{4}-\d{2}-\d{2}$/.test(parsed)){
+      const matching=S.tasks.filter(t=>t.due===parsed&&t.status!=='done');
+      items.unshift({title:'Tasks due '+relativeDate(parsed)+' ('+matching.length+')',desc:matching.slice(0,3).map(t=>t.title).join(', ')||'No tasks',icon:'D',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='due';renderTasks();toast(matching.length+' tasks due '+parsed);}});
     }
   }
   // Quick spec search from Cmd+K
