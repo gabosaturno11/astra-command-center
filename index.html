@@ -6200,6 +6200,12 @@ function cmdGetItems(q) {
       ['console log','Console.log template snippets'],
       ['flow efficiency','Task flow efficiency dashboard'],
       ['gratitude','Daily gratitude journal'],
+      ['http status','HTTP status code reference'],
+      ['recurrence','Task recurrence summary'],
+      ['journal','Daily journal with writing prompts'],
+      ['env file','.env file generator and editor'],
+      ['blocked graph','Blocked tasks dependency graph'],
+      ['hydration','Water intake tracker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8969,6 +8975,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='gratitude' || ql==='grateful' || ql==='gratitude journal' || ql==='thankful')){
     items.unshift({title:'Gratitude Journal',desc:'Daily gratitude entries with streak',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGratitude();}});
+  }
+  if(ql && (ql==='http status' || ql==='status code' || ql==='http codes' || ql==='status')){
+    items.unshift({title:'HTTP Status Codes',desc:'Complete HTTP status code reference',icon:'H',type:'action',action:()=>{closeCommandPalette();showHttpStatusRef();}});
+  }
+  if(ql && (ql==='recurrence' || ql==='recurring' || ql==='recurring tasks' || ql==='repeat tasks')){
+    items.unshift({title:'Recurrence Summary',desc:'Overview of recurring task patterns',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskRecurrenceSummary();}});
+  }
+  if(ql && (ql==='journal' || ql==='journal prompt' || ql==='writing prompt' || ql==='daily journal')){
+    items.unshift({title:'Journal Prompt',desc:'Daily journal with writing prompts',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJournalPrompt();}});
+  }
+  if(ql && (ql==='env file' || ql==='env' || ql==='.env' || ql==='dotenv')){
+    items.unshift({title:'.env Generator',desc:'Build .env files with comments',icon:'E',type:'action',action:()=>{closeCommandPalette();showEnvFileGen();}});
+  }
+  if(ql && (ql==='blocked graph' || ql==='blocked' || ql==='dependency graph' || ql==='blockers')){
+    items.unshift({title:'Blocked Graph',desc:'Task dependency blockers visualization',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBlockedGraph();}});
+  }
+  if(ql && (ql==='hydration' || ql==='water' || ql==='drink water' || ql==='cups')){
+    items.unshift({title:'Hydration Tracker',desc:'Track daily water intake',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHydration();}});
   }
   return items.slice(0, 20);
 }
@@ -23378,6 +23402,210 @@ function showQuickGratitude(){
       save();rend();
     };
     document.getElementById('grat-input').onkeydown=function(e){if(e.key==='Enter'){document.getElementById('grat-add').click();}};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showHttpStatusRef(){
+  let p=document.getElementById('http-status-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='http-status-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let groups=[
+    {label:'1xx Informational',color:'#94a3b8',codes:[
+      {c:100,t:'Continue'},{c:101,t:'Switching Protocols'},{c:102,t:'Processing'},{c:103,t:'Early Hints'}
+    ]},
+    {label:'2xx Success',color:'#4ade80',codes:[
+      {c:200,t:'OK'},{c:201,t:'Created'},{c:202,t:'Accepted'},{c:204,t:'No Content'},{c:206,t:'Partial Content'},{c:207,t:'Multi-Status'}
+    ]},
+    {label:'3xx Redirection',color:'#22d3ee',codes:[
+      {c:301,t:'Moved Permanently'},{c:302,t:'Found'},{c:304,t:'Not Modified'},{c:307,t:'Temporary Redirect'},{c:308,t:'Permanent Redirect'}
+    ]},
+    {label:'4xx Client Error',color:'#fbbf24',codes:[
+      {c:400,t:'Bad Request'},{c:401,t:'Unauthorized'},{c:403,t:'Forbidden'},{c:404,t:'Not Found'},{c:405,t:'Method Not Allowed'},{c:408,t:'Request Timeout'},{c:409,t:'Conflict'},{c:410,t:'Gone'},{c:413,t:'Payload Too Large'},{c:415,t:'Unsupported Media Type'},{c:418,t:'I\'m a Teapot'},{c:422,t:'Unprocessable Entity'},{c:429,t:'Too Many Requests'},{c:451,t:'Unavailable For Legal Reasons'}
+    ]},
+    {label:'5xx Server Error',color:'#f87171',codes:[
+      {c:500,t:'Internal Server Error'},{c:501,t:'Not Implemented'},{c:502,t:'Bad Gateway'},{c:503,t:'Service Unavailable'},{c:504,t:'Gateway Timeout'}
+    ]}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">HTTP Status Codes</span><button onclick="document.getElementById(\'http-status-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<input id="http-search" placeholder="Search codes..." style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:12px;margin-bottom:10px;box-sizing:border-box">';
+  groups.forEach(g=>{
+    html+='<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:'+g.color+';margin-bottom:4px;padding:4px 0;border-bottom:1px solid var(--border)">'+g.label+'</div>';
+    g.codes.forEach(c=>{
+      html+='<div class="http-code-row" data-code="'+c.c+'" data-text="'+esc(c.t.toLowerCase())+'" style="display:flex;align-items:center;gap:8px;padding:4px 6px;cursor:pointer;border-radius:3px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'transparent\'"><span style="font-family:monospace;font-weight:700;color:'+g.color+';min-width:36px;font-size:12px">'+c.c+'</span><span style="font-size:11px;color:var(--text-primary)">'+esc(c.t)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  p.innerHTML=html;
+  p.querySelectorAll('.http-code-row').forEach(r=>{
+    r.onclick=function(){navigator.clipboard.writeText(this.dataset.code);let orig=this.style.background;this.style.background='rgba(74,222,128,0.2)';setTimeout(()=>{this.style.background=orig;},400);};
+  });
+  document.getElementById('http-search').oninput=function(){
+    let q=this.value.toLowerCase();
+    p.querySelectorAll('.http-code-row').forEach(r=>{
+      let show=r.dataset.code.includes(q)||r.dataset.text.includes(q);
+      r.style.display=show?'flex':'none';
+    });
+  };
+  document.body.appendChild(p);
+}
+function showTaskRecurrenceSummary(){
+  let p=document.getElementById('recur-sum-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='recur-sum-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let recurring=tasks.filter(t=>t.recurrence&&t.recurrence!=='none');
+  let byType={};
+  recurring.forEach(t=>{
+    let r=t.recurrence||'unknown';
+    if(!byType[r])byType[r]={count:0,tasks:[]};
+    byType[r].count++;
+    byType[r].tasks.push(t);
+  });
+  let types=Object.keys(byType).sort((a,b)=>byType[b].count-byType[a].count);
+  let colors={daily:'#4ade80',weekday:'#22d3ee',weekly:'#a78bfa',biweekly:'#fbbf24',monthly:'#fb923c'};
+  let rows=types.map(t=>{
+    let info=byType[t];
+    let c=colors[t]||'#94a3b8';
+    let taskList=info.tasks.map(tk=>'<div style="font-size:10px;color:var(--text-muted);padding:2px 0;padding-left:12px">- '+esc(tk.title)+'</div>').join('');
+    return '<div style="margin-bottom:8px;padding:8px;background:var(--bg-surface);border-radius:var(--radius);border-left:3px solid '+c+'"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;color:var(--text-primary);font-size:12px;text-transform:capitalize">'+t+'</span><span style="font-size:12px;font-weight:700;color:'+c+'">'+info.count+'</span></div>'+taskList+'</div>';
+  }).join('');
+  if(!rows)rows='<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:12px">No recurring tasks found</div>';
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Recurrence Summary</span><button onclick="document.getElementById(\'recur-sum-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:12px;margin-bottom:12px"><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:#4ade80">'+recurring.length+'</div><div style="font-size:10px;color:var(--text-muted)">Recurring</div></div><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:var(--text-primary)">'+types.length+'</div><div style="font-size:10px;color:var(--text-muted)">Patterns</div></div></div>'
+    +rows;
+  document.body.appendChild(p);
+}
+function showQuickJournalPrompt(){
+  let p=document.getElementById('journal-prompt-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='journal-prompt-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  let prompts=[
+    'What is one thing you learned today that surprised you?',
+    'What challenge did you face, and how did you handle it?',
+    'What are you most proud of accomplishing recently?',
+    'If you could tell your past self one thing, what would it be?',
+    'What is something small that brought you joy today?',
+    'What habit do you want to build or break?',
+    'Describe a moment today when you felt fully present.',
+    'What would you do differently if you could redo today?',
+    'Who inspired you recently, and why?',
+    'What is one fear you want to overcome this week?',
+    'What does your ideal day look like?',
+    'Write about a skill you want to develop and why.',
+    'What conversation had the biggest impact on you recently?',
+    'What are 3 things you can control right now?',
+    'What would you attempt if you knew you could not fail?'
+  ];
+  let prompt=prompts[Math.floor(Math.random()*prompts.length)];
+  if(!S._journalEntries)S._journalEntries=[];
+  let today=new Date().toISOString().slice(0,10);
+  function rend(){
+    let todayEntry=S._journalEntries.find(e=>e.date===today);
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Journal Prompt</span><button onclick="document.getElementById(\'journal-prompt-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="padding:10px;background:var(--bg-surface);border-radius:var(--radius);margin-bottom:10px;border-left:3px solid #4ade80"><div style="font-size:12px;color:var(--text-primary);font-style:italic;line-height:1.5">'+esc(prompt)+'</div></div>'
+      +'<textarea id="journal-text" rows="5" placeholder="Write your thoughts..." style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;resize:vertical;box-sizing:border-box;line-height:1.5">'+(todayEntry?esc(todayEntry.text):'')+'</textarea>'
+      +'<div style="display:flex;gap:6px;margin-top:6px"><button id="journal-save" style="flex:1;padding:6px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:11px">Save</button><button id="journal-new" style="padding:6px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:11px">New Prompt</button></div>'
+      +'<div style="font-size:9px;color:var(--text-muted);margin-top:6px;text-align:center">'+S._journalEntries.length+' total entries</div>';
+    document.getElementById('journal-save').onclick=function(){
+      let text=document.getElementById('journal-text').value.trim();
+      if(!text)return;
+      let existing=S._journalEntries.findIndex(e=>e.date===today);
+      if(existing>=0)S._journalEntries[existing]={date:today,prompt:prompt,text:text,ts:Date.now()};
+      else S._journalEntries.push({date:today,prompt:prompt,text:text,ts:Date.now()});
+      save();this.textContent='Saved!';setTimeout(()=>{this.textContent='Save';},1200);
+    };
+    document.getElementById('journal-new').onclick=function(){prompt=prompts[Math.floor(Math.random()*prompts.length)];rend();};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showEnvFileGen(){
+  let p=document.getElementById('env-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='env-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let vars=S._envVars||[{k:'DATABASE_URL',v:'postgresql://user:pass@localhost:5432/db',comment:'Database connection'},{k:'API_KEY',v:'',comment:'Your API key'},{k:'NODE_ENV',v:'development',comment:'Environment'}];
+  function gen(){
+    return vars.map(v=>{
+      let line='';
+      if(v.comment)line='# '+v.comment+'\n';
+      line+=v.k+'='+(v.v.includes(' ')?'"'+v.v+'"':v.v);
+      return line;
+    }).join('\n\n');
+  }
+  function rend(){
+    let rows=vars.map((v,i)=>'<div style="display:flex;gap:4px;margin-bottom:6px;align-items:center"><input data-ei="'+i+'" data-ef="k" value="'+esc(v.k)+'" placeholder="KEY" style="width:140px;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:#4ade80;font-size:11px;font-family:monospace"><input data-ei="'+i+'" data-ef="v" value="'+esc(v.v)+'" placeholder="value" style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:11px;font-family:monospace"><input data-ei="'+i+'" data-ef="comment" value="'+esc(v.comment)+'" placeholder="comment" style="width:100px;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-muted);font-size:10px"><button data-ed="'+i+'" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:14px">x</button></div>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">.env File Generator</span><button onclick="document.getElementById(\'env-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +rows
+      +'<button id="env-add" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:11px;margin-bottom:10px">+ Add Variable</button>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.6">'+esc(gen())+'</pre>'
+      +'<div style="display:flex;gap:6px"><button id="env-copy" style="flex:1;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy .env</button><button id="env-example" style="padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:11px">Copy .env.example</button></div>';
+    p.querySelectorAll('[data-ei]').forEach(inp=>{inp.oninput=function(){let i=parseInt(this.dataset.ei);vars[i][this.dataset.ef]=this.value;S._envVars=vars;save();};});
+    p.querySelectorAll('[data-ed]').forEach(b=>{b.onclick=function(){vars.splice(parseInt(this.dataset.ed),1);S._envVars=vars;save();rend();};});
+    document.getElementById('env-add').onclick=function(){vars.push({k:'NEW_VAR',v:'',comment:''});S._envVars=vars;save();rend();};
+    document.getElementById('env-copy').onclick=function(){navigator.clipboard.writeText(gen());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy .env';},1200);};
+    document.getElementById('env-example').onclick=function(){
+      let ex=vars.map(v=>{let line='';if(v.comment)line='# '+v.comment+'\n';line+=v.k+'=';return line;}).join('\n\n');
+      navigator.clipboard.writeText(ex);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy .env.example';},1200);
+    };
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskBlockedGraph(){
+  let p=document.getElementById('blocked-graph-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='blocked-graph-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let blocked=tasks.filter(t=>t.blockedBy&&t.blockedBy.length>0&&t.status!=='done');
+  let blockers={};
+  blocked.forEach(t=>{
+    (t.blockedBy||[]).forEach(bid=>{
+      if(!blockers[bid])blockers[bid]={task:tasks.find(tk=>tk.id===bid),blocking:[]};
+      blockers[bid].blocking.push(t);
+    });
+  });
+  let blockerList=Object.keys(blockers).sort((a,b)=>blockers[b].blocking.length-blockers[a].blocking.length);
+  if(blockerList.length===0){
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Blocked Tasks Graph</span><button onclick="document.getElementById(\'blocked-graph-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="text-align:center;padding:30px;color:var(--text-muted)"><div style="font-size:24px;margin-bottom:8px">No blocked tasks!</div><div style="font-size:12px">All tasks are unblocked and ready to work on.</div></div>';
+  } else {
+    let rows=blockerList.map(bid=>{
+      let b=blockers[bid];
+      let blocker=b.task;
+      let bName=blocker?esc(blocker.title):'Unknown ('+bid+')';
+      let bStatus=blocker?blocker.status:'unknown';
+      let statusColor=bStatus==='done'?'#4ade80':bStatus==='in-progress'?'#22d3ee':'#fbbf24';
+      let deps=b.blocking.map(t=>'<div style="font-size:10px;color:var(--text-muted);padding:2px 0 2px 16px">- '+esc(t.title)+'</div>').join('');
+      return '<div style="padding:8px;background:var(--bg-surface);border-radius:var(--radius);margin-bottom:6px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:600;color:var(--text-primary);font-size:12px">'+bName+'</span><span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+statusColor+'20;color:'+statusColor+'">'+bStatus+'</span></div><div style="font-size:10px;color:#f87171;margin:4px 0">Blocking '+b.blocking.length+' task'+(b.blocking.length>1?'s':'')+':</div>'+deps+'</div>';
+    }).join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Blocked Tasks Graph</span><button onclick="document.getElementById(\'blocked-graph-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;gap:12px;margin-bottom:12px"><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:#f87171">'+blocked.length+'</div><div style="font-size:10px;color:var(--text-muted)">Blocked</div></div><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;flex:1"><div style="font-size:20px;font-weight:700;color:#fbbf24">'+blockerList.length+'</div><div style="font-size:10px;color:var(--text-muted)">Blockers</div></div></div>'
+      +rows;
+  }
+  document.body.appendChild(p);
+}
+function showQuickHydration(){
+  let p=document.getElementById('hydration-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='hydration-panel';
+  p.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:220px';
+  let today=new Date().toISOString().slice(0,10);
+  if(!S._hydration)S._hydration={};
+  if(!S._hydration[today])S._hydration[today]=0;
+  let goal=S._hydrationGoal||8;
+  function rend(){
+    let cups=S._hydration[today]||0;
+    let pct=Math.min(Math.round(cups/goal*100),100);
+    let blocks='';
+    for(let i=0;i<goal;i++){
+      blocks+='<div style="width:20px;height:20px;border-radius:3px;background:'+(i<cups?'#22d3ee':'var(--bg-surface)')+';border:1px solid '+(i<cups?'#22d3ee':'var(--border)')+';transition:background 0.2s"></div>';
+    }
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Hydration</span><button onclick="document.getElementById(\'hydration-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="text-align:center;margin-bottom:8px"><div style="font-size:28px;font-weight:700;color:#22d3ee">'+cups+'/'+goal+'</div><div style="font-size:10px;color:var(--text-muted)">cups ('+pct+'%)</div></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-bottom:10px">'+blocks+'</div>'
+      +'<div style="display:flex;gap:4px"><button id="hyd-add" style="flex:1;padding:6px;background:#22d3ee;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:12px">+ Cup</button><button id="hyd-sub" style="padding:6px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:12px">-</button></div>';
+    document.getElementById('hyd-add').onclick=function(){S._hydration[today]=(S._hydration[today]||0)+1;save();rend();};
+    document.getElementById('hyd-sub').onclick=function(){if(S._hydration[today]>0)S._hydration[today]--;save();rend();};
   }
   document.body.appendChild(p);
   rend();
