@@ -5703,6 +5703,9 @@ function cmdGetItems(q) {
       ['workspace','Full workspace stats overview'],
       ['chart','SVG charts: status pie, priority bars, themes, weekly'],
       ['plan','7-day task plan with quick-add'],['bookmarks','Import browser bookmarks HTML'],
+      ['burndown','14-day task burndown chart (created vs completed)'],
+      ['deadlinks','Check all links for broken URLs'],
+      ['notifications','Enable desktop notifications for overdue tasks'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6801,6 +6804,19 @@ function cmdGetItems(q) {
     items.unshift({title:'Import Browser Bookmarks',desc:'Upload HTML bookmarks file (Chrome/Firefox export)',icon:'L',type:'action',action:()=>{closeCommandPalette();importBookmarks();}});
     items.unshift({title:'Batch Import URLs',desc:'Paste multiple URLs (one per line)',icon:'L',type:'action',action:()=>{closeCommandPalette();batchImportLinks();}});
   }
+  // Burndown chart prefix
+  if(ql && (ql==='burndown' || ql==='burn' || ql==='burndown chart')){
+    items.unshift({title:'Task Burndown Chart (14 days)',desc:'SVG chart: tasks created vs completed per day',icon:'B',type:'action',action:()=>{closeCommandPalette();showBurndownChart();}});
+    items.unshift({title:'Burndown Chart (30 days)',desc:'Extended 30-day view',icon:'B',type:'action',action:()=>{closeCommandPalette();showBurndownChart(30);}});
+  }
+  // Dead links checker prefix
+  if(ql && (ql==='deadlinks' || ql==='dead links' || ql==='check links' || ql==='broken links' || ql==='link check')){
+    items.unshift({title:'Check All Links for Broken URLs',desc:'Tests each link via HEAD request (may take a moment)',icon:'L',type:'action',action:()=>{closeCommandPalette();checkDeadLinks();}});
+  }
+  // Notifications prefix
+  if(ql && (ql==='notifications' || ql==='notify' || ql==='alerts' || ql==='desktop alerts')){
+    items.unshift({title:'Enable Desktop Notifications',desc:'Get alerts for overdue tasks and focus timer',icon:'N',type:'action',action:()=>{closeCommandPalette();enableDesktopNotifications();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -6821,6 +6837,81 @@ function importBookmarks(){
       save();renderLinks();toast('Imported '+count+' bookmarks ('+links.length+' total, dupes skipped)');
     };reader.readAsText(f);
   };input.click();
+}
+function showBurndownChart(days){
+  days=days||14;
+  let panel=document.getElementById('burndown-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='burndown-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw';
+  const w=500,h=260,pad=40,gw=w-pad*2,gh=h-pad*2;
+  const today=new Date();const dates=[];
+  for(let i=days-1;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);dates.push(d.toISOString().split('T')[0]);}
+  const created=dates.map(ds=>S.tasks.filter(t=>t.created&&t.created.startsWith(ds)).length);
+  const completed=dates.map(ds=>S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(ds)).length);
+  const maxVal=Math.max(1,...created,...completed);
+  const barW=Math.floor(gw/dates.length*0.35);
+  let svg=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="font-family:var(--mono)">`;
+  // grid lines
+  for(let i=0;i<=4;i++){const y=pad+gh-gh*(i/4);const v=Math.round(maxVal*(i/4));svg+=`<line x1="${pad}" y1="${y}" x2="${pad+gw}" y2="${y}" stroke="#222" stroke-width="0.5"/><text x="${pad-4}" y="${y+3}" fill="#666" font-size="8" text-anchor="end">${v}</text>`;}
+  // bars
+  dates.forEach((ds,i)=>{
+    const x=pad+i*(gw/dates.length)+2;
+    const ch=created[i]?(created[i]/maxVal)*gh:0;
+    const dh=completed[i]?(completed[i]/maxVal)*gh:0;
+    svg+=`<rect x="${x}" y="${pad+gh-ch}" width="${barW}" height="${ch}" fill="#3b82f6" rx="1" opacity="0.85"><title>${ds}: ${created[i]} created</title></rect>`;
+    svg+=`<rect x="${x+barW+1}" y="${pad+gh-dh}" width="${barW}" height="${dh}" fill="#4ade80" rx="1" opacity="0.85"><title>${ds}: ${completed[i]} completed</title></rect>`;
+    if(i%Math.ceil(days/7)===0||i===dates.length-1){svg+=`<text x="${x+barW}" y="${h-5}" fill="#666" font-size="7" text-anchor="middle">${ds.substring(5)}</text>`;}
+  });
+  // legend
+  svg+=`<rect x="${w-120}" y="8" width="8" height="8" fill="#3b82f6" rx="1"/><text x="${w-108}" y="16" fill="#888" font-size="9">Created</text>`;
+  svg+=`<rect x="${w-120}" y="22" width="8" height="8" fill="#4ade80" rx="1"/><text x="${w-108}" y="30" fill="#888" font-size="9">Completed</text>`;
+  // totals
+  const totalCreated=created.reduce((a,v)=>a+v,0);const totalCompleted=completed.reduce((a,v)=>a+v,0);
+  svg+=`<text x="${pad}" y="16" fill="#888" font-size="9">${totalCreated} created, ${totalCompleted} completed (${days}d)</text>`;
+  svg+=`</svg>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Task Burndown (${days} days)</span><button onclick="document.getElementById('burndown-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;justify-content:center;overflow-x:auto">${svg}</div><div style="margin-top:10px;display:flex;gap:8px;justify-content:center"><button onclick="showBurndownChart(7)" class="btn btn-sm btn-ghost" style="font-size:9px">7d</button><button onclick="showBurndownChart(14)" class="btn btn-sm btn-ghost" style="font-size:9px">14d</button><button onclick="showBurndownChart(30)" class="btn btn-sm btn-ghost" style="font-size:9px">30d</button><button onclick="showBurndownChart(90)" class="btn btn-sm btn-ghost" style="font-size:9px">90d</button></div>`;
+  document.body.appendChild(panel);
+}
+function checkDeadLinks(){
+  const links=S.links.filter(l=>l.url&&l.url.startsWith('http'));
+  if(!links.length){toast('No links to check');return;}
+  let panel=document.getElementById('deadlinks-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='deadlinks-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Checking ${links.length} Links...</span><button onclick="document.getElementById('deadlinks-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div id="deadlinks-progress" style="font-size:10px;color:var(--text-muted);margin-bottom:8px">0/${links.length} checked</div><div id="deadlinks-results"></div>`;
+  document.body.appendChild(panel);
+  let checked=0;const results=[];const batch=5;
+  async function checkBatch(start){
+    const slice=links.slice(start,start+batch);
+    await Promise.allSettled(slice.map(async l=>{
+      try{const r=await fetch(l.url,{method:'HEAD',mode:'no-cors',signal:AbortSignal.timeout(5000)});results.push({url:l.url,title:l.title,status:'ok',code:r.status||'opaque'});}
+      catch(e){results.push({url:l.url,title:l.title,status:'error',error:e.message||'timeout'});}
+      checked++;document.getElementById('deadlinks-progress').textContent=checked+'/'+links.length+' checked';
+    }));
+    const resEl=document.getElementById('deadlinks-results');
+    const broken=results.filter(r=>r.status==='error');
+    const ok=results.filter(r=>r.status==='ok');
+    resEl.innerHTML=(broken.length?`<div style="margin-bottom:8px;font-size:11px;color:var(--red);font-weight:600">${broken.length} Broken/Unreachable</div>`+broken.map(r=>`<div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:10px"><span style="color:var(--red)">x</span> <span style="color:var(--text-primary)">${esc(r.title)}</span><br><span style="color:var(--text-muted);font-size:9px">${esc(r.url)} - ${esc(r.error)}</span></div>`).join(''):'')+(ok.length?`<div style="margin-top:8px;margin-bottom:4px;font-size:11px;color:var(--green);font-weight:600">${ok.length} OK</div>`:'')+(checked===links.length?`<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Done. ${broken.length} broken, ${ok.length} ok out of ${links.length} total.</div>`:'');
+    if(start+batch<links.length)setTimeout(()=>checkBatch(start+batch),200);
+    else{document.getElementById('deadlinks-progress').textContent='Complete: '+checked+'/'+links.length;document.querySelector('#deadlinks-panel > div:first-child > span').textContent='Link Health: '+broken.length+' broken, '+ok.length+' ok';}
+  }
+  checkBatch(0);
+}
+function enableDesktopNotifications(){
+  if(!('Notification' in window)){toast('Browser does not support notifications');return;}
+  if(Notification.permission==='granted'){toast('Notifications already enabled');checkOverdueNotify();return;}
+  if(Notification.permission==='denied'){toast('Notifications blocked. Enable in browser settings.');return;}
+  Notification.requestPermission().then(perm=>{if(perm==='granted'){toast('Notifications enabled');checkOverdueNotify();S._notificationsEnabled=true;save();}else toast('Notifications denied');});
+}
+function checkOverdueNotify(){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  const today=new Date().toISOString().split('T')[0];
+  const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done');
+  if(overdue.length){new Notification('SATURNO HUB',{body:overdue.length+' overdue task'+(overdue.length>1?'s':'')+': '+overdue.slice(0,3).map(t=>t.title).join(', '),icon:'planet-logo.png'});}
+}
+function notifyFocusComplete(taskName){
+  if(!('Notification' in window)||Notification.permission!=='granted')return;
+  new Notification('Focus Session Complete',{body:taskName?'Finished: '+taskName:'Timer done! Take a break.',icon:'planet-logo.png'});
 }
 function showChart(type){
   let panel=document.getElementById('chart-panel');if(panel)panel.remove();
@@ -7270,6 +7361,7 @@ renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();rend
 ftUpdateDisplay();updateContextStats();
 document.getElementById('sidebar-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 setTimeout(function(){ cloudSave(true); }, 3000);
+setTimeout(function(){ if(S._notificationsEnabled) checkOverdueNotify(); }, 5000);
 // Whiteboard drop handler for KB items
 document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
 document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
@@ -7823,6 +7915,8 @@ function stopFocusTimer(){
   const elapsed=focusTimerStartedAt?Math.max(1,Math.round((Date.now()-new Date(focusTimerStartedAt).getTime())/60000)):0;
   if(focusTimerTaskId){const t=S.tasks.find(x=>x.id===focusTimerTaskId);if(t){t.timeSpent=(t.timeSpent||0)+elapsed;save();renderTasks();}}
   if(elapsed>0&&focusTimerStartedAt){if(!S.focusSessions)S.focusSessions=[];const t=focusTimerTaskId?S.tasks.find(x=>x.id===focusTimerTaskId):null;S.focusSessions.unshift({date:new Date().toISOString().split('T')[0],minutes:elapsed,task:t?t.title:'',startedAt:new Date(focusTimerStartedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}),planned:focusTimerMinutes});if(S.focusSessions.length>200)S.focusSessions.length=200;save();}
+  const fTaskName=focusTimerTaskId?(S.tasks.find(x=>x.id===focusTimerTaskId)||{}).title:'';
+  notifyFocusComplete(fTaskName);
   focusTimerTaskId=null;focusTimerStartedAt=null;focusTimerMinutes=0;
 }
 function extendFocusTimer(mins){focusTimerEnd+=mins*60*1000;toast('+'+mins+' minutes added');}
