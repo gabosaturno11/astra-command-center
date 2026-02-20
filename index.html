@@ -2344,6 +2344,7 @@ function updateSidebarCtx() {
       weeklyProductivity()+
       projectCompletionBars()+
       activityStreak()+
+      recentlyCompleted()+
       `</div>`;
   }
 }
@@ -2359,6 +2360,11 @@ function projectCompletionBars(){
   return`<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Projects</div>${bars}</div>`;
 }
 
+function recentlyCompleted(){
+  const done=S.tasks.filter(t=>t.status==='done'&&t.completedAt).sort((a,b)=>b.completedAt.localeCompare(a.completedAt)).slice(0,5);
+  if(!done.length)return'';
+  return`<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Recently Done</div>${done.map(t=>`<div style="font-size:10px;color:var(--text-muted);padding:1px 0;display:flex;align-items:center;gap:4px;cursor:pointer" onclick="openTaskDetail(${t.id})"><span style="color:var(--accent);font-size:8px">*</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title)}</span><span style="font-size:8px;font-family:var(--mono);opacity:0.5">${timeAgo(t.completedAt)}</span></div>`).join('')}</div>`;
+}
 function activityStreak(){
   let streak=0;const d=new Date();
   for(let i=0;i<365;i++){
@@ -6130,6 +6136,30 @@ function cmdGetItems(q) {
     if(blocked.length){blocked.forEach(t=>{items.unshift({title:'BLOCKED: '+t.title,desc:'Blocked by: '+t.blockedBy,icon:'!',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}
     if(blocking.length){blocking.forEach(t=>{const deps=S.tasks.filter(x=>x.blockedBy&&x.blockedBy.toLowerCase().includes(t.title.toLowerCase())&&x.status!=='done');items.unshift({title:'BLOCKING ('+deps.length+'): '+t.title,desc:'Blocks: '+deps.map(d=>d.title).join(', ').substring(0,80),icon:'B',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}
     if(!blocked.length&&!blocking.length)items.unshift({title:'No dependencies found',desc:'No tasks are blocked or blocking others',icon:'*',type:'info'});
+  }
+  // Chart prefix
+  if(ql && (ql.startsWith('chart:') || ql==='chart' || ql==='charts')){
+    const cq=ql.startsWith('chart:')?q.substring(6).trim().toLowerCase():'status';
+    const svgW=300;const svgH=160;const cx=80;const cy=80;const rad=60;
+    let data=[];
+    if(cq==='priority'||cq==='p'){
+      data=[{label:'P0 Critical',value:S.tasks.filter(t=>t.priority==='p0'&&t.status!=='done').length,color:'#ef4444'},{label:'P1 High',value:S.tasks.filter(t=>t.priority==='p1'&&t.status!=='done').length,color:'#f97316'},{label:'P2 Medium',value:S.tasks.filter(t=>(t.priority==='p2'||!t.priority)&&t.status!=='done').length,color:'#eab308'},{label:'P3 Low',value:S.tasks.filter(t=>t.priority==='p3'&&t.status!=='done').length,color:'#6b7280'}];
+    }else if(cq==='project'){
+      const projs=[...new Set(S.tasks.map(t=>t.project||'No Project'))].sort();
+      const pColors=['#4ade80','#22d3ee','#a855f7','#f472b6','#fbbf24','#f87171','#60a5fa','#34d399'];
+      data=projs.slice(0,8).map((p,i)=>({label:p,value:S.tasks.filter(t=>(t.project||'No Project')===p&&t.status!=='done').length,color:pColors[i%pColors.length]}));
+    }else{
+      data=[{label:'To Do',value:S.tasks.filter(t=>t.status==='todo').length,color:'#22d3ee'},{label:'In Progress',value:S.tasks.filter(t=>t.status==='progress').length,color:'#4ade80'},{label:'Done',value:S.tasks.filter(t=>t.status==='done').length,color:'#6b7280'},{label:'Blocked',value:S.tasks.filter(t=>t.status==='blocked').length,color:'#f97316'}];
+    }
+    const total=data.reduce((a,d)=>a+d.value,0);
+    if(total){let angle=-Math.PI/2;
+      let svgParts=data.filter(d=>d.value).map(d=>{const pct=d.value/total;const sa=angle;const ea=angle+pct*Math.PI*2;const la=ea-sa>Math.PI?1:0;const x1=cx+rad*Math.cos(sa);const y1=cy+rad*Math.sin(sa);const x2=cx+rad*Math.cos(ea-0.001);const y2=cy+rad*Math.sin(ea-0.001);angle=ea;return`<path d="M${cx},${cy}L${x1},${y1}A${rad},${rad} 0 ${la} 1 ${x2},${y2}Z" fill="${d.color}" opacity="0.8"/>`;}).join('');
+      const legend=data.filter(d=>d.value).map((d,i)=>`<g transform="translate(170,${20+i*18})"><rect width="8" height="8" rx="2" fill="${d.color}"/><text x="12" y="8" fill="var(--text-muted)" font-size="9" font-family="var(--mono)">${d.label}: ${d.value}</text></g>`).join('');
+      items.unshift({title:'Task Chart (by '+(cq==='priority'||cq==='p'?'Priority':cq==='project'?'Project':'Status')+')',desc:'<svg xmlns="http://www.w3.org/2000/svg" width="'+svgW+'" height="'+svgH+'">'+svgParts+legend+'</svg>',icon:'C',type:'info'});
+    }
+    items.unshift({title:'chart:status',desc:'Pie chart by status',icon:'C',type:'info'});
+    items.unshift({title:'chart:priority',desc:'Pie chart by priority',icon:'C',type:'info'});
+    items.unshift({title:'chart:project',desc:'Pie chart by project',icon:'C',type:'info'});
   }
   // Config prefix
   if(ql && (ql.startsWith('config:') || ql==='config' || ql==='settings' || ql==='prefs')){
