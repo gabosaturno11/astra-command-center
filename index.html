@@ -914,6 +914,7 @@ textarea{resize:vertical;line-height:1.6}
           </div>
           <button class="btn btn-sm" onclick="archiveCompletedTasks()" title="Archive all completed tasks">Archive Done</button>
           <button class="btn btn-sm" id="task-filter-archived" onclick="showArchivedTasks()" title="View archived tasks">Archived<span id="archived-count" style="font-size:8px;color:var(--text-muted);margin-left:3px;font-family:var(--mono)"></span></button>
+          <button class="btn btn-sm" onclick="taskManageTags()" title="Manage task tags (rename/delete/merge)" style="font-size:9px">Tags</button>
           <div class="task-toolbar-search">
             <input type="text" id="task-search" placeholder="Search tasks..." oninput="renderTasks()" style="font-size:10px;padding:5px 8px">
           </div>
@@ -2861,6 +2862,16 @@ function taskBulkMove(){
   let count=0;
   S.tasks.forEach(t=>{if(taskSelected.has(t.id)){t.project=target.trim();count++;}});
   save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Moved '+count+' tasks to '+target.trim());
+}
+function taskManageTags(){
+  const allTags=[...new Set(S.tasks.flatMap(t=>t.tags||[]).filter(Boolean))].sort();
+  if(!allTags.length){toast('No tags on any tasks');return;}
+  const action=prompt('Task Tag Management\n\nTags: '+allTags.join(', ')+'\n\nCommands:\n- rename:oldtag:newtag\n- delete:tagname\n- merge:tag1:tag2 (merge tag1 into tag2)');
+  if(!action)return;
+  if(action.startsWith('rename:')){const parts=action.split(':');if(parts.length===3){const old=parts[1].trim(),nw=parts[2].trim();let count=0;S.tasks.forEach(t=>{if(t.tags){const i=t.tags.indexOf(old);if(i>=0){t.tags[i]=nw;count++;}}});save();renderTasks();toast('Renamed "'+old+'" to "'+nw+'" in '+count+' tasks');}}
+  else if(action.startsWith('delete:')){const tag=action.substring(7).trim();let count=0;S.tasks.forEach(t=>{if(t.tags){const i=t.tags.indexOf(tag);if(i>=0){t.tags.splice(i,1);count++;}}});save();renderTasks();toast('Removed "'+tag+'" from '+count+' tasks');}
+  else if(action.startsWith('merge:')){const parts=action.split(':');if(parts.length===3){const from=parts[1].trim(),to=parts[2].trim();let count=0;S.tasks.forEach(t=>{if(t.tags){const i=t.tags.indexOf(from);if(i>=0){t.tags.splice(i,1);if(!t.tags.includes(to))t.tags.push(to);count++;}}});save();renderTasks();toast('Merged "'+from+'" into "'+to+'" in '+count+' tasks');}}
+  else{toast('Use rename:old:new, delete:tag, or merge:tag1:tag2');}
 }
 function exportTasks(){
   const items=getFilteredTasks();
@@ -6406,6 +6417,18 @@ function cmdGetItems(q) {
       const sMap={task:'T',doc:'W',spec:'S',project:'P'};
       items.unshift({title:r.title,desc:'Recent '+r.type+' ('+timeAgo(r.time)+')',icon:sMap[r.type]||'*',type:'action',action:()=>{closeCommandPalette();if(r.type==='task')openTaskDetail(r.id);else if(r.type==='doc'){switchDoc(r.id);switchSection('writer',null);}else if(r.type==='spec'){switchSpec(r.id);switchSection('specs',null);}else if(r.type==='project')openProject(r.id);}});
     });
+  }
+  // Cleanup prefix
+  if(ql && (ql==='cleanup' || ql.startsWith('cleanup:') || ql==='clean')){
+    const emptyTasks=S.tasks.filter(t=>!t.title||!t.title.trim());
+    const dupTasks=(()=>{const seen=new Set();return S.tasks.filter(t=>{const key=t.title+'-'+t.project+'-'+t.due;if(seen.has(key))return true;seen.add(key);return false;});})();
+    const oldDone=S.tasks.filter(t=>t.status==='done'&&t.completedAt&&(Date.now()-new Date(t.completedAt).getTime())>30*86400000);
+    const emptyContent=S.content.filter(c=>!c.body||c.body.trim().length<5);
+    if(emptyTasks.length)items.unshift({title:'Remove '+emptyTasks.length+' empty tasks',desc:'Tasks with no title',icon:'!',type:'action',action:()=>{closeCommandPalette();S.tasks=S.tasks.filter(t=>t.title&&t.title.trim());save();renderTasks();toast('Removed '+emptyTasks.length+' empty tasks');}});
+    if(dupTasks.length)items.unshift({title:'Found '+dupTasks.length+' potential duplicate tasks',desc:'Same title + project + due date',icon:'!',type:'info'});
+    if(oldDone.length)items.unshift({title:'Archive '+oldDone.length+' old completed tasks (30+ days)',desc:'Move to archive to keep board clean',icon:'A',type:'action',action:()=>{closeCommandPalette();if(!S.archivedTasks)S.archivedTasks=[];S.archivedTasks=oldDone.concat(S.archivedTasks);S.tasks=S.tasks.filter(t=>!(t.status==='done'&&t.completedAt&&(Date.now()-new Date(t.completedAt).getTime())>30*86400000));save();renderTasks();toast('Archived '+oldDone.length+' old tasks');}});
+    if(emptyContent.length)items.unshift({title:'Remove '+emptyContent.length+' empty content items',desc:'Content with fewer than 5 characters',icon:'!',type:'action',action:()=>{closeCommandPalette();S.content=S.content.filter(c=>c.body&&c.body.trim().length>=5);save();renderContent();toast('Removed '+emptyContent.length+' empty items');}});
+    if(!emptyTasks.length&&!dupTasks.length&&!oldDone.length&&!emptyContent.length)items.unshift({title:'Everything looks clean!',desc:'No empty tasks, no duplicates, no stale items',icon:'*',type:'info'});
   }
   // Random prefix
   if(ql && (ql==='random' || ql==='random:' || ql.startsWith('random:') || ql==='inspire' || ql==='surprise')){
