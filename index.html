@@ -5829,6 +5829,9 @@ function cmdGetItems(q) {
       ['favorites','Quick access to starred and pinned items'],
       ['due groups','Tasks grouped: Overdue/Today/Tomorrow/Week/Later'],
       ['convert','Convert content to task or task to content'],
+      ['deep focus','Full-screen dimming overlay for distraction-free work'],
+      ['estimation','Compare estimated vs actual time on tasks'],
+      ['data tools','Manage/clear data by section, factory reset'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7237,6 +7240,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='convert' || ql==='content to task' || ql==='task to content' || ql==='transform item')){
     items.unshift({title:'Convert Content to Task',desc:'Pick a content item to convert to a task',icon:'C',type:'info'});
     items.unshift({title:'Convert Task to Content',desc:'Pick a task to convert to a content item',icon:'T',type:'info'});
+  }
+  // Deep focus prefix
+  if(ql && (ql==='deep focus' || ql==='focus overlay' || ql==='distraction free' || ql==='dim')){
+    items.unshift({title:'Toggle Deep Focus',desc:'Dim everything except current panel for distraction-free work',icon:'F',type:'action',action:()=>{closeCommandPalette();toggleDeepFocus();}});
+  }
+  // Estimation report prefix
+  if(ql && (ql==='estimation' || ql==='estimate report' || ql==='time accuracy' || ql==='est vs actual')){
+    items.unshift({title:'Estimation Report',desc:'Compare estimated vs actual time across tasks',icon:'E',type:'action',action:()=>{closeCommandPalette();showEstimationReport();}});
+  }
+  // Data tools prefix
+  if(ql && (ql==='data tools' || ql==='data management' || ql==='clear data' || ql==='factory reset')){
+    items.unshift({title:'Data Management',desc:'Clear individual sections, factory reset, storage info',icon:'X',type:'action',action:()=>{closeCommandPalette();showDataTools();}});
   }
   return items.slice(0, 20);
 }
@@ -9011,6 +9026,74 @@ function quickConvertTaskToContent(taskId){
   const id=Date.now();
   S.content.unshift({id,body:(t.title||'')+(t.description?'\n\n'+t.description:''),type:'thought',theme:t.project||'',tags:['from-task'],createdAt:new Date().toISOString()});
   save();renderContent();toast('Task converted to content');
+}
+function toggleDeepFocus(){
+  let overlay=document.getElementById('deep-focus-overlay');
+  if(overlay){overlay.remove();document.body.style.overflow='';toast('Deep focus off');return;}
+  overlay=document.createElement('div');overlay.id='deep-focus-overlay';
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:999;background:rgba(0,0,0,0.85);pointer-events:none';
+  overlay.innerHTML=`<div style="position:absolute;top:10px;right:10px;pointer-events:auto;padding:4px 10px;background:var(--accent);border-radius:4px;color:#000;font-size:10px;font-weight:600;cursor:pointer" onclick="document.getElementById('deep-focus-overlay').remove();document.body.style.overflow='';toast('Deep focus off')">Exit Focus</div>`;
+  document.body.appendChild(overlay);
+  const primary=document.getElementById('primary-panel');
+  if(primary)primary.style.position='relative';
+  toast('Deep focus ON - overlay dimming enabled');
+}
+function showEstimationReport(){
+  let panel=document.getElementById('est-report-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='est-report-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const withEst=S.tasks.filter(t=>t.estimate&&t.timeSpent);
+  const withEstOnly=S.tasks.filter(t=>t.estimate);
+  function parseMinutes(est){
+    if(!est)return 0;
+    const h=est.match(/(\d+)h/);const m=est.match(/(\d+)m/);
+    return(h?parseInt(h[1])*60:0)+(m?parseInt(m[1]):0)||(parseInt(est)||0);
+  }
+  let totalEstMin=0;let totalActMin=0;
+  withEst.forEach(t=>{totalEstMin+=parseMinutes(t.estimate);totalActMin+=(t.timeSpent||0);});
+  const accuracy=totalEstMin?Math.round(totalActMin/totalEstMin*100):0;
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:var(--accent)">${withEstOnly.length}</div><div style="font-size:8px;color:var(--text-muted)">With Estimates</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#3b82f6">${withEst.length}</div><div style="font-size:8px;color:var(--text-muted)">With Both</div></div>`;
+  h+=`<div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:${accuracy>120?'#ef4444':accuracy>=80?'#22c55e':'#f59e0b'}">${accuracy}%</div><div style="font-size:8px;color:var(--text-muted)">Accuracy</div></div>`;
+  h+='</div>';
+  if(withEst.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Tasks with Both Estimate + Actual</div>';
+    withEst.forEach(t=>{
+      const estMin=parseMinutes(t.estimate);
+      const ratio=estMin?Math.round((t.timeSpent||0)/estMin*100):0;
+      const color=ratio>150?'#ef4444':ratio>=80?'#22c55e':'#f59e0b';
+      h+=`<div onclick="document.getElementById('est-report-panel').remove();openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:6px;padding:4px 8px;cursor:pointer;border-left:2px solid ${color};margin:2px 0;font-size:10px" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="flex:1;color:var(--text-primary)">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:var(--text-muted)">Est: ${t.estimate}</span><span style="font-size:8px;color:var(--text-muted)">Act: ${t.timeSpent}m</span><span style="font-size:8px;font-weight:600;color:${color}">${ratio}%</span></div>`;
+    });
+  }
+  if(!withEst.length&&!withEstOnly.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No tasks with estimates yet. Add estimates in task detail.</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Estimation Report</span><button onclick="document.getElementById('est-report-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showDataTools(){
+  let panel=document.getElementById('data-tools-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='data-tools-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  const sections=[
+    {key:'tasks',label:'Tasks',count:S.tasks.length},
+    {key:'content',label:'Content',count:S.content.length},
+    {key:'docs',label:'Writer Docs',count:(S.docs||[]).length},
+    {key:'links',label:'Links',count:(S.links||[]).length},
+    {key:'focusSessions',label:'Focus Sessions',count:(S.focusSessions||[]).length},
+    {key:'_habits',label:'Habits',count:(S._habits||[]).length},
+    {key:'_snippets',label:'Snippets',count:(S._snippets||[]).length},
+    {key:'_stickies',label:'Sticky Notes',count:(S._stickies||[]).length},
+    {key:'_timeBlocks',label:'Time Blocks',count:(S._timeBlocks||[]).length},
+    {key:'_clips',label:'Clipboard History',count:(S._clips||[]).length},
+  ];
+  const totalSize=(JSON.stringify(S).length/1024).toFixed(1);
+  let h=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Total storage: ${totalSize}KB. Clear individual sections below.</div>`;
+  sections.forEach(s=>{
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:10px;color:var(--text-primary)">${s.label}</span><span style="font-size:10px;color:var(--accent)">${s.count}</span><button onclick="if(confirm('Clear all ${s.label.toLowerCase()}? This cannot be undone.')){S.${s.key}=[];save();showDataTools();toast('${s.label} cleared')}" style="padding:2px 8px;background:#ef4444;border:none;border-radius:3px;color:#fff;font-size:8px;cursor:pointer">Clear</button></div>`;
+  });
+  h+=`<div style="margin-top:12px"><button onclick="if(confirm('Reset ALL data? This will clear everything!')){localStorage.removeItem('astra-state');location.reload()}" style="padding:6px 12px;background:#ef4444;border:none;border-radius:4px;color:#fff;font-size:10px;font-weight:600;cursor:pointer;width:100%">Factory Reset</button></div>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Data Management</span><button onclick="document.getElementById('data-tools-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
