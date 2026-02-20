@@ -1455,6 +1455,17 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Connect</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">C</span></div>
       </div>
     </div>
+    <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+      <div style="font-weight:600;color:var(--accent);margin-bottom:8px;font-size:11px">Cmd+K Prefixes</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 12px;font-size:10px;color:var(--text-muted)">
+        <span>focus: — Timer</span><span>chart: — Pie charts</span><span>export: — Export hub</span>
+        <span>tpl: — Task templates</span><span>review: — Stale items</span><span>writerstats — Doc stats</span>
+        <span>goal: — Goal tracker</span><span>habit: — Habit tracker</span><span>wb: — WB search</span>
+        <span>log: — Activity log</span><span>config: — Settings</span><span>wordgoal: — Word goals</span>
+        <span>deps: — Dependencies</span><span>standup — Daily brief</span><span>random: — Inspiration</span>
+        <span>task: — Quick task</span><span>note: — Quick content</span><span>count: — Data counts</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -6368,6 +6379,25 @@ function cmdGetItems(q) {
       const sMap={task:'T',doc:'W',spec:'S',project:'P'};
       items.unshift({title:r.title,desc:'Recent '+r.type+' ('+timeAgo(r.time)+')',icon:sMap[r.type]||'*',type:'action',action:()=>{closeCommandPalette();if(r.type==='task')openTaskDetail(r.id);else if(r.type==='doc'){switchDoc(r.id);switchSection('writer',null);}else if(r.type==='spec'){switchSpec(r.id);switchSection('specs',null);}else if(r.type==='project')openProject(r.id);}});
     });
+  }
+  // Random prefix
+  if(ql && (ql==='random' || ql==='random:' || ql.startsWith('random:') || ql==='inspire' || ql==='surprise')){
+    const rq=ql.startsWith('random:')?q.substring(7).trim().toLowerCase():'';
+    const pool=[];
+    if(!rq||rq==='task')S.tasks.filter(t=>t.status!=='done').forEach(t=>pool.push({title:t.title,desc:'Task | '+t.priority+' | '+(t.project||'No project'),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}}));
+    if(!rq||rq==='content')S.content.forEach(c=>pool.push({title:(c.body||'').substring(0,60),desc:'Content | '+(c.theme||c.type||''),icon:'C',type:'action',action:()=>{closeCommandPalette();switchSection('content',null);}}));
+    if(!rq||rq==='doc')S.docs.forEach(d=>pool.push({title:d.title||'Untitled',desc:'Doc | '+countW(d.body)+'w',icon:'W',type:'action',action:()=>{closeCommandPalette();switchDoc(d.id);switchSection('writer',null);}}));
+    if(pool.length){for(let i=0;i<Math.min(5,pool.length);i++){const idx=Math.floor(Math.random()*pool.length);items.unshift(pool.splice(idx,1)[0]);}
+    }else{items.unshift({title:'Nothing to randomize yet',desc:'Add tasks, content, or docs first',icon:'!',type:'info'});}
+  }
+  // What's next prefix
+  if(ql && (ql==='next' || ql==='whatsnext' || ql==="what's next")){
+    const today=new Date().toISOString().split('T')[0];
+    const candidates=S.tasks.filter(t=>t.status!=='done'&&t.status!=='blocked').sort((a,b)=>{const pMap={p0:0,p1:1,p2:2,p3:3};const pDiff=(pMap[a.priority]||2)-(pMap[b.priority]||2);if(pDiff!==0)return pDiff;if(a.due&&b.due)return a.due.localeCompare(b.due);if(a.due)return -1;if(b.due)return 1;return 0;});
+    candidates.slice(0,5).forEach((t,i)=>{
+      items.unshift({title:(i===0?'Next up: ':'')+(t.title||'Untitled'),desc:t.priority.toUpperCase()+' | '+(t.due?'Due: '+relativeDate(t.due):'No date')+' | '+(t.project||'No project'),icon:i===0?'>':'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
+    });
+    if(!candidates.length)items.unshift({title:'Nothing pending',desc:'All tasks are done or blocked',icon:'*',type:'info'});
   }
   // Export hub prefix
   if(ql && (ql.startsWith('export:') || ql==='export' || ql==='exports')){
