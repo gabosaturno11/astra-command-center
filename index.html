@@ -6134,6 +6134,12 @@ function cmdGetItems(q) {
       ['border radius','CSS border-radius generator with live preview'],
       ['velocity','Task completion velocity over time'],
       ['affirmation','Daily motivational affirmation'],
+      ['flexbox','CSS flexbox layout generator with live preview'],
+      ['burndown','Task burndown chart over time'],
+      ['countdown','Countdown timer to a target date'],
+      ['grid','CSS grid layout generator with live preview'],
+      ['distribution','Task distribution by status and priority'],
+      ['dice','Dice roller with d4-d20 options'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8705,6 +8711,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='affirmation' || ql==='motivational' || ql==='daily affirmation' || ql==='inspire')){
     items.unshift({title:'Affirmation',desc:'Daily motivational affirmation',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAffirmation();}});
+  }
+  if(ql && (ql==='flexbox' || ql==='flex generator' || ql==='css flex' || ql==='flex layout')){
+    items.unshift({title:'Flexbox Generator',desc:'CSS flexbox layout with live preview',icon:'F',type:'action',action:()=>{closeCommandPalette();showFlexboxGen();}});
+  }
+  if(ql && (ql==='burndown' || ql==='task burndown' || ql==='burn down' || ql==='burndown chart')){
+    items.unshift({title:'Task Burndown',desc:'Burndown chart of remaining tasks',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBurndown();}});
+  }
+  if(ql && (ql==='countdown' || ql==='count down' || ql==='timer countdown' || ql==='event timer')){
+    items.unshift({title:'Countdown',desc:'Countdown timer to target date',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdown();}});
+  }
+  if(ql && (ql==='grid' || ql==='css grid' || ql==='grid generator' || ql==='grid layout')){
+    items.unshift({title:'CSS Grid Generator',desc:'Grid layout with live preview',icon:'G',type:'action',action:()=>{closeCommandPalette();showGridGen();}});
+  }
+  if(ql && (ql==='distribution' || ql==='task distribution' || ql==='task breakdown' || ql==='status breakdown')){
+    items.unshift({title:'Task Distribution',desc:'Tasks by status and priority',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDistribution();}});
+  }
+  if(ql && (ql==='dice' || ql==='dice roller' || ql==='roll dice' || ql==='d20')){
+    items.unshift({title:'Dice Roller',desc:'Roll d4-d20 dice',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDice();}});
   }
   return items.slice(0, 20);
 }
@@ -20557,6 +20581,254 @@ function showQuickAffirmation(){
     if(q) q.innerHTML='"'+affirmations[idx]+'"';
   };
   document.body.appendChild(d);
+}
+function showFlexboxGen(){
+  var ex=document.getElementById('flexbox-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='flexbox-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  var dir='row',just='center',ali='center',wrap='nowrap',gap=8;
+  function getCSS(){return 'display: flex;\\nflex-direction: '+dir+';\\njustify-content: '+just+';\\nalign-items: '+ali+';\\nflex-wrap: '+wrap+';\\ngap: '+gap+'px;';}
+  function render(){
+    var prev=d.querySelector('.flex-preview');
+    if(prev){prev.style.flexDirection=dir;prev.style.justifyContent=just;prev.style.alignItems=ali;prev.style.flexWrap=wrap;prev.style.gap=gap+'px';}
+    var code=d.querySelector('.flex-code');
+    if(code)code.textContent=getCSS().replace(/\\n/g,'\n');
+  }
+  function sel(id,opts,val){
+    var h='<select id="'+id+'" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px">';
+    opts.forEach(function(o){h+='<option value="'+o+'"'+(o===val?' selected':'')+'>'+o+'</option>';});
+    return h+'</select>';
+  }
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Flexbox Generator</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div class="flex-preview" style="display:flex;flex-direction:'+dir+';justify-content:'+just+';align-items:'+ali+';flex-wrap:'+wrap+';gap:'+gap+'px;height:140px;background:var(--bg-surface);border-radius:8px;margin-bottom:12px;padding:8px">'+
+    '<div style="width:40px;height:40px;background:#4ade80;border-radius:6px;opacity:0.9"></div>'+
+    '<div style="width:60px;height:30px;background:#06b6d4;border-radius:6px;opacity:0.9"></div>'+
+    '<div style="width:35px;height:50px;background:#f59e0b;border-radius:6px;opacity:0.9"></div>'+
+    '<div style="width:50px;height:35px;background:#ef4444;border-radius:6px;opacity:0.9"></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:11px">Direction<br>'+sel('flex-dir',['row','row-reverse','column','column-reverse'],dir)+'</label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Justify<br>'+sel('flex-just',['flex-start','flex-end','center','space-between','space-around','space-evenly'],just)+'</label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Align<br>'+sel('flex-ali',['flex-start','flex-end','center','stretch','baseline'],ali)+'</label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Wrap<br>'+sel('flex-wrap',['nowrap','wrap','wrap-reverse'],wrap)+'</label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Gap<br><input type="range" min="0" max="32" value="'+gap+'" id="flex-gap" style="width:100%"></label>'+
+    '</div>'+
+    '<pre class="flex-code" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:#4ade80;margin-bottom:10px;white-space:pre-wrap">'+getCSS().replace(/\\n/g,'\n')+'</pre>'+
+    '<button id="flex-copy" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy CSS</button>';
+  document.body.appendChild(d);
+  d.querySelector('#flex-dir').onchange=function(e){dir=e.target.value;render();};
+  d.querySelector('#flex-just').onchange=function(e){just=e.target.value;render();};
+  d.querySelector('#flex-ali').onchange=function(e){ali=e.target.value;render();};
+  d.querySelector('#flex-wrap').onchange=function(e){wrap=e.target.value;render();};
+  d.querySelector('#flex-gap').oninput=function(e){gap=parseInt(e.target.value);render();};
+  d.querySelector('#flex-copy').onclick=function(){
+    navigator.clipboard.writeText(getCSS().replace(/\\n/g,'\n'));
+    this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy CSS';},800);
+  };
+}
+function showTaskBurndown(){
+  var ex=document.getElementById('task-burndown-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var total=tasks.length;
+  var done=tasks.filter(function(t){return t.status==='done';});
+  var remaining=total-done.length;
+  var dayMap={};
+  done.forEach(function(t){
+    if(!t.completedAt)return;
+    var d=t.completedAt.split('T')[0];
+    dayMap[d]=(dayMap[d]||0)+1;
+  });
+  var sorted=Object.keys(dayMap).sort();
+  var last14=sorted.slice(-14);
+  var svgW=400,svgH=160;
+  var pts=[];
+  var cum=total;
+  if(last14.length>0){
+    var startDay=new Date(last14[0]);
+    for(var i=0;i<14;i++){
+      var day=new Date(startDay);day.setDate(day.getDate()+i);
+      var key=day.toISOString().split('T')[0];
+      if(dayMap[key])cum-=dayMap[key];
+      pts.push({day:key,val:cum});
+    }
+  }
+  var maxVal=total||1;
+  var path='';
+  pts.forEach(function(p,i){
+    var x=20+i*(svgW-40)/Math.max(pts.length-1,1);
+    var y=20+(1-p.val/maxVal)*(svgH-40);
+    path+=(i===0?'M':'L')+x.toFixed(1)+','+y.toFixed(1);
+  });
+  var idealPath='M20,20 L'+(svgW-20)+','+(svgH-20);
+  var d=document.createElement('div');d.id='task-burndown-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Task Burndown</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="display:flex;justify-content:space-around;margin-bottom:12px">'+
+    '<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">'+done.length+'</div><div style="font-size:10px;color:var(--text-muted)">Completed</div></div>'+
+    '<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#f59e0b">'+remaining+'</div><div style="font-size:10px;color:var(--text-muted)">Remaining</div></div>'+
+    '<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--text-primary)">'+total+'</div><div style="font-size:10px;color:var(--text-muted)">Total</div></div>'+
+    '</div>'+
+    '<svg width="'+svgW+'" height="'+svgH+'" style="display:block;margin:0 auto">'+
+    '<path d="'+idealPath+'" stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4" fill="none"/>'+
+    (path?'<path d="'+path+'" stroke="#4ade80" stroke-width="2" fill="none"/>':'')+
+    '</svg>'+
+    (pts.length===0?'<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:16px 0">Complete tasks to see burndown chart</div>':'');
+  document.body.appendChild(d);
+}
+function showQuickCountdown(){
+  var ex=document.getElementById('countdown-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='countdown-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:260px';
+  var target=null,interval=null;
+  function rend(){
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Countdown</span><button onclick="document.getElementById(\'countdown-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button></div>';
+    if(!target){
+      h+='<div style="margin-bottom:8px"><input type="text" id="cd-label" placeholder="Event name..." style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;box-sizing:border-box;margin-bottom:6px"></div>';
+      h+='<div style="margin-bottom:8px"><input type="datetime-local" id="cd-date" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;box-sizing:border-box"></div>';
+      h+='<button onclick="window._cdStart()" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;width:100%">Start Countdown</button>';
+    } else {
+      var now=new Date(),diff=target.date-now;
+      if(diff<=0){
+        h+='<div style="text-align:center;padding:16px 0"><div style="font-size:18px;font-weight:700;color:#4ade80">Time\'s up!</div><div style="color:var(--text-muted);font-size:12px;margin-top:4px">'+esc(target.label)+'</div></div>';
+      } else {
+        var days=Math.floor(diff/86400000);
+        var hours=Math.floor((diff%86400000)/3600000);
+        var mins=Math.floor((diff%3600000)/60000);
+        var secs=Math.floor((diff%60000)/1000);
+        h+='<div style="text-align:center;margin-bottom:8px"><div style="color:var(--text-muted);font-size:11px;margin-bottom:4px">'+esc(target.label)+'</div>';
+        h+='<div style="display:flex;justify-content:center;gap:8px">';
+        h+='<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">'+days+'</div><div style="font-size:9px;color:var(--text-muted)">days</div></div>';
+        h+='<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--text-primary)">'+hours+'</div><div style="font-size:9px;color:var(--text-muted)">hrs</div></div>';
+        h+='<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--text-primary)">'+mins+'</div><div style="font-size:9px;color:var(--text-muted)">min</div></div>';
+        h+='<div style="text-align:center"><div style="font-size:24px;font-weight:700;color:var(--text-primary)">'+secs+'</div><div style="font-size:9px;color:var(--text-muted)">sec</div></div>';
+        h+='</div></div>';
+      }
+      h+='<button onclick="window._cdReset()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;width:100%;margin-top:6px">Reset</button>';
+    }
+    d.innerHTML=h;
+  }
+  window._cdStart=function(){
+    var label=document.getElementById('cd-label');
+    var date=document.getElementById('cd-date');
+    if(!date||!date.value)return;
+    target={label:(label&&label.value?label.value:'Countdown'),date:new Date(date.value)};
+    rend();
+    interval=setInterval(rend,1000);
+  };
+  window._cdReset=function(){
+    target=null;if(interval)clearInterval(interval);interval=null;rend();
+  };
+  document.body.appendChild(d);
+  rend();
+}
+function showGridGen(){
+  var ex=document.getElementById('grid-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='grid-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  var cols=3,rows=2,gap=8,colSize='1fr',rowSize='1fr';
+  function getCSS(){return 'display: grid;\\ngrid-template-columns: repeat('+cols+', '+colSize+');\\ngrid-template-rows: repeat('+rows+', '+rowSize+');\\ngap: '+gap+'px;';}
+  function render(){
+    var prev=d.querySelector('.grid-preview');
+    if(prev){
+      prev.style.gridTemplateColumns='repeat('+cols+', 1fr)';
+      prev.style.gridTemplateRows='repeat('+rows+', 1fr)';
+      prev.style.gap=gap+'px';
+      var cells='';for(var i=0;i<cols*rows;i++){cells+='<div style="background:'+(['#4ade80','#06b6d4','#f59e0b','#ef4444','#a78bfa','#ec4899'][i%6])+';border-radius:4px;opacity:0.7;min-height:30px"></div>';}
+      prev.innerHTML=cells;
+    }
+    var code=d.querySelector('.grid-code');
+    if(code)code.textContent=getCSS().replace(/\\n/g,'\n');
+  }
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">CSS Grid Generator</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div class="grid-preview" style="display:grid;grid-template-columns:repeat('+cols+',1fr);grid-template-rows:repeat('+rows+',1fr);gap:'+gap+'px;min-height:120px;background:var(--bg-surface);border-radius:8px;padding:8px;margin-bottom:12px"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:11px">Columns<br><input type="number" min="1" max="12" value="'+cols+'" id="grid-cols" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px;box-sizing:border-box"></label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Rows<br><input type="number" min="1" max="12" value="'+rows+'" id="grid-rows" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px;box-sizing:border-box"></label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Gap (px)<br><input type="number" min="0" max="40" value="'+gap+'" id="grid-gap" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px;box-sizing:border-box"></label>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:11px">Col Size<br><input type="text" value="'+colSize+'" id="grid-colsize" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px;box-sizing:border-box"></label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Row Size<br><input type="text" value="'+rowSize+'" id="grid-rowsize" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px;box-sizing:border-box"></label>'+
+    '</div>'+
+    '<pre class="grid-code" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:#4ade80;margin-bottom:10px;white-space:pre-wrap">'+getCSS().replace(/\\n/g,'\n')+'</pre>'+
+    '<button id="grid-copy" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy CSS</button>';
+  document.body.appendChild(d);
+  render();
+  d.querySelector('#grid-cols').oninput=function(e){cols=Math.max(1,parseInt(e.target.value)||1);render();};
+  d.querySelector('#grid-rows').oninput=function(e){rows=Math.max(1,parseInt(e.target.value)||1);render();};
+  d.querySelector('#grid-gap').oninput=function(e){gap=parseInt(e.target.value)||0;render();};
+  d.querySelector('#grid-colsize').oninput=function(e){colSize=e.target.value||'1fr';render();};
+  d.querySelector('#grid-rowsize').oninput=function(e){rowSize=e.target.value||'1fr';render();};
+  d.querySelector('#grid-copy').onclick=function(){
+    navigator.clipboard.writeText(getCSS().replace(/\\n/g,'\n'));
+    this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy CSS';},800);
+  };
+}
+function showTaskDistribution(){
+  var ex=document.getElementById('task-dist-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var byStatus={};
+  tasks.forEach(function(t){
+    var s=t.status||'todo';
+    byStatus[s]=(byStatus[s]||0)+1;
+  });
+  var byPriority={p0:0,p1:0,p2:0,p3:0};
+  tasks.forEach(function(t){
+    var p=t.priority||'p3';
+    if(byPriority[p]!==undefined)byPriority[p]++;
+  });
+  var total=tasks.length||1;
+  var statusColors={todo:'#64748b','in-progress':'#f59e0b',done:'#4ade80',blocked:'#ef4444'};
+  var priorityColors={p0:'#ef4444',p1:'#f59e0b',p2:'#3b82f6',p3:'#64748b'};
+  var statusBars='';
+  Object.keys(byStatus).forEach(function(s){
+    var pct=Math.round(byStatus[s]/total*100);
+    statusBars+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<span style="color:var(--text-muted);font-size:11px;min-width:80px">'+s+'</span>'+
+      '<div style="flex:1;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(statusColors[s]||'#64748b')+';border-radius:4px"></div></div>'+
+      '<span style="color:var(--text-muted);font-size:11px;min-width:30px;text-align:right">'+byStatus[s]+'</span></div>';
+  });
+  var priBars='';
+  Object.keys(byPriority).forEach(function(p){
+    var pct=Math.round(byPriority[p]/total*100);
+    priBars+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<span style="color:var(--text-muted);font-size:11px;min-width:80px">'+p.toUpperCase()+'</span>'+
+      '<div style="flex:1;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+priorityColors[p]+';border-radius:4px"></div></div>'+
+      '<span style="color:var(--text-muted);font-size:11px;min-width:30px;text-align:right">'+byPriority[p]+'</span></div>';
+  });
+  var d=document.createElement('div');d.id='task-dist-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Task Distribution</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;font-weight:600">By Status</div>'+statusBars+
+    '<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;margin-top:12px;font-weight:600">By Priority</div>'+priBars;
+  document.body.appendChild(d);
+}
+function showQuickDice(){
+  var ex=document.getElementById('dice-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='dice-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:240px;text-align:center';
+  var result='?';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Dice Roller</span><button onclick="document.getElementById(\'dice-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button></div>'+
+    '<div id="dice-result" style="font-size:48px;font-weight:700;color:#4ade80;margin-bottom:16px">?</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">'+
+    '<button onclick="window._rollDice(4)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px;border-radius:6px;cursor:pointer;font-size:12px">d4</button>'+
+    '<button onclick="window._rollDice(6)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px;border-radius:6px;cursor:pointer;font-size:12px">d6</button>'+
+    '<button onclick="window._rollDice(8)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px;border-radius:6px;cursor:pointer;font-size:12px">d8</button>'+
+    '<button onclick="window._rollDice(10)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px;border-radius:6px;cursor:pointer;font-size:12px">d10</button>'+
+    '<button onclick="window._rollDice(12)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px;border-radius:6px;cursor:pointer;font-size:12px">d12</button>'+
+    '<button onclick="window._rollDice(20)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px;border-radius:6px;cursor:pointer;font-size:12px">d20</button>'+
+    '</div>'+
+    '<div id="dice-history" style="color:var(--text-muted);font-size:10px;min-height:20px"></div>';
+  document.body.appendChild(d);
+  var history=[];
+  window._rollDice=function(sides){
+    var val=Math.floor(Math.random()*sides)+1;
+    var el=document.getElementById('dice-result');
+    if(el){el.textContent=val;el.style.transform='scale(1.2)';setTimeout(function(){el.style.transform='scale(1)';},200);}
+    history.unshift('d'+sides+': '+val);if(history.length>8)history.length=8;
+    var hel=document.getElementById('dice-history');
+    if(hel)hel.textContent=history.join(' | ');
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
