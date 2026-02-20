@@ -2254,8 +2254,9 @@ function updateSidebarCtx() {
   } else if(currentSection==='specs') {
     const totalSections=S.specs.reduce((a,s)=>a+(s.sections||[]).length,0);
     const totalSpecWords=S.specs.reduce((a,s)=>a+(s.sections||[]).reduce((b,sec)=>b+(sec.body||'').trim().split(/\s+/).filter(x=>x.length).length,0),0);
-    const byProject={};S.specs.forEach(s=>{const p=s.project||'Global';byProject[p]=(byProject[p]||0)+1;});
-    el.innerHTML=`<div class="sidebar-label">Living Docs Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.specs.length} specs / ${totalSections} sections / ${totalSpecWords.toLocaleString()} words</div>`+Object.entries(byProject).map(([p,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${p}: ${n} specs</div>`).join('');
+    const byProject={};S.specs.forEach(s=>{const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;const pn=proj?proj.name:'Global';byProject[pn]=(byProject[pn]||0)+1;});
+    const topSpecs=[...S.specs].sort((a,b)=>(b.sections||[]).reduce((x,sec)=>x+countW(sec.body),0)-(a.sections||[]).reduce((x,sec)=>x+countW(sec.body),0)).slice(0,5);
+    el.innerHTML=`<div class="sidebar-label">Living Docs Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.specs.length} specs / ${totalSections} sections / ${totalSpecWords.toLocaleString()} words</div><div class="sidebar-label" style="margin-top:6px">By Project</div>`+Object.entries(byProject).map(([p,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${esc(p)}: ${n} specs</div>`).join('')+`<div class="sidebar-label" style="margin-top:6px">Largest Specs</div>`+topSpecs.map(s=>{const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);return`<div class="sidebar-item" onclick="switchSpec('${s.id}')" style="cursor:pointer"><span style="font-size:10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.title||'Untitled')}</span><span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${wc}w</span></div>`;}).join('');
   } else if(currentSection==='links') {
     const cats={};S.links.forEach(l=>{const c=l.category||'uncategorized';cats[c]=(cats[c]||0)+1;});
     const pinned=S.links.filter(l=>l.pinned).length;
@@ -2264,7 +2265,8 @@ function updateSidebarCtx() {
   } else if(currentSection==='repos') {
     const active=(S.repos||[]).filter(r=>r.status==='active').length;
     const withLive=(S.repos||[]).filter(r=>r.live).length;
-    el.innerHTML=`<div class="sidebar-label">Repo Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${(S.repos||[]).length} repos / ${active} active / ${withLive} live</div>`;
+    const byRole={};(S.repos||[]).forEach(r=>{const rl=r.role||'other';byRole[rl]=(byRole[rl]||0)+1;});
+    el.innerHTML=`<div class="sidebar-label">Repo Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${(S.repos||[]).length} repos / ${active} active / ${withLive} live</div><div class="sidebar-label" style="margin-top:6px">By Role</div>`+Object.entries(byRole).map(([r,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${esc(r)}: ${n}</div>`).join('');
   } else if(currentSection==='pipeline') {
     const hist=(S.pipelineHistory||[]).length;
     const templates=(S.pipelineTemplates||[]).length;
