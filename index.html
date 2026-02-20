@@ -6521,6 +6521,12 @@ function cmdGetItems(q) {
       ['tmux','tmux terminal multiplexer reference'],
       ['project health','Project health dashboard overview'],
       ['pomodoro timer','Pomodoro technique timer widget'],
+      ['screen','GNU Screen terminal multiplexer reference'],
+      ['completion rate','Task completion rate with gauge'],
+      ['password','Secure password generator'],
+      ['sed','sed stream editor reference'],
+      ['workload','Workload balance across projects'],
+      ['countdown','Countdown timer with presets'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10253,6 +10259,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='pomodoro timer' || ql==='pomodoro' || ql==='pomo' || ql==='focus timer')){
     items.unshift({title:'Pomodoro Timer',desc:'25/5/15 min Pomodoro technique',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPomodoroTimer();}});
+  }
+  if(ql && (ql==='screen' || ql==='gnu screen' || ql==='screen ref' || ql==='screen commands')){
+    items.unshift({title:'GNU Screen Reference',desc:'Terminal session manager commands',icon:'S',type:'action',action:()=>{closeCommandPalette();showScreenRef();}});
+  }
+  if(ql && (ql==='completion rate' || ql==='completion' || ql==='done rate' || ql==='task rate')){
+    items.unshift({title:'Completion Rate',desc:'Task completion gauge with periods',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCompletionRate();}});
+  }
+  if(ql && (ql==='password' || ql==='password gen' || ql==='passgen' || ql==='password generator')){
+    items.unshift({title:'Password Generator',desc:'Secure random password generator',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordGenerator();}});
+  }
+  if(ql && (ql==='sed' || ql==='sed ref' || ql==='stream editor' || ql==='sed commands')){
+    items.unshift({title:'sed Reference',desc:'Stream editor commands and patterns',icon:'S',type:'action',action:()=>{closeCommandPalette();showSedRef();}});
+  }
+  if(ql && (ql==='workload' || ql==='workload balance' || ql==='task balance' || ql==='work distribution')){
+    items.unshift({title:'Workload Balance',desc:'Task distribution across projects',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWorkloadBalance();}});
+  }
+  if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='timer countdown' || ql==='count down')){
+    items.unshift({title:'Countdown Timer',desc:'Countdown with preset durations',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
   }
   return items.slice(0, 20);
 }
@@ -33271,6 +33295,261 @@ function showQuickPomodoroTimer(){
   };
   window._pomMode=(m)=>{running=false;clearInterval(window._pomInterval);mode=m;timeLeft=modes[m];render();};
   window._pomReset=()=>{running=false;clearInterval(window._pomInterval);timeLeft=modes[mode];render();};
+  render();
+  document.body.appendChild(d);
+}
+function showScreenRef(){
+  const cmds={
+    'Sessions':{
+      'screen':'Start new session',
+      'screen -S name':'Start named session',
+      'screen -ls':'List sessions',
+      'screen -r name':'Reattach to session',
+      'screen -d -r name':'Detach elsewhere and reattach here',
+      'screen -x name':'Multi-display (share session)',
+      'Ctrl+a d':'Detach from session',
+      'Ctrl+a \\\\':'Kill all windows and exit'
+    },
+    'Windows':{
+      'Ctrl+a c':'Create new window',
+      'Ctrl+a n':'Next window',
+      'Ctrl+a p':'Previous window',
+      'Ctrl+a 0-9':'Switch to window number',
+      'Ctrl+a "':'List all windows',
+      'Ctrl+a A':'Rename current window',
+      'Ctrl+a k':'Kill current window',
+      'Ctrl+a w':'Show window bar'
+    },
+    'Split':{
+      'Ctrl+a S':'Split horizontally',
+      'Ctrl+a |':'Split vertically',
+      'Ctrl+a Tab':'Switch region',
+      'Ctrl+a X':'Remove current region',
+      'Ctrl+a Q':'Remove all regions except current',
+      'Ctrl+a :resize N':'Resize region to N lines',
+      'Ctrl+a F':'Fit window to region',
+      'Ctrl+a :focus':'Focus next region'
+    },
+    'Copy/Scroll':{
+      'Ctrl+a [':'Enter copy/scroll mode',
+      'Ctrl+a ]':'Paste buffer',
+      'Space':'Start/end selection (in copy mode)',
+      'Ctrl+a >':'Write paste buffer to file',
+      'Ctrl+a <':'Read file into paste buffer',
+      'Ctrl+a H':'Log window output to file',
+      'Ctrl+a h':'Write window hardcopy',
+      'Ctrl+a :hardcopy':'Save window to file'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">GNU Screen Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskCompletionRate(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const done=tasks.filter(t=>t.status==='done');
+  const total=tasks.length;
+  const rate=Math.round((done.length/total)*100);
+  const now=new Date();
+  const periods=[{label:'Today',filter:t=>{const d=new Date(t.completedAt||t.updated||t.id);return d.toDateString()===now.toDateString();}},{label:'This Week',filter:t=>{const d=new Date(t.completedAt||t.updated||t.id);const diff=(now-d)/(1000*60*60*24);return diff<=7;}},{label:'This Month',filter:t=>{const d=new Date(t.completedAt||t.updated||t.id);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();}},{label:'All Time',filter:()=>true}];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Completion Rate</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="text-align:center;margin-bottom:16px">';
+  html+='<svg width="140" height="140" viewBox="0 0 140 140"><circle cx="70" cy="70" r="60" fill="none" stroke="var(--border)" stroke-width="10"/>';
+  html+='<circle cx="70" cy="70" r="60" fill="none" stroke="#4ade80" stroke-width="10" stroke-dasharray="'+((rate/100)*377)+' 377" stroke-linecap="round" transform="rotate(-90 70 70)"/>';
+  html+='<text x="70" y="65" text-anchor="middle" fill="#4ade80" font-size="28" font-weight="700">'+rate+'%</text>';
+  html+='<text x="70" y="85" text-anchor="middle" fill="var(--text-muted)" font-size="12">'+done.length+'/'+total+'</text></svg></div>';
+  periods.forEach(p=>{
+    const periodDone=done.filter(p.filter).length;
+    const periodTotal=tasks.filter(p.filter).length;
+    const pRate=periodTotal?Math.round((periodDone/periodTotal)*100):0;
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">';
+    html+='<span style="font-size:12px;color:var(--text-secondary)">'+p.label+'</span>';
+    html+='<div style="display:flex;align-items:center;gap:8px"><div style="width:80px;height:4px;background:var(--bg-base);border-radius:2px"><div style="height:100%;width:'+pRate+'%;background:#4ade80;border-radius:2px"></div></div>';
+    html+='<span style="font-size:11px;color:var(--text-muted);min-width:40px;text-align:right">'+periodDone+'/'+periodTotal+'</span></div></div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickPasswordGenerator(){
+  let ex=document.getElementById('passgen-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='passgen-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+  let len=16,upper=true,lower=true,nums=true,syms=true;
+  function gen(){
+    let chars='';
+    if(upper)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(lower)chars+='abcdefghijklmnopqrstuvwxyz';
+    if(nums)chars+='0123456789';
+    if(syms)chars+='!@#$%^&*()-_=+[]{}|;:,.<>?';
+    if(!chars)chars='abcdefghijklmnopqrstuvwxyz';
+    const arr=new Uint32Array(len);crypto.getRandomValues(arr);
+    return Array.from(arr).map(v=>chars[v%chars.length]).join('');
+  }
+  function render(){
+    const pw=gen();
+    const strength=len>=20?'Strong':len>=12?'Good':'Weak';
+    const stColor=len>=20?'#4ade80':len>=12?'#f59e0b':'#ef4444';
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">Password Generator</span><button onclick="document.getElementById(\'passgen-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="background:var(--bg-base);padding:10px;border-radius:6px;margin-bottom:10px;display:flex;align-items:center;gap:8px">';
+    html+='<code id="pw-output" style="flex:1;color:#e2e8f0;font-size:13px;word-break:break-all">'+esc(pw)+'</code>';
+    html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'pw-output\').textContent);this.textContent=\'OK\';setTimeout(()=>this.textContent=\'Copy\',500)" style="background:#4ade80;color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap">Copy</button></div>';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:11px;color:var(--text-muted)">Length: '+len+'</span><span style="font-size:11px;color:'+stColor+'">'+strength+'</span></div>';
+    html+='<input type="range" min="4" max="64" value="'+len+'" oninput="window._pgLen(this.value)" style="width:100%;margin-bottom:10px">';
+    html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">';
+    [['A-Z',upper,'_pgUpper'],['a-z',lower,'_pgLower'],['0-9',nums,'_pgNums'],['!@#',syms,'_pgSyms']].forEach(([label,on,fn])=>{
+      html+='<button onclick="window.'+fn+'()" style="background:'+(on?'#4ade8033':'var(--bg-surface)')+';color:'+(on?'#4ade80':'var(--text-muted)')+';border:1px solid '+(on?'#4ade80':'var(--border)')+';padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">'+label+'</button>';
+    });
+    html+='</div>';
+    html+='<button onclick="window._pgRegen()" style="width:100%;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px;border-radius:4px;cursor:pointer;font-size:12px">Regenerate</button>';
+    d.innerHTML=html;
+  }
+  window._pgLen=(v)=>{len=parseInt(v);render();};
+  window._pgUpper=()=>{upper=!upper;render();};
+  window._pgLower=()=>{lower=!lower;render();};
+  window._pgNums=()=>{nums=!nums;render();};
+  window._pgSyms=()=>{syms=!syms;render();};
+  window._pgRegen=()=>{render();};
+  render();
+  document.body.appendChild(d);
+}
+function showSedRef(){
+  const cmds={
+    'Basic Usage':{
+      'sed "s/old/new/" file':'Replace first occurrence per line',
+      'sed "s/old/new/g" file':'Replace all occurrences',
+      'sed -i "s/old/new/g" file':'Edit file in-place',
+      'sed -i.bak "s/old/new/g" file':'In-place with backup',
+      'sed -n "5p" file':'Print only line 5',
+      'sed -n "5,10p" file':'Print lines 5-10',
+      'sed "5d" file':'Delete line 5',
+      'sed "/pattern/d" file':'Delete matching lines'
+    },
+    'Advanced Patterns':{
+      'sed "s/old/new/2" file':'Replace 2nd occurrence',
+      'sed "s/old/new/gi" file':'Case-insensitive replace',
+      'sed "/start/,/end/d" file':'Delete range between patterns',
+      'sed "3,5s/old/new/g" file':'Replace only in lines 3-5',
+      'sed "/pattern/s/old/new/" file':'Replace in matching lines',
+      'sed "s/[0-9]//g" file':'Remove all digits',
+      'sed "s/  */ /g" file':'Squeeze multiple spaces',
+      'sed "/^$/d" file':'Remove blank lines'
+    },
+    'Insert/Append':{
+      'sed "3i\\text" file':'Insert text before line 3',
+      'sed "3a\\text" file':'Append text after line 3',
+      'sed "s/$/suffix/" file':'Append to end of each line',
+      'sed "s/^/prefix/" file':'Prepend to start of each line',
+      'sed "1i\\header" file':'Add header line',
+      'sed "$a\\footer" file':'Add footer line',
+      'sed "y/abc/ABC/" file':'Transliterate characters',
+      'sed "=" file':'Print line numbers'
+    },
+    'Multiple Commands':{
+      'sed -e "s/a/b/" -e "s/c/d/" file':'Multiple substitutions',
+      'sed "{s/a/b/;s/c/d/}" file':'Grouped commands',
+      'sed -f script.sed file':'Commands from file',
+      'cmd | sed "s/old/new/"':'Pipe input',
+      'sed "s/\\(.*\\)/[\\1]/" file':'Capture groups',
+      'sed -n "s/.*\\(pattern\\).*/\\1/p" file':'Extract pattern',
+      'sed "N;s/\\n/ /" file':'Join consecutive lines',
+      'sed "G" file':'Double-space output'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">sed Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskWorkloadBalance(){
+  const tasks=S.tasks||[];const projects=S.projects||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const active=tasks.filter(t=>t.status!=='done');
+  const byProject={};
+  active.forEach(t=>{
+    const p=t.project||t.projectId||'Unassigned';
+    const name=projects.find(pr=>pr.id===p)?.name||p;
+    if(!byProject[name])byProject[name]={total:0,p0:0,p1:0,p2:0,p3:0,overdue:0};
+    byProject[name].total++;
+    if(t.priority==='p0')byProject[name].p0++;
+    else if(t.priority==='p1')byProject[name].p1++;
+    else if(t.priority==='p2')byProject[name].p2++;
+    else byProject[name].p3++;
+    if(t.due&&new Date(t.due)<new Date())byProject[name].overdue++;
+  });
+  const sorted=Object.entries(byProject).sort((a,b)=>b[1].total-a[1].total);
+  const maxT=Math.max(...sorted.map(([,v])=>v.total),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Workload Balance</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="color:var(--text-muted);font-size:11px;margin-bottom:12px">'+active.length+' active tasks across '+sorted.length+' projects</div>';
+  sorted.forEach(([name,data])=>{
+    const pct=Math.round((data.total/maxT)*100);
+    html+='<div style="margin-bottom:10px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#e2e8f0">'+esc(name)+'</span>';
+    html+='<span style="font-size:11px;color:var(--text-muted)">'+data.total+' tasks'+(data.overdue?' <span style="color:#ef4444">('+data.overdue+' overdue)</span>':'')+'</span></div>';
+    html+='<div style="height:16px;background:var(--bg-base);border-radius:4px;display:flex;overflow:hidden">';
+    const w0=(data.p0/data.total)*pct;const w1=(data.p1/data.total)*pct;const w2=(data.p2/data.total)*pct;const w3=(data.p3/data.total)*pct;
+    if(w0)html+='<div style="width:'+w0+'%;background:#ef4444" title="P0: '+data.p0+'"></div>';
+    if(w1)html+='<div style="width:'+w1+'%;background:#f97316" title="P1: '+data.p1+'"></div>';
+    if(w2)html+='<div style="width:'+w2+'%;background:#3b82f6" title="P2: '+data.p2+'"></div>';
+    if(w3)html+='<div style="width:'+w3+'%;background:#6b7280" title="P3: '+data.p3+'"></div>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickCountdownTimer(){
+  let ex=document.getElementById('countdown-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='countdown-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let total=300,timeLeft=300,running=false,interval=null;
+  const presets=[{label:'1m',sec:60},{label:'5m',sec:300},{label:'10m',sec:600},{label:'15m',sec:900},{label:'30m',sec:1800},{label:'1h',sec:3600}];
+  function fmt(s){const m=Math.floor(s/60);const ss=s%60;return String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0');}
+  function render(){
+    const pct=total?(timeLeft/total)*100:100;
+    const color=timeLeft<=30&&timeLeft>0?'#ef4444':'#4ade80';
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">Countdown</span><button onclick="clearInterval(window._cdInterval);document.getElementById(\'countdown-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="font-family:monospace;font-size:36px;color:'+color+';text-align:center;margin-bottom:12px">'+fmt(timeLeft)+'</div>';
+    html+='<div style="height:4px;background:var(--bg-base);border-radius:2px;margin-bottom:10px"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:2px;transition:width 1s linear"></div></div>';
+    html+='<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-bottom:10px">';
+    presets.forEach(p=>{
+      html+='<button onclick="window._cdSet('+p.sec+')" style="background:'+(total===p.sec?'#4ade8033':'var(--bg-surface)')+';color:'+(total===p.sec?'#4ade80':'var(--text-muted)')+';border:1px solid '+(total===p.sec?'#4ade80':'var(--border)')+';padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px">'+p.label+'</button>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;gap:8px;justify-content:center">';
+    html+='<button onclick="window._cdToggle()" style="background:'+(running?'#ef4444':'#4ade80')+';color:#000;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">'+(running?'Pause':'Start')+'</button>';
+    html+='<button onclick="window._cdReset()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">Reset</button>';
+    html+='</div>';
+    d.innerHTML=html;
+  }
+  window._cdSet=(s)=>{running=false;clearInterval(interval);total=s;timeLeft=s;render();};
+  window._cdToggle=()=>{
+    running=!running;
+    if(running){window._cdInterval=setInterval(()=>{timeLeft--;if(timeLeft<=0){clearInterval(window._cdInterval);running=false;render();}else{const disp=d.querySelector('div[style*=monospace]');if(disp){disp.textContent=fmt(timeLeft);if(timeLeft<=30)disp.style.color='#ef4444';}}},1000);}
+    else{clearInterval(window._cdInterval);}
+    render();
+  };
+  window._cdReset=()=>{running=false;clearInterval(window._cdInterval);timeLeft=total;render();};
   render();
   document.body.appendChild(d);
 }
