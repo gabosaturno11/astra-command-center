@@ -6665,6 +6665,12 @@ function cmdGetItems(q) {
       ['kubernetes','Kubectl pods deploy services ref'],
       ['velocity','Task velocity chart 8 weeks'],
       ['countdown','Countdown timer with pause reset'],
+      ['terraform','Terraform init plan apply state ref'],
+      ['dependency graph','Task dependency chain visualization'],
+      ['stopwatch','Stopwatch with laps'],
+      ['ansible playbook','Ansible playbook vault galaxy ref'],
+      ['scope creep','Scope creep detector 4 weeks'],
+      ['markdown preview','Live markdown preview editor'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10829,6 +10835,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='timer countdown' || ql==='count down')){
     items.unshift({title:'Countdown Timer',desc:'Timer with start/pause/reset',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
+  }
+  if(ql && (ql==='terraform' || ql==='terraform cli' || ql==='tf' || ql==='terraform ref')){
+    items.unshift({title:'Terraform Reference',desc:'Init, plan, apply, state management',icon:'T',type:'action',action:()=>{closeCommandPalette();showTerraformRef();}});
+  }
+  if(ql && (ql==='dependency graph' || ql==='dep graph' || ql==='task dependencies' || ql==='blocked graph')){
+    items.unshift({title:'Dependency Graph',desc:'Task dependency chain visualization',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDependencyGraph();}});
+  }
+  if(ql && (ql==='stopwatch' || ql==='stop watch' || ql==='lap timer' || ql==='timer laps')){
+    items.unshift({title:'Stopwatch',desc:'Stopwatch with lap tracking',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
+  }
+  if(ql && (ql==='ansible playbook' || ql==='ansible pb' || ql==='playbook ref' || ql==='ansible vault')){
+    items.unshift({title:'Ansible Playbook Reference',desc:'Playbook, vault, galaxy, inventory',icon:'A',type:'action',action:()=>{closeCommandPalette();showAnsiblePlaybookRef();}});
+  }
+  if(ql && (ql==='scope creep' || ql==='scope' || ql==='creep detector' || ql==='task growth')){
+    items.unshift({title:'Scope Creep Detector',desc:'4-week scope growth analysis',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskScopeCreep();}});
+  }
+  if(ql && (ql==='markdown preview' || ql==='md preview' || ql==='markdown editor' || ql==='md editor')){
+    items.unshift({title:'Markdown Preview',desc:'Live markdown preview editor',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownPreview();}});
   }
   return items.slice(0, 20);
 }
@@ -38297,6 +38321,127 @@ function showQuickCountdownTimer(){
   window._cdPause=function(){if(window._cdInterval)clearInterval(window._cdInterval);window._cdRunning=false;};
   window._cdReset=function(){if(window._cdInterval)clearInterval(window._cdInterval);window._cdRunning=false;const m=parseInt(document.getElementById('cd-min').value)||0;const s=parseInt(document.getElementById('cd-sec').value)||0;window._cdTotal=m*60+s;window._cdRemaining=window._cdTotal;window._cdUpdateDisplay();};
   window._cdUpdateDisplay();
+}
+function showTerraformRef(){
+  let p=document.getElementById('terraform-ref-panel');if(p)p.remove();
+  const cmds={'Init & Plan':['terraform init','terraform init -upgrade','terraform plan','terraform plan -out=plan.tfplan','terraform plan -target=aws_instance.web','terraform validate','terraform fmt','terraform fmt -recursive','terraform fmt -check'],'Apply & Destroy':['terraform apply','terraform apply plan.tfplan','terraform apply -auto-approve','terraform apply -target=aws_instance.web','terraform destroy','terraform destroy -target=aws_instance.web','terraform refresh','terraform taint aws_instance.web','terraform untaint aws_instance.web'],'State Management':['terraform state list','terraform state show aws_instance.web','terraform state mv aws_instance.old aws_instance.new','terraform state rm aws_instance.web','terraform state pull','terraform state push','terraform import aws_instance.web i-12345','terraform state replace-provider'],'Workspace & Backend':['terraform workspace list','terraform workspace new dev','terraform workspace select prod','terraform workspace delete staging','terraform output','terraform output -json','terraform providers','terraform graph | dot -Tpng > graph.png'],'Modules & Registry':['terraform get','terraform init -from-module=./module','terraform providers lock','terraform login','terraform logout','terraform version']};
+  p=document.createElement('div');p.id='terraform-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Terraform CLI Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskDependencyGraph(){
+  let p=document.getElementById('depgraph-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const blocked=tasks.filter(t=>t.blockedBy);const blocking=tasks.filter(t=>blocked.some(b=>b.blockedBy===t.id));
+  p=document.createElement('div');p.id='depgraph-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:640px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Task Dependency Graph</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="display:flex;gap:16px;margin-bottom:12px"><div style="font-size:12px;color:var(--text-muted)">Active: <span style="color:#60a5fa">'+tasks.length+'</span></div><div style="font-size:12px;color:var(--text-muted)">Blocked: <span style="color:#f87171">'+blocked.length+'</span></div><div style="font-size:12px;color:var(--text-muted)">Blocking others: <span style="color:#fbbf24">'+blocking.length+'</span></div></div>';
+  if(blocked.length===0){h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">No task dependencies found. Add blocked-by relationships in task details.</div>';}
+  else{
+    blocked.forEach(t=>{
+      const blocker=tasks.find(b=>b.id===t.blockedBy);
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:6px">';
+      h+='<div style="flex:1"><div style="font-size:12px;color:#fbbf24;font-weight:600">'+(blocker?esc(blocker.title):'Unknown')+'</div><div style="font-size:10px;color:var(--text-muted)">Blocking</div></div>';
+      h+='<div style="color:var(--text-muted);font-size:16px">&rarr;</div>';
+      h+='<div style="flex:1"><div style="font-size:12px;color:#f87171;font-weight:600">'+esc(t.title)+'</div><div style="font-size:10px;color:var(--text-muted)">Blocked</div></div>';
+      h+='</div>';
+    });
+  }
+  const independent=tasks.filter(t=>!t.blockedBy&&!blocked.some(b=>b.blockedBy===t.id));
+  if(independent.length>0){
+    h+='<div style="margin-top:12px;font-size:11px;color:var(--text-muted);font-weight:600">Independent tasks: '+independent.length+'</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
+    independent.slice(0,15).forEach(t=>{h+='<span style="font-size:10px;padding:2px 8px;background:var(--bg-surface);border-radius:10px;color:var(--text-secondary)">'+esc(t.title.substring(0,25))+'</span>';});
+    if(independent.length>15)h+='<span style="font-size:10px;padding:2px 8px;color:var(--text-muted)">+'+(independent.length-15)+' more</span>';
+    h+='</div>';
+  }
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickStopwatch(){
+  let w=document.getElementById('stopwatch-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='stopwatch-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Stopwatch</div><button onclick="if(window._swInterval)clearInterval(window._swInterval);this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="sw-display" style="font-size:36px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:10px;font-family:monospace">00:00.0</div><div id="sw-laps" style="max-height:80px;overflow-y:auto;margin-bottom:8px"></div><div style="display:flex;gap:6px"><button onclick="window._swToggle()" id="sw-toggle-btn" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Start</button><button onclick="window._swLap()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Lap</button><button onclick="window._swReset()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Reset</button></div>';
+  document.body.appendChild(w);
+  window._swElapsed=0;window._swRunning=false;window._swInterval=null;window._swLaps=[];window._swLapCount=0;
+  window._swFormat=function(ms){const m=Math.floor(ms/60000);const s=Math.floor((ms%60000)/1000);const d=Math.floor((ms%1000)/100);return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+d;};
+  window._swUpdate=function(){document.getElementById('sw-display').textContent=window._swFormat(window._swElapsed);};
+  window._swToggle=function(){if(window._swRunning){clearInterval(window._swInterval);window._swRunning=false;document.getElementById('sw-toggle-btn').textContent='Start';}else{const start=Date.now()-window._swElapsed;window._swInterval=setInterval(()=>{window._swElapsed=Date.now()-start;window._swUpdate();},100);window._swRunning=true;document.getElementById('sw-toggle-btn').textContent='Stop';}};
+  window._swLap=function(){if(!window._swRunning)return;window._swLapCount++;window._swLaps.push(window._swElapsed);const el=document.getElementById('sw-laps');el.innerHTML='';window._swLaps.forEach((l,i)=>{el.innerHTML+='<div style="font-size:10px;color:var(--text-muted);display:flex;justify-content:space-between"><span>Lap '+(i+1)+'</span><span style="font-family:monospace">'+window._swFormat(l)+'</span></div>';});};
+  window._swReset=function(){if(window._swInterval)clearInterval(window._swInterval);window._swRunning=false;window._swElapsed=0;window._swLaps=[];window._swLapCount=0;window._swUpdate();document.getElementById('sw-toggle-btn').textContent='Start';document.getElementById('sw-laps').innerHTML='';};
+  window._swUpdate();
+}
+function showAnsiblePlaybookRef(){
+  let p=document.getElementById('ansible-pb-ref-panel');if(p)p.remove();
+  const cmds={'Playbook Execution':['ansible-playbook site.yml','ansible-playbook site.yml -i inventory.ini','ansible-playbook site.yml --limit webservers','ansible-playbook site.yml --tags deploy','ansible-playbook site.yml --skip-tags test','ansible-playbook site.yml --check','ansible-playbook site.yml --diff','ansible-playbook site.yml --step','ansible-playbook site.yml -e "env=prod"','ansible-playbook site.yml --forks=10','ansible-playbook site.yml -v','ansible-playbook site.yml -vvv'],'Inventory & Hosts':['ansible-inventory --list','ansible-inventory --graph','ansible all -m ping','ansible webservers -m shell -a "uptime"','ansible all -m setup','ansible all -m setup -a "filter=ansible_os_family"','ansible-inventory --host myserver'],'Vault':['ansible-vault create secrets.yml','ansible-vault edit secrets.yml','ansible-vault encrypt file.yml','ansible-vault decrypt file.yml','ansible-vault view secrets.yml','ansible-vault rekey secrets.yml','ansible-playbook site.yml --ask-vault-pass','ansible-playbook site.yml --vault-password-file=.vaultpass'],'Galaxy & Roles':['ansible-galaxy init myrole','ansible-galaxy install geerlingguy.docker','ansible-galaxy collection install community.general','ansible-galaxy list','ansible-galaxy role remove myrole','ansible-galaxy collection list'],'Config & Debug':['ansible --version','ansible-config dump','ansible-config list','ansible-doc -l','ansible-doc -t module yum','ansible-lint site.yml','ansible-playbook site.yml --syntax-check']};
+  p=document.createElement('div');p.id='ansible-pb-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Ansible Playbook Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskScopeCreep(){
+  let p=document.getElementById('scope-creep-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const now=new Date();
+  const weekMs=7*24*60*60*1000;
+  const weeks=[];for(let i=3;i>=0;i--){const start=new Date(now.getTime()-i*weekMs);const end=new Date(start.getTime()+weekMs);weeks.push({start,end,label:'Week '+(4-i)});}
+  const weekData=weeks.map(w=>{
+    const created=tasks.filter(t=>{const c=new Date(t.created||'');return c>=w.start&&c<w.end;}).length;
+    const done=tasks.filter(t=>{if(t.status!=='done')return false;const d=new Date(t.completedAt||t.created||'');return d>=w.start&&d<w.end;}).length;
+    return{...w,created,done,net:created-done};
+  });
+  const totalCreated=weekData.reduce((s,w)=>s+w.created,0);
+  const totalDone=weekData.reduce((s,w)=>s+w.done,0);
+  const creepScore=totalCreated>0?((totalCreated-totalDone)/totalCreated*100).toFixed(0):0;
+  const creepColor=creepScore>50?'#f87171':creepScore>20?'#fbbf24':'#4ade80';
+  const creepLabel=creepScore>50?'High Scope Creep':creepScore>20?'Moderate Creep':'Under Control';
+  p=document.createElement('div');p.id='scope-creep-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Scope Creep Detector</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:48px;font-weight:700;color:'+creepColor+'">'+creepScore+'%</div><div style="font-size:13px;color:'+creepColor+';font-weight:600">'+creepLabel+'</div></div>';
+  h+='<div style="display:flex;gap:16px;justify-content:center;margin-bottom:16px"><div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#60a5fa">'+totalCreated+'</div><div style="font-size:10px;color:var(--text-muted)">Created (4w)</div></div><div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#4ade80">'+totalDone+'</div><div style="font-size:10px;color:var(--text-muted)">Done (4w)</div></div><div style="text-align:center"><div style="font-size:20px;font-weight:700;color:'+(totalCreated-totalDone>0?'#f87171':'#4ade80')+'">'+(totalCreated-totalDone>0?'+':'')+(totalCreated-totalDone)+'</div><div style="font-size:10px;color:var(--text-muted)">Net Growth</div></div></div>';
+  weekData.forEach(w=>{
+    const barMax=Math.max(w.created,w.done,1);
+    h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;font-weight:600;color:var(--text-primary)">'+w.label+'</span><span style="font-size:10px;color:'+(w.net>0?'#f87171':'#4ade80')+'">'+(w.net>0?'+':'')+w.net+' net</span></div><div style="display:flex;gap:4px;align-items:center"><span style="font-size:9px;color:#60a5fa;width:40px">+'+w.created+'</span><div style="flex:1;height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden"><div style="width:'+(w.created/barMax*100)+'%;height:100%;background:#60a5fa;border-radius:3px"></div></div></div><div style="display:flex;gap:4px;align-items:center;margin-top:2px"><span style="font-size:9px;color:#4ade80;width:40px">-'+w.done+'</span><div style="flex:1;height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden"><div style="width:'+(w.done/barMax*100)+'%;height:100%;background:#4ade80;border-radius:3px"></div></div></div></div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickMarkdownPreview(){
+  let w=document.getElementById('mdpreview-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='mdpreview-widget';
+  w.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:90vw;max-height:80vh;display:flex;flex-direction:column';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Markdown Preview</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div><div style="display:flex;gap:12px;flex:1;min-height:300px"><textarea id="md-input" placeholder="Type markdown here..." oninput="window._mdRender()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-family:monospace;font-size:12px;resize:none;line-height:1.6">## Hello World\n\nThis is **bold** and *italic* text.\n\n- Item one\n- Item two\n- Item three\n\n### Code\n\n`inline code` and:\n\n```\nconst x = 42;\nconsole.log(x);\n```\n\n> A blockquote\n\n[Link text](https://example.com)\n\n---\n\n1. First\n2. Second\n3. Third</textarea><div id="md-output" style="flex:1;background:var(--bg-surface);border-radius:6px;padding:10px;overflow-y:auto;font-size:13px;color:var(--text-primary);line-height:1.6"></div></div>';
+  document.body.appendChild(w);
+  window._mdRender=function(){
+    let md=document.getElementById('md-input').value;
+    md=md.replace(/```([\s\S]*?)```/g,'<pre style="background:var(--bg-elevated);padding:8px;border-radius:4px;font-size:11px;overflow-x:auto"><code>$1</code></pre>');
+    md=md.replace(/`([^`]+)`/g,'<code style="background:var(--bg-elevated);padding:1px 4px;border-radius:3px;font-size:11px">$1</code>');
+    md=md.replace(/^### (.+)$/gm,'<h3 style="font-size:14px;font-weight:700;color:var(--accent);margin:12px 0 6px">$1</h3>');
+    md=md.replace(/^## (.+)$/gm,'<h2 style="font-size:16px;font-weight:700;color:var(--accent);margin:14px 0 8px">$1</h2>');
+    md=md.replace(/^# (.+)$/gm,'<h1 style="font-size:20px;font-weight:700;color:var(--accent);margin:16px 0 10px">$1</h1>');
+    md=md.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+    md=md.replace(/\*(.+?)\*/g,'<em>$1</em>');
+    md=md.replace(/^> (.+)$/gm,'<blockquote style="border-left:3px solid var(--accent);padding-left:10px;color:var(--text-muted);margin:8px 0">$1</blockquote>');
+    md=md.replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">');
+    md=md.replace(/^\d+\. (.+)$/gm,'<div style="margin-left:16px;margin-bottom:2px">&#8226; $1</div>');
+    md=md.replace(/^- (.+)$/gm,'<div style="margin-left:16px;margin-bottom:2px">&#8226; $1</div>');
+    md=md.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" style="color:var(--accent);text-decoration:underline" target="_blank">$1</a>');
+    md=md.replace(/\n\n/g,'<br><br>');
+    document.getElementById('md-output').innerHTML=md;
+  };
+  window._mdRender();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
