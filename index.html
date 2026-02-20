@@ -6185,6 +6185,9 @@ function cmdGetItems(q) {
       ['world clock','World clock with timezone comparison'],
       ['tag cloud','Tag cloud from tasks and content'],
       ['ruler','Screen ruler with pixel coordinates'],
+      ['jwt','JWT token decoder and inspector'],
+      ['cumulative flow','Cumulative flow diagram for tasks'],
+      ['typing test','Typing speed test with WPM tracking'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8909,6 +8912,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='ruler' || ql==='screen ruler' || ql==='pixel ruler' || ql==='measure')){
     items.unshift({title:'Screen Ruler',desc:'Pixel ruler overlay',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickScreenRuler();}});
+  }
+  if(ql && (ql==='jwt' || ql==='jwt decoder' || ql==='json web token' || ql==='token decode')){
+    items.unshift({title:'JWT Decoder',desc:'Decode and inspect JWT tokens',icon:'J',type:'action',action:()=>{closeCommandPalette();showJwtDecoder();}});
+  }
+  if(ql && (ql==='cumulative flow' || ql==='cfd' || ql==='cumulative' || ql==='flow diagram')){
+    items.unshift({title:'Cumulative Flow',desc:'CFD for task status over time',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCumulativeFlow();}});
+  }
+  if(ql && (ql==='typing test' || ql==='typing' || ql==='wpm' || ql==='typing speed')){
+    items.unshift({title:'Typing Test',desc:'Typing speed test with WPM',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTypingTest();}});
   }
   return items.slice(0, 20);
 }
@@ -22672,6 +22684,145 @@ function showQuickScreenRuler(){
     label.textContent=e.clientX+'px, '+e.clientY+'px ('+window.innerWidth+'x'+window.innerHeight+')';
   }
   document.addEventListener('mousemove',onMove);
+}
+function showJwtDecoder(){
+  var ex=document.getElementById('jwt-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='jwt-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">JWT Decoder</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Paste JWT Token</label><textarea id="jwt-input" rows="3" placeholder="eyJhbGciOiJIUzI1NiIs..." style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box"></textarea></div>'+
+    '<button onclick="window._jwtDecode()" style="background:#4ade80;color:#000;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:12px">Decode</button>'+
+    '<div id="jwt-output" style="font-family:monospace;font-size:11px"></div>';
+  document.body.appendChild(d);
+  window._jwtDecode=function(){
+    var inp=document.getElementById('jwt-input');
+    var out=document.getElementById('jwt-output');
+    if(!inp||!out)return;
+    var token=inp.value.trim();
+    if(!token){out.innerHTML='<span style="color:var(--text-muted)">Paste a JWT token above</span>';return;}
+    var parts=token.split('.');
+    if(parts.length!==3){out.innerHTML='<span style="color:#ef4444">Invalid JWT: expected 3 parts, got '+parts.length+'</span>';return;}
+    try{
+      var header=JSON.parse(atob(parts[0].replace(/-/g,'+').replace(/_/g,'/')));
+      var payload=JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+      var h='<div style="margin-bottom:8px"><div style="color:#ef4444;font-size:10px;font-weight:600;margin-bottom:4px">HEADER</div><pre style="background:var(--bg-surface);padding:8px;border-radius:6px;color:#ef4444;white-space:pre-wrap;margin:0">'+esc(JSON.stringify(header,null,2))+'</pre></div>';
+      h+='<div style="margin-bottom:8px"><div style="color:#a78bfa;font-size:10px;font-weight:600;margin-bottom:4px">PAYLOAD</div><pre style="background:var(--bg-surface);padding:8px;border-radius:6px;color:#a78bfa;white-space:pre-wrap;margin:0">'+esc(JSON.stringify(payload,null,2))+'</pre></div>';
+      if(payload.exp){
+        var expDate=new Date(payload.exp*1000);
+        var expired=expDate<new Date();
+        h+='<div style="padding:6px 10px;background:var(--bg-surface);border-radius:6px;border-left:3px solid '+(expired?'#ef4444':'#4ade80')+'"><span style="color:var(--text-muted);font-size:10px">Expires: </span><span style="color:'+(expired?'#ef4444':'#4ade80')+';font-size:11px">'+expDate.toLocaleString()+(expired?' (EXPIRED)':' (valid)')+'</span></div>';
+      }
+      out.innerHTML=h;
+    }catch(e){out.innerHTML='<span style="color:#ef4444">Decode error: '+esc(e.message)+'</span>';}
+  };
+}
+function showTaskCumulativeFlow(){
+  var ex=document.getElementById('cum-flow-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var statuses=['todo','in-progress','done'];
+  var statusColors={todo:'#64748b','in-progress':'#f59e0b',done:'#4ade80'};
+  var days=[];
+  var now=new Date();
+  for(var i=13;i>=0;i--){
+    var dt=new Date(now);dt.setDate(dt.getDate()-i);
+    days.push(dt.toISOString().split('T')[0]);
+  }
+  var data=days.map(function(day){
+    var counts={todo:0,'in-progress':0,done:0};
+    tasks.forEach(function(t){
+      if(!t.createdAt||t.createdAt.split('T')[0]>day)return;
+      if(t.status==='done'&&t.completedAt&&t.completedAt.split('T')[0]<=day)counts.done++;
+      else if(t.status==='in-progress')counts['in-progress']++;
+      else counts.todo++;
+    });
+    return counts;
+  });
+  var maxTotal=0;
+  data.forEach(function(d){var t=d.todo+d['in-progress']+d.done;if(t>maxTotal)maxTotal=t;});
+  var svgW=400,svgH=160;
+  var areas='';
+  statuses.forEach(function(status){
+    var pts=[];
+    data.forEach(function(d,i){
+      var x=20+i*(svgW-40)/Math.max(data.length-1,1);
+      var belowSum=0;
+      for(var si=statuses.indexOf(status)+1;si<statuses.length;si++){belowSum+=d[statuses[si]];}
+      var total=belowSum+d[status];
+      var y1=maxTotal?svgH-20-(belowSum/maxTotal)*(svgH-40):svgH-20;
+      var y2=maxTotal?svgH-20-(total/maxTotal)*(svgH-40):svgH-20;
+      pts.push({x:x,y1:y1,y2:y2});
+    });
+    var path='M'+pts[0].x+','+pts[0].y2.toFixed(1);
+    for(var i=1;i<pts.length;i++)path+='L'+pts[i].x+','+pts[i].y2.toFixed(1);
+    for(var i=pts.length-1;i>=0;i--)path+='L'+pts[i].x+','+pts[i].y1.toFixed(1);
+    path+='Z';
+    areas+='<path d="'+path+'" fill="'+statusColors[status]+'" opacity="0.6"/>';
+  });
+  var d=document.createElement('div');d.id='cum-flow-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Cumulative Flow</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="display:flex;gap:12px;justify-content:center;margin-bottom:8px">'+
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#64748b;border-radius:2px"></div><span style="font-size:10px;color:var(--text-muted)">Todo</span></div>'+
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#f59e0b;border-radius:2px"></div><span style="font-size:10px;color:var(--text-muted)">In Progress</span></div>'+
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#4ade80;border-radius:2px"></div><span style="font-size:10px;color:var(--text-muted)">Done</span></div>'+
+    '</div>'+
+    '<svg width="'+svgW+'" height="'+svgH+'" style="display:block;margin:0 auto">'+areas+'</svg>';
+  document.body.appendChild(d);
+}
+function showQuickTypingTest(){
+  var ex=document.getElementById('typing-test-float');if(ex){ex.remove();return;}
+  var sentences=[
+    'The quick brown fox jumps over the lazy dog.',
+    'A journey of a thousand miles begins with a single step.',
+    'To be or not to be, that is the question.',
+    'All that glitters is not gold, but it sure is shiny.',
+    'The best way to predict the future is to create it.',
+    'Stay hungry, stay foolish, and keep shipping code.',
+    'In the middle of difficulty lies opportunity to grow.',
+    'Every expert was once a beginner who refused to quit.'
+  ];
+  var text=sentences[Math.floor(Math.random()*sentences.length)];
+  var started=false,startTime=0,done=false;
+  var d=document.createElement('div');d.id='typing-test-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  function rend(){
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Typing Speed Test</span><button onclick="document.getElementById(\'typing-test-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+    h+='<div style="background:var(--bg-surface);padding:12px;border-radius:8px;margin-bottom:12px;font-size:14px;color:var(--text-primary);line-height:1.6">'+text+'</div>';
+    h+='<textarea id="tt-input" placeholder="Start typing..." rows="3" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:14px;resize:none;box-sizing:border-box" '+(done?'disabled':'')+'></textarea>';
+    h+='<div id="tt-stats" style="display:flex;gap:16px;justify-content:center;margin-top:12px">';
+    h+='<div style="text-align:center"><div id="tt-wpm" style="font-size:24px;font-weight:700;color:#4ade80">0</div><div style="font-size:9px;color:var(--text-muted)">WPM</div></div>';
+    h+='<div style="text-align:center"><div id="tt-acc" style="font-size:24px;font-weight:700;color:#06b6d4">100%</div><div style="font-size:9px;color:var(--text-muted)">Accuracy</div></div>';
+    h+='<div style="text-align:center"><div id="tt-time" style="font-size:24px;font-weight:700;color:var(--text-primary)">0s</div><div style="font-size:9px;color:var(--text-muted)">Time</div></div>';
+    h+='</div>';
+    if(done)h+='<button onclick="window._ttReset()" style="display:block;margin:12px auto 0;background:#4ade80;color:#000;border:none;padding:8px 24px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Try Again</button>';
+    d.innerHTML=h;
+    if(!done){
+      var inp=document.getElementById('tt-input');
+      if(inp){
+        inp.oninput=function(){
+          if(!started){started=true;startTime=Date.now();}
+          var typed=inp.value;
+          var elapsed=(Date.now()-startTime)/1000;
+          var words=typed.split(/\s+/).filter(function(w){return w;}).length;
+          var wpm=elapsed>0?Math.round(words/(elapsed/60)):0;
+          var correct=0;
+          for(var i=0;i<typed.length;i++){if(typed[i]===text[i])correct++;}
+          var acc=typed.length?Math.round(correct/typed.length*100):100;
+          document.getElementById('tt-wpm').textContent=wpm;
+          document.getElementById('tt-acc').textContent=acc+'%';
+          document.getElementById('tt-time').textContent=Math.round(elapsed)+'s';
+          if(typed===text){done=true;rend();}
+        };
+        inp.focus();
+      }
+    }
+  }
+  window._ttReset=function(){
+    text=sentences[Math.floor(Math.random()*sentences.length)];
+    started=false;done=false;startTime=0;rend();
+  };
+  document.body.appendChild(d);
+  rend();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
