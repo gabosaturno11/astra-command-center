@@ -6260,6 +6260,9 @@ function cmdGetItems(q) {
       ['jest','Jest config generator'],
       ['workload','Workload balance by project'],
       ['daily quote','Quote of the day'],
+      ['tailwind','Tailwind CSS config generator'],
+      ['burndown','Task burndown chart'],
+      ['habit tracker','Daily habit tracker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9209,6 +9212,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='daily quote' || ql==='quote' || ql==='quote of the day' || ql==='inspiration')){
     items.unshift({title:'Daily Quote',desc:'Programming quote of the day',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickDailyQuote();}});
+  }
+  if(ql && (ql==='tailwind' || ql==='tailwind config' || ql==='tailwindcss' || ql==='tw config')){
+    items.unshift({title:'Tailwind Config',desc:'Generate tailwind.config.js presets',icon:'T',type:'action',action:()=>{closeCommandPalette();showTailwindConfigGen();}});
+  }
+  if(ql && (ql==='burndown' || ql==='burn down' || ql==='burndown chart' || ql==='task burndown')){
+    items.unshift({title:'Burndown Chart',desc:'14-day task burndown trend',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBurndown();}});
+  }
+  if(ql && (ql==='habit tracker' || ql==='habits' || ql==='habit' || ql==='daily habits')){
+    items.unshift({title:'Habit Tracker',desc:'Track daily habits with 7-day grid',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHabitTracker();}});
   }
   return items.slice(0, 20);
 }
@@ -25546,6 +25558,98 @@ function showQuickDailyQuote(){
     </div>
   </div>`;
   document.body.appendChild(d);
+}
+function showTailwindConfigGen(){
+  let ex=document.getElementById('tailwind-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'Standard':`/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: ['./src/**/*.{js,jsx,ts,tsx}', './public/index.html'],\n  theme: {\n    extend: {\n      colors: {\n        primary: '#3b82f6',\n        secondary: '#10b981'\n      },\n      fontFamily: {\n        sans: ['Inter', 'sans-serif']\n      }\n    }\n  },\n  plugins: []\n};`,
+    'Dark Mode':`/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: ['./src/**/*.{js,jsx,ts,tsx}'],\n  darkMode: 'class',\n  theme: {\n    extend: {\n      colors: {\n        dark: {\n          bg: '#0f172a',\n          surface: '#1e293b',\n          border: '#334155'\n        }\n      }\n    }\n  },\n  plugins: []\n};`,
+    'With Plugins':`/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: ['./src/**/*.{js,jsx,ts,tsx}'],\n  theme: {\n    extend: {}\n  },\n  plugins: [\n    require('@tailwindcss/forms'),\n    require('@tailwindcss/typography'),\n    require('@tailwindcss/aspect-ratio'),\n    require('@tailwindcss/container-queries')\n  ]\n};`,
+    'Next.js':`/** @type {import('tailwindcss').Config} */\nmodule.exports = {\n  content: [\n    './pages/**/*.{js,ts,jsx,tsx,mdx}',\n    './components/**/*.{js,ts,jsx,tsx,mdx}',\n    './app/**/*.{js,ts,jsx,tsx,mdx}'\n  ],\n  theme: {\n    extend: {\n      backgroundImage: {\n        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'\n      }\n    }\n  },\n  plugins: []\n};`
+  };
+  let sel='Standard';
+  const d=document.createElement('div');d.id='tailwind-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-twpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-twpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Tailwind Config Generator</span><span onclick="document.getElementById('tailwind-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#tailwind-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy tailwind.config.js',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy tailwind.config.js</button>
+    </div>`;
+    d.querySelectorAll('[data-twpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.twpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskBurndown(){
+  let ex=document.getElementById('burndown-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const days=14;
+  const now=new Date();
+  const data=[];
+  for(let i=days-1;i>=0;i--){
+    const dt=new Date(now);dt.setDate(dt.getDate()-i);
+    const ds=dt.toISOString().split('T')[0];
+    const created=tasks.filter(t=>t.createdAt&&t.createdAt.startsWith(ds)).length;
+    const done=tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt.startsWith(ds)).length;
+    data.push({day:ds.slice(5),created,done});
+  }
+  let totalOpen=tasks.filter(t=>t.status!=='done').length;
+  const burnData=[];
+  for(let i=data.length-1;i>=0;i--){
+    burnData.unshift({day:data[i].day,open:totalOpen});
+    totalOpen=totalOpen+data[i].done-data[i].created;
+  }
+  const mx=Math.max(...burnData.map(d=>d.open),1);
+  const w=320,h=140;
+  const pts=burnData.map((d,i)=>{const x=Math.round((i/(burnData.length-1||1))*w);const y=Math.round(h-(d.open/mx)*h);return `${x},${y}`;}).join(' ');
+  const area=`0,${h} ${pts} ${w},${h}`;
+  const labels=burnData.filter((_,i)=>i%3===0||i===burnData.length-1).map((d,i,arr)=>{const x=Math.round((burnData.indexOf(d)/(burnData.length-1||1))*w);return `<text x="${x}" y="${h+14}" text-anchor="middle" fill="var(--text-muted)" font-size="8">${d.day}</text>`;}).join('');
+  const d=document.createElement('div');d.id='burndown-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Burndown (14 days)</span><span onclick="document.getElementById('burndown-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <svg width="${w}" height="${h+20}" viewBox="0 0 ${w} ${h+20}">
+      <polygon points="${area}" fill="rgba(74,222,128,0.15)"/>
+      <polyline points="${pts}" fill="none" stroke="#4ade80" stroke-width="2"/>
+      ${labels}
+    </svg>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Currently ${tasks.filter(t=>t.status!=='done').length} open tasks</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickHabitTracker(){
+  let ex=document.getElementById('habit-tracker-float');if(ex){ex.remove();return;}
+  if(!S._habits) S._habits=['Exercise','Read 30min','Meditate','Code 1hr','Journal'];
+  if(!S._habitLog) S._habitLog={};
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._habitLog[today]) S._habitLog[today]={};
+  const d=document.createElement('div');d.id='habit-tracker-float';
+  const rend=()=>{
+    const days=[];
+    for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);days.push(dt.toISOString().split('T')[0]);}
+    const grid=S._habits.map((h,hi)=>{
+      const cells=days.map(dy=>{
+        const checked=S._habitLog[dy]&&S._habitLog[dy][hi];
+        const isToday=dy===today;
+        return `<div onclick="${isToday?`window._toggleHabit(${hi})`:''}" style="width:22px;height:22px;border-radius:4px;${checked?'background:#4ade80':'background:var(--bg-surface);border:1px solid var(--border)'};${isToday?'cursor:pointer;box-shadow:0 0 0 1px var(--accent)':''};display:flex;align-items:center;justify-content:center;font-size:9px;color:#000">${checked?'v':''}</div>`;
+      }).join('');
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><div style="width:80px;font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(h)}">${esc(h)}</div>${cells}</div>`;
+    }).join('');
+    const dayHeaders=days.map(dy=>`<div style="width:22px;text-align:center;font-size:8px;color:var(--text-muted)">${['Su','Mo','Tu','We','Th','Fr','Sa'][new Date(dy).getDay()]}</div>`).join('');
+    const streak=()=>{let s=0;for(let i=0;i<30;i++){const dt=new Date();dt.setDate(dt.getDate()-i);const ds=dt.toISOString().split('T')[0];if(S._habitLog[ds]&&Object.values(S._habitLog[ds]).some(v=>v))s++;else break;}return s;};
+    d.innerHTML=`<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:310px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Habit Tracker</span><span onclick="document.getElementById('habit-tracker-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="display:flex;gap:6px;margin-left:86px;margin-bottom:4px">${dayHeaders}</div>
+      ${grid}
+      <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Streak: ${streak()} days</div>
+    </div>`;
+  };
+  window._toggleHabit=(idx)=>{
+    if(!S._habitLog[today]) S._habitLog[today]={};
+    S._habitLog[today][idx]=!S._habitLog[today][idx];
+    save();rend();
+  };
+  document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
