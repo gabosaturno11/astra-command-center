@@ -6419,6 +6419,12 @@ function cmdGetItems(q) {
       ['git advanced','Git rebase, stash, bisect, worktree reference'],
       ['status pie','Task status pie chart distribution'],
       ['text transform','Transform text case, sort, reverse'],
+      ['makefile','Makefile and make command reference'],
+      ['project health','Per-project health dashboard'],
+      ['word frequency','Analyze word frequency in text'],
+      ['cmake','CMake build system reference'],
+      ['sprint','Current week sprint summary'],
+      ['reading time','Calculate reading and speaking time'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9845,6 +9851,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='text transform' || ql==='case convert' || ql==='uppercase' || ql==='camelcase')){
     items.unshift({title:'Text Transformer',desc:'Convert text case, sort, reverse',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTextTransformer();}});
+  }
+  if(ql && (ql==='makefile' || ql==='make' || ql==='make ref' || ql==='gnu make')){
+    items.unshift({title:'Makefile Reference',desc:'Make and Makefile cheatsheet',icon:'M',type:'action',action:()=>{closeCommandPalette();showMakefileRef();}});
+  }
+  if(ql && (ql==='project health' || ql==='health dashboard' || ql==='project status' || ql==='project overview')){
+    items.unshift({title:'Project Health',desc:'Per-project health dashboard',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskProjectHealth();}});
+  }
+  if(ql && (ql==='word frequency' || ql==='word freq' || ql==='frequency' || ql==='word count')){
+    items.unshift({title:'Word Frequency',desc:'Analyze word frequency in text',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWordFrequency();}});
+  }
+  if(ql && (ql==='cmake' || ql==='cmake ref' || ql==='cmake build' || ql==='cmakelists')){
+    items.unshift({title:'CMake Reference',desc:'CMake build system cheatsheet',icon:'C',type:'action',action:()=>{closeCommandPalette();showCmakeRef();}});
+  }
+  if(ql && (ql==='sprint' || ql==='sprint summary' || ql==='weekly sprint' || ql==='this week')){
+    items.unshift({title:'Sprint Summary',desc:'Current week sprint metrics',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSprintSummary();}});
+  }
+  if(ql && (ql==='reading time' || ql==='read time' || ql==='speak time' || ql==='wpm')){
+    items.unshift({title:'Reading Time Calc',desc:'Calculate reading and speaking time',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickReadingTimeCalc();}});
   }
   return items.slice(0, 20);
 }
@@ -30253,6 +30277,141 @@ function showQuickTextTransformer(){
   html+='<textarea id="_tt-output" readonly style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:#4ade80;border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:monospace" placeholder="Output appears here..."></textarea>';
   html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_tt-output\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Output\',800)" style="margin-top:8px;background:#4ade80;color:#000;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;width:100%">Copy Output</button>';
   html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showMakefileRef(){
+  const cmds={
+    'Running':['make|Run default target','make target|Run specific target','make -j4|Run 4 jobs in parallel','make -n|Dry run (show commands without executing)','make -B|Force rebuild all targets','make -f custom.mk|Use custom makefile','make VARNAME=value|Override variable'],
+    'Variables':['CC=gcc|Set C compiler','CFLAGS=-Wall -O2|Compiler flags','LDFLAGS=-lm|Linker flags','SRC=$(wildcard *.c)|All .c files','OBJ=$(SRC:.c=.o)|Replace .c with .o','$(info $(VAR))|Print variable value'],
+    'Syntax':['target: deps|Basic rule','\\t command|Tab-indented command (required)','%.o: %.c|Pattern rule','.PHONY: clean|Declare phony target','$(shell command)|Run shell command','$(if cond,then,else)|Conditional','$(foreach var,list,body)|Loop'],
+    'Common Targets':['all: program|Default build target','clean:\\n\\trm -f *.o|Clean build artifacts','install:\\n\\tcp prog /usr/local/bin|Install binary','test:\\n\\t./run_tests.sh|Run tests','dist:\\n\\ttar czf prog.tar.gz src/|Create distribution'],
+    'Functions':['$(patsubst %.c,%.o,$(SRC))|Pattern substitution','$(filter %.c,$(FILES))|Filter matching','$(sort $(LIST))|Sort and deduplicate','$(word 1,$(LIST))|Get nth word','$(dir path/file.c)|Extract directory','$(notdir path/file.c)|Extract filename']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Makefile Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskProjectHealth(){
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Project Health Dashboard</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  const projMap={};
+  tasks.forEach(t=>{
+    const p=t.project||'Unassigned';
+    if(!projMap[p])projMap[p]={total:0,done:0,overdue:0,inProgress:0};
+    projMap[p].total++;
+    if(t.status==='done')projMap[p].done++;
+    if(t.status==='in-progress')projMap[p].inProgress++;
+    const today=new Date().toISOString().split('T')[0];
+    if(t.status!=='done'&&t.due&&t.due<today)projMap[p].overdue++;
+  });
+  const entries=Object.entries(projMap).sort((a,b)=>b[1].total-a[1].total);
+  entries.forEach(([name,data])=>{
+    const pct=data.total>0?Math.round(data.done/data.total*100):0;
+    const healthColor=data.overdue>2?'#ef4444':data.overdue>0?'#f59e0b':pct>70?'#4ade80':'#60a5fa';
+    const healthLabel=data.overdue>2?'At Risk':data.overdue>0?'Needs Attention':pct>70?'Healthy':'In Progress';
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid '+healthColor+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="color:var(--text-primary);font-weight:600;font-size:13px">'+esc(name)+'</span><span style="font-size:10px;color:'+healthColor+';font-weight:600">'+healthLabel+'</span></div>';
+    html+='<div style="background:var(--bg-elevated);border-radius:4px;height:8px;overflow:hidden;margin-bottom:6px"><div style="width:'+pct+'%;height:100%;background:'+healthColor+';border-radius:4px"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)"><span>'+data.total+' total</span><span style="color:#4ade80">'+data.done+' done</span><span style="color:#f59e0b">'+data.inProgress+' active</span>';
+    if(data.overdue>0)html+='<span style="color:#ef4444">'+data.overdue+' overdue</span>';
+    html+='</div></div>';
+  });
+  if(entries.length===0)html+='<div style="text-align:center;color:var(--text-muted);padding:20px">No tasks to analyze</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickWordFrequency(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80">Word Frequency Analyzer</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<textarea id="_wf-input" style="width:100%;height:120px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:inherit" placeholder="Paste text here to analyze word frequency..."></textarea>';
+  html+='<button onclick="window._analyzeWf()" style="margin:10px 0;background:#4ade80;color:#000;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;width:100%">Analyze</button>';
+  html+='<div id="_wf-results"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  const stopWords=new Set(['the','a','an','and','or','but','in','on','at','to','for','of','is','it','that','this','was','are','be','has','have','had','will','with','as','by','from','not','do','if','they','them','we','you','he','she','i','my','your','its','so','no','up']);
+  window._analyzeWf=function(){
+    const text=document.getElementById('_wf-input').value;
+    const words=text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>1&&!stopWords.has(w));
+    const freq={};words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,25);
+    const maxCount=sorted.length>0?sorted[0][1]:1;
+    let r='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">'+words.length+' words analyzed (stop words excluded)</div>';
+    sorted.forEach(([word,count])=>{
+      const pct=Math.round((count/maxCount)*100);
+      r+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="width:80px;font-size:11px;color:var(--text-secondary);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+word+'</span>';
+      r+='<div style="flex:1;background:var(--bg-surface);border-radius:3px;height:14px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#4ade80;border-radius:3px;opacity:0.7"></div></div>';
+      r+='<span style="width:30px;font-size:11px;color:#4ade80;font-weight:600">'+count+'</span></div>';
+    });
+    document.getElementById('_wf-results').innerHTML=r;
+  };
+}
+function showCmakeRef(){
+  const cmds={
+    'Build':['cmake -B build|Configure into build directory','cmake --build build|Build the project','cmake --build build --parallel 8|Build with 8 threads','cmake --build build --target clean|Clean build','cmake --install build --prefix /usr/local|Install built project','cmake --build build --config Release|Build in Release mode'],
+    'Configure':['cmake -B build -DCMAKE_BUILD_TYPE=Release|Set build type','cmake -B build -G Ninja|Use Ninja generator','cmake -B build -G "Unix Makefiles"|Use Makefiles','cmake -B build -DCMAKE_INSTALL_PREFIX=/opt|Set install prefix','cmake -B build -DBUILD_TESTING=ON|Enable testing','cmake -LH build|List cache variables with help'],
+    'CMakeLists.txt':['cmake_minimum_required(VERSION 3.20)|Min CMake version','project(MyProject VERSION 1.0 LANGUAGES CXX)|Project declaration','add_executable(app src/main.cpp)|Add executable','add_library(mylib src/lib.cpp)|Add library','target_link_libraries(app PRIVATE mylib)|Link library','target_include_directories(app PUBLIC include/)|Include dirs'],
+    'Find & Fetch':['find_package(OpenSSL REQUIRED)|Find installed package','FetchContent_Declare(fmt GIT_REPOSITORY ...)|Declare dependency','FetchContent_MakeAvailable(fmt)|Download and make available','target_link_libraries(app PRIVATE fmt::fmt)|Link fetched lib'],
+    'Testing':['enable_testing()|Enable CTest','add_test(NAME mytest COMMAND app)|Register test','ctest --test-dir build|Run all tests','ctest --test-dir build -R pattern|Run matching tests','ctest --test-dir build --output-on-failure|Show output on fail']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">CMake Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskSprintSummary(){
+  const tasks=(S.tasks||[]);const now=new Date();
+  const sprintStart=new Date(now);sprintStart.setDate(now.getDate()-now.getDay());sprintStart.setHours(0,0,0,0);
+  const sprintEnd=new Date(sprintStart);sprintEnd.setDate(sprintStart.getDate()+6);
+  const sprintTasks=tasks.filter(t=>{
+    const cd=t.createdAt?new Date(t.createdAt):null;
+    const ud=t.updatedAt?new Date(t.updatedAt):null;
+    return (cd&&cd>=sprintStart&&cd<=sprintEnd)||(ud&&ud>=sprintStart&&ud<=sprintEnd)||(t.due&&t.due>=sprintStart.toISOString().split('T')[0]&&t.due<=sprintEnd.toISOString().split('T')[0]);
+  });
+  const created=sprintTasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=sprintStart).length;
+  const completed=sprintTasks.filter(t=>t.status==='done'&&t.updatedAt&&new Date(t.updatedAt)>=sprintStart).length;
+  const remaining=sprintTasks.filter(t=>t.status!=='done').length;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Sprint Summary</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Week of '+(sprintStart.getMonth()+1)+'/'+sprintStart.getDate()+' - '+(sprintEnd.getMonth()+1)+'/'+sprintEnd.getDate()+'</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Created</div><div style="font-size:24px;color:#60a5fa;font-weight:700">'+created+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Completed</div><div style="font-size:24px;color:#4ade80;font-weight:700">'+completed+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Remaining</div><div style="font-size:24px;color:#f59e0b;font-weight:700">'+remaining+'</div></div></div>';
+  const velocity=completed;const pct=created>0?Math.round(completed/created*100):0;
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--text-muted)">Sprint Progress</span><span style="font-size:11px;color:#4ade80;font-weight:600">'+pct+'%</span></div>';
+  html+='<div style="background:var(--bg-elevated);border-radius:4px;height:10px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#4ade80;border-radius:4px;transition:width 0.3s"></div></div></div>';
+  const dayOfWeek=now.getDay();const daysLeft=6-dayOfWeek;
+  html+='<div style="display:flex;gap:8px"><div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Velocity</div><div style="font-size:16px;color:#4ade80;font-weight:700">'+velocity+'/wk</div></div>';
+  html+='<div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Days Left</div><div style="font-size:16px;color:#60a5fa;font-weight:700">'+daysLeft+'</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickReadingTimeCalc(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Reading Time Calc</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<textarea id="_rt-text" style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:inherit" placeholder="Paste text to calculate reading time..." oninput="window._calcReadTime()"></textarea>';
+  html+='<div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Words</div><div id="_rt-words" style="font-size:16px;color:#4ade80;font-weight:700">0</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Characters</div><div id="_rt-chars" style="font-size:16px;color:#60a5fa;font-weight:700">0</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Read Time</div><div id="_rt-read" style="font-size:16px;color:#f59e0b;font-weight:700">0m</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted)">Speak Time</div><div id="_rt-speak" style="font-size:16px;color:#a78bfa;font-weight:700">0m</div></div>';
+  html+='</div></div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._calcReadTime=function(){
+    const text=document.getElementById('_rt-text').value;
+    const words=text.split(/\s+/).filter(w=>w).length;
+    const chars=text.length;
+    const readMin=Math.ceil(words/238);const speakMin=Math.ceil(words/150);
+    document.getElementById('_rt-words').textContent=words;
+    document.getElementById('_rt-chars').textContent=chars;
+    document.getElementById('_rt-read').textContent=readMin<60?readMin+'m':Math.floor(readMin/60)+'h '+readMin%60+'m';
+    document.getElementById('_rt-speak').textContent=speakMin<60?speakMin+'m':Math.floor(speakMin/60)+'h '+speakMin%60+'m';
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
