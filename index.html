@@ -5827,6 +5827,8 @@ function cmdGetItems(q) {
       ['session','Show current ASTRA session time'],
       ['undo','Undo last destructive action (delete task/content/link)'],
       ['favorites','Quick access to starred and pinned items'],
+      ['due groups','Tasks grouped: Overdue/Today/Tomorrow/Week/Later'],
+      ['convert','Convert content to task or task to content'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7226,6 +7228,15 @@ function cmdGetItems(q) {
   if(ql && (ql==='favorites' || ql==='starred' || ql==='pinned' || ql==='bookmarks')){
     const total=S.content.filter(c=>c.starred).length+S.content.filter(c=>c.pinned).length+(S.links||[]).filter(l=>l.pinned).length;
     items.unshift({title:'Favorites ('+total+' items)',desc:'Starred and pinned content and links',icon:'*',type:'action',action:()=>{closeCommandPalette();showFavorites();}});
+  }
+  // Due groups prefix
+  if(ql && (ql==='due groups' || ql==='due grouped' || ql==='tasks by date' || ql==='task groups')){
+    items.unshift({title:'Tasks by Due Date',desc:'Grouped: Overdue, Today, Tomorrow, This Week, Later, No Date',icon:'D',type:'action',action:()=>{closeCommandPalette();showTasksByDueGroup();}});
+  }
+  // Convert prefix
+  if(ql && (ql==='convert' || ql==='content to task' || ql==='task to content' || ql==='transform item')){
+    items.unshift({title:'Convert Content to Task',desc:'Pick a content item to convert to a task',icon:'C',type:'info'});
+    items.unshift({title:'Convert Task to Content',desc:'Pick a task to convert to a content item',icon:'T',type:'info'});
   }
   return items.slice(0, 20);
 }
@@ -8955,6 +8966,51 @@ function showFavorites(){
   if(!total)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No favorites yet. Star or pin items to see them here.</div>';
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Favorites (${total} items)</span><button onclick="document.getElementById('favorites-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
+}
+function showTasksByDueGroup(){
+  let panel=document.getElementById('due-group-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='due-group-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);const tmrStr=tomorrow.toISOString().split('T')[0];
+  const weekEnd=new Date();weekEnd.setDate(weekEnd.getDate()+7);const weekStr=weekEnd.toISOString().split('T')[0];
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const overdue=active.filter(t=>t.due&&t.due<today);
+  const todayTasks=active.filter(t=>t.due===today);
+  const tomorrowTasks=active.filter(t=>t.due===tmrStr);
+  const thisWeek=active.filter(t=>t.due&&t.due>tmrStr&&t.due<=weekStr);
+  const later=active.filter(t=>t.due&&t.due>weekStr);
+  const noDate=active.filter(t=>!t.due);
+  function renderGroup(tasks,label,color){
+    if(!tasks.length)return'';
+    let h=`<div style="font-size:10px;font-weight:600;color:${color};margin-bottom:4px;padding-top:8px">${label} (${tasks.length})</div>`;
+    tasks.forEach(t=>{
+      const priColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':'var(--text-muted)';
+      h+=`<div onclick="document.getElementById('due-group-panel').remove();openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:6px;padding:3px 8px;cursor:pointer;border-left:2px solid ${color};margin:2px 0;font-size:10px" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><span style="flex:1;color:var(--text-primary)">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:${priColor}">${(t.priority||'p2').toUpperCase()}</span>${t.due?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${t.due.substring(5)}</span>`:''}</div>`;
+    });
+    return h;
+  }
+  let h=renderGroup(overdue,'Overdue','#ef4444');
+  h+=renderGroup(todayTasks,'Today','var(--accent)');
+  h+=renderGroup(tomorrowTasks,'Tomorrow','#3b82f6');
+  h+=renderGroup(thisWeek,'This Week','#8b5cf6');
+  h+=renderGroup(later,'Later','#6b7280');
+  h+=renderGroup(noDate,'No Due Date','var(--text-muted)');
+  if(!active.length)h='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No active tasks</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Tasks by Due Date (${active.length})</span><button onclick="document.getElementById('due-group-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function quickConvertContentToTask(contentId){
+  const c=S.content.find(x=>x.id===contentId);if(!c)return;
+  const id=Date.now();
+  S.tasks.unshift({id,title:(c.body||'').substring(0,80),description:c.body||'',status:'todo',priority:'p2',createdAt:new Date().toISOString(),project:c.theme||''});
+  save();renderTasks();toast('Content converted to task');
+}
+function quickConvertTaskToContent(taskId){
+  const t=S.tasks.find(x=>x.id===taskId);if(!t)return;
+  const id=Date.now();
+  S.content.unshift({id,body:(t.title||'')+(t.description?'\n\n'+t.description:''),type:'thought',theme:t.project||'',tags:['from-task'],createdAt:new Date().toISOString()});
+  save();renderContent();toast('Task converted to content');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
