@@ -5872,6 +5872,12 @@ function cmdGetItems(q) {
       ['focus config','Configure focus mode: duration, breaks, blocked sections'],
       ['action items','Extract TODO/ACTION items from content as tasks'],
       ['weekly planner','Week-at-a-glance task planner'],
+      ['switch project','Quick switch between projects'],
+      ['task chains','View task dependency chains'],
+      ['themes','Content theme breakdown with bar chart'],
+      ['multi project','Dashboard across all projects'],
+      ['export themes','Export content grouped by theme to clipboard'],
+      ['global search','Dedicated search panel across all sections'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7458,6 +7464,30 @@ function cmdGetItems(q) {
   // Weekly planner prefix
   if(ql && (ql==='weekly planner' || ql==='week planner' || ql==='plan week' || ql==='week view planner')){
     items.unshift({title:'Weekly Planner',desc:'Week-at-a-glance with tasks in day slots',icon:'W',type:'action',action:()=>{closeCommandPalette();showWeeklyPlanner();}});
+  }
+  // Project switcher prefix
+  if(ql && (ql==='switch project' || ql==='project switcher' || ql==='projects' || ql==='switch')){
+    items.unshift({title:'Project Switcher',desc:'Quick switch between projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showProjectSwitcher();}});
+  }
+  // Task chains prefix
+  if(ql && (ql==='task chains' || ql==='dependency chains' || ql==='chains' || ql==='blocked chains')){
+    items.unshift({title:'Task Dependency Chains',desc:'Visualize blocked-by task chains',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskChainsView();}});
+  }
+  // Theme breakdown prefix
+  if(ql && (ql==='themes' || ql==='theme breakdown' || ql==='content themes' || ql==='theme chart')){
+    items.unshift({title:'Content Theme Breakdown',desc:'Bar chart of content themes with counts',icon:'T',type:'action',action:()=>{closeCommandPalette();showThemeBreakdown();}});
+  }
+  // Multi-project dashboard prefix
+  if(ql && (ql==='multi project' || ql==='all projects' || ql==='project dashboard' || ql==='multi')){
+    items.unshift({title:'Multi-Project Dashboard',desc:'Summary stats across all projects',icon:'M',type:'action',action:()=>{closeCommandPalette();showMultiProjectDashboard();}});
+  }
+  // Export themes prefix
+  if(ql && (ql==='export themes' || ql==='export by theme' || ql==='theme export' || ql==='content export themes')){
+    items.unshift({title:'Export Content by Theme',desc:'Copy all content grouped by theme as markdown',icon:'E',type:'action',action:()=>{closeCommandPalette();exportContentByTheme();}});
+  }
+  // Global search prefix
+  if(ql && (ql==='global search' || ql==='search all' || ql==='deep search' || ql==='find everything')){
+    items.unshift({title:'Global Search',desc:'Dedicated search panel across all data',icon:'S',type:'action',action:()=>{closeCommandPalette();showGlobalSearch();}});
   }
   return items.slice(0, 20);
 }
@@ -10743,6 +10773,193 @@ function showWeeklyPlanner(){
     h+=`</div></div>`;
   }
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectSwitcher(){
+  const projects=S.projects||[];
+  const panel=document.createElement('div');panel.id='project-switcher-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=S.tasks||[];
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Switch Project</span><button onclick="document.getElementById('project-switcher-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;gap:6px">`;
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const active=pTasks.filter(t=>t.status!=='done').length;
+    const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
+    const color=colors[projects.indexOf(p)%colors.length];
+    h+=`<div onclick="document.getElementById('project-switcher-panel').remove();switchSection('tasks');setTimeout(()=>{const sel=document.querySelector('.task-project-filter');if(sel){sel.value='${esc(p.name)}';sel.dispatchEvent(new Event('change'));}},100)" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-surface);border-radius:8px;cursor:pointer;border:1px solid transparent;border-left:3px solid ${color};transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent';this.style.borderLeftColor='${color}'">`;
+    h+=`<div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--text-primary)">${esc(p.name)}</div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted)">${active} active | ${done} done</div></div>`;
+    h+=`<span style="font-size:10px;color:${color};font-weight:600">${pTasks.length}</span>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskChainsView(){
+  const tasks=S.tasks||[];
+  const blockedTasks=tasks.filter(t=>t.blockedBy&&t.blockedBy.length);
+  const chains=[];
+  blockedTasks.forEach(t=>{
+    const chain=[t];
+    let current=t;
+    while(current.blockedBy&&current.blockedBy.length){
+      const blocker=tasks.find(x=>x.id===current.blockedBy[0]);
+      if(!blocker||chain.includes(blocker))break;
+      chain.unshift(blocker);current=blocker;
+    }
+    if(chain.length>1)chains.push(chain);
+  });
+  const panel=document.createElement('div');panel.id='task-chains-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Task Dependency Chains (${chains.length})</span><button onclick="document.getElementById('task-chains-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent)">${blockedTasks.length}</div><div style="font-size:9px;color:var(--text-muted)">Blocked Tasks</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#f59e0b">${chains.length}</div><div style="font-size:9px;color:var(--text-muted)">Chains</div></div>`;
+  h+=`</div>`;
+  if(!chains.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No dependency chains found. Use the "B" (blocked-by) field in task details to create dependencies.</div>`;
+  } else {
+    chains.forEach((chain,ci)=>{
+      h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;margin-bottom:8px"><div style="font-size:10px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Chain ${ci+1} (${chain.length} tasks)</div>`;
+      h+=`<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px">`;
+      chain.forEach((t,ti)=>{
+        const sColor=t.status==='done'?'#4ade80':t.status==='in-progress'?'#3b82f6':'#f59e0b';
+        h+=`<span style="font-size:10px;padding:3px 8px;background:var(--bg-base);border:1px solid ${sColor};border-radius:4px;color:${sColor}">${esc(t.title.substring(0,25))}</span>`;
+        if(ti<chain.length-1)h+=`<span style="color:var(--text-muted);font-size:12px">&rarr;</span>`;
+      });
+      h+=`</div></div>`;
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showThemeBreakdown(){
+  const content=S.content||[];
+  const themeMap={};
+  content.forEach(c=>{const t=c.theme||'untagged';themeMap[t]=(themeMap[t]||0)+1;});
+  const sorted=Object.entries(themeMap).sort((a,b)=>b[1]-a[1]);
+  const total=content.length||1;
+  const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316','#a855f7','#22d3ee','#84cc16','#e879f9'];
+  const panel=document.createElement('div');panel.id='theme-breakdown-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Themes (${sorted.length})</span><button onclick="document.getElementById('theme-breakdown-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:flex;gap:4px;height:24px;border-radius:6px;overflow:hidden;margin-bottom:16px">`;
+  sorted.forEach(([theme,count],i)=>{
+    const pct=Math.max(2,(count/total)*100);
+    h+=`<div title="${theme}: ${count}" style="width:${pct}%;background:${colors[i%colors.length]};min-width:4px"></div>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:grid;gap:6px">`;
+  sorted.forEach(([theme,count],i)=>{
+    const pct=Math.round((count/total)*100);
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg-surface);border-radius:6px">`;
+    h+=`<div style="width:12px;height:12px;border-radius:3px;background:${colors[i%colors.length]};flex-shrink:0"></div>`;
+    h+=`<div style="flex:1"><div style="font-size:11px;color:var(--text-primary)">${esc(theme)}</div></div>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${count} (${pct}%)</span>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showMultiProjectDashboard(){
+  const projects=S.projects||[];const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];
+  const panel=document.createElement('div');panel.id='multi-project-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:95vw;max-height:85vh;overflow-y:auto';
+  const totalTasks=tasks.length;const totalDone=tasks.filter(t=>t.status==='done').length;
+  const totalOverdue=tasks.filter(t=>t.due&&new Date(t.due)<new Date()&&t.status!=='done').length;
+  const totalContent=content.length;const totalLinks=links.length;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Multi-Project Dashboard</span><button onclick="document.getElementById('multi-project-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--accent)">${totalTasks}</div><div style="font-size:8px;color:var(--text-muted)">Tasks</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">${totalDone}</div><div style="font-size:8px;color:var(--text-muted)">Done</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#ef4444">${totalOverdue}</div><div style="font-size:8px;color:var(--text-muted)">Overdue</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#3b82f6">${totalContent}</div><div style="font-size:8px;color:var(--text-muted)">Content</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#f59e0b">${totalLinks}</div><div style="font-size:8px;color:var(--text-muted)">Links</div></div>`;
+  h+=`</div>`;
+  const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899'];
+  h+=`<div style="display:grid;gap:8px">`;
+  projects.forEach((p,pi)=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const overdue=pTasks.filter(t=>t.due&&new Date(t.due)<new Date()&&t.status!=='done').length;
+    const pct=pTasks.length?Math.round((done/pTasks.length)*100):0;
+    const color=colors[pi%colors.length];
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;border-left:3px solid ${color}">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">`;
+    h+=`<span style="font-size:12px;font-weight:600;color:${color}">${esc(p.name)}</span>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${done}/${pTasks.length} (${pct}%)</span></div>`;
+    h+=`<div style="height:5px;background:var(--bg-base);border-radius:3px"><div style="height:100%;width:${pct}%;background:${color};border-radius:3px"></div></div>`;
+    if(overdue)h+=`<div style="font-size:9px;color:#ef4444;margin-top:4px">${overdue} overdue</div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function exportContentByTheme(){
+  const content=S.content||[];
+  const themeMap={};
+  content.forEach(c=>{const t=c.theme||'untagged';if(!themeMap[t])themeMap[t]=[];themeMap[t].push(c);});
+  let md='# Content Export by Theme\n\n';
+  md+='Generated: '+new Date().toLocaleString()+'\n\n';
+  Object.entries(themeMap).sort((a,b)=>b[1].length-a[1].length).forEach(([theme,items])=>{
+    md+=`## ${theme} (${items.length} items)\n\n`;
+    items.forEach(c=>{
+      const date=c.created?new Date(c.created).toLocaleDateString():'';
+      const body=(c.body||'').substring(0,200);
+      md+=`### ${date}\n${body}\n\n---\n\n`;
+    });
+  });
+  navigator.clipboard.writeText(md);showToast('Content by theme copied to clipboard ('+content.length+' items)');
+}
+function showGlobalSearch(initialQuery){
+  const panel=document.createElement('div');panel.id='global-search-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Global Search</span><button onclick="document.getElementById('global-search-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<input id="global-search-input" type="text" value="${initialQuery||''}" placeholder="Search everything..." style="width:100%;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;margin-bottom:12px;box-sizing:border-box" oninput="runGlobalSearch(this.value)">`;
+  h+=`<div id="global-search-results" style="display:grid;gap:4px"></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+  document.getElementById('global-search-input').focus();
+  if(initialQuery)runGlobalSearch(initialQuery);
+}
+function runGlobalSearch(query){
+  const q=query.toLowerCase().trim();const results=document.getElementById('global-search-results');
+  if(!results)return;
+  if(!q){results.innerHTML='<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:16px">Type to search across all sections</div>';return;}
+  const found=[];
+  (S.tasks||[]).forEach(t=>{
+    if((t.title||'').toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q)){
+      found.push({type:'Task',title:t.title,detail:t.status+' | '+(t.priority||''),color:'#4ade80'});
+    }
+  });
+  (S.content||[]).forEach(c=>{
+    if((c.body||'').toLowerCase().includes(q)){
+      found.push({type:'Content',title:(c.body||'').substring(0,60),detail:c.theme||'',color:'#3b82f6'});
+    }
+  });
+  (S.links||[]).forEach(l=>{
+    if((l.title||'').toLowerCase().includes(q)||(l.url||'').toLowerCase().includes(q)){
+      found.push({type:'Link',title:l.title||l.url,detail:l.category||'',color:'#f59e0b'});
+    }
+  });
+  (S.writerDocs||[]).forEach(d=>{
+    if((d.title||'').toLowerCase().includes(q)||(d.body||'').toLowerCase().includes(q)){
+      found.push({type:'Doc',title:d.title||'Untitled',detail:(d.body||'').split(/\s+/).length+' words',color:'#8b5cf6'});
+    }
+  });
+  let html='';
+  if(!found.length){
+    html='<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:16px">No results for "'+esc(query)+'"</div>';
+  } else {
+    html=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">${found.length} results</div>`;
+    found.slice(0,20).forEach(r=>{
+      html+=`<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:4px;border-left:2px solid ${r.color}">`;
+      html+=`<span style="font-size:8px;font-weight:600;color:${r.color};width:40px;flex-shrink:0">${r.type}</span>`;
+      html+=`<div style="flex:1;min-width:0"><div style="font-size:10px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.title)}</div>`;
+      html+=`<div style="font-size:8px;color:var(--text-muted)">${esc(r.detail)}</div></div>`;
+      html+=`</div>`;
+    });
+  }
+  results.innerHTML=html;
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
