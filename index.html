@@ -6401,6 +6401,12 @@ function cmdGetItems(q) {
       ['packer','Packer image builder CLI reference'],
       ['overdue history','Overdue and late-completed task history'],
       ['stopwatch','Stopwatch with lap times'],
+      ['redis','Redis CLI command reference'],
+      ['label cloud','Task label word cloud visualization'],
+      ['dice','Dice roller for random decisions'],
+      ['postgres','PostgreSQL psql command reference'],
+      ['priority matrix','Eisenhower urgent/important matrix'],
+      ['coin flip','Flip a coin for quick decisions'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9773,6 +9779,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='stopwatch' || ql==='stop watch' || ql==='lap timer' || ql==='sw')){
     items.unshift({title:'Stopwatch',desc:'Stopwatch with lap times',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
+  }
+  if(ql && (ql==='redis' || ql==='redis cli' || ql==='redis ref' || ql==='redis commands')){
+    items.unshift({title:'Redis CLI Reference',desc:'Redis commands cheatsheet',icon:'R',type:'action',action:()=>{closeCommandPalette();showRedisCliRef();}});
+  }
+  if(ql && (ql==='label cloud' || ql==='tag cloud' || ql==='word cloud' || ql==='task labels')){
+    items.unshift({title:'Task Label Cloud',desc:'Visual word cloud of task labels',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskLabelCloud();}});
+  }
+  if(ql && (ql==='dice' || ql==='dice roller' || ql==='roll dice' || ql==='d20')){
+    items.unshift({title:'Dice Roller',desc:'Roll dice for random decisions',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDiceRoller();}});
+  }
+  if(ql && (ql==='postgres' || ql==='psql' || ql==='postgresql' || ql==='pg')){
+    items.unshift({title:'PostgreSQL Reference',desc:'psql commands cheatsheet',icon:'P',type:'action',action:()=>{closeCommandPalette();showPostgresRef();}});
+  }
+  if(ql && (ql==='priority matrix' || ql==='eisenhower' || ql==='urgent important' || ql==='matrix')){
+    items.unshift({title:'Priority Matrix',desc:'Eisenhower urgent/important matrix',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskPriorityMatrix();}});
+  }
+  if(ql && (ql==='coin flip' || ql==='coin' || ql==='flip coin' || ql==='heads tails')){
+    items.unshift({title:'Coin Flip',desc:'Flip a coin for quick decisions',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCoinFlipper();}});
   }
   return items.slice(0, 20);
 }
@@ -29772,6 +29796,128 @@ function showQuickStopwatch(){
     const disp=document.getElementById('_sw-display');if(disp)disp.textContent='00:00:00';
     const laps=document.getElementById('_sw-laps');if(laps)laps.innerHTML='';
     const btn=document.getElementById('_sw-start');if(btn){btn.textContent='Start';btn.style.background='#4ade80';}
+  };
+}
+function showRedisCliRef(){
+  const cmds={
+    'Strings':['SET key value|Set a string value','GET key|Get value by key','MSET k1 v1 k2 v2|Set multiple keys','MGET k1 k2|Get multiple values','INCR key|Increment integer by 1','INCRBY key 5|Increment by amount','DECR key|Decrement by 1','APPEND key value|Append to string','STRLEN key|Get string length'],
+    'Keys':['KEYS pattern|Find keys matching pattern','EXISTS key|Check if key exists','DEL key|Delete a key','TYPE key|Get value type','TTL key|Get time to live (sec)','EXPIRE key 300|Set expiry in seconds','PERSIST key|Remove expiry','RENAME old new|Rename a key','SCAN 0 MATCH user:*|Iterate keys safely'],
+    'Hashes':['HSET user name "Gabo"|Set hash field','HGET user name|Get hash field','HMSET user name "Gabo" age 30|Set multiple fields','HGETALL user|Get all fields and values','HDEL user age|Delete hash field','HKEYS user|Get all field names','HLEN user|Count fields'],
+    'Lists':['LPUSH list val|Push to left','RPUSH list val|Push to right','LPOP list|Pop from left','RPOP list|Pop from right','LRANGE list 0 -1|Get all elements','LLEN list|Get list length','LINDEX list 0|Get by index'],
+    'Sets':['SADD set member|Add to set','SMEMBERS set|Get all members','SCARD set|Count members','SISMEMBER set val|Check membership','SREM set member|Remove member','SUNION set1 set2|Union of sets'],
+    'Server':['INFO|Server information','PING|Test connection','DBSIZE|Count all keys','FLUSHDB|Delete all keys in DB','CONFIG GET maxmemory|Get config value','MONITOR|Real-time command log']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Redis CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskLabelCloud(){
+  const tasks=(S.tasks||[]);const tagMap={};
+  tasks.forEach(t=>{
+    if(t.project){tagMap[t.project]=(tagMap[t.project]||0)+1;}
+    if(t.priority){tagMap['P'+t.priority]=(tagMap['P'+t.priority]||0)+1;}
+    if(t.status){tagMap[t.status]=(tagMap[t.status]||0)+1;}
+  });
+  const tags=Object.entries(tagMap).sort((a,b)=>b[1]-a[1]);
+  const maxCount=tags.length>0?tags[0][1]:1;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Task Label Cloud</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px">';
+  const colors=['#4ade80','#60a5fa','#f59e0b','#a78bfa','#fb923c','#22d3ee','#f472b6','#34d399'];
+  tags.forEach(([tag,count],i)=>{
+    const size=12+Math.round((count/maxCount)*16);
+    const color=colors[i%colors.length];
+    const opacity=(0.5+(count/maxCount)*0.5).toFixed(2);
+    html+='<span style="font-size:'+size+'px;color:'+color+';opacity:'+opacity+';padding:4px 8px;cursor:default" title="'+count+' tasks">'+esc(tag)+' <sup style="font-size:9px;color:var(--text-muted)">'+count+'</sup></span>';
+  });
+  if(tags.length===0)html+='<div style="color:var(--text-muted);font-size:13px">No task labels yet</div>';
+  html+='</div></div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickDiceRoller(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">Dice Roller</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_dice-result" style="text-align:center;font-size:42px;color:#4ade80;font-weight:700;margin-bottom:12px;min-height:50px">-</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px">';
+  [4,6,8,10,12,20].forEach(sides=>{
+    html+='<button onclick="window._rollDice(1,'+sides+')" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">d'+sides+'</button>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px"><input id="_dice-count" type="number" min="1" max="20" value="2" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center">';
+  html+='<button onclick="window._rollDice(parseInt(document.getElementById(\'_dice-count\').value)||1,6)" style="flex:1;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Roll Multiple d6</button></div>';
+  html+='<div id="_dice-history" style="max-height:80px;overflow-y:auto;font-size:10px;color:var(--text-muted)"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._rollDice=function(count,sides){
+    const results=[];for(let i=0;i<Math.min(count,20);i++)results.push(Math.floor(Math.random()*sides)+1);
+    const total=results.reduce((a,b)=>a+b,0);
+    const disp=document.getElementById('_dice-result');
+    if(disp){disp.textContent=total;disp.style.transform='scale(1.2)';setTimeout(()=>disp.style.transform='scale(1)',200);}
+    const hist=document.getElementById('_dice-history');
+    if(hist){hist.innerHTML='<div style="padding:2px 0">'+count+'d'+sides+': ['+results.join(', ')+'] = '+total+'</div>'+hist.innerHTML;if(hist.children.length>20)hist.lastChild.remove();}
+  };
+}
+function showPostgresRef(){
+  const cmds={
+    'Connection':['psql -U user -d dbname|Connect to database','psql -h host -p 5432 -U user dbname|Connect to remote','\\l|List all databases','\\c dbname|Switch database','\\q|Quit psql','\\conninfo|Show connection info'],
+    'Tables & Schema':['\\dt|List tables','\\d tablename|Describe table structure','\\di|List indexes','\\dv|List views','\\df|List functions','\\dn|List schemas','\\du|List roles/users'],
+    'Queries':['SELECT * FROM table LIMIT 10;|Basic select','INSERT INTO t (col) VALUES (val);|Insert row','UPDATE t SET col=val WHERE id=1;|Update row','DELETE FROM t WHERE id=1;|Delete row','EXPLAIN ANALYZE SELECT ...;|Query plan with timing','COPY t TO stdout CSV HEADER;|Export as CSV'],
+    'Database Admin':['CREATE DATABASE mydb;|Create database','DROP DATABASE mydb;|Delete database','CREATE TABLE t (id SERIAL PRIMARY KEY);|Create table','ALTER TABLE t ADD COLUMN name TEXT;|Add column','DROP TABLE t;|Delete table','VACUUM ANALYZE;|Optimize tables'],
+    'Backup & Restore':['pg_dump dbname > backup.sql|Dump database','pg_dump -Fc dbname > backup.dump|Custom format dump','pg_restore -d dbname backup.dump|Restore from dump','pg_dumpall > all.sql|Dump all databases'],
+    'Useful':['\\timing|Toggle query timing','\\x|Toggle expanded display','\\i file.sql|Execute SQL file','\\copy t FROM file.csv CSV HEADER;|Import CSV','SELECT pg_size_pretty(pg_database_size(current_database()));|DB size']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">PostgreSQL Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskPriorityMatrix(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const urgent=tasks.filter(t=>{const d=t.due?new Date(t.due):null;return d&&(d-new Date())<3*86400000;});
+  const important=tasks.filter(t=>t.priority==='p0'||t.priority==='p1');
+  const q1=tasks.filter(t=>{const d=t.due?new Date(t.due):null;const isUrg=d&&(d-new Date())<3*86400000;const isImp=t.priority==='p0'||t.priority==='p1';return isUrg&&isImp;});
+  const q2=tasks.filter(t=>{const d=t.due?new Date(t.due):null;const isUrg=d&&(d-new Date())<3*86400000;const isImp=t.priority==='p0'||t.priority==='p1';return !isUrg&&isImp;});
+  const q3=tasks.filter(t=>{const d=t.due?new Date(t.due):null;const isUrg=d&&(d-new Date())<3*86400000;const isImp=t.priority==='p0'||t.priority==='p1';return isUrg&&!isImp;});
+  const q4=tasks.filter(t=>{const d=t.due?new Date(t.due):null;const isUrg=d&&(d-new Date())<3*86400000;const isImp=t.priority==='p0'||t.priority==='p1';return !isUrg&&!isImp;});
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Eisenhower Priority Matrix</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  const quadrants=[{title:'DO FIRST',color:'#ef4444',tasks:q1},{title:'SCHEDULE',color:'#60a5fa',tasks:q2},{title:'DELEGATE',color:'#f59e0b',tasks:q3},{title:'ELIMINATE',color:'#6b7280',tasks:q4}];
+  quadrants.forEach(q=>{
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;border-top:3px solid '+q.color+'">';
+    html+='<div style="font-size:11px;color:'+q.color+';font-weight:700;margin-bottom:8px">'+q.title+' ('+q.tasks.length+')</div>';
+    q.tasks.slice(0,5).forEach(t=>{html+='<div style="font-size:11px;color:var(--text-secondary);padding:3px 0;border-bottom:1px solid var(--border)">'+esc(t.title)+'</div>';});
+    if(q.tasks.length>5)html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px">+'+(q.tasks.length-5)+' more</div>';
+    if(q.tasks.length===0)html+='<div style="font-size:11px;color:var(--text-muted);font-style:italic">None</div>';
+    html+='</div>';
+  });
+  html+='</div></div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickCoinFlipper(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:220px;text-align:center">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">Coin Flip</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_coin-result" style="font-size:48px;margin-bottom:8px">?</div>';
+  html+='<div id="_coin-text" style="font-size:20px;color:#4ade80;font-weight:700;margin-bottom:12px">Flip it!</div>';
+  html+='<button onclick="window._flipCoin()" style="background:#4ade80;color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-weight:700;font-size:14px;width:100%">FLIP</button>';
+  html+='<div style="margin-top:10px;display:flex;justify-content:center;gap:16px"><div><span style="font-size:10px;color:var(--text-muted)">Heads</span><div id="_coin-heads" style="font-size:16px;color:#4ade80;font-weight:700">0</div></div>';
+  html+='<div><span style="font-size:10px;color:var(--text-muted)">Tails</span><div id="_coin-tails" style="font-size:16px;color:#60a5fa;font-weight:700">0</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._coinHeads=0;window._coinTails=0;
+  window._flipCoin=function(){
+    const result=Math.random()<0.5?'heads':'tails';
+    const el=document.getElementById('_coin-result');const txt=document.getElementById('_coin-text');
+    if(el){el.style.transition='transform 0.5s';el.style.transform='rotateY(720deg)';
+      setTimeout(()=>{el.textContent=result==='heads'?'H':'T';el.style.transform='rotateY(0)';},250);}
+    if(txt){txt.textContent=result.toUpperCase();txt.style.color=result==='heads'?'#4ade80':'#60a5fa';}
+    if(result==='heads'){window._coinHeads++;const h=document.getElementById('_coin-heads');if(h)h.textContent=window._coinHeads;}
+    else{window._coinTails++;const t=document.getElementById('_coin-tails');if(t)t.textContent=window._coinTails;}
   };
 }
 function showProjectRoadmap(filterProject){
