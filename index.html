@@ -5883,6 +5883,8 @@ function cmdGetItems(q) {
       ['board filters','Filter kanban by priority, project, due date'],
       ['scratchpad','Quick persistent notepad'],
       ['print export','Downloadable printable HTML export'],
+      ['slides','Convert content to presentation slides'],
+      ['workload','14-day task workload forecast'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7513,6 +7515,14 @@ function cmdGetItems(q) {
   // Printable export prefix
   if(ql && (ql==='print export' || ql==='print' || ql==='printable' || ql==='html export')){
     items.unshift({title:'Printable Export',desc:'Download formatted HTML with tasks and content',icon:'P',type:'action',action:()=>{closeCommandPalette();printableExport();}});
+  }
+  // Slides export prefix
+  if(ql && (ql==='slides' || ql==='presentation' || ql==='content slides' || ql==='slideshow')){
+    items.unshift({title:'Content to Slides',desc:'Export content as dark-themed HTML slides',icon:'S',type:'action',action:()=>{closeCommandPalette();contentToSlides();}});
+  }
+  // Workload prefix
+  if(ql && (ql==='workload' || ql==='task workload' || ql==='workload forecast' || ql==='load')){
+    items.unshift({title:'Workload Forecast',desc:'14-day task workload with overload warnings',icon:'W',type:'action',action:()=>{closeCommandPalette();showWorkloadIndicator();}});
   }
   return items.slice(0, 20);
 }
@@ -11128,6 +11138,96 @@ function printableExport(){
   a.href=url;a.download='astra-export-'+new Date().toISOString().split('T')[0]+'.html';
   a.click();URL.revokeObjectURL(url);
   showToast('Printable HTML exported');
+}
+function contentToSlides(){
+  const content=S.content||[];
+  if(!content.length){showToast('No content to convert');return;}
+  let html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>ASTRA Slides</title>';
+  html+='<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0a0a;color:#e5e5e5;font-family:system-ui}';
+  html+='.slide{width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:60px;text-align:center;page-break-after:always}';
+  html+='.slide h2{font-size:36px;margin-bottom:20px;color:#4ade80}.slide p{font-size:18px;line-height:1.8;max-width:700px;color:#a3a3a3}';
+  html+='.slide-num{position:fixed;bottom:20px;right:20px;font-size:12px;color:#555}';
+  html+='.title-slide{background:linear-gradient(135deg,#050508,#0a1628)}.title-slide h1{font-size:48px;color:#4ade80;margin-bottom:16px}.title-slide p{font-size:20px}';
+  html+='@media print{.slide{page-break-after:always}}</style></head><body>';
+  html+=`<div class="slide title-slide"><h1>ASTRA Content</h1><p>${new Date().toLocaleDateString()} | ${content.length} items</p></div>`;
+  content.slice(0,20).forEach((c,i)=>{
+    const body=(c.body||'').substring(0,500);
+    const theme=c.theme||'';
+    html+=`<div class="slide"><h2>${esc(theme||'Note '+(i+1))}</h2><p>${esc(body)}</p></div>`;
+  });
+  html+='</body></html>';
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='astra-slides-'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();URL.revokeObjectURL(url);
+  showToast('Slides exported ('+Math.min(content.length,20)+' slides)');
+}
+function showWorkloadIndicator(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();const today=now.toISOString().split('T')[0];
+  const days=[];
+  for(let i=0;i<14;i++){
+    const d=new Date(now);d.setDate(d.getDate()+i);
+    const dateStr=d.toISOString().split('T')[0];
+    const dayTasks=tasks.filter(t=>t.due===dateStr);
+    days.push({date:d,dateStr,name:d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}),count:dayTasks.length,isToday:dateStr===today});
+  }
+  const maxLoad=Math.max(...days.map(d=>d.count),1);
+  const panel=document.createElement('div');panel.id='workload-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Workload Forecast (14 days)</span><button onclick="document.getElementById('workload-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:flex;align-items:end;gap:6px;height:120px;padding:4px;background:var(--bg-surface);border-radius:8px;margin-bottom:12px">`;
+  days.forEach(day=>{
+    const height=day.count?Math.max(20,Math.round((day.count/maxLoad)*100)):4;
+    const color=day.count>=4?'#ef4444':day.count>=2?'#f59e0b':day.count>=1?'#4ade80':'rgba(255,255,255,0.05)';
+    h+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end" title="${day.name}: ${day.count} tasks">`;
+    h+=`<div style="font-size:8px;color:var(--text-muted);margin-bottom:2px">${day.count||''}</div>`;
+    h+=`<div style="width:100%;height:${height}px;background:${color};border-radius:3px 3px 0 0;border:${day.isToday?'2px solid var(--accent)':'none'}"></div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center">`;
+  days.forEach(day=>{
+    h+=`<span style="font-size:7px;color:${day.isToday?'var(--accent)':'var(--text-muted)'};width:${100/14}%;text-align:center">${day.name.split(',')[0].split(' ')[0]}</span>`;
+  });
+  h+=`</div>`;
+  const overloaded=days.filter(d=>d.count>=4);
+  if(overloaded.length){
+    h+=`<div style="margin-top:12px;padding:8px;background:rgba(239,68,68,0.1);border:1px solid #ef4444;border-radius:6px;font-size:10px;color:#ef4444">Warning: ${overloaded.length} day(s) with 4+ tasks. Consider redistributing.</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showMiniDatePicker(taskId){
+  const task=(S.tasks||[]).find(t=>t.id===taskId);
+  if(!task)return;
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
+  const panel=document.createElement('div');panel.id='mini-datepicker';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1600;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:12px;font-weight:600;color:var(--text-primary)">${monthName}</span><button onclick="document.getElementById('mini-datepicker').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">&times;</button></div>`;
+  h+=`<div style="font-size:10px;color:var(--text-primary);margin-bottom:4px">Set due date for: ${esc(task.title.substring(0,30))}</div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:8px">`;
+  ['Su','Mo','Tu','We','Th','Fr','Sa'].forEach(d=>{h+=`<div style="text-align:center;font-size:9px;color:var(--text-muted);padding:2px">${d}</div>`;});
+  for(let i=0;i<firstDay;i++)h+=`<div></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=d===now.getDate();
+    const isSelected=task.due===dateStr;
+    h+=`<button onclick="setTaskDueDate('${taskId}','${dateStr}')" style="padding:6px;text-align:center;font-size:10px;border-radius:4px;border:${isSelected?'1px solid var(--accent)':isToday?'1px solid var(--text-muted)':'1px solid transparent'};background:${isSelected?'var(--accent)':'var(--bg-surface)'};color:${isSelected?'#000':'var(--text-primary)'};cursor:pointer">${d}</button>`;
+  }
+  h+=`</div>`;
+  h+=`<div style="display:flex;gap:6px;margin-top:10px">`;
+  h+=`<button onclick="setTaskDueDate('${taskId}','')" style="flex:1;padding:6px;font-size:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-muted);cursor:pointer">Clear</button>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function setTaskDueDate(taskId,dateStr){
+  const task=(S.tasks||[]).find(t=>t.id===taskId);if(!task)return;
+  task.due=dateStr;save();
+  document.getElementById('mini-datepicker').remove();
+  showToast(dateStr?'Due date set: '+dateStr:'Due date cleared');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
