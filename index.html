@@ -6182,6 +6182,9 @@ function cmdGetItems(q) {
       ['html entities','HTML entity reference with click-to-copy'],
       ['weekly digest','Weekly task completion digest'],
       ['color blend','Color blend/interpolation tool'],
+      ['world clock','World clock with timezone comparison'],
+      ['tag cloud','Tag cloud from tasks and content'],
+      ['ruler','Screen ruler with pixel coordinates'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8897,6 +8900,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='color blend' || ql==='blend' || ql==='color mix' || ql==='interpolate')){
     items.unshift({title:'Color Blend',desc:'Color interpolation tool',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorBlend();}});
+  }
+  if(ql && (ql==='world clock' || ql==='timezone' || ql==='time zone' || ql==='clock')){
+    items.unshift({title:'World Clock',desc:'Timezone comparison',icon:'W',type:'action',action:()=>{closeCommandPalette();showTimezoneConverter();}});
+  }
+  if(ql && (ql==='tag cloud' || ql==='tags' || ql==='cloud' || ql==='word cloud tags')){
+    items.unshift({title:'Tag Cloud',desc:'Visual tag frequency cloud',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTagCloud();}});
+  }
+  if(ql && (ql==='ruler' || ql==='screen ruler' || ql==='pixel ruler' || ql==='measure')){
+    items.unshift({title:'Screen Ruler',desc:'Pixel ruler overlay',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickScreenRuler();}});
   }
   return items.slice(0, 20);
 }
@@ -22569,6 +22581,97 @@ function showQuickColorBlend(){
   d.querySelector('#blend-c1').oninput=function(e){c1=e.target.value;render();};
   d.querySelector('#blend-c2').oninput=function(e){c2=e.target.value;render();};
   d.querySelector('#blend-steps').oninput=function(e){steps=Math.max(1,parseInt(e.target.value)||1);render();};
+}
+function showTimezoneConverter(){
+  var ex=document.getElementById('tz-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='tz-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  var zones=[
+    {name:'Local',tz:Intl.DateTimeFormat().resolvedOptions().timeZone},
+    {name:'UTC',tz:'UTC'},
+    {name:'New York',tz:'America/New_York'},
+    {name:'Los Angeles',tz:'America/Los_Angeles'},
+    {name:'London',tz:'Europe/London'},
+    {name:'Paris',tz:'Europe/Paris'},
+    {name:'Tokyo',tz:'Asia/Tokyo'},
+    {name:'Sydney',tz:'Australia/Sydney'},
+    {name:'Dubai',tz:'Asia/Dubai'},
+    {name:'Singapore',tz:'Asia/Singapore'}
+  ];
+  function render(){
+    var now=new Date();
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">World Clock</span><button onclick="document.getElementById(\'tz-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+    zones.forEach(function(z){
+      var time=now.toLocaleString('en-US',{timeZone:z.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+      var date=now.toLocaleString('en-US',{timeZone:z.tz,weekday:'short',month:'short',day:'numeric'});
+      var hour=parseInt(now.toLocaleString('en-US',{timeZone:z.tz,hour:'numeric',hour12:false}));
+      var isDark=hour<6||hour>=20;
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid '+(isDark?'#64748b':'#f59e0b')+'">'+
+        '<div><div style="color:var(--text-primary);font-size:12px;font-weight:600">'+z.name+'</div><div style="color:var(--text-muted);font-size:9px">'+z.tz+'</div></div>'+
+        '<div style="text-align:right"><div style="color:'+(z.name==='Local'?'#4ade80':'var(--text-primary)')+';font-size:14px;font-weight:700;font-family:monospace">'+time+'</div><div style="color:var(--text-muted);font-size:9px">'+date+'</div></div></div>';
+    });
+    d.innerHTML=h;
+  }
+  document.body.appendChild(d);
+  render();
+  var interval=setInterval(render,1000);
+  var origRemove=d.remove.bind(d);
+  d.remove=function(){clearInterval(interval);origRemove();};
+}
+function showTaskTagCloud(){
+  var ex=document.getElementById('tag-cloud-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var content=(S.content||[]);
+  var tagCounts={};
+  tasks.forEach(function(t){
+    if(t.tags){t.tags.forEach(function(tag){tagCounts[tag]=(tagCounts[tag]||0)+1;});}
+    if(t.project){tagCounts[t.project]=(tagCounts[t.project]||0)+1;}
+  });
+  content.forEach(function(c){
+    if(c.tags){c.tags.forEach(function(tag){tagCounts[tag]=(tagCounts[tag]||0)+1;});}
+    if(c.theme)tagCounts[c.theme]=(tagCounts[c.theme]||0)+1;
+  });
+  var sorted=Object.entries(tagCounts).sort(function(a,b){return b[1]-a[1];}).slice(0,40);
+  var maxCount=sorted.length?sorted[0][1]:1;
+  var colors=['#4ade80','#06b6d4','#a78bfa','#f59e0b','#ef4444','#ec4899','#3b82f6'];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Tag Cloud</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">';
+  sorted.forEach(function(entry,i){
+    var size=10+Math.round(entry[1]/maxCount*14);
+    var color=colors[i%colors.length];
+    h+='<span style="font-size:'+size+'px;color:'+color+';cursor:default;padding:2px 6px" title="'+entry[1]+' items">'+esc(entry[0])+'</span>';
+  });
+  h+='</div>';
+  if(!sorted.length)h+='<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">Add tags to tasks and content to see cloud</div>';
+  var d=document.createElement('div');d.id='tag-cloud-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showQuickScreenRuler(){
+  var ex=document.getElementById('ruler-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='ruler-float';
+  d.style.cssText='position:fixed;top:0;left:0;z-index:1500;width:100vw;height:100vh;pointer-events:none';
+  var hLine=document.createElement('div');
+  hLine.style.cssText='position:absolute;top:50%;left:0;width:100%;height:1px;background:#4ade80;opacity:0.7;pointer-events:none';
+  var vLine=document.createElement('div');
+  vLine.style.cssText='position:absolute;top:0;left:50%;width:1px;height:100%;background:#4ade80;opacity:0.7;pointer-events:none';
+  var label=document.createElement('div');
+  label.style.cssText='position:absolute;background:rgba(0,0,0,0.8);color:#4ade80;font-size:11px;font-family:monospace;padding:4px 8px;border-radius:4px;pointer-events:none';
+  var closeBtn=document.createElement('button');
+  closeBtn.textContent='Close Ruler';
+  closeBtn.style.cssText='position:fixed;top:10px;right:10px;z-index:1501;background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;pointer-events:auto';
+  closeBtn.onclick=function(){d.remove();document.removeEventListener('mousemove',onMove);};
+  d.appendChild(hLine);d.appendChild(vLine);d.appendChild(label);d.appendChild(closeBtn);
+  document.body.appendChild(d);
+  function onMove(e){
+    hLine.style.top=e.clientY+'px';
+    vLine.style.left=e.clientX+'px';
+    label.style.left=(e.clientX+12)+'px';
+    label.style.top=(e.clientY+12)+'px';
+    label.textContent=e.clientX+'px, '+e.clientY+'px ('+window.innerWidth+'x'+window.innerHeight+')';
+  }
+  document.addEventListener('mousemove',onMove);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
