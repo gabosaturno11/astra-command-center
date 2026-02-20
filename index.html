@@ -1456,6 +1456,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Focus Mode</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+F</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Close/Escape</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Esc</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Export Section</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+E</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Scratchpad</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+Shift+S</span></div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Show Shortcuts</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">Cmd+/</span></div>
         <div style="font-weight:600;color:var(--text);margin:12px 0 8px">Task Detail</div>
         <div style="display:flex;justify-content:space-between;padding:3px 0;color:var(--text-secondary)"><span>Set P0-P3</span><span style="font-family:var(--mono);font-size:9px;color:var(--text-muted)">1-4</span></div>
@@ -2922,6 +2923,15 @@ function exportTasks(){
   });
 }
 
+function exportTasksCSV(){
+  const csvEsc=s=>{s=String(s||'').replace(/"/g,'""');return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s+'"':s;};
+  const headers=['Title','Status','Priority','Project','Due','Description','Tags','Created','Estimate','Time Spent','Subtasks'];
+  const rows=[headers.join(',')];
+  S.tasks.forEach(t=>{
+    rows.push([csvEsc(t.title),csvEsc(t.status),csvEsc(t.priority),csvEsc(t.project),csvEsc(t.due),csvEsc(t.description),csvEsc((t.tags||[]).join(';')),csvEsc(t.created?t.created.split('T')[0]:''),csvEsc(t.estimate),csvEsc(t.timeSpent?t.timeSpent+'m':''),csvEsc((t.subtasks||[]).map(s=>(s.done?'[x]':'[ ]')+s.title).join('; '))].join(','));
+  });
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='tasks-'+new Date().toISOString().split('T')[0]+'.csv';a.click();toast('Exported '+S.tasks.length+' tasks as CSV');
+}
 // Task drag reorder
 let taskDragId=null;
 function taskDragStart(e,id){taskDragId=id;e.dataTransfer.effectAllowed='move';}
@@ -5690,6 +5700,7 @@ function cmdGetItems(q) {
       ['deps','Task dependency chain visualization'],['accent','Change accent color (8 presets)'],
       ['pomodoro','Focus session stats + start timer'],['collections','Auto-detect content groups'],
       ['scratch','Persistent floating scratchpad'],['review','Weekly review + copy markdown'],
+      ['workspace','Full workspace stats overview'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6573,6 +6584,7 @@ function cmdGetItems(q) {
   // Export hub prefix
   if(ql && (ql.startsWith('export:') || ql==='export' || ql==='exports')){
     items.unshift({title:'Export Tasks (Markdown)',desc:'Copy filtered tasks as grouped markdown',icon:'T',type:'action',action:()=>{closeCommandPalette();exportTasks();}});
+    items.unshift({title:'Export Tasks (CSV)',desc:'Download tasks as spreadsheet CSV',icon:'T',type:'action',action:()=>{closeCommandPalette();exportTasksCSV();}});
     items.unshift({title:'Export Content (Markdown)',desc:'Copy all content as markdown',icon:'C',type:'action',action:()=>{closeCommandPalette();exportFilteredContentMD();}});
     items.unshift({title:'Export Content (HTML)',desc:'Download content as styled HTML file',icon:'C',type:'action',action:()=>{closeCommandPalette();exportContentHTML();}});
     items.unshift({title:'Export Links (Markdown)',desc:'Copy all links categorized as markdown',icon:'L',type:'action',action:()=>{closeCommandPalette();exportLinks();}});
@@ -6742,6 +6754,24 @@ function cmdGetItems(q) {
     items.unshift({title:'Weekly Review (7 days)',desc:completed.length+' done | '+created.length+' new | '+contentAdded.length+' content | '+wordsWritten+' words | '+focusMins+'min focus',icon:'R',type:'info'});
     items.unshift({title:'Copy Review as Markdown',desc:'Copy weekly summary to clipboard',icon:'C',type:'action',action:()=>{closeCommandPalette();const md=['# Weekly Review','',`**Period:** ${ws} to ${now.toISOString().split('T')[0]}`,'',`## Completed (${completed.length})`,...completed.map(t=>'- [x] '+t.title+(t.project?' ('+t.project+')':'')),``,`## Still Active (${created.length})`,...created.map(t=>'- [ ] '+t.title+' ['+t.status+']'),``,`## Stats`,'- '+contentAdded.length+' content items added','- '+docsEdited.length+' docs edited ('+wordsWritten+' words)','- '+focusMins+' minutes focused'].join('\n');navigator.clipboard.writeText(md);toast('Weekly review copied');}});
     completed.slice(0,8).forEach(t=>{items.unshift({title:'[x] '+esc(t.title),desc:(t.project||'No project')+' | Completed '+timeAgo(t.completedAt),icon:'*',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+  }
+  // Workspace stats prefix
+  if(ql && (ql==='workspace' || ql.startsWith('workspace:') || ql==='ws' || ql==='stats overview')){
+    const dataSize=JSON.stringify(S).length;const kb=Math.round(dataSize/1024);
+    const totalTasks=S.tasks.length;const totalContent=S.content.length;const totalDocs=S.docs.length;
+    const totalLinks=S.links.length;const totalSpecs=(S.specs||[]).length;const totalRepos=(S.repos||[]).length;
+    const totalWords=S.docs.reduce((a,d)=>a+countW(d.body),0)+S.content.reduce((a,c)=>a+(c.body||'').trim().split(/\s+/).filter(Boolean).length,0);
+    const totalProjects=(S.projects||[]).length;
+    const totalGoals=(S.goals||[]).length;const totalFocus=(S.focusSessions||[]).length;
+    const totalFocusMins=(S.focusSessions||[]).reduce((a,s)=>a+s.minutes,0);
+    const nodes=(S.whiteboard&&S.whiteboard.nodes||[]).length;
+    const kbItems=(S.knowledgeBase||[]).length;
+    items.unshift({title:'Workspace: '+kb+'KB ('+Math.round(kb/1024*100)/100+'MB)',desc:'localStorage usage',icon:'W',type:'info'});
+    items.unshift({title:'Items: T:'+totalTasks+' C:'+totalContent+' D:'+totalDocs+' L:'+totalLinks+' S:'+totalSpecs+' R:'+totalRepos,desc:'P:'+totalProjects+' KB:'+kbItems+' WB:'+nodes+' Goals:'+totalGoals+' Focus:'+totalFocus,icon:'#',type:'info'});
+    items.unshift({title:'Words: '+totalWords.toLocaleString()+' total',desc:S.docs.length+' docs + '+S.content.length+' content items',icon:'W',type:'info'});
+    items.unshift({title:'Focus: '+totalFocusMins+' minutes ('+Math.round(totalFocusMins/60)+'h) across '+totalFocus+' sessions',desc:'Across all time',icon:'F',type:'info'});
+    const lastSave=S._lastSaveTime||null;
+    items.unshift({title:'Last saved: '+(lastSave?timeAgo(lastSave):'unknown'),desc:'Accent: '+(S._accentColor||'#4ade80 (default)'),icon:'i',type:'info'});
   }
   return items.slice(0, 20);
 }
@@ -7156,6 +7186,8 @@ document.addEventListener('keydown',e=>{
   if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='w'||e.key==='W')) { e.preventDefault(); if(zenIsOpen) zenClose(); else zenOpen(); return; }
   // Cmd+S: save (Zen Writer version save or workspace save)
   if((e.metaKey||e.ctrlKey) && e.key==='s') { e.preventDefault(); if(zenIsOpen){ zenSaveVersion(); } else { snapshotWriter(); snapshotSpec(); wbPersist(); save(); cloudSave(); } return; }
+  // Cmd+Shift+S: toggle Scratchpad
+  if((e.metaKey||e.ctrlKey) && e.shiftKey && (e.key==='s'||e.key==='S')) { e.preventDefault(); toggleScratchpad(); return; }
   // Skip shortcuts when typing in inputs
   const inInput = e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.contentEditable==='true';
   if(e.key==='Escape'){
