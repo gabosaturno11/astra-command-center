@@ -6413,6 +6413,12 @@ function cmdGetItems(q) {
       ['mongodb','MongoDB mongosh command reference'],
       ['cumulative flow','Cumulative flow diagram for tasks'],
       ['color picker','Pick and copy colors with preview'],
+      ['sqlite','SQLite command reference'],
+      ['aging report','How old are your open tasks'],
+      ['emoji','Emoji picker with click to copy'],
+      ['git advanced','Git rebase, stash, bisect, worktree reference'],
+      ['status pie','Task status pie chart distribution'],
+      ['text transform','Transform text case, sort, reverse'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9821,6 +9827,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='color picker' || ql==='pick color' || ql==='colour' || ql==='hex color')){
     items.unshift({title:'Color Picker',desc:'Pick and copy color codes',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorPicker();}});
+  }
+  if(ql && (ql==='sqlite' || ql==='sqlite3' || ql==='sqlite ref' || ql==='sqlite cli')){
+    items.unshift({title:'SQLite Reference',desc:'SQLite commands cheatsheet',icon:'S',type:'action',action:()=>{closeCommandPalette();showSqliteRef();}});
+  }
+  if(ql && (ql==='aging report' || ql==='task aging' || ql==='old tasks' || ql==='stale tasks')){
+    items.unshift({title:'Task Aging Report',desc:'How old are your open tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAgingReport();}});
+  }
+  if(ql && (ql==='emoji' || ql==='emoji picker' || ql==='emojis' || ql==='smiley')){
+    items.unshift({title:'Emoji Picker',desc:'Click to copy emoji characters',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEmojiPicker();}});
+  }
+  if(ql && (ql==='git advanced' || ql==='git rebase' || ql==='git stash' || ql==='git bisect')){
+    items.unshift({title:'Git Advanced',desc:'Rebase, stash, bisect, worktree',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitAdvancedRef();}});
+  }
+  if(ql && (ql==='status pie' || ql==='task pie' || ql==='pie chart' || ql==='status chart')){
+    items.unshift({title:'Status Pie Chart',desc:'Task status distribution donut',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskStatusPieChart();}});
+  }
+  if(ql && (ql==='text transform' || ql==='case convert' || ql==='uppercase' || ql==='camelcase')){
+    items.unshift({title:'Text Transformer',desc:'Convert text case, sort, reverse',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTextTransformer();}});
   }
   return items.slice(0, 20);
 }
@@ -30079,6 +30103,155 @@ function showQuickColorPicker(){
   });
   html+='</div>';
   html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_cp-value\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Color\',800)" style="width:100%;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Copy Color</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showSqliteRef(){
+  const cmds={
+    'Shell Commands':['sqlite3 mydb.db|Open/create database','.tables|List all tables','.schema tablename|Show CREATE statement','.headers on|Show column headers','.mode column|Column-aligned output','.mode csv|CSV output mode','.import file.csv tablename|Import CSV into table','.dump|Export entire database as SQL','.quit|Exit sqlite3'],
+    'Tables':['CREATE TABLE t (id INTEGER PRIMARY KEY, name TEXT);|Create table','ALTER TABLE t ADD COLUMN age INTEGER;|Add column','ALTER TABLE t RENAME TO new_name;|Rename table','DROP TABLE t;|Delete table','CREATE INDEX idx ON t(col);|Create index','PRAGMA table_info(t);|Show table columns'],
+    'CRUD':['SELECT * FROM t WHERE col=val;|Select rows','INSERT INTO t (col) VALUES (val);|Insert row','UPDATE t SET col=val WHERE id=1;|Update row','DELETE FROM t WHERE id=1;|Delete row','INSERT OR REPLACE INTO t VALUES (...);|Upsert','SELECT * FROM t ORDER BY col DESC LIMIT 10;|Sort and limit'],
+    'Functions':['COUNT(*)|Count rows','GROUP BY col|Group results','HAVING COUNT(*)>1|Filter groups','COALESCE(a,b)|First non-null value','datetime("now")|Current timestamp','json_extract(col,"$.key")|Extract JSON field'],
+    'Admin':['VACUUM;|Rebuild and compact database','PRAGMA integrity_check;|Verify database integrity','PRAGMA journal_mode=WAL;|Enable WAL mode','PRAGMA foreign_keys=ON;|Enable foreign keys','.backup main backup.db|Backup database']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">SQLite Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskAgingReport(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();
+  const aged=tasks.map(t=>{
+    const created=t.createdAt?new Date(t.createdAt):now;
+    const ageDays=Math.floor((now-created)/(86400000));
+    return{...t,ageDays};
+  }).sort((a,b)=>b.ageDays-a.ageDays);
+  const buckets=[{label:'< 1 week',max:7,count:0,color:'#4ade80'},{label:'1-2 weeks',max:14,count:0,color:'#60a5fa'},{label:'2-4 weeks',max:28,count:0,color:'#f59e0b'},{label:'1-3 months',max:90,count:0,color:'#fb923c'},{label:'3+ months',max:Infinity,count:0,color:'#ef4444'}];
+  aged.forEach(t=>{for(const b of buckets){if(t.ageDays<b.max){b.count++;break;}}});
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Task Aging Report</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="margin-bottom:16px">';
+  const maxBucket=Math.max(...buckets.map(b=>b.count),1);
+  buckets.forEach(b=>{
+    const pct=Math.round((b.count/maxBucket)*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="width:80px;font-size:11px;color:var(--text-muted);text-align:right">'+b.label+'</span>';
+    html+='<div style="flex:1;background:var(--bg-surface);border-radius:4px;height:20px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+b.color+';border-radius:4px;transition:width 0.3s"></div></div>';
+    html+='<span style="width:30px;font-size:12px;color:'+b.color+';font-weight:600">'+b.count+'</span></div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase">Oldest Open Tasks</div>';
+  aged.slice(0,10).forEach(t=>{
+    const color=t.ageDays>90?'#ef4444':t.ageDays>28?'#fb923c':t.ageDays>14?'#f59e0b':'#60a5fa';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;border-left:3px solid '+color+'">';
+    html+='<span style="color:var(--text-primary);font-size:12px">'+esc(t.title)+'</span>';
+    html+='<span style="color:'+color+';font-size:11px;font-weight:600">'+t.ageDays+'d</span></div>';
+  });
+  if(aged.length===0)html+='<div style="text-align:center;color:var(--text-muted);padding:12px">No open tasks</div>';
+  const avgAge=aged.length>0?Math.round(aged.reduce((a,t)=>a+t.ageDays,0)/aged.length):0;
+  html+='<div style="margin-top:12px;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Average Age of Open Tasks</div><div style="font-size:20px;color:#4ade80;font-weight:700">'+avgAge+' days</div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickEmojiPicker(){
+  const cats={
+    'Faces':['😀','😂','🥲','😍','🤔','😎','🥳','😴','🤯','😇','🙄','😏','😤','😭','🫠'],
+    'Hands':['👍','👎','👋','🤝','✌️','🤞','👏','🙏','💪','✍️','🫰','🤙','👊','✋','🖐️'],
+    'Symbols':['❤️','⭐','🔥','✅','❌','⚡','💡','🎯','🚀','💎','🏆','📌','🔗','⚙️','🎉'],
+    'Nature':['🌟','🌈','☀️','🌙','⛅','🌊','🍀','🌸','🍎','🌍','🐱','🦊','🐼','🦋','🌲'],
+    'Objects':['📱','💻','🎮','📷','🎵','📚','✏️','💰','🔑','🏠','🚗','✈️','⏰','📧','🗓️']
+  };
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px;max-height:400px;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Emoji Picker</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_emoji-copied" style="text-align:center;font-size:11px;color:#4ade80;height:16px;margin-bottom:4px"></div>';
+  Object.entries(cats).forEach(([cat,emojis])=>{
+    html+='<div style="font-size:10px;color:var(--text-muted);margin:6px 0 4px;text-transform:uppercase">'+cat+'</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:2px">';
+    emojis.forEach(e=>{
+      html+='<button onclick="navigator.clipboard.writeText(\''+e+'\');document.getElementById(\'_emoji-copied\').textContent=\'Copied: '+e+'\';setTimeout(()=>{const el=document.getElementById(\'_emoji-copied\');if(el)el.textContent=\'\'},1000)" style="background:none;border:none;font-size:20px;padding:4px;cursor:pointer;border-radius:4px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+e+'</button>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showGitAdvancedRef(){
+  const cmds={
+    'Rebase & Cherry-pick':['git rebase main|Rebase current branch onto main','git rebase --onto new-base old-base branch|Rebase onto different base','git rebase --abort|Cancel in-progress rebase','git rebase --continue|Continue after resolving conflict','git cherry-pick abc123|Apply specific commit','git cherry-pick abc123..def456|Apply range of commits'],
+    'Stash':['git stash|Stash working changes','git stash pop|Apply and remove last stash','git stash list|List all stashes','git stash apply stash@{2}|Apply specific stash','git stash drop stash@{0}|Delete specific stash','git stash show -p|Show stash diff','git stash -u|Include untracked files'],
+    'Bisect':['git bisect start|Begin bisect session','git bisect bad|Mark current as bad','git bisect good abc123|Mark commit as good','git bisect reset|End bisect session','git bisect run ./test.sh|Auto-bisect with script'],
+    'Reflog & Recovery':['git reflog|Show all reference changes','git reflog show HEAD|Show HEAD history','git checkout HEAD@{3}|Go to reflog entry','git branch recover abc123|Recover deleted branch'],
+    'Worktrees':['git worktree add ../feature feature|Add worktree','git worktree list|List worktrees','git worktree remove ../feature|Remove worktree'],
+    'Submodules':['git submodule add URL path|Add submodule','git submodule update --init --recursive|Init all submodules','git submodule foreach git pull|Update all submodules','git submodule deinit path|Remove submodule'],
+    'Advanced Log':['git log --oneline --graph --all|Visual branch graph','git log --follow file.txt|Track file through renames','git log -p file.txt|Show patches for file','git shortlog -sn|Commit count by author','git log --since="2 weeks ago"|Recent commits']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Git Advanced Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskStatusPieChart(){
+  const tasks=(S.tasks||[]);
+  const statuses={todo:0,'in-progress':0,done:0,blocked:0};
+  tasks.forEach(t=>{const s=t.status||'todo';statuses[s]=(statuses[s]||0)+1;});
+  const total=tasks.length||1;
+  const slices=[{label:'To Do',count:statuses.todo,color:'#6b7280'},{label:'In Progress',count:statuses['in-progress'],color:'#f59e0b'},{label:'Done',count:statuses.done,color:'#4ade80'},{label:'Blocked',count:statuses.blocked||0,color:'#ef4444'}].filter(s=>s.count>0);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Task Status Distribution</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<svg viewBox="0 0 200 200" style="width:200px;height:200px;display:block;margin:0 auto 16px">';
+  let startAngle=0;
+  slices.forEach(s=>{
+    const pct=s.count/total;const angle=pct*360;
+    const endAngle=startAngle+angle;
+    const x1=100+80*Math.cos((startAngle-90)*Math.PI/180);
+    const y1=100+80*Math.sin((startAngle-90)*Math.PI/180);
+    const x2=100+80*Math.cos((endAngle-90)*Math.PI/180);
+    const y2=100+80*Math.sin((endAngle-90)*Math.PI/180);
+    const large=angle>180?1:0;
+    if(pct>=1){html+='<circle cx="100" cy="100" r="80" fill="'+s.color+'"/>';}
+    else{html+='<path d="M100,100 L'+x1+','+y1+' A80,80 0 '+large+',1 '+x2+','+y2+' Z" fill="'+s.color+'" opacity="0.85"/>';}
+    startAngle=endAngle;
+  });
+  html+='<circle cx="100" cy="100" r="45" fill="var(--bg-elevated)"/>';
+  html+='<text x="100" y="95" fill="var(--text-primary)" font-size="20" text-anchor="middle" font-weight="700">'+tasks.length+'</text>';
+  html+='<text x="100" y="112" fill="var(--text-muted)" font-size="10" text-anchor="middle">tasks</text>';
+  html+='</svg>';
+  html+='<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">';
+  slices.forEach(s=>{
+    html+='<div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;border-radius:3px;background:'+s.color+'"></div><span style="font-size:12px;color:var(--text-secondary)">'+s.label+': '+s.count+' ('+Math.round(s.count/total*100)+'%)</span></div>';
+  });
+  html+='</div></div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickTextTransformer(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80">Text Transformer</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<textarea id="_tt-input" style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:inherit" placeholder="Type or paste text here..."></textarea>';
+  html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin:10px 0">';
+  const transforms=[
+    {l:'UPPER',fn:'t=>t.toUpperCase()'},
+    {l:'lower',fn:'t=>t.toLowerCase()'},
+    {l:'Title Case',fn:'t=>t.replace(/\\w\\S*/g,w=>w[0].toUpperCase()+w.slice(1).toLowerCase())'},
+    {l:'camelCase',fn:'t=>t.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g,(_,c)=>c.toUpperCase())'},
+    {l:'snake_case',fn:'t=>t.toLowerCase().replace(/\\s+/g,"_").replace(/[^a-z0-9_]/g,"")'},
+    {l:'kebab-case',fn:'t=>t.toLowerCase().replace(/\\s+/g,"-").replace(/[^a-z0-9-]/g,"")'},
+    {l:'Reverse',fn:'t=>t.split("").reverse().join("")'},
+    {l:'Trim',fn:'t=>t.replace(/\\s+/g," ").trim()'},
+    {l:'Sort Lines',fn:'t=>t.split("\\n").sort().join("\\n")'},
+    {l:'Unique Lines',fn:'t=>[...new Set(t.split("\\n"))].join("\\n")'},
+    {l:'Remove Blanks',fn:'t=>t.split("\\n").filter(l=>l.trim()).join("\\n")'},
+    {l:'Number Lines',fn:'t=>t.split("\\n").map((l,i)=>(i+1)+". "+l).join("\\n")'}
+  ];
+  transforms.forEach((tr,i)=>{
+    html+='<button onclick="const inp=document.getElementById(\'_tt-input\');const out=document.getElementById(\'_tt-output\');const fn='+esc(tr.fn)+';try{const r=(eval(fn))(inp.value);out.value=r;}catch(e){out.value=\'Error: \'+e.message;}" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:5px 10px;border-radius:6px;cursor:pointer;font-size:10px">'+tr.l+'</button>';
+  });
+  html+='</div>';
+  html+='<textarea id="_tt-output" readonly style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:#4ade80;border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:monospace" placeholder="Output appears here..."></textarea>';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_tt-output\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Output\',800)" style="margin-top:8px;background:#4ade80;color:#000;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;width:100%">Copy Output</button>';
   html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
