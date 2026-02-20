@@ -6206,6 +6206,12 @@ function cmdGetItems(q) {
       ['env file','.env file generator and editor'],
       ['blocked graph','Blocked tasks dependency graph'],
       ['hydration','Water intake tracker'],
+      ['dockerfile','Dockerfile template generator'],
+      ['completion funnel','Task completion funnel visualization'],
+      ['screen break','Full-screen break timer overlay'],
+      ['gitignore','.gitignore file generator with presets'],
+      ['project balance','Task balance across all projects'],
+      ['daily review','End-of-day review and reflection'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8993,6 +8999,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='hydration' || ql==='water' || ql==='drink water' || ql==='cups')){
     items.unshift({title:'Hydration Tracker',desc:'Track daily water intake',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHydration();}});
+  }
+  if(ql && (ql==='dockerfile' || ql==='docker' || ql==='container' || ql==='docker template')){
+    items.unshift({title:'Dockerfile Generator',desc:'Dockerfile templates for 6 stacks',icon:'D',type:'action',action:()=>{closeCommandPalette();showDockerfileGen();}});
+  }
+  if(ql && (ql==='completion funnel' || ql==='funnel' || ql==='task funnel' || ql==='conversion')){
+    items.unshift({title:'Completion Funnel',desc:'Task pipeline funnel visualization',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskCompletionFunnel();}});
+  }
+  if(ql && (ql==='screen break' || ql==='break' || ql==='take a break' || ql==='full break')){
+    items.unshift({title:'Screen Break',desc:'Full-screen 5-minute break timer',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickScreenBreak();}});
+  }
+  if(ql && (ql==='gitignore' || ql==='.gitignore' || ql==='git ignore' || ql==='ignore file')){
+    items.unshift({title:'.gitignore Generator',desc:'Generate .gitignore with preset combos',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitignoreGen();}});
+  }
+  if(ql && (ql==='project balance' || ql==='balance' || ql==='workload' || ql==='project workload')){
+    items.unshift({title:'Project Balance',desc:'Task distribution across projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectBalance();}});
+  }
+  if(ql && (ql==='daily review' || ql==='review' || ql==='end of day' || ql==='day review')){
+    items.unshift({title:'Daily Review',desc:'End-of-day review and reflection',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDailyReview();}});
   }
   return items.slice(0, 20);
 }
@@ -23606,6 +23630,201 @@ function showQuickHydration(){
       +'<div style="display:flex;gap:4px"><button id="hyd-add" style="flex:1;padding:6px;background:#22d3ee;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:12px">+ Cup</button><button id="hyd-sub" style="padding:6px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:12px">-</button></div>';
     document.getElementById('hyd-add').onclick=function(){S._hydration[today]=(S._hydration[today]||0)+1;save();rend();};
     document.getElementById('hyd-sub').onclick=function(){if(S._hydration[today]>0)S._hydration[today]--;save();rend();};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showDockerfileGen(){
+  let p=document.getElementById('docker-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='docker-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let templates=[
+    {name:'Node.js',code:'FROM node:20-alpine\n\nWORKDIR /app\n\nCOPY package*.json ./\nRUN npm ci --only=production\n\nCOPY . .\n\nEXPOSE 3000\n\nCMD ["node", "server.js"]'},
+    {name:'Python',code:'FROM python:3.12-slim\n\nWORKDIR /app\n\nCOPY requirements.txt .\nRUN pip install --no-cache-dir -r requirements.txt\n\nCOPY . .\n\nEXPOSE 8000\n\nCMD ["python", "app.py"]'},
+    {name:'React (Multi-stage)',code:'# Build stage\nFROM node:20-alpine AS build\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\n# Production stage\nFROM nginx:alpine\nCOPY --from=build /app/build /usr/share/nginx/html\nEXPOSE 80\nCMD ["nginx", "-g", "daemon off;"]'},
+    {name:'Go',code:'FROM golang:1.22-alpine AS build\n\nWORKDIR /app\nCOPY go.* ./\nRUN go mod download\nCOPY . .\nRUN CGO_ENABLED=0 go build -o /app/server .\n\nFROM alpine:latest\nCOPY --from=build /app/server /server\nEXPOSE 8080\nCMD ["/server"]'},
+    {name:'Static Site',code:'FROM nginx:alpine\n\nCOPY . /usr/share/nginx/html\n\nEXPOSE 80\n\nCMD ["nginx", "-g", "daemon off;"]'},
+    {name:'Java Spring',code:'FROM eclipse-temurin:21-jdk-alpine AS build\nWORKDIR /app\nCOPY . .\nRUN ./gradlew bootJar --no-daemon\n\nFROM eclipse-temurin:21-jre-alpine\nCOPY --from=build /app/build/libs/*.jar app.jar\nEXPOSE 8080\nCMD ["java", "-jar", "app.jar"]'}
+  ];
+  let selected=0;
+  function rend(){
+    let tabs=templates.map((t,i)=>'<button data-dt="'+i+'" style="padding:4px 10px;border-radius:var(--radius);border:1px solid '+(i===selected?'#4ade80':'var(--border)')+';background:'+(i===selected?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(i===selected?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:11px">'+t.name+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Dockerfile Generator</span><button onclick="document.getElementById(\'docker-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">'+tabs+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.5">'+esc(templates[selected].code)+'</pre>'
+      +'<div style="display:flex;gap:6px"><button id="dock-copy" style="flex:1;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy Dockerfile</button><button id="dock-gitignore" style="padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:11px">Copy .dockerignore</button></div>';
+    p.querySelectorAll('[data-dt]').forEach(b=>{b.onclick=function(){selected=parseInt(this.dataset.dt);rend();};});
+    document.getElementById('dock-copy').onclick=function(){navigator.clipboard.writeText(templates[selected].code);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy Dockerfile';},1200);};
+    document.getElementById('dock-gitignore').onclick=function(){
+      let ignore='node_modules\nnpm-debug.log\n.git\n.gitignore\n.env\n*.md\ndist\nbuild\n.DS_Store\n*.log';
+      navigator.clipboard.writeText(ignore);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy .dockerignore';},1200);
+    };
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskCompletionFunnel(){
+  let p=document.getElementById('comp-funnel-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='comp-funnel-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let stages=[
+    {label:'Backlog',filter:t=>t.status==='backlog',color:'#94a3b8'},
+    {label:'To Do',filter:t=>t.status==='todo',color:'#fbbf24'},
+    {label:'In Progress',filter:t=>t.status==='in-progress',color:'#22d3ee'},
+    {label:'Done',filter:t=>t.status==='done',color:'#4ade80'}
+  ];
+  stages.forEach(s=>{s.count=tasks.filter(s.filter).length;});
+  let maxC=Math.max(...stages.map(s=>s.count),1);
+  let funnel=stages.map((s,i)=>{
+    let widthPct=Math.max(Math.round(s.count/maxC*100),15);
+    let topWidth=i===0?100:Math.max(Math.round(stages[i-1].count/maxC*100),15);
+    return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:2px"><span style="min-width:80px;font-size:11px;color:var(--text-muted);text-align:right">'+s.label+'</span><div style="flex:1;display:flex;justify-content:center"><div style="width:'+widthPct+'%;height:32px;background:'+s.color+'25;border-left:3px solid '+s.color+';border-right:3px solid '+s.color+';display:flex;align-items:center;justify-content:center;transition:width 0.3s"><span style="font-weight:700;font-size:14px;color:'+s.color+'">'+s.count+'</span></div></div></div>';
+  }).join('');
+  let convRate=stages[0].count>0?Math.round(stages[3].count/(stages[0].count+stages[1].count+stages[2].count+stages[3].count)*100):0;
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Completion Funnel</span><button onclick="document.getElementById(\'comp-funnel-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;margin-bottom:14px"><span style="font-size:10px;color:var(--text-muted)">Completion Rate: </span><span style="font-size:18px;font-weight:700;color:#4ade80">'+convRate+'%</span></div>'
+    +funnel;
+  document.body.appendChild(p);
+}
+function showQuickScreenBreak(){
+  let p=document.getElementById('screen-break-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='screen-break-panel';
+  p.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2000;background:rgba(0,0,0,0.95);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer';
+  let secs=300;
+  let messages=[
+    'Stand up and walk around',
+    'Look out the window',
+    'Do some light stretching',
+    'Take a few deep breaths',
+    'Check your posture',
+    'Relax your shoulders',
+    'Drink some water'
+  ];
+  let msg=messages[Math.floor(Math.random()*messages.length)];
+  function rend(){
+    let min=Math.floor(secs/60);
+    let sec=secs%60;
+    p.innerHTML='<div style="font-size:48px;font-weight:200;color:#4ade80;margin-bottom:16px;font-family:monospace">'+min+':'+(sec<10?'0':'')+sec+'</div>'
+      +'<div style="font-size:18px;color:var(--text-primary);margin-bottom:8px;font-weight:300">Screen Break</div>'
+      +'<div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">'+esc(msg)+'</div>'
+      +'<div style="font-size:11px;color:#666">Click anywhere or press Escape to dismiss</div>';
+  }
+  p.onclick=function(){clearInterval(window._sbTimer);p.remove();};
+  document.addEventListener('keydown',function handler(e){if(e.key==='Escape'){clearInterval(window._sbTimer);p.remove();document.removeEventListener('keydown',handler);}});
+  document.body.appendChild(p);
+  rend();
+  window._sbTimer=setInterval(()=>{secs--;if(secs<=0){clearInterval(window._sbTimer);p.remove();}else rend();},1000);
+}
+function showGitignoreGen(){
+  let p=document.getElementById('gitignore-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='gitignore-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let presets={
+    'Node.js':'node_modules/\nnpm-debug.log*\n.env\n.env.local\ndist/\nbuild/\n.DS_Store\ncoverage/\n*.tgz\n.npm',
+    'Python':'__pycache__/\n*.py[cod]\n*$py.class\n.env\nvenv/\n.venv/\ndist/\nbuild/\n*.egg-info/\n.pytest_cache/',
+    'React':'node_modules/\nbuild/\n.env\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\nnpm-debug.log*\n.DS_Store',
+    'Next.js':'node_modules/\n.next/\nout/\n.env\n.env.local\n.vercel\n.DS_Store\nnpm-debug.log*\ncoverage/',
+    'Go':'*.exe\n*.exe~\n*.dll\n*.so\n*.dylib\n*.test\n*.out\nvendor/\n.env\ngo.work',
+    'Java':'.class\n*.jar\n*.war\ntarget/\nbuild/\n.gradle/\n.settings/\n.project\n.classpath\n.env',
+    'General':'.DS_Store\nThumbs.db\n*.log\n*.tmp\n*.swp\n*~\n.env\n.env.*\n.idea/\n.vscode/\n*.bak'
+  };
+  let keys=Object.keys(presets);
+  let selected=S._gitignorePreset||keys;
+  if(!Array.isArray(selected))selected=keys;
+  function gen(){
+    let lines=['# Generated .gitignore',''];
+    selected.forEach(k=>{
+      if(presets[k]){
+        lines.push('# '+k);
+        lines.push(presets[k]);
+        lines.push('');
+      }
+    });
+    return lines.join('\n');
+  }
+  function rend(){
+    let checks=keys.map(k=>'<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-primary);cursor:pointer;padding:3px 0"><input type="checkbox" data-gk="'+k+'" '+(selected.includes(k)?'checked':'')+' style="cursor:pointer">'+k+'</label>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">.gitignore Generator</span><button onclick="document.getElementById(\'gitignore-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:10px;padding:8px;background:var(--bg-surface);border-radius:var(--radius)">'+checks+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.4;max-height:250px;overflow-y:auto">'+esc(gen())+'</pre>'
+      +'<button id="gi-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy .gitignore</button>';
+    p.querySelectorAll('[data-gk]').forEach(cb=>{
+      cb.onchange=function(){
+        let k=this.dataset.gk;
+        if(this.checked){if(!selected.includes(k))selected.push(k);}
+        else{selected=selected.filter(s=>s!==k);}
+        S._gitignorePreset=selected;save();rend();
+      };
+    });
+    document.getElementById('gi-copy').onclick=function(){navigator.clipboard.writeText(gen());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy .gitignore';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskProjectBalance(){
+  let p=document.getElementById('proj-balance-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='proj-balance-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let projects=(S.projects||[]);
+  let projMap={};
+  projects.forEach(pr=>{projMap[pr.id]={name:pr.name,open:0,done:0,overdue:0,total:0};});
+  projMap['none']={name:'No Project',open:0,done:0,overdue:0,total:0};
+  let now=new Date();
+  tasks.forEach(t=>{
+    let pid=t.projectId||'none';
+    if(!projMap[pid])projMap[pid]={name:pid,open:0,done:0,overdue:0,total:0};
+    projMap[pid].total++;
+    if(t.status==='done')projMap[pid].done++;
+    else{
+      projMap[pid].open++;
+      if(t.due&&new Date(t.due)<now)projMap[pid].overdue++;
+    }
+  });
+  let sorted=Object.values(projMap).filter(p=>p.total>0).sort((a,b)=>b.total-a.total);
+  let maxT=Math.max(...sorted.map(p=>p.total),1);
+  let rows=sorted.map(pr=>{
+    let donePct=Math.round(pr.done/pr.total*100);
+    let openPct=Math.round(pr.open/pr.total*100);
+    return '<div style="margin-bottom:8px;padding:8px;background:var(--bg-surface);border-radius:var(--radius)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-weight:600;color:var(--text-primary);font-size:12px">'+esc(pr.name)+'</span><span style="font-size:10px;color:var(--text-muted)">'+pr.total+' tasks</span></div>'
+      +'<div style="height:12px;background:var(--bg-base);border-radius:6px;overflow:hidden;display:flex"><div style="width:'+donePct+'%;background:#4ade80;transition:width 0.3s"></div><div style="width:'+openPct+'%;background:#60a5fa;transition:width 0.3s"></div></div>'
+      +'<div style="display:flex;gap:12px;margin-top:4px"><span style="font-size:9px;color:#4ade80">Done: '+pr.done+'</span><span style="font-size:9px;color:#60a5fa">Open: '+pr.open+'</span>'+(pr.overdue>0?'<span style="font-size:9px;color:#f87171">Overdue: '+pr.overdue+'</span>':'')+'</div></div>';
+  }).join('');
+  if(!rows)rows='<div style="text-align:center;color:var(--text-muted);padding:20px">No tasks found</div>';
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Project Balance</span><button onclick="document.getElementById(\'proj-balance-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:8px;margin-bottom:10px;font-size:9px;color:var(--text-muted)"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#4ade80;border-radius:2px;display:inline-block"></span>Done</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#60a5fa;border-radius:2px;display:inline-block"></span>Open</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#f87171;border-radius:2px;display:inline-block"></span>Overdue</span></div>'
+    +rows;
+  document.body.appendChild(p);
+}
+function showQuickDailyReview(){
+  let p=document.getElementById('daily-review-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='daily-review-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  let today=new Date().toISOString().slice(0,10);
+  if(!S._dailyReviews)S._dailyReviews={};
+  let review=S._dailyReviews[today]||{wins:'',challenges:'',tomorrow:'',mood:3};
+  let moods=['Terrible','Bad','Okay','Good','Great'];
+  function rend(){
+    let moodBtns=moods.map((m,i)=>'<button data-mood="'+i+'" style="padding:4px 8px;border-radius:var(--radius);border:1px solid '+(review.mood===i?'#4ade80':'var(--border)')+';background:'+(review.mood===i?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(review.mood===i?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:10px">'+m+'</button>').join('');
+    let tasks=(S.tasks||[]);
+    let doneToday=tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt.startsWith(today)).length;
+    let created=tasks.filter(t=>{let c=t.created?new Date(t.created).toISOString().slice(0,10):null;return c===today;}).length;
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Daily Review</span><button onclick="document.getElementById(\'daily-review-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;gap:10px;margin-bottom:12px"><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:20px;font-weight:700;color:#4ade80">'+doneToday+'</div><div style="font-size:9px;color:var(--text-muted)">Completed</div></div><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:20px;font-weight:700;color:#22d3ee">'+created+'</div><div style="font-size:9px;color:var(--text-muted)">Created</div></div></div>'
+      +'<div style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">How was your day?</label><div style="display:flex;gap:4px;flex-wrap:wrap">'+moodBtns+'</div></div>'
+      +'<div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Wins today</label><textarea id="rev-wins" rows="2" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;resize:vertical;box-sizing:border-box">'+esc(review.wins)+'</textarea></div>'
+      +'<div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Challenges</label><textarea id="rev-challenges" rows="2" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;resize:vertical;box-sizing:border-box">'+esc(review.challenges)+'</textarea></div>'
+      +'<div style="margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Plan for tomorrow</label><textarea id="rev-tomorrow" rows="2" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;resize:vertical;box-sizing:border-box">'+esc(review.tomorrow)+'</textarea></div>'
+      +'<button id="rev-save" style="width:100%;padding:8px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Save Review</button>';
+    p.querySelectorAll('[data-mood]').forEach(b=>{b.onclick=function(){review.mood=parseInt(this.dataset.mood);rend();};});
+    document.getElementById('rev-save').onclick=function(){
+      review.wins=document.getElementById('rev-wins').value;
+      review.challenges=document.getElementById('rev-challenges').value;
+      review.tomorrow=document.getElementById('rev-tomorrow').value;
+      S._dailyReviews[today]=review;save();
+      this.textContent='Saved!';setTimeout(()=>{this.textContent='Save Review';},1200);
+    };
   }
   document.body.appendChild(p);
   rend();
