@@ -6449,6 +6449,12 @@ function cmdGetItems(q) {
       ['imagemagick','ImageMagick image processing reference'],
       ['velocity forecast','When will backlog be cleared'],
       ['bookmarks','Quick bookmark manager with URLs'],
+      ['curl','cURL HTTP request reference'],
+      ['completion trend','Task creation vs completion over time'],
+      ['clipboard history','Quick clipboard history manager'],
+      ['wget','wget download manager reference'],
+      ['recurrence calendar','View all recurring tasks schedule'],
+      ['json formatter','Format validate and minify JSON'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9965,6 +9971,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='bookmarks' || ql==='bookmark manager' || ql==='save url' || ql==='quick bookmark')){
     items.unshift({title:'Quick Bookmarks',desc:'Lightweight bookmark manager',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBookmarkManager();}});
+  }
+  if(ql && (ql==='curl' || ql==='curl ref' || ql==='http request' || ql==='curl command')){
+    items.unshift({title:'cURL Reference',desc:'HTTP request CLI cheatsheet',icon:'C',type:'action',action:()=>{closeCommandPalette();showCurlRef();}});
+  }
+  if(ql && (ql==='completion trend' || ql==='task trend' || ql==='created vs completed' || ql==='trend chart')){
+    items.unshift({title:'Completion Trend',desc:'Created vs completed over 8 weeks',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskCompletionTrend();}});
+  }
+  if(ql && (ql==='clipboard' || ql==='clipboard history' || ql==='clip history' || ql==='paste history')){
+    items.unshift({title:'Clipboard History',desc:'Save and recall clipboard items',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickClipboardHistory();}});
+  }
+  if(ql && (ql==='wget' || ql==='wget ref' || ql==='download file' || ql==='wget command')){
+    items.unshift({title:'wget Reference',desc:'Download manager CLI cheatsheet',icon:'W',type:'action',action:()=>{closeCommandPalette();showWgetRef();}});
+  }
+  if(ql && (ql==='recurrence' || ql==='recurrence calendar' || ql==='recurring tasks' || ql==='repeat schedule')){
+    items.unshift({title:'Recurrence Calendar',desc:'View all recurring tasks schedule',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskRecurrenceCalendar();}});
+  }
+  if(ql && (ql==='json' || ql==='json formatter' || ql==='format json' || ql==='json pretty')){
+    items.unshift({title:'JSON Formatter',desc:'Format, validate and minify JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonFormatter();}});
   }
   return items.slice(0, 20);
 }
@@ -31145,6 +31169,166 @@ function showQuickBookmarkManager(){
   }
   html+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">'+S._bookmarks.length+' bookmarks saved</div>';
   html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showCurlRef(){
+  const cmds={
+    'Basic Requests':{'GET request':'curl https://api.example.com','POST JSON':'curl -X POST -H "Content-Type: application/json" -d \'{"key":"val"}\' URL','PUT request':'curl -X PUT -d @file.json URL','DELETE request':'curl -X DELETE URL','PATCH request':'curl -X PATCH -d \'{"field":"val"}\' URL'},
+    'Headers & Auth':{'Custom header':'curl -H "Authorization: Bearer TOKEN" URL','Basic auth':'curl -u user:pass URL','Cookie':'curl -b "session=abc123" URL','User agent':'curl -A "MyApp/1.0" URL','Accept JSON':'curl -H "Accept: application/json" URL'},
+    'Data & Files':{'Form data':'curl -F "file=@photo.jpg" URL','URL encoded':'curl -d "name=foo&val=bar" URL','Upload file':'curl -T file.txt URL','Download file':'curl -o output.txt URL','Follow redirects':'curl -L URL'},
+    'Debug & Options':{'Verbose output':'curl -v URL','Silent mode':'curl -s URL','Show headers':'curl -I URL','Response code only':'curl -o /dev/null -s -w "%{http_code}" URL','Timing info':'curl -w "time: %{time_total}s" -o /dev/null -s URL'},
+    'Advanced':{'Retry on fail':'curl --retry 3 --retry-delay 2 URL','Timeout':'curl --connect-timeout 5 --max-time 10 URL','Proxy':'curl -x http://proxy:8080 URL','Insecure SSL':'curl -k https://self-signed.example.com','Rate limit':'curl --limit-rate 100K URL'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">cURL Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskCompletionTrend(){
+  const tasks=S.tasks||[];const now=new Date();const weeks=[];
+  for(let w=7;w>=0;w--){
+    const weekStart=new Date(now);weekStart.setDate(now.getDate()-w*7);
+    const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+7);
+    const label='W'+(8-w);
+    let created=0,completed=0;
+    tasks.forEach(t=>{
+      const cd=new Date(t.created||t.createdAt||0);
+      if(cd>=weekStart&&cd<weekEnd)created++;
+      if(t.status==='done'){
+        const dd=t.completedAt?new Date(t.completedAt):cd;
+        if(dd>=weekStart&&dd<weekEnd)completed++;
+      }
+    });
+    weeks.push({label,created,completed});
+  }
+  const maxV=Math.max(...weeks.map(w=>Math.max(w.created,w.completed)),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Completion Trend</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:2px;margin-bottom:12px;color:var(--text-muted);font-size:10px"><span style="color:#06b6d4">Created</span> vs <span style="color:#4ade80">Completed</span> per week</div>';
+  html+='<svg width="100%" viewBox="0 0 560 200" style="display:block">';
+  weeks.forEach((w,i)=>{
+    const x=i*70+10;const ch=w.created/maxV*150;const dh=w.completed/maxV*150;
+    html+='<rect x="'+(x)+'" y="'+(180-ch)+'" width="25" height="'+ch+'" fill="#06b6d4" rx="3" opacity="0.7"/>';
+    html+='<rect x="'+(x+28)+'" y="'+(180-dh)+'" width="25" height="'+dh+'" fill="#4ade80" rx="3" opacity="0.7"/>';
+    html+='<text x="'+(x+25)+'" y="196" fill="var(--text-muted)" font-size="10" text-anchor="middle">'+w.label+'</text>';
+    html+='<text x="'+(x+12)+'" y="'+(175-ch)+'" fill="#06b6d4" font-size="9" text-anchor="middle">'+w.created+'</text>';
+    html+='<text x="'+(x+40)+'" y="'+(175-dh)+'" fill="#4ade80" font-size="9" text-anchor="middle">'+w.completed+'</text>';
+  });
+  html+='</svg>';
+  const totalCreated=weeks.reduce((s,w)=>s+w.created,0);const totalCompleted=weeks.reduce((s,w)=>s+w.completed,0);
+  const ratio=totalCreated>0?(totalCompleted/totalCreated*100).toFixed(0):'0';
+  html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-secondary)">8-week completion ratio: <span style="color:#4ade80;font-weight:600">'+ratio+'%</span> ('+totalCompleted+' completed / '+totalCreated+' created)</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickClipboardHistory(){
+  if(!S._clipHistory)S._clipHistory=[];
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px;max-height:70vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Clipboard History</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:10px"><input id="clip-input" placeholder="Paste or type to save..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 10px;border-radius:4px;font-size:12px"/><button onclick="window._addClipItem()" style="background:#4ade80;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Save</button></div>';
+  if(S._clipHistory.length===0){
+    html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:11px">No clipboard items saved yet</div>';
+  } else {
+    S._clipHistory.forEach((item,i)=>{
+      const preview=item.length>60?item.substring(0,60)+'...':item;
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;margin-bottom:4px;background:var(--bg-surface);border-radius:4px"><div style="flex:1;font-size:11px;color:var(--text-secondary);font-family:monospace;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-right:8px">'+esc(preview)+'</div><div style="display:flex;gap:4px"><button onclick="navigator.clipboard.writeText(S._clipHistory['+i+']);this.textContent=\'ok\';setTimeout(()=>this.textContent=\'cp\',600)" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);padding:2px 6px;border-radius:3px;cursor:pointer;font-size:9px">cp</button><button onclick="S._clipHistory.splice('+i+',1);save();this.closest(\'div[style*=fixed]\').remove();showQuickClipboardHistory()" style="background:var(--bg-elevated);border:1px solid var(--border);color:#ef4444;padding:2px 6px;border-radius:3px;cursor:pointer;font-size:9px">x</button></div></div>';
+    });
+  }
+  html+='<div style="margin-top:8px;display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--text-muted)">'+S._clipHistory.length+' items</span>';
+  html+='<button onclick="S._clipHistory=[];save();this.closest(\'div[style*=fixed]\').remove();showQuickClipboardHistory()" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:10px">Clear All</button></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._addClipItem=function(){
+    const inp=document.getElementById('clip-input');if(!inp||!inp.value.trim())return;
+    S._clipHistory.unshift(inp.value.trim());if(S._clipHistory.length>50)S._clipHistory.length=50;
+    save();document.querySelector('div[style*="fixed"][style*="bottom"]').remove();showQuickClipboardHistory();
+  };
+}
+function showWgetRef(){
+  const cmds={
+    'Basic Downloads':{'Download file':'wget https://example.com/file.zip','Save as name':'wget -O output.txt URL','Download to dir':'wget -P /path/to/dir URL','Resume download':'wget -c URL','Background download':'wget -b URL'},
+    'Recursive & Mirror':{'Mirror site':'wget --mirror -p --convert-links URL','Recursive depth 2':'wget -r -l 2 URL','No parent':'wget -r --no-parent URL','Accept only PDFs':'wget -r -A "*.pdf" URL','Reject images':'wget -r -R "*.jpg,*.png" URL'},
+    'Auth & Headers':{'Basic auth':'wget --user=name --password=pass URL','Custom header':'wget --header="Authorization: Bearer TOKEN" URL','Cookie file':'wget --load-cookies cookies.txt URL','User agent':'wget -U "Mozilla/5.0" URL','Referer header':'wget --referer=http://example.com URL'},
+    'Speed & Limits':{'Limit rate':'wget --limit-rate=200k URL','Wait between':'wget -w 2 URL','Random wait':'wget --random-wait -w 3 URL','Retry count':'wget --tries=5 URL','Timeout':'wget -T 30 URL'},
+    'Output & Debug':{'Quiet mode':'wget -q URL','Show progress':'wget --show-progress URL','Log to file':'wget -o log.txt URL','Debug mode':'wget -d URL','Spider mode':'wget --spider URL'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">wget Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskRecurrenceCalendar(){
+  const tasks=(S.tasks||[]).filter(t=>t.recurrence&&t.recurrence!=='none');
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Recurrence Calendar</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(tasks.length===0){
+    html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No recurring tasks found</div>';
+  } else {
+    const byType={daily:[],weekday:[],weekly:[],biweekly:[],monthly:[]};
+    tasks.forEach(t=>{const r=t.recurrence;if(byType[r])byType[r].push(t);});
+    const colors={daily:'#ef4444',weekday:'#f59e0b',weekly:'#06b6d4',biweekly:'#8b5cf6',monthly:'#4ade80'};
+    Object.entries(byType).forEach(([type,list])=>{
+      if(list.length===0)return;
+      html+='<div style="margin-bottom:14px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="width:8px;height:8px;border-radius:50%;background:'+colors[type]+'"></div><span style="color:var(--text-secondary);font-size:12px;font-weight:600;text-transform:capitalize">'+type+'</span><span style="color:var(--text-muted);font-size:10px">('+list.length+')</span></div>';
+      list.forEach(t=>{
+        html+='<div style="padding:8px 12px;margin-bottom:3px;background:var(--bg-surface);border-radius:4px;border-left:3px solid '+colors[type]+'"><div style="color:var(--text-primary);font-size:12px">'+esc(t.title)+'</div><div style="color:var(--text-muted);font-size:10px;margin-top:2px">'+(t.due||'No due date')+' | '+(t.project||'No project')+'</div></div>';
+      });
+      html+='</div>';
+    });
+    const now=new Date();const next30=[];
+    tasks.forEach(t=>{
+      const due=t.due?new Date(t.due):null;if(!due)return;
+      for(let d=0;d<30;d++){
+        const check=new Date(now);check.setDate(now.getDate()+d);
+        let match=false;
+        if(t.recurrence==='daily')match=true;
+        else if(t.recurrence==='weekday')match=check.getDay()>0&&check.getDay()<6;
+        else if(t.recurrence==='weekly')match=check.getDay()===due.getDay();
+        else if(t.recurrence==='monthly')match=check.getDate()===due.getDate();
+        if(match)next30.push({date:check.toISOString().split('T')[0],title:t.title,type:t.recurrence});
+      }
+    });
+    html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px">Next 30 days: '+next30.length+' recurring occurrences</div>';
+    html+='<div style="color:var(--text-muted);font-size:10px">'+tasks.length+' recurring tasks active</div></div>';
+  }
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickJsonFormatter(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">JSON Formatter</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<textarea id="json-input" placeholder="Paste JSON here..." style="width:100%;height:120px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box"></textarea>';
+  html+='<div style="display:flex;gap:6px;margin:10px 0"><button onclick="window._formatJson(2)" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Pretty (2sp)</button>';
+  html+='<button onclick="window._formatJson(4)" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Pretty (4sp)</button>';
+  html+='<button onclick="window._minifyJson()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Minify</button>';
+  html+='<button onclick="window._validateJson()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Validate</button>';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'json-output\').textContent)" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Copy</button></div>';
+  html+='<div id="json-status" style="font-size:11px;margin-bottom:6px;color:var(--text-muted)"></div>';
+  html+='<pre id="json-output" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-size:11px;max-height:300px;overflow:auto;white-space:pre-wrap;word-break:break-all"></pre>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._formatJson=function(spaces){
+    const inp=document.getElementById('json-input');const out=document.getElementById('json-output');const st=document.getElementById('json-status');
+    try{const obj=JSON.parse(inp.value);const result=JSON.stringify(obj,null,spaces);out.textContent=result;st.style.color='#4ade80';st.textContent='Valid JSON ('+result.length+' chars, '+Object.keys(obj).length+' top-level keys)';}
+    catch(e){st.style.color='#ef4444';st.textContent='Error: '+e.message;out.textContent='';}
+  };
+  window._minifyJson=function(){
+    const inp=document.getElementById('json-input');const out=document.getElementById('json-output');const st=document.getElementById('json-status');
+    try{const obj=JSON.parse(inp.value);const result=JSON.stringify(obj);out.textContent=result;st.style.color='#4ade80';st.textContent='Minified ('+result.length+' chars)';}
+    catch(e){st.style.color='#ef4444';st.textContent='Error: '+e.message;out.textContent='';}
+  };
+  window._validateJson=function(){
+    const inp=document.getElementById('json-input');const st=document.getElementById('json-status');
+    try{JSON.parse(inp.value);st.style.color='#4ade80';st.textContent='Valid JSON';}
+    catch(e){st.style.color='#ef4444';st.textContent='Invalid: '+e.message;}
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
