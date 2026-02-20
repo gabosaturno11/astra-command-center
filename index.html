@@ -6140,6 +6140,12 @@ function cmdGetItems(q) {
       ['grid','CSS grid layout generator with live preview'],
       ['distribution','Task distribution by status and priority'],
       ['dice','Dice roller with d4-d20 options'],
+      ['animation','CSS animation presets library'],
+      ['gantt','Task Gantt chart timeline view'],
+      ['coin flip','Quick coin flip with stats'],
+      ['transition','CSS transition generator with live preview'],
+      ['overdue','Overdue tasks summary grouped by age'],
+      ['roulette','Decision roulette wheel spinner'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8729,6 +8735,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='dice' || ql==='dice roller' || ql==='roll dice' || ql==='d20')){
     items.unshift({title:'Dice Roller',desc:'Roll d4-d20 dice',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDice();}});
+  }
+  if(ql && (ql==='animation' || ql==='css animation' || ql==='keyframes' || ql==='animation presets')){
+    items.unshift({title:'Animation Presets',desc:'CSS animation library',icon:'A',type:'action',action:()=>{closeCommandPalette();showAnimationGen();}});
+  }
+  if(ql && (ql==='gantt' || ql==='gantt chart' || ql==='task timeline' || ql==='task gantt')){
+    items.unshift({title:'Task Gantt',desc:'Gantt chart timeline view',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskGantt();}});
+  }
+  if(ql && (ql==='coin flip' || ql==='coin' || ql==='flip coin' || ql==='heads tails')){
+    items.unshift({title:'Coin Flip',desc:'Quick coin flip with stats',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCoinFlip();}});
+  }
+  if(ql && (ql==='transition' || ql==='css transition' || ql==='transition generator' || ql==='hover effect')){
+    items.unshift({title:'Transition Generator',desc:'CSS transition with live preview',icon:'T',type:'action',action:()=>{closeCommandPalette();showTransitionGen();}});
+  }
+  if(ql && (ql==='overdue' || ql==='overdue tasks' || ql==='overdue summary' || ql==='late tasks')){
+    items.unshift({title:'Overdue Summary',desc:'Overdue tasks grouped by age',icon:'!',type:'action',action:()=>{closeCommandPalette();showTaskOverdueSummary();}});
+  }
+  if(ql && (ql==='roulette' || ql==='spin wheel' || ql==='random picker' || ql==='decision wheel')){
+    items.unshift({title:'Roulette',desc:'Decision roulette spinner',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRoulette();}});
   }
   return items.slice(0, 20);
 }
@@ -20829,6 +20853,200 @@ function showQuickDice(){
     var hel=document.getElementById('dice-history');
     if(hel)hel.textContent=history.join(' | ');
   };
+}
+function showAnimationGen(){
+  var ex=document.getElementById('animation-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='animation-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  var presets=[
+    {name:'Fade In',css:'@keyframes fadeIn{from{opacity:0}to{opacity:1}}\\n.fade-in{animation:fadeIn 0.3s ease forwards}'},
+    {name:'Slide Up',css:'@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}\\n.slide-up{animation:slideUp 0.4s ease forwards}'},
+    {name:'Slide Down',css:'@keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}\\n.slide-down{animation:slideDown 0.4s ease forwards}'},
+    {name:'Scale In',css:'@keyframes scaleIn{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}\\n.scale-in{animation:scaleIn 0.3s ease forwards}'},
+    {name:'Bounce',css:'@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}\\n.bounce{animation:bounce 0.6s ease infinite}'},
+    {name:'Pulse',css:'@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}\\n.pulse{animation:pulse 1s ease infinite}'},
+    {name:'Shake',css:'@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}\\n.shake{animation:shake 0.4s ease}'},
+    {name:'Spin',css:'@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}\\n.spin{animation:spin 1s linear infinite}'},
+    {name:'Glow',css:'@keyframes glow{0%,100%{box-shadow:0 0 5px #4ade80}50%{box-shadow:0 0 20px #4ade80,0 0 40px #4ade8050}}\\n.glow{animation:glow 2s ease infinite}'}
+  ];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">CSS Animation Presets</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  presets.forEach(function(p,i){
+    h+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:8px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+      '<span style="color:var(--text-primary);font-size:13px;font-weight:600">'+p.name+'</span>'+
+      '<button onclick="window._copyAnim('+i+')" style="background:#4ade80;color:#000;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Copy</button>'+
+      '</div>'+
+      '<pre style="font-family:monospace;font-size:10px;color:#4ade80;white-space:pre-wrap;margin:0">'+p.css.replace(/\\n/g,'\n')+'</pre>'+
+      '</div>';
+  });
+  d.innerHTML=h;
+  window._copyAnim=function(i){
+    navigator.clipboard.writeText(presets[i].css.replace(/\\n/g,'\n'));
+    var btns=d.querySelectorAll('button');
+    var btn=btns[i+1];
+    if(btn){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},800);}
+  };
+  document.body.appendChild(d);
+}
+function showTaskGantt(){
+  var ex=document.getElementById('task-gantt-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]).filter(function(t){return t.due;});
+  tasks.sort(function(a,b){return new Date(a.due)-new Date(b.due);});
+  var first20=tasks.slice(0,20);
+  var minDate=null,maxDate=null;
+  first20.forEach(function(t){
+    var d=new Date(t.due);
+    var created=t.createdAt?new Date(t.createdAt):new Date(d.getTime()-86400000*3);
+    if(!minDate||created<minDate)minDate=created;
+    if(!maxDate||d>maxDate)maxDate=d;
+  });
+  if(!minDate)minDate=new Date();
+  if(!maxDate)maxDate=new Date(minDate.getTime()+86400000*14);
+  var range=maxDate-minDate||1;
+  var svgW=420,rowH=24;
+  var svgH=first20.length*rowH+40;
+  var bars='';
+  var statusColors={todo:'#64748b','in-progress':'#f59e0b',done:'#4ade80',blocked:'#ef4444'};
+  first20.forEach(function(t,i){
+    var due=new Date(t.due);
+    var start=t.createdAt?new Date(t.createdAt):new Date(due.getTime()-86400000*3);
+    var x1=40+Math.max(0,(start-minDate)/range)*(svgW-60);
+    var x2=40+Math.max(0,(due-minDate)/range)*(svgW-60);
+    var w=Math.max(x2-x1,8);
+    var y=i*rowH+25;
+    var c=statusColors[t.status]||'#64748b';
+    bars+='<rect x="'+x1.toFixed(1)+'" y="'+y+'" width="'+w.toFixed(1)+'" height="16" rx="3" fill="'+c+'" opacity="0.8"/>';
+    var label=(t.title||'').substring(0,20);
+    bars+='<text x="'+(x1+4).toFixed(1)+'" y="'+(y+12)+'" fill="#fff" font-size="9" font-family="monospace">'+label+'</text>';
+  });
+  var d=document.createElement('div');d.id='task-gantt-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Task Gantt Chart</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    (first20.length?'<svg width="'+svgW+'" height="'+svgH+'" style="display:block;margin:0 auto">'+bars+'</svg>':
+    '<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">Add tasks with due dates to see Gantt chart</div>');
+  document.body.appendChild(d);
+}
+function showQuickCoinFlip(){
+  var ex=document.getElementById('coin-flip-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='coin-flip-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:200px;text-align:center';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Coin Flip</span><button onclick="document.getElementById(\'coin-flip-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button></div>'+
+    '<div id="coin-result" style="font-size:36px;font-weight:700;color:#4ade80;margin-bottom:4px">?</div>'+
+    '<div id="coin-stats" style="color:var(--text-muted);font-size:10px;margin-bottom:12px">Flip to start</div>'+
+    '<button onclick="window._flipCoin()" style="background:#4ade80;color:#000;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;width:100%">Flip</button>';
+  document.body.appendChild(d);
+  var heads=0,tails=0;
+  window._flipCoin=function(){
+    var result=Math.random()<0.5?'Heads':'Tails';
+    if(result==='Heads')heads++;else tails++;
+    var el=document.getElementById('coin-result');
+    if(el){el.textContent=result;el.style.color=result==='Heads'?'#4ade80':'#06b6d4';}
+    var st=document.getElementById('coin-stats');
+    if(st)st.textContent='H: '+heads+' | T: '+tails+' ('+Math.round(heads/(heads+tails)*100)+'% heads)';
+  };
+}
+function showTransitionGen(){
+  var ex=document.getElementById('transition-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='transition-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  var prop='all',dur=300,ease='ease',delay=0;
+  function getCSS(){return 'transition: '+prop+' '+dur+'ms '+ease+(delay?' '+delay+'ms':'')+';\n-webkit-transition: '+prop+' '+dur+'ms '+ease+(delay?' '+delay+'ms':'')+';';}
+  function render(){
+    var code=d.querySelector('.trans-code');if(code)code.textContent=getCSS();
+  }
+  function sel(id,opts,val){
+    var h='<select id="'+id+'" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px;font-size:11px;width:100%">';
+    opts.forEach(function(o){h+='<option value="'+o+'"'+(o===val?' selected':'')+'>'+o+'</option>';});
+    return h+'</select>';
+  }
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">CSS Transition Generator</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="display:flex;justify-content:center;margin-bottom:16px"><div id="trans-preview" onmouseenter="this.style.transform=\'scale(1.2)\';this.style.background=\'#4ade80\'" onmouseleave="this.style.transform=\'scale(1)\';this.style.background=\'#06b6d4\'" style="width:80px;height:80px;background:#06b6d4;border-radius:12px;transition:'+prop+' '+dur+'ms '+ease+';cursor:pointer;display:flex;align-items:center;justify-content:center;color:#000;font-size:11px;font-weight:600">Hover me</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:11px">Property<br>'+sel('trans-prop',['all','transform','opacity','background','color','border','box-shadow','width','height'],prop)+'</label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Easing<br>'+sel('trans-ease',['ease','linear','ease-in','ease-out','ease-in-out','cubic-bezier(0.4,0,0.2,1)'],ease)+'</label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Duration (ms)<br><input type="range" min="50" max="2000" value="'+dur+'" id="trans-dur" style="width:100%"><span id="trans-dur-val" style="color:var(--text-primary);font-size:10px">'+dur+'ms</span></label>'+
+    '<label style="color:var(--text-muted);font-size:11px">Delay (ms)<br><input type="range" min="0" max="1000" value="'+delay+'" id="trans-delay" style="width:100%"><span id="trans-delay-val" style="color:var(--text-primary);font-size:10px">'+delay+'ms</span></label>'+
+    '</div>'+
+    '<pre class="trans-code" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:#4ade80;margin-bottom:10px;white-space:pre-wrap">'+getCSS()+'</pre>'+
+    '<button id="trans-copy" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy CSS</button>';
+  document.body.appendChild(d);
+  function updatePreview(){
+    var prev=document.getElementById('trans-preview');
+    if(prev)prev.style.transition=prop+' '+dur+'ms '+ease+(delay?' '+delay+'ms':'');
+  }
+  d.querySelector('#trans-prop').onchange=function(e){prop=e.target.value;render();updatePreview();};
+  d.querySelector('#trans-ease').onchange=function(e){ease=e.target.value;render();updatePreview();};
+  d.querySelector('#trans-dur').oninput=function(e){dur=parseInt(e.target.value);document.getElementById('trans-dur-val').textContent=dur+'ms';render();updatePreview();};
+  d.querySelector('#trans-delay').oninput=function(e){delay=parseInt(e.target.value);document.getElementById('trans-delay-val').textContent=delay+'ms';render();updatePreview();};
+  d.querySelector('#trans-copy').onclick=function(){
+    navigator.clipboard.writeText(getCSS());
+    this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy CSS';},800);
+  };
+}
+function showTaskOverdueSummary(){
+  var ex=document.getElementById('overdue-summary-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var now=new Date();var today=now.toISOString().split('T')[0];
+  var overdue=tasks.filter(function(t){return t.due&&t.due<today&&t.status!=='done';});
+  overdue.sort(function(a,b){return new Date(a.due)-new Date(b.due);});
+  var byAge={'1-3 days':[],  '4-7 days':[], '1-2 weeks':[], '2+ weeks':[]};
+  overdue.forEach(function(t){
+    var diff=Math.floor((now-new Date(t.due))/86400000);
+    if(diff<=3)byAge['1-3 days'].push(t);
+    else if(diff<=7)byAge['4-7 days'].push(t);
+    else if(diff<=14)byAge['1-2 weeks'].push(t);
+    else byAge['2+ weeks'].push(t);
+  });
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Overdue Tasks</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  h+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;font-weight:700;color:'+(overdue.length?'#ef4444':'#4ade80')+'">'+overdue.length+'</div><div style="font-size:11px;color:var(--text-muted)">overdue tasks</div></div>';
+  var ageColors={'1-3 days':'#f59e0b','4-7 days':'#f97316','1-2 weeks':'#ef4444','2+ weeks':'#dc2626'};
+  Object.keys(byAge).forEach(function(bucket){
+    if(!byAge[bucket].length)return;
+    h+='<div style="margin-bottom:12px"><div style="font-size:11px;color:'+ageColors[bucket]+';font-weight:600;margin-bottom:4px">'+bucket+' ('+byAge[bucket].length+')</div>';
+    byAge[bucket].forEach(function(t){
+      h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--bg-surface);border-radius:4px;margin-bottom:3px;border-left:3px solid '+ageColors[bucket]+'">'+
+        '<span style="color:var(--text-primary);font-size:12px">'+esc(t.title||'Untitled')+'</span>'+
+        '<span style="color:var(--text-muted);font-size:10px">'+t.due+'</span></div>';
+    });
+    h+='</div>';
+  });
+  if(!overdue.length)h+='<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No overdue tasks! You\'re on track.</div>';
+  var d=document.createElement('div');d.id='overdue-summary-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showQuickRoulette(){
+  var ex=document.getElementById('roulette-float');if(ex){ex.remove();return;}
+  if(!S._rouletteItems)S._rouletteItems=['Option A','Option B','Option C'];
+  var d=document.createElement('div');d.id='roulette-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:260px';
+  function rend(){
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Roulette</span><button onclick="document.getElementById(\'roulette-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button></div>';
+    h+='<div id="roulette-result" style="text-align:center;font-size:18px;font-weight:700;color:#4ade80;padding:12px 0;margin-bottom:8px;background:var(--bg-surface);border-radius:8px">Spin to choose</div>';
+    h+='<div style="margin-bottom:8px">';
+    S._rouletteItems.forEach(function(item,i){
+      h+='<div style="display:flex;gap:4px;margin-bottom:4px"><input value="'+esc(item)+'" onchange="S._rouletteItems['+i+']=this.value;save()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px"><button onclick="S._rouletteItems.splice('+i+',1);save();window._rouletteRender()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">x</button></div>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;gap:6px"><button onclick="S._rouletteItems.push(\'Option \'+(S._rouletteItems.length+1));save();window._rouletteRender()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;flex:1">+ Add</button><button onclick="window._rouletteSpin()" style="background:#4ade80;color:#000;border:none;padding:4px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;flex:1">Spin</button></div>';
+    d.innerHTML=h;
+  }
+  window._rouletteRender=rend;
+  window._rouletteSpin=function(){
+    if(!S._rouletteItems.length)return;
+    var el=document.getElementById('roulette-result');if(!el)return;
+    var count=0,total=15;
+    var interval=setInterval(function(){
+      var rand=S._rouletteItems[Math.floor(Math.random()*S._rouletteItems.length)];
+      el.textContent=rand;
+      el.style.color=count<total-1?'var(--text-muted)':'#4ade80';
+      count++;
+      if(count>=total)clearInterval(interval);
+    },80);
+  };
+  document.body.appendChild(d);
+  rend();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
