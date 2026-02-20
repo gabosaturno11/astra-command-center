@@ -6194,6 +6194,12 @@ function cmdGetItems(q) {
       ['curl','cURL command generator'],
       ['task age','Task age distribution chart'],
       ['white noise','White/pink/brown noise generator'],
+      ['fetch','Fetch API code generator'],
+      ['priority history','Task priority breakdown over time'],
+      ['stretch','Guided desk stretching exercises'],
+      ['console log','Console.log template snippets'],
+      ['flow efficiency','Task flow efficiency dashboard'],
+      ['gratitude','Daily gratitude journal'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8945,6 +8951,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='white noise' || ql==='noise' || ql==='pink noise' || ql==='brown noise')){
     items.unshift({title:'White Noise',desc:'White/pink/brown noise generator',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWhiteNoise();}});
+  }
+  if(ql && (ql==='fetch' || ql==='fetch api' || ql==='fetch generator' || ql==='api code')){
+    items.unshift({title:'Fetch API Generator',desc:'Generate fetch() code snippets',icon:'F',type:'action',action:()=>{closeCommandPalette();showFetchGenerator();}});
+  }
+  if(ql && (ql==='priority history' || ql==='priority chart' || ql==='priority breakdown' || ql==='prio history')){
+    items.unshift({title:'Priority History',desc:'Priority distribution over 8 weeks',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityHistory();}});
+  }
+  if(ql && (ql==='stretch' || ql==='stretching' || ql==='desk stretch' || ql==='body break')){
+    items.unshift({title:'Desk Stretch',desc:'Guided stretching exercises',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStretch();}});
+  }
+  if(ql && (ql==='console log' || ql==='console' || ql==='console.log' || ql==='log templates')){
+    items.unshift({title:'Console.log Templates',desc:'10 useful logging patterns',icon:'C',type:'action',action:()=>{closeCommandPalette();showConsoleLogGen();}});
+  }
+  if(ql && (ql==='flow efficiency' || ql==='flow' || ql==='efficiency' || ql==='throughput')){
+    items.unshift({title:'Flow Efficiency',desc:'Task flow metrics dashboard',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFlowEfficiency();}});
+  }
+  if(ql && (ql==='gratitude' || ql==='grateful' || ql==='gratitude journal' || ql==='thankful')){
+    items.unshift({title:'Gratitude Journal',desc:'Daily gratitude entries with streak',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGratitude();}});
   }
   return items.slice(0, 20);
 }
@@ -23101,6 +23125,260 @@ function showQuickWhiteNoise(){
     document.getElementById('wn-toggle').onclick=function(){if(playing)stop();else start();rend();};
   }
   window._wnStop=stop;
+  document.body.appendChild(p);
+  rend();
+}
+function showFetchGenerator(){
+  let p=document.getElementById('fetch-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='fetch-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:540px;width:90vw;max-height:80vh;overflow-y:auto';
+  let cfg=S._fetchCfg||{method:'GET',url:'https://api.example.com/data',headers:[{k:'Content-Type',v:'application/json'}],body:'',async:true,errorHandling:true};
+  function gen(){
+    let lines=[];
+    if(cfg.async)lines.push('async function fetchData() {');
+    else lines.push('function fetchData() {');
+    let opts=[];
+    if(cfg.method!=='GET')opts.push("    method: '"+cfg.method+"'");
+    if(cfg.headers.filter(h=>h.k&&h.v).length){
+      opts.push('    headers: {');
+      cfg.headers.filter(h=>h.k&&h.v).forEach((h,i,a)=>{opts.push("      '"+h.k+"': '"+h.v+"'"+(i<a.length-1?',':''));});
+      opts.push('    }');
+    }
+    if(cfg.body&&cfg.method!=='GET')opts.push("    body: JSON.stringify("+cfg.body+")");
+    if(cfg.async){
+      if(cfg.errorHandling)lines.push('  try {');
+      let indent=cfg.errorHandling?'    ':'  ';
+      if(opts.length){
+        lines.push(indent+"const response = await fetch('"+cfg.url+"', {");
+        opts.forEach(o=>lines.push(indent+o.trim()));
+        lines.push(indent+'});');
+      } else {
+        lines.push(indent+"const response = await fetch('"+cfg.url+"');");
+      }
+      lines.push(indent+'if (!response.ok) throw new Error(`HTTP ${response.status}`);');
+      lines.push(indent+'const data = await response.json();');
+      lines.push(indent+'return data;');
+      if(cfg.errorHandling){lines.push('  } catch (error) {');lines.push('    console.error(error);');lines.push('    throw error;');lines.push('  }');}
+    } else {
+      if(opts.length){
+        lines.push("  return fetch('"+cfg.url+"', {");
+        opts.forEach(o=>lines.push('  '+o.trim()));
+        lines.push('  })');
+      } else {
+        lines.push("  return fetch('"+cfg.url+"')");
+      }
+      lines.push('    .then(res => {');
+      lines.push('      if (!res.ok) throw new Error(`HTTP ${res.status}`);');
+      lines.push('      return res.json();');
+      lines.push('    })');
+      if(cfg.errorHandling){lines.push('    .catch(err => {');lines.push('      console.error(err);');lines.push('      throw err;');lines.push('    });');}
+      else lines[lines.length-1]+=';';
+    }
+    lines.push('}');
+    return lines.join('\n');
+  }
+  function rend(){
+    let code=gen();
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Fetch API Generator</span><button onclick="document.getElementById(\'fetch-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:8px"><select id="fetch-method" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary)">'+['GET','POST','PUT','PATCH','DELETE'].map(m=>'<option'+(m===cfg.method?' selected':'')+'>'+m+'</option>').join('')+'</select><input id="fetch-url" value="'+esc(cfg.url)+'" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:12px"></div>'
+      +'<div style="display:flex;gap:12px;margin-bottom:8px"><label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);cursor:pointer"><input type="checkbox" id="fetch-async" '+(cfg.async?'checked':'')+' style="cursor:pointer"> async/await</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted);cursor:pointer"><input type="checkbox" id="fetch-err" '+(cfg.errorHandling?'checked':'')+' style="cursor:pointer"> Error handling</label></div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.5">'+esc(code)+'</pre>'
+      +'<button id="fetch-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy Code</button>';
+    document.getElementById('fetch-method').onchange=function(){cfg.method=this.value;S._fetchCfg=cfg;save();rend();};
+    document.getElementById('fetch-url').oninput=function(){cfg.url=this.value;S._fetchCfg=cfg;save();};
+    document.getElementById('fetch-async').onchange=function(){cfg.async=this.checked;S._fetchCfg=cfg;save();rend();};
+    document.getElementById('fetch-err').onchange=function(){cfg.errorHandling=this.checked;S._fetchCfg=cfg;save();rend();};
+    document.getElementById('fetch-copy').onclick=function(){navigator.clipboard.writeText(code);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy Code';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskPriorityHistory(){
+  let p=document.getElementById('prio-hist-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='prio-hist-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let weeks=8;let now=new Date();
+  let data=[];
+  let colors={p0:'#f87171',p1:'#fb923c',p2:'#60a5fa',p3:'#6b7280'};
+  for(let w=weeks-1;w>=0;w--){
+    let wEnd=new Date(now);wEnd.setDate(wEnd.getDate()-w*7);
+    let label=(wEnd.getMonth()+1)+'/'+wEnd.getDate();
+    let counts={p0:0,p1:0,p2:0,p3:0};
+    tasks.forEach(t=>{
+      let created=new Date(t.created||t.id);
+      if(created<=wEnd){
+        let prio=t.priority||'p3';
+        if(counts[prio]!==undefined)counts[prio]++;
+      }
+    });
+    data.push({label,...counts});
+  }
+  let svgW=460,svgH=220,pad=35;
+  let maxT=Math.max(...data.map(d=>d.p0+d.p1+d.p2+d.p3),1);
+  let gap=(svgW-pad*2)/data.length;
+  let barW=gap*0.6;
+  let bars='';
+  data.forEach((d,i)=>{
+    let x=pad+i*gap+gap*0.2;
+    let total=d.p0+d.p1+d.p2+d.p3;
+    let y=svgH-pad;
+    ['p3','p2','p1','p0'].forEach(pk=>{
+      let h=(d[pk]/maxT)*(svgH-pad*2);
+      y-=h;
+      bars+='<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" fill="'+colors[pk]+'" rx="1"/>';
+    });
+    bars+='<text x="'+(x+barW/2)+'" y="'+(svgH-pad+14)+'" text-anchor="middle" fill="#888" font-size="9">'+d.label+'</text>';
+    bars+='<text x="'+(x+barW/2)+'" y="'+(svgH-pad-((total/maxT)*(svgH-pad*2))-4)+'" text-anchor="middle" fill="#ccc" font-size="9">'+total+'</text>';
+  });
+  let legend=['p0: Critical','p1: High','p2: Medium','p3: Low'].map((l,i)=>{
+    let c=[colors.p0,colors.p1,colors.p2,colors.p3][i];
+    return '<span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-muted)"><span style="width:8px;height:8px;background:'+c+';border-radius:2px;display:inline-block"></span>'+l+'</span>';
+  }).join('');
+  let svg='<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%"><rect width="'+svgW+'" height="'+svgH+'" fill="transparent"/>'+bars+'</svg>';
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Priority History (8 Weeks)</span><button onclick="document.getElementById(\'prio-hist-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:12px;justify-content:center;margin-bottom:10px">'+legend+'</div>'
+    +svg;
+  document.body.appendChild(p);
+}
+function showQuickStretch(){
+  let p=document.getElementById('stretch-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='stretch-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  let stretches=[
+    {name:'Neck Roll',desc:'Slowly roll your head in a circle, 5 each direction',dur:30},
+    {name:'Shoulder Shrugs',desc:'Raise shoulders to ears, hold 3s, release. Repeat 10x',dur:30},
+    {name:'Wrist Circles',desc:'Extend arms, circle wrists slowly. 10 each direction',dur:20},
+    {name:'Chest Opener',desc:'Clasp hands behind back, squeeze shoulder blades, lift arms',dur:20},
+    {name:'Seated Twist',desc:'Cross one leg, twist torso toward knee. Hold 15s each side',dur:30},
+    {name:'Standing Hamstring',desc:'Place heel on desk edge, lean forward gently. 15s each',dur:30},
+    {name:'Finger Stretches',desc:'Spread fingers wide, hold 5s. Make fists, hold 5s. Repeat 5x',dur:20},
+    {name:'Cat-Cow Seated',desc:'Round back (cat), arch back (cow). Slow breathing. 8 reps',dur:25}
+  ];
+  let idx=Math.floor(Math.random()*stretches.length);
+  let ex=stretches[idx];
+  let phase=0;let secs=ex.dur;let timer=null;
+  function rend(){
+    if(phase===0){
+      p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Desk Stretch</span><button onclick="document.getElementById(\'stretch-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+        +'<div style="text-align:center;padding:8px 0"><div style="font-size:14px;font-weight:600;color:#4ade80;margin-bottom:6px">'+esc(ex.name)+'</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;line-height:1.4">'+esc(ex.desc)+'</div>'
+        +'<div style="display:flex;gap:6px;justify-content:center"><button id="str-start" style="padding:8px 20px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Start ('+ex.dur+'s)</button><button id="str-skip" style="padding:8px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:11px">Skip</button></div></div>';
+      document.getElementById('str-start').onclick=function(){phase=1;secs=ex.dur;startTimer();};
+      document.getElementById('str-skip').onclick=function(){idx=(idx+1)%stretches.length;ex=stretches[idx];secs=ex.dur;rend();};
+    } else if(phase===1){
+      let pct=((ex.dur-secs)/ex.dur)*100;
+      p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Desk Stretch</span><button onclick="clearInterval(window._strTimer);document.getElementById(\'stretch-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+        +'<div style="text-align:center;padding:8px 0"><div style="font-size:13px;color:#4ade80;margin-bottom:4px">'+esc(ex.name)+'</div><div style="font-size:32px;font-weight:700;color:var(--text-primary);margin-bottom:6px">'+secs+'s</div>'
+        +'<div style="height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;transition:width 1s linear"></div></div></div>';
+    } else {
+      p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Desk Stretch</span><button onclick="document.getElementById(\'stretch-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+        +'<div style="text-align:center;padding:12px 0"><div style="font-size:16px;color:#4ade80;margin-bottom:6px">Great stretch!</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Keep your body happy while you code.</div>'
+        +'<div style="display:flex;gap:6px;justify-content:center"><button onclick="document.getElementById(\'stretch-panel\').remove()" style="padding:6px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);cursor:pointer">Close</button></div></div>';
+    }
+  }
+  function startTimer(){
+    rend();
+    window._strTimer=setInterval(()=>{secs--;if(secs<=0){phase=2;clearInterval(window._strTimer);}rend();},1000);
+    timer=window._strTimer;
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showConsoleLogGen(){
+  let p=document.getElementById('clog-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='clog-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let templates=[
+    {name:'Basic Log',code:'console.log("value:", variable);',desc:'Simple value inspection'},
+    {name:'Table',code:'console.table(arrayOrObject);',desc:'Display data in table format'},
+    {name:'Group',code:'console.group("Label");\nconsole.log("detail1:", val1);\nconsole.log("detail2:", val2);\nconsole.groupEnd();',desc:'Grouped log output'},
+    {name:'Timer',code:'console.time("operation");\n// ... code to measure ...\nconsole.timeEnd("operation");',desc:'Measure execution time'},
+    {name:'Styled',code:'console.log("%c Custom Message ", "background:#4ade80;color:#000;padding:2px 6px;border-radius:3px;font-weight:bold");',desc:'Styled console output'},
+    {name:'Assert',code:'console.assert(condition, "Assertion failed:", { expected, actual });',desc:'Log only when condition fails'},
+    {name:'Trace',code:'console.trace("Stack trace at this point");',desc:'Print stack trace'},
+    {name:'Count',code:'console.count("function-name");  // logs how many times called',desc:'Count invocations'},
+    {name:'Dir',code:'console.dir(domElement, { depth: 3 });',desc:'Inspect object with depth'},
+    {name:'Debug Block',code:'const DEBUG = true;\nfunction dbg(...args) { if(DEBUG) console.log("[DBG]", ...args); }\ndbg("message", data);',desc:'Conditional debug wrapper'}
+  ];
+  let rows=templates.map(t=>'<div style="padding:10px;background:var(--bg-surface);border-radius:var(--radius);margin-bottom:6px;cursor:pointer" data-code="'+esc(t.code)+'"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-weight:600;color:var(--text-primary);font-size:12px">'+esc(t.name)+'</span><span style="font-size:10px;color:var(--text-muted)">'+esc(t.desc)+'</span></div><pre style="margin:0;font-size:10px;color:#4ade80;background:#0a0a0f;padding:6px 8px;border-radius:3px;overflow-x:auto;white-space:pre">'+esc(t.code)+'</pre></div>').join('');
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Console.log Templates</span><button onclick="document.getElementById(\'clog-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">Click any template to copy to clipboard</div>'
+    +rows;
+  p.querySelectorAll('[data-code]').forEach(el=>{
+    el.onclick=function(){
+      navigator.clipboard.writeText(this.dataset.code);
+      let orig=this.style.border;this.style.border='1px solid #4ade80';
+      setTimeout(()=>{this.style.border=orig;},600);
+    };
+  });
+  document.body.appendChild(p);
+}
+function showTaskFlowEfficiency(){
+  let p=document.getElementById('flow-eff-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='flow-eff-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let done=tasks.filter(t=>t.status==='done');
+  let total=tasks.length;
+  let doneCount=done.length;
+  let inProg=tasks.filter(t=>t.status==='in-progress').length;
+  let todo=tasks.filter(t=>t.status==='todo'||t.status==='backlog').length;
+  let blocked=tasks.filter(t=>t.blockedBy&&t.blockedBy.length>0&&t.status!=='done').length;
+  let overdue=tasks.filter(t=>{if(!t.due||t.status==='done')return false;return new Date(t.due)<new Date();}).length;
+  let throughput=0;
+  if(done.length){
+    let earliest=Infinity;let latest=0;
+    done.forEach(t=>{
+      let d=t.completedAt?new Date(t.completedAt).getTime():(t.created||Date.now());
+      if(d<earliest)earliest=d;if(d>latest)latest=d;
+    });
+    let weeks=Math.max((latest-earliest)/604800000,1);
+    throughput=Math.round(done.length/weeks*10)/10;
+  }
+  let flowEff=total>0?Math.round(doneCount/total*100):0;
+  let wipRatio=total>0?Math.round(inProg/Math.max(total-doneCount,1)*100):0;
+  let metrics=[
+    {label:'Flow Efficiency',value:flowEff+'%',color:flowEff>70?'#4ade80':flowEff>40?'#fbbf24':'#f87171',desc:'Done / Total tasks'},
+    {label:'Throughput',value:throughput+'/wk',color:'#22d3ee',desc:'Tasks completed per week'},
+    {label:'WIP Ratio',value:wipRatio+'%',color:wipRatio<50?'#4ade80':wipRatio<80?'#fbbf24':'#f87171',desc:'In-progress vs open tasks'},
+    {label:'Blocked',value:blocked+'',color:blocked===0?'#4ade80':'#f87171',desc:'Tasks with unresolved dependencies'},
+    {label:'Overdue',value:overdue+'',color:overdue===0?'#4ade80':'#f87171',desc:'Tasks past due date'},
+    {label:'Completion Rate',value:doneCount+'/'+total,color:'#a78bfa',desc:'Total tasks done vs created'}
+  ];
+  let cards=metrics.map(m=>'<div style="padding:10px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:22px;font-weight:700;color:'+m.color+'">'+m.value+'</div><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-top:2px">'+m.label+'</div><div style="font-size:9px;color:var(--text-muted);margin-top:2px">'+m.desc+'</div></div>').join('');
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Flow Efficiency Dashboard</span><button onclick="document.getElementById(\'flow-eff-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">'+cards+'</div>';
+  document.body.appendChild(p);
+}
+function showQuickGratitude(){
+  let p=document.getElementById('gratitude-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='gratitude-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  if(!S._gratitude)S._gratitude=[];
+  let today=new Date().toISOString().slice(0,10);
+  let todayEntries=S._gratitude.filter(g=>g.date===today);
+  function rend(){
+    todayEntries=S._gratitude.filter(g=>g.date===today);
+    let list=todayEntries.map((g,i)=>'<div style="display:flex;gap:6px;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:#4ade80;font-size:11px;min-width:14px">'+(i+1)+'.</span><span style="font-size:11px;color:var(--text-primary);flex:1">'+esc(g.text)+'</span></div>').join('');
+    let streak=0;
+    let d=new Date();
+    while(true){
+      let ds=d.toISOString().slice(0,10);
+      if(S._gratitude.some(g=>g.date===ds)){streak++;d.setDate(d.getDate()-1);}
+      else break;
+    }
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Gratitude Journal</span><button onclick="document.getElementById(\'gratitude-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:10px"><div style="flex:1;padding:6px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:16px;font-weight:700;color:#4ade80">'+todayEntries.length+'</div><div style="font-size:9px;color:var(--text-muted)">Today</div></div><div style="flex:1;padding:6px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:16px;font-weight:700;color:#22d3ee">'+streak+'</div><div style="font-size:9px;color:var(--text-muted)">Day Streak</div></div></div>'
+      +(list||'<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0">No entries yet today</div>')
+      +'<div style="margin-top:8px"><input id="grat-input" placeholder="I am grateful for..." style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;box-sizing:border-box"><button id="grat-add" style="width:100%;margin-top:4px;padding:6px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:11px">Add Entry</button></div>';
+    document.getElementById('grat-add').onclick=function(){
+      let v=document.getElementById('grat-input').value.trim();
+      if(!v)return;
+      S._gratitude.push({text:v,date:today,ts:Date.now()});
+      save();rend();
+    };
+    document.getElementById('grat-input').onkeydown=function(e){if(e.key==='Enter'){document.getElementById('grat-add').click();}};
+  }
   document.body.appendChild(p);
   rend();
 }
