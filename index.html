@@ -1013,7 +1013,7 @@ textarea{resize:vertical;line-height:1.6}
           </div>
           <div class="writer-editor-wrap" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
             <input type="text" class="writer-title-input" id="writer-title" placeholder="Untitled Document" oninput="onWriterChange()">
-            <div class="writer-editor" id="writer-editor" contenteditable="true" data-placeholder="Start writing..." oninput="onWriterChange()" onkeydown="writerKeydown(event)"></div>
+            <div class="writer-editor" id="writer-editor" contenteditable="true" data-placeholder="Start writing..." oninput="onWriterChange()" onkeydown="writerKeydown(event)" onscroll="writerScrollUpdate(this)"></div>
           </div>
           <div class="writer-statusbar">
             <span id="ws-words">0 words</span>
@@ -1022,6 +1022,7 @@ textarea{resize:vertical;line-height:1.6}
             <span id="ws-goal" style="cursor:pointer" onclick="setWriterGoal()" title="Click to set word goal"></span>
             <span id="ws-edited" style="color:var(--text-muted)"></span>
             <span id="ws-session" style="color:var(--green)"></span>
+            <span id="ws-scroll" style="color:var(--text-muted);font-family:var(--mono)"></span>
             <span id="ws-saved" style="margin-left:auto">Saved</span>
           </div>
         </div>
@@ -1037,7 +1038,14 @@ textarea{resize:vertical;line-height:1.6}
       <div class="specs-shell">
         <div class="specs-sidebar">
           <div style="padding:8px;border-bottom:1px solid var(--border);display:flex;gap:4px">
-            <button class="btn btn-primary btn-sm" style="flex:1" onclick="newSpec()">+ New Spec</button>
+            <button class="btn btn-primary btn-sm" style="flex:1" onclick="newSpec()">+ New</button>
+            <select class="writer-toolbar-select" onchange="newSpecFromTemplate(this.value);this.selectedIndex=0" style="width:auto">
+              <option value="">Template</option>
+              <option value="prd">PRD</option>
+              <option value="rfc">RFC</option>
+              <option value="retro">Retrospective</option>
+              <option value="checklist">Checklist</option>
+            </select>
             <select class="writer-toolbar-select" onchange="specExport(this.value);this.selectedIndex=0" style="width:auto">
               <option value="">Export</option>
               <option value="md">Markdown</option>
@@ -3027,6 +3035,7 @@ function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerTe
   const sesEl=document.getElementById('ws-session');if(sesEl&&d&&writerSessionStart[d.id]!==undefined){const delta=w-writerSessionStart[d.id];sesEl.textContent=delta>0?'+'+delta+' this session':delta<0?delta+' this session':'';sesEl.style.color=delta>0?'var(--green)':'var(--yellow)';};
   const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
   if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
+function writerScrollUpdate(el){const s=document.getElementById('ws-scroll');if(!s||!el)return;const max=el.scrollHeight-el.clientHeight;if(max<=0){s.textContent='';return;}const pct=Math.round(el.scrollTop/max*100);s.textContent=pct+'%';}
 function setWriterGoal(){const d=getActiveDoc();if(!d)return;const g=prompt('Word count goal:',d.wordGoal||'');if(g===null)return;d.wordGoal=parseInt(g)||0;save();updateWS();}
 function countW(html){const d=document.createElement('div');d.innerHTML=html||'';return(d.innerText||'').trim().split(/\s+/).filter(x=>x.length).length;}
 function execCmd(c){document.execCommand(c,false,null);document.getElementById('writer-editor').focus();}
@@ -3259,6 +3268,7 @@ function renderSpecList(){const sq=(document.getElementById('spec-list-search')?
 function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';const spa=document.getElementById('spec-project-assign');if(spa){spa.innerHTML='<option value="">No Project</option>'+(S.projects||[]).map(p=>`<option value="${p.id}" ${s.projectId===p.id?'selected':''}>${esc(p.name)}</option>`).join('');}renderSpecSections();updateSpecStatus();}
 function assignSpecProject(pid){const s=getActiveSpec();if(!s)return;s.projectId=pid||undefined;save();renderSpecList();toast(pid?'Assigned to project':'Removed project');}
 function switchSpec(id){if(String(S.activeSpec)===String(id))return;snapshotSpec();save();S.activeSpec=id;renderSpecs();const s=S.specs.find(x=>String(x.id)===String(id));if(s)trackRecent('spec',id,s.title);save();updateBreadcrumb();}
+function newSpecFromTemplate(tpl){if(!tpl)return;const templates={prd:{title:'Product Requirements',sections:['Overview','Problem Statement','Goals','User Stories','Requirements','Success Metrics','Timeline']},rfc:{title:'RFC',sections:['Summary','Motivation','Detailed Design','Drawbacks','Alternatives','Unresolved Questions']},retro:{title:'Retrospective',sections:['What Went Well','What Could Improve','Action Items','Key Metrics','Follow-ups']},checklist:{title:'Checklist',sections:['Pre-Launch','During','Post-Launch','Review']}};const t=templates[tpl];if(!t)return;snapshotSpec();const now=Date.now();const s={id:now,title:t.title,sections:t.sections.map((title,i)=>({id:'sec_'+(now+i+1),title,body:'',collapsed:false})),created:new Date().toISOString(),updated:new Date().toISOString()};if(activeProject)s.projectId=activeProject;S.specs.unshift(s);S.activeSpec=s.id;save();renderSpecs();toast('Created: '+t.title);}
 function newSpec(){snapshotSpec();const s={id:Date.now(),title:'',sections:[{id:Date.now()+1,title:'Overview',body:'',collapsed:false}],created:new Date().toISOString(),updated:new Date().toISOString()};S.specs.unshift(s);S.activeSpec=s.id;save();renderSpecs();document.getElementById('specs-title').focus();}
 function delSpec(id){if(S.specs.length<=1){toast('Cannot delete last spec');return;}S.specs=S.specs.filter(s=>String(s.id)!==String(id));if(String(S.activeSpec)===String(id))S.activeSpec=S.specs[0].id;save();renderSpecs();toast('Deleted');}
 function dupSpec(id){const s=S.specs.find(x=>String(x.id)===String(id));if(!s)return;const dup={...JSON.parse(JSON.stringify(s)),id:Date.now(),title:(s.title||'Spec')+' (copy)',created:new Date().toISOString(),updated:new Date().toISOString()};dup.sections=dup.sections.map(sec=>({...sec,id:'sec_'+Date.now()+Math.random()*1000}));S.specs.unshift(dup);S.activeSpec=dup.id;save();renderSpecs();toast('Duplicated: '+dup.title.substring(0,30));}
