@@ -6152,6 +6152,12 @@ function cmdGetItems(q) {
       ['clamp','CSS clamp() fluid typography generator'],
       ['project heatmap','Project vs status heatmap grid'],
       ['bingo','Developer bingo card game'],
+      ['filter','CSS filter effects generator with live preview'],
+      ['project timeline','Project completion timeline'],
+      ['spin wheel','Spin the wheel decision maker'],
+      ['text shadow','CSS text-shadow generator with live preview'],
+      ['streak calendar','GitHub-style task streak calendar'],
+      ['tarot','Daily tarot card draw'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8777,6 +8783,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='bingo' || ql==='dev bingo' || ql==='developer bingo' || ql==='bingo card')){
     items.unshift({title:'Dev Bingo',desc:'Developer bingo card game',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBingo();}});
+  }
+  if(ql && (ql==='filter' || ql==='css filter' || ql==='filter generator' || ql==='image filter')){
+    items.unshift({title:'CSS Filter Generator',desc:'Filter effects with live preview',icon:'F',type:'action',action:()=>{closeCommandPalette();showFilterGen();}});
+  }
+  if(ql && (ql==='project timeline' || ql==='proj timeline' || ql==='completion timeline' || ql==='done timeline')){
+    items.unshift({title:'Project Timeline',desc:'Project completion history',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskProjectTimeline();}});
+  }
+  if(ql && (ql==='spin wheel' || ql==='spin' || ql==='wheel spinner' || ql==='lucky wheel')){
+    items.unshift({title:'Spin Wheel',desc:'Spin the wheel decision maker',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSpinWheel();}});
+  }
+  if(ql && (ql==='text shadow' || ql==='text-shadow' || ql==='css text shadow' || ql==='shadow text')){
+    items.unshift({title:'Text Shadow Generator',desc:'CSS text-shadow with live preview',icon:'T',type:'action',action:()=>{closeCommandPalette();showTextShadowGen();}});
+  }
+  if(ql && (ql==='streak calendar' || ql==='streak' || ql==='contribution graph' || ql==='task streak')){
+    items.unshift({title:'Streak Calendar',desc:'GitHub-style task completion calendar',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStreakCalendar();}});
+  }
+  if(ql && (ql==='tarot' || ql==='tarot card' || ql==='card draw' || ql==='daily card')){
+    items.unshift({title:'Tarot Draw',desc:'Daily tarot card draw',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTarot();}});
   }
   return items.slice(0, 20);
 }
@@ -21283,6 +21307,250 @@ function showQuickBingo(){
     if(!S._bingoCard)S._bingoCard=genCard();
     rend();
   };
+  document.body.appendChild(d);
+  rend();
+}
+function showFilterGen(){
+  var ex=document.getElementById('filter-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='filter-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  var blur=0,brightness=100,contrast=100,saturate=100,hueRotate=0,grayscale=0,sepia=0,invert=0;
+  function getCSS(){
+    var parts=[];
+    if(blur)parts.push('blur('+blur+'px)');
+    if(brightness!==100)parts.push('brightness('+brightness+'%)');
+    if(contrast!==100)parts.push('contrast('+contrast+'%)');
+    if(saturate!==100)parts.push('saturate('+saturate+'%)');
+    if(hueRotate)parts.push('hue-rotate('+hueRotate+'deg)');
+    if(grayscale)parts.push('grayscale('+grayscale+'%)');
+    if(sepia)parts.push('sepia('+sepia+'%)');
+    if(invert)parts.push('invert('+invert+'%)');
+    return parts.length?parts.join(' '):'none';
+  }
+  function render(){
+    var prev=d.querySelector('.filter-preview');if(prev)prev.style.filter=getCSS();
+    var code=d.querySelector('.filter-code');if(code)code.textContent='filter: '+getCSS()+';';
+  }
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">CSS Filter Generator</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div class="filter-preview" style="height:100px;background:linear-gradient(135deg,#4ade80,#06b6d4,#a78bfa,#f59e0b);border-radius:8px;margin-bottom:12px"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:10px">Blur ('+blur+'px)<br><input type="range" min="0" max="20" value="'+blur+'" id="f-blur" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Brightness ('+brightness+'%)<br><input type="range" min="0" max="300" value="'+brightness+'" id="f-bright" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Contrast ('+contrast+'%)<br><input type="range" min="0" max="300" value="'+contrast+'" id="f-contrast" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Saturate ('+saturate+'%)<br><input type="range" min="0" max="300" value="'+saturate+'" id="f-saturate" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Hue Rotate ('+hueRotate+'deg)<br><input type="range" min="0" max="360" value="'+hueRotate+'" id="f-hue" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Grayscale ('+grayscale+'%)<br><input type="range" min="0" max="100" value="'+grayscale+'" id="f-gray" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Sepia ('+sepia+'%)<br><input type="range" min="0" max="100" value="'+sepia+'" id="f-sepia" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Invert ('+invert+'%)<br><input type="range" min="0" max="100" value="'+invert+'" id="f-invert" style="width:100%"></label>'+
+    '</div>'+
+    '<div class="filter-code" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:#4ade80;margin-bottom:10px">filter: '+getCSS()+';</div>'+
+    '<div style="display:flex;gap:8px"><button id="filter-copy" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy CSS</button>'+
+    '<button id="filter-reset" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px">Reset</button></div>';
+  document.body.appendChild(d);
+  function updateLabel(id,val,unit){var lbl=d.querySelector('#'+id).parentElement;lbl.childNodes[0].textContent=lbl.childNodes[0].textContent.replace(/\(.*\)/,'('+val+unit+')');}
+  d.querySelector('#f-blur').oninput=function(e){blur=parseInt(e.target.value);updateLabel('f-blur',blur,'px');render();};
+  d.querySelector('#f-bright').oninput=function(e){brightness=parseInt(e.target.value);updateLabel('f-bright',brightness,'%');render();};
+  d.querySelector('#f-contrast').oninput=function(e){contrast=parseInt(e.target.value);updateLabel('f-contrast',contrast,'%');render();};
+  d.querySelector('#f-saturate').oninput=function(e){saturate=parseInt(e.target.value);updateLabel('f-saturate',saturate,'%');render();};
+  d.querySelector('#f-hue').oninput=function(e){hueRotate=parseInt(e.target.value);updateLabel('f-hue',hueRotate,'deg');render();};
+  d.querySelector('#f-gray').oninput=function(e){grayscale=parseInt(e.target.value);updateLabel('f-gray',grayscale,'%');render();};
+  d.querySelector('#f-sepia').oninput=function(e){sepia=parseInt(e.target.value);updateLabel('f-sepia',sepia,'%');render();};
+  d.querySelector('#f-invert').oninput=function(e){invert=parseInt(e.target.value);updateLabel('f-invert',invert,'%');render();};
+  d.querySelector('#filter-copy').onclick=function(){
+    navigator.clipboard.writeText('filter: '+getCSS()+';');
+    this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy CSS';},800);
+  };
+  d.querySelector('#filter-reset').onclick=function(){
+    blur=0;brightness=100;contrast=100;saturate=100;hueRotate=0;grayscale=0;sepia=0;invert=0;
+    d.querySelector('#f-blur').value=0;d.querySelector('#f-bright').value=100;
+    d.querySelector('#f-contrast').value=100;d.querySelector('#f-saturate').value=100;
+    d.querySelector('#f-hue').value=0;d.querySelector('#f-gray').value=0;
+    d.querySelector('#f-sepia').value=0;d.querySelector('#f-invert').value=0;
+    render();
+  };
+}
+function showTaskProjectTimeline(){
+  var ex=document.getElementById('proj-timeline-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var projects=(S.projects||[]);
+  var projTasks={};
+  projects.forEach(function(p){projTasks[p.name]=[];});
+  projTasks['No Project']=[];
+  tasks.forEach(function(t){
+    if(t.status==='done'&&t.completedAt){
+      var pn='No Project';
+      if(t.project){var found=projects.find(function(p){return p.id===t.project||p.name===t.project;});if(found)pn=found.name;else pn=t.project;}
+      if(!projTasks[pn])projTasks[pn]=[];
+      projTasks[pn].push(t);
+    }
+  });
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Project Timeline</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  var colors=['#4ade80','#06b6d4','#a78bfa','#f59e0b','#ef4444','#ec4899','#64748b'];
+  var ci=0;
+  Object.keys(projTasks).forEach(function(pn){
+    var ts=projTasks[pn];if(!ts.length)return;
+    ts.sort(function(a,b){return new Date(a.completedAt)-new Date(b.completedAt);});
+    var col=colors[ci%colors.length];ci++;
+    h+='<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:600;color:'+col+';margin-bottom:6px">'+esc(pn)+' ('+ts.length+' done)</div>';
+    var last5=ts.slice(-5);
+    last5.forEach(function(t){
+      var d=t.completedAt?t.completedAt.split('T')[0]:'';
+      h+='<div style="display:flex;gap:8px;align-items:center;padding:3px 0;padding-left:12px;border-left:2px solid '+col+'">'+
+        '<span style="color:var(--text-muted);font-size:10px;min-width:70px">'+d+'</span>'+
+        '<span style="color:var(--text-primary);font-size:11px">'+esc(t.title||'')+'</span></div>';
+    });
+    if(ts.length>5)h+='<div style="color:var(--text-muted);font-size:10px;padding-left:12px;border-left:2px solid '+col+'">'+(ts.length-5)+' more...</div>';
+    h+='</div>';
+  });
+  if(!ci)h+='<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">Complete tasks to see project timeline</div>';
+  var d=document.createElement('div');d.id='proj-timeline-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showQuickSpinWheel(){
+  var ex=document.getElementById('spin-wheel-float');if(ex){ex.remove();return;}
+  if(!S._spinItems)S._spinItems=['Work','Break','Exercise','Read','Code'];
+  var d=document.createElement('div');d.id='spin-wheel-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:340px;width:90vw;text-align:center';
+  var colors=['#4ade80','#06b6d4','#a78bfa','#f59e0b','#ef4444','#ec4899','#3b82f6','#64748b'];
+  function drawWheel(){
+    var n=S._spinItems.length;if(!n)return '<div style="color:var(--text-muted);font-size:12px;padding:20px">Add items first</div>';
+    var size=200,cx=size/2,cy=size/2,r=90;
+    var svg='<svg width="'+size+'" height="'+size+'" style="display:block;margin:0 auto">';
+    var slice=2*Math.PI/n;
+    for(var i=0;i<n;i++){
+      var a1=i*slice-Math.PI/2;
+      var a2=(i+1)*slice-Math.PI/2;
+      var x1=cx+r*Math.cos(a1),y1=cy+r*Math.sin(a1);
+      var x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+      var large=slice>Math.PI?1:0;
+      svg+='<path d="M'+cx+','+cy+' L'+x1.toFixed(1)+','+y1.toFixed(1)+' A'+r+','+r+' 0 '+large+',1 '+x2.toFixed(1)+','+y2.toFixed(1)+' Z" fill="'+colors[i%colors.length]+'" opacity="0.8"/>';
+      var mid=(a1+a2)/2;
+      var tx=cx+(r*0.6)*Math.cos(mid),ty=cy+(r*0.6)*Math.sin(mid);
+      svg+='<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-size="10" font-weight="600">'+esc(S._spinItems[i].substring(0,8))+'</text>';
+    }
+    svg+='<polygon points="'+cx+','+(cy-r-8)+' '+(cx-6)+','+(cy-r+4)+' '+(cx+6)+','+(cy-r+4)+'" fill="#fff"/>';
+    svg+='</svg>';
+    return svg;
+  }
+  function rend(){
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Spin Wheel</span><button onclick="document.getElementById(\'spin-wheel-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+    h+='<div id="spin-result" style="font-size:20px;font-weight:700;color:#4ade80;margin-bottom:8px;min-height:28px"></div>';
+    h+=drawWheel();
+    h+='<button onclick="window._spinGo()" style="background:#4ade80;color:#000;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;width:100%;margin:10px 0">SPIN</button>';
+    h+='<div style="display:flex;gap:4px;margin-top:8px"><input id="spin-add" placeholder="Add item..." style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px"><button onclick="var i=document.getElementById(\'spin-add\');if(i&&i.value.trim()){S._spinItems.push(i.value.trim());save();window._spinRend();}" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px">+</button></div>';
+    d.innerHTML=h;
+  }
+  window._spinRend=rend;
+  window._spinGo=function(){
+    if(!S._spinItems.length)return;
+    var el=document.getElementById('spin-result');if(!el)return;
+    var count=0,total=20;
+    var interval=setInterval(function(){
+      el.textContent=S._spinItems[Math.floor(Math.random()*S._spinItems.length)];
+      el.style.color='var(--text-muted)';
+      count++;
+      if(count>=total){
+        clearInterval(interval);
+        var winner=S._spinItems[Math.floor(Math.random()*S._spinItems.length)];
+        el.textContent=winner;
+        el.style.color='#4ade80';
+      }
+    },80);
+  };
+  document.body.appendChild(d);
+  rend();
+}
+function showTextShadowGen(){
+  var ex=document.getElementById('textshadow-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='textshadow-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  var x=2,y=2,blur=4,color='#4ade80',opacity=80;
+  function getCSS(){
+    var r=parseInt(color.substring(1,3),16),g=parseInt(color.substring(3,5),16),b=parseInt(color.substring(5,7),16);
+    return 'text-shadow: '+x+'px '+y+'px '+blur+'px rgba('+r+','+g+','+b+','+(opacity/100).toFixed(2)+');';
+  }
+  function render(){
+    var prev=d.querySelector('.ts-preview');
+    if(prev){var r=parseInt(color.substring(1,3),16),g=parseInt(color.substring(3,5),16),b=parseInt(color.substring(5,7),16);
+      prev.style.textShadow=x+'px '+y+'px '+blur+'px rgba('+r+','+g+','+b+','+(opacity/100)+')';}
+    var code=d.querySelector('.ts-code');if(code)code.textContent=getCSS();
+  }
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Text Shadow Generator</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div class="ts-preview" style="text-align:center;font-size:36px;font-weight:700;color:var(--text-primary);margin-bottom:16px;text-shadow:'+x+'px '+y+'px '+blur+'px '+color+'">Shadow Text</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+    '<label style="color:var(--text-muted);font-size:10px">X Offset<br><input type="range" min="-20" max="20" value="'+x+'" id="ts-x" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Y Offset<br><input type="range" min="-20" max="20" value="'+y+'" id="ts-y" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Blur<br><input type="range" min="0" max="40" value="'+blur+'" id="ts-blur" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Opacity<br><input type="range" min="0" max="100" value="'+opacity+'" id="ts-opacity" style="width:100%"></label>'+
+    '<label style="color:var(--text-muted);font-size:10px">Color<br><input type="color" value="'+color+'" id="ts-color" style="width:60px;height:26px;border:none;cursor:pointer"></label>'+
+    '</div>'+
+    '<div class="ts-code" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:#4ade80;margin-bottom:10px">'+getCSS()+'</div>'+
+    '<button id="ts-copy" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy CSS</button>';
+  document.body.appendChild(d);
+  d.querySelector('#ts-x').oninput=function(e){x=parseInt(e.target.value);render();};
+  d.querySelector('#ts-y').oninput=function(e){y=parseInt(e.target.value);render();};
+  d.querySelector('#ts-blur').oninput=function(e){blur=parseInt(e.target.value);render();};
+  d.querySelector('#ts-opacity').oninput=function(e){opacity=parseInt(e.target.value);render();};
+  d.querySelector('#ts-color').oninput=function(e){color=e.target.value;render();};
+  d.querySelector('#ts-copy').onclick=function(){
+    navigator.clipboard.writeText(getCSS());
+    this.textContent='Copied!';var b=this;setTimeout(function(){b.textContent='Copy CSS';},800);
+  };
+}
+function showTaskStreakCalendar(){
+  var ex=document.getElementById('streak-cal-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var daySet={};
+  tasks.forEach(function(t){
+    if(t.status==='done'&&t.completedAt){
+      var d=t.completedAt.split('T')[0];
+      daySet[d]=(daySet[d]||0)+1;
+    }
+  });
+  var today=new Date();
+  var streak=0;
+  var dt=new Date(today);
+  for(var i=0;i<365;i++){
+    var key=dt.toISOString().split('T')[0];
+    if(daySet[key])streak++;else break;
+    dt.setDate(dt.getDate()-1);
+  }
+  var cells='';
+  var startDate=new Date(today);startDate.setDate(startDate.getDate()-83);
+  for(var i=0;i<84;i++){
+    var d=new Date(startDate);d.setDate(d.getDate()+i);
+    var key=d.toISOString().split('T')[0];
+    var count=daySet[key]||0;
+    var intensity=count===0?'0':count>=4?'1':count>=2?'0.6':'0.3';
+    cells+='<div title="'+key+': '+count+' tasks" style="width:10px;height:10px;border-radius:2px;background:'+(count?'#4ade80':'var(--bg-surface)')+';opacity:'+(count?intensity:'1')+'"></div>';
+  }
+  var d=document.createElement('div');d.id='streak-cal-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Task Streak Calendar</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="text-align:center;margin-bottom:16px"><span style="font-size:36px;font-weight:700;color:#4ade80">'+streak+'</span><span style="color:var(--text-muted);font-size:12px;margin-left:6px">day streak</span></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin-bottom:12px">'+cells+'</div>'+
+    '<div style="display:flex;justify-content:space-between;color:var(--text-muted);font-size:10px"><span>12 weeks ago</span><span>Today</span></div>';
+  document.body.appendChild(d);
+}
+function showQuickTarot(){
+  var ex=document.getElementById('tarot-float');if(ex){ex.remove();return;}
+  var cards=['The Fool','The Magician','The High Priestess','The Empress','The Emperor','The Hierophant','The Lovers','The Chariot','Strength','The Hermit','Wheel of Fortune','Justice','The Hanged Man','Death','Temperance','The Devil','The Tower','The Star','The Moon','The Sun','Judgement','The World'];
+  var meanings=['New beginnings, spontaneity','Manifestation, resourcefulness','Intuition, inner knowledge','Abundance, nurturing','Authority, structure','Tradition, guidance','Love, harmony, choices','Determination, willpower','Courage, inner strength','Soul-searching, introspection','Change, cycles, fate','Fairness, truth, cause and effect','Surrender, new perspectives','Transformation, endings','Balance, patience, moderation','Shadow self, attachment','Sudden change, upheaval','Hope, inspiration, serenity','Illusion, fear, subconscious','Joy, success, vitality','Reflection, reckoning','Completion, accomplishment'];
+  var idx=Math.floor(Math.random()*cards.length);
+  var d=document.createElement('div');d.id='tarot-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:320px;width:90vw;text-align:center';
+  function rend(){
+    d.innerHTML='<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Daily Draw</div>'+
+      '<div style="width:120px;height:180px;border:2px solid #4ade80;border-radius:12px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(74,222,128,0.1),rgba(6,182,212,0.1))">'+
+      '<div style="font-size:14px;color:#4ade80;font-weight:600;padding:10px;line-height:1.3">'+cards[idx]+'</div></div>'+
+      '<div style="font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:8px">'+cards[idx]+'</div>'+
+      '<div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;font-style:italic">'+meanings[idx]+'</div>'+
+      '<button onclick="window._tarotDraw()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;margin-right:8px">Draw Again</button>'+
+      '<button onclick="document.getElementById(\'tarot-float\').remove()" style="background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Close</button>';
+  }
+  window._tarotDraw=function(){idx=Math.floor(Math.random()*cards.length);rend();};
   document.body.appendChild(d);
   rend();
 }
