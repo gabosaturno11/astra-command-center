@@ -6407,6 +6407,12 @@ function cmdGetItems(q) {
       ['postgres','PostgreSQL psql command reference'],
       ['priority matrix','Eisenhower urgent/important matrix'],
       ['coin flip','Flip a coin for quick decisions'],
+      ['mysql','MySQL command reference'],
+      ['burndown','Task burndown chart over time'],
+      ['notepad','Quick notepad for scratch notes'],
+      ['mongodb','MongoDB mongosh command reference'],
+      ['cumulative flow','Cumulative flow diagram for tasks'],
+      ['color picker','Pick and copy colors with preview'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9797,6 +9803,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='coin flip' || ql==='coin' || ql==='flip coin' || ql==='heads tails')){
     items.unshift({title:'Coin Flip',desc:'Flip a coin for quick decisions',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCoinFlipper();}});
+  }
+  if(ql && (ql==='mysql' || ql==='mysql cli' || ql==='mysql ref' || ql==='mariadb')){
+    items.unshift({title:'MySQL Reference',desc:'MySQL commands cheatsheet',icon:'M',type:'action',action:()=>{closeCommandPalette();showMysqlRef();}});
+  }
+  if(ql && (ql==='burndown' || ql==='burndown chart' || ql==='task burndown' || ql==='burn down')){
+    items.unshift({title:'Task Burndown',desc:'Burndown chart over last 14 days',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBurndownChart();}});
+  }
+  if(ql && (ql==='notepad' || ql==='quick note' || ql==='scratch pad' || ql==='notes')){
+    items.unshift({title:'Quick Notepad',desc:'Scratch notepad persisted to state',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNotePad();}});
+  }
+  if(ql && (ql==='mongodb' || ql==='mongo' || ql==='mongosh' || ql==='nosql')){
+    items.unshift({title:'MongoDB Reference',desc:'MongoDB mongosh cheatsheet',icon:'M',type:'action',action:()=>{closeCommandPalette();showMongoDbRef();}});
+  }
+  if(ql && (ql==='cumulative flow' || ql==='cfd' || ql==='flow diagram' || ql==='cumulative')){
+    items.unshift({title:'Cumulative Flow',desc:'CFD for task status over time',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskCumulativeFlow();}});
+  }
+  if(ql && (ql==='color picker' || ql==='pick color' || ql==='colour' || ql==='hex color')){
+    items.unshift({title:'Color Picker',desc:'Pick and copy color codes',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorPicker();}});
   }
   return items.slice(0, 20);
 }
@@ -29919,6 +29943,143 @@ function showQuickCoinFlipper(){
     if(result==='heads'){window._coinHeads++;const h=document.getElementById('_coin-heads');if(h)h.textContent=window._coinHeads;}
     else{window._coinTails++;const t=document.getElementById('_coin-tails');if(t)t.textContent=window._coinTails;}
   };
+}
+function showMysqlRef(){
+  const cmds={
+    'Connection':['mysql -u root -p|Connect as root','mysql -u user -p dbname|Connect to database','mysql -h host -P 3306 -u user -p|Connect to remote','SHOW DATABASES;|List all databases','USE dbname;|Switch database','\\q|Quit mysql'],
+    'Tables':['SHOW TABLES;|List tables in current DB','DESCRIBE tablename;|Show table structure','SHOW CREATE TABLE t;|Show CREATE statement','SHOW INDEX FROM t;|Show indexes','SHOW TABLE STATUS;|Table stats (rows, size, engine)'],
+    'CRUD':['SELECT * FROM t LIMIT 10;|Basic select','INSERT INTO t (col) VALUES (val);|Insert row','UPDATE t SET col=val WHERE id=1;|Update row','DELETE FROM t WHERE id=1;|Delete row','REPLACE INTO t (id,col) VALUES (1,val);|Upsert row'],
+    'Admin':['CREATE DATABASE mydb;|Create database','DROP DATABASE mydb;|Delete database','CREATE TABLE t (id INT AUTO_INCREMENT PRIMARY KEY);|Create table','ALTER TABLE t ADD COLUMN name VARCHAR(255);|Add column','TRUNCATE TABLE t;|Empty table fast'],
+    'Users & Grants':['CREATE USER user@localhost IDENTIFIED BY pass;|Create user','GRANT ALL ON db.* TO user@localhost;|Grant privileges','SHOW GRANTS FOR user@localhost;|Show grants','FLUSH PRIVILEGES;|Reload grant tables','DROP USER user@localhost;|Remove user'],
+    'Backup':['mysqldump -u root -p dbname > backup.sql|Dump database','mysqldump -u root -p --all-databases > all.sql|Dump all','mysql -u root -p dbname < backup.sql|Restore from dump','mysqlcheck -u root -p --optimize dbname|Optimize tables']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">MySQL Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskBurndownChart(){
+  const tasks=(S.tasks||[]);const now=new Date();
+  const total=tasks.length;const done=tasks.filter(t=>t.status==='done').length;
+  const days=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];
+    const doneByDate=tasks.filter(t=>t.status==='done'&&t.updatedAt&&t.updatedAt.split('T')[0]<=ds).length;
+    const remaining=total-doneByDate;
+    days.push({label:(d.getMonth()+1)+'/'+d.getDate(),remaining,done:doneByDate});
+  }
+  const maxR=Math.max(...days.map(d=>d.remaining),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Task Burndown Chart</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">Remaining tasks over last 14 days ('+total+' total, '+done+' done)</div>';
+  html+='<svg viewBox="0 0 520 160" style="width:100%;margin-bottom:16px">';
+  let path='M';const idealPath='M';
+  days.forEach((d,i)=>{
+    const x=i*(500/13)+10;const y=140-(d.remaining/maxR)*120;
+    path+=(i===0?'':' L')+x+','+y;
+  });
+  const idealStart=10+','+(140-(days[0].remaining/maxR)*120);
+  const idealEnd=(10+500)+','+140;
+  html+='<line x1="10" y1="'+(140-(days[0].remaining/maxR)*120)+'" x2="510" y2="140" stroke="#6b7280" stroke-width="1" stroke-dasharray="4 4" opacity="0.5"/>';
+  html+='<path d="'+path+'" fill="none" stroke="#4ade80" stroke-width="2.5"/>';
+  days.forEach((d,i)=>{
+    const x=i*(500/13)+10;const y=140-(d.remaining/maxR)*120;
+    html+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="#4ade80"/>';
+    if(i%2===0)html+='<text x="'+x+'" y="155" fill="var(--text-muted)" font-size="7" text-anchor="middle">'+d.label+'</text>';
+  });
+  html+='</svg>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Remaining</div><div style="font-size:18px;color:#f59e0b;font-weight:700">'+(total-done)+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Completed</div><div style="font-size:18px;color:#4ade80;font-weight:700">'+done+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Progress</div><div style="font-size:18px;color:#60a5fa;font-weight:700">'+(total>0?Math.round(done/total*100):0)+'%</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickNotePad(){
+  if(!S._quickNotes)S._quickNotes='';
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Quick Notepad</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<textarea id="_qnote-text" style="width:100%;height:180px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:inherit;line-height:1.5" placeholder="Quick notes... auto-saved to state">'+esc(S._quickNotes)+'</textarea>';
+  html+='<div style="display:flex;gap:6px;margin-top:8px">';
+  html+='<button onclick="const t=document.getElementById(\'_qnote-text\');S._quickNotes=t.value;save();this.textContent=\'Saved!\';setTimeout(()=>this.textContent=\'Save\',800)" style="flex:1;background:#4ade80;color:#000;border:none;padding:6px;border-radius:6px;cursor:pointer;font-weight:600;font-size:11px">Save</button>';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_qnote-text\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px;border-radius:6px;cursor:pointer;font-size:11px">Copy</button>';
+  html+='<button onclick="document.getElementById(\'_qnote-text\').value=\'\';S._quickNotes=\'\';save()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px;border-radius:6px;cursor:pointer;font-size:11px">Clear</button></div>';
+  html+='<div style="margin-top:6px;font-size:10px;color:var(--text-muted)" id="_qnote-count">'+S._quickNotes.split(/\s+/).filter(w=>w).length+' words</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  const ta=document.getElementById('_qnote-text');
+  if(ta)ta.addEventListener('input',()=>{const wc=ta.value.split(/\s+/).filter(w=>w).length;const el=document.getElementById('_qnote-count');if(el)el.textContent=wc+' words';});
+}
+function showMongoDbRef(){
+  const cmds={
+    'Connection':['mongosh|Start MongoDB shell','mongosh "mongodb://host:27017/db"|Connect to remote','show dbs|List all databases','use mydb|Switch database','db|Show current database','exit|Exit shell'],
+    'CRUD':['db.col.insertOne({key:val})|Insert one document','db.col.insertMany([{a:1},{a:2}])|Insert multiple','db.col.find()|Find all documents','db.col.find({key:val})|Find with filter','db.col.findOne({_id:ObjectId("...")})|Find one by ID','db.col.updateOne({f:v},{$set:{f:newV}})|Update one','db.col.updateMany({},{$set:{f:v}})|Update many','db.col.deleteOne({f:v})|Delete one','db.col.deleteMany({f:v})|Delete many'],
+    'Query Operators':['$eq, $ne, $gt, $gte, $lt, $lte|Comparison','$in, $nin|In/not in array','$and, $or, $not, $nor|Logical','$exists, $type|Element','$regex|Pattern match','$elemMatch|Array element match'],
+    'Indexes':['db.col.createIndex({field:1})|Create ascending index','db.col.createIndex({field:-1})|Create descending index','db.col.createIndex({a:1,b:1})|Compound index','db.col.getIndexes()|List indexes','db.col.dropIndex("name")|Drop index'],
+    'Aggregation':['db.col.aggregate([{$match:{}}])|Match stage','db.col.aggregate([{$group:{_id:"$f",c:{$sum:1}}}])|Group','db.col.aggregate([{$sort:{f:-1}}])|Sort stage','db.col.aggregate([{$limit:10}])|Limit stage','db.col.aggregate([{$project:{f:1}}])|Projection'],
+    'Admin':['db.col.countDocuments()|Count documents','db.col.distinct("field")|Unique values','db.col.drop()|Drop collection','show collections|List collections','db.stats()|Database statistics','db.col.stats()|Collection statistics']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">MongoDB Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskCumulativeFlow(){
+  const tasks=(S.tasks||[]);const now=new Date();const days=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];
+    let todo=0,inprog=0,done=0;
+    tasks.forEach(t=>{
+      const created=t.createdAt?t.createdAt.split('T')[0]:'2020-01-01';
+      if(created>ds)return;
+      if(t.status==='done'&&t.updatedAt&&t.updatedAt.split('T')[0]<=ds){done++;}
+      else if(t.status==='in-progress'||(t.status==='done'&&t.updatedAt&&t.updatedAt.split('T')[0]>ds)){inprog++;}
+      else{todo++;}
+    });
+    days.push({label:(d.getMonth()+1)+'/'+d.getDate(),todo,inprog,done});
+  }
+  const maxTotal=Math.max(...days.map(d=>d.todo+d.inprog+d.done),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Cumulative Flow Diagram</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<svg viewBox="0 0 520 160" style="width:100%;margin-bottom:12px">';
+  let donePath='M10,140 ';let inpPath='M10,140 ';let todoPath='M10,140 ';
+  days.forEach((d,i)=>{
+    const x=i*(500/13)+10;
+    const hDone=(d.done/maxTotal)*120;
+    const hInp=(d.inprog/maxTotal)*120;
+    const hTodo=(d.todo/maxTotal)*120;
+    donePath+='L'+x+','+(140-hDone)+' ';
+    inpPath+='L'+x+','+(140-hDone-hInp)+' ';
+    todoPath+='L'+x+','+(140-hDone-hInp-hTodo)+' ';
+    if(i%2===0)html+='<text x="'+x+'" y="155" fill="var(--text-muted)" font-size="7" text-anchor="middle">'+d.label+'</text>';
+  });
+  donePath+='L510,140 Z';inpPath+='L510,140 Z';todoPath+='L510,140 Z';
+  html+='<path d="'+todoPath+'" fill="#6b7280" opacity="0.6"/>';
+  html+='<path d="'+inpPath+'" fill="#f59e0b" opacity="0.6"/>';
+  html+='<path d="'+donePath+'" fill="#4ade80" opacity="0.6"/>';
+  html+='</svg>';
+  html+='<div style="display:flex;gap:12px;font-size:10px"><span><span style="display:inline-block;width:10px;height:10px;background:#4ade80;border-radius:2px;margin-right:4px"></span>Done</span><span><span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-right:4px"></span>In Progress</span><span><span style="display:inline-block;width:10px;height:10px;background:#6b7280;border-radius:2px;margin-right:4px"></span>To Do</span></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickColorPicker(){
+  const colors=['#ef4444','#f59e0b','#eab308','#22c55e','#4ade80','#14b8a6','#06b6d4','#3b82f6','#6366f1','#8b5cf6','#a855f7','#ec4899','#f43f5e','#fb923c','#84cc16','#0ea5e9','#d946ef','#64748b','#ffffff','#000000'];
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">Color Picker</h4><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_cp-preview" style="height:60px;border-radius:8px;margin-bottom:10px;background:#4ade80;border:1px solid var(--border)"></div>';
+  html+='<div id="_cp-value" style="text-align:center;font-size:16px;color:var(--text-primary);font-weight:700;font-family:monospace;margin-bottom:10px">#4ade80</div>';
+  html+='<input id="_cp-input" type="color" value="#4ade80" style="width:100%;height:36px;border:none;cursor:pointer;margin-bottom:10px;border-radius:6px" oninput="document.getElementById(\'_cp-preview\').style.background=this.value;document.getElementById(\'_cp-value\').textContent=this.value">';
+  html+='<div style="display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:10px">';
+  colors.forEach(c=>{
+    html+='<div onclick="document.getElementById(\'_cp-preview\').style.background=\''+c+'\';document.getElementById(\'_cp-value\').textContent=\''+c+'\';document.getElementById(\'_cp-input\').value=\''+c+'\'" style="width:100%;aspect-ratio:1;background:'+c+';border-radius:4px;cursor:pointer;border:1px solid var(--border)"></div>';
+  });
+  html+='</div>';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_cp-value\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Color\',800)" style="width:100%;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Copy Color</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
