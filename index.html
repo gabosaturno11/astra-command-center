@@ -1022,6 +1022,7 @@ textarea{resize:vertical;line-height:1.6}
                 <option value="html">HTML</option>
                 <option value="txt">Plain Text</option>
                 <option value="clipboard">Copy All</option>
+                <option value="print">Print / PDF</option>
               </select>
             </div>
           </div>
@@ -1149,6 +1150,7 @@ textarea{resize:vertical;line-height:1.6}
         <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
           <input type="text" id="link-search" placeholder="Search links..." oninput="renderLinks()" style="width:140px;font-size:10px;padding:5px 8px">
           <select id="link-sort" onchange="renderLinks()" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="newest">Newest</option><option value="oldest">Oldest</option><option value="alpha">A-Z</option><option value="category">Category</option><option value="domain">By Domain</option><option value="tag">By Tag</option></select>
+          <button class="btn btn-sm" onclick="manageLinkTags()" title="Manage link tags">Tags</button>
           <button class="btn btn-sm" onclick="openFilteredLinks()" title="Open all visible links">Open All</button>
           <button class="btn btn-sm" onclick="copyAllLinkURLs()" title="Copy all filtered URLs to clipboard">Copy URLs</button>
           <button class="btn btn-sm" onclick="batchImportLinks()" title="Paste multiple URLs to import">Import</button>
@@ -3355,7 +3357,7 @@ function previewVersion(i){
   overlay.onclick=e=>{if(e.target===overlay)overlay.remove();};
 }
 function toggleWriterPanel(){writerPanelOpen=!writerPanelOpen;document.getElementById('writer-right-panel').classList.toggle('hidden',!writerPanelOpen);}
-function writerExport(fmt){const d=getActiveDoc();if(!d||!fmt)return;const t=d.title||'untitled',e=document.getElementById('writer-editor');if(fmt==='clipboard'){navigator.clipboard.writeText(e.innerText);toast('Copied');return;}let c,m,x;if(fmt==='txt'){c=e.innerText;m='text/plain';x='txt';}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px}h2{font-size:22px}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow-x:auto}</style></head><body><h1>${esc(t)}</h1>${e.innerHTML}</body></html>`;m='text/html';x='html';}else if(fmt==='md'){c=htmlToMd(e.innerHTML,t);m='text/markdown';x='md';}const blob=new Blob([c],{type:m});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+x;a.click();toast('Exported .'+x);}
+function writerExport(fmt){const d=getActiveDoc();if(!d||!fmt)return;const t=d.title||'untitled',e=document.getElementById('writer-editor');if(fmt==='clipboard'){navigator.clipboard.writeText(e.innerText);toast('Copied');return;}if(fmt==='print'){const wc=countW(e.innerHTML);const printHtml=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>@media print{@page{margin:1in}}body{font-family:Georgia,serif;max-width:680px;margin:40px auto;padding:0 20px;line-height:2;color:#111;font-size:12pt}h1{font-size:24pt;margin-bottom:8px;page-break-after:avoid}h2{font-size:18pt;margin-top:24px;page-break-after:avoid}h3{font-size:14pt;page-break-after:avoid}blockquote{border-left:3px solid #999;padding-left:16px;color:#444;font-style:italic;margin:16px 0}code{background:#f0f0f0;padding:1px 4px;border-radius:3px;font-size:10pt}pre{background:#f0f0f0;padding:12px;border-radius:6px;font-size:9pt;overflow-x:auto;page-break-inside:avoid}.meta{font-size:9pt;color:#666;margin-bottom:24px;border-bottom:1px solid #ddd;padding-bottom:8px}</style></head><body><h1>${esc(t)}</h1><div class="meta">${wc} words | Exported ${new Date().toLocaleDateString()}</div>${e.innerHTML}</body></html>`;const w=window.open('','_blank');w.document.write(printHtml);w.document.close();toast('Opened print view');return;}let c,m,x;if(fmt==='txt'){c=e.innerText;m='text/plain';x='txt';}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px}h2{font-size:22px}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow-x:auto}</style></head><body><h1>${esc(t)}</h1>${e.innerHTML}</body></html>`;m='text/html';x='html';}else if(fmt==='md'){c=htmlToMd(e.innerHTML,t);m='text/markdown';x='md';}const blob=new Blob([c],{type:m});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+x;a.click();toast('Exported .'+x);}
 function writerDetailedStats(){
   const d=getActiveDoc();if(!d)return;snapshotWriter();
   const text=(document.getElementById('writer-editor')?.innerText||'').trim();
@@ -3848,6 +3850,16 @@ function copyAllLinkURLs(){
   navigator.clipboard.writeText(urls).then(()=>toast('Copied '+items.length+' URLs'));
 }
 
+function manageLinkTags(){
+  const allTags=[...new Set(S.links.flatMap(l=>l.tags||[]).filter(Boolean))].sort();
+  if(!allTags.length){toast('No tags found on links');return;}
+  const tagCounts={};allTags.forEach(t=>{tagCounts[t]=S.links.filter(l=>(l.tags||[]).includes(t)).length;});
+  const action=prompt('Link Tags ('+allTags.length+'):\n\n'+allTags.map(t=>t+' ('+tagCounts[t]+')').join('\n')+'\n\nActions:\n- rename:old:new\n- delete:tagname\n- merge:tag1:tag2 (merges tag1 INTO tag2)\n\nOr click Cancel to close:');
+  if(!action)return;
+  if(action.startsWith('rename:')){const parts=action.split(':');if(parts.length===3){const old=parts[1].trim(),nw=parts[2].trim();let count=0;S.links.forEach(l=>{if(l.tags){const i=l.tags.indexOf(old);if(i>=0){l.tags[i]=nw;count++;}}});save();renderLinks();toast('Renamed "'+old+'" to "'+nw+'" in '+count+' links');}}
+  else if(action.startsWith('delete:')){const tag=action.substring(7).trim();let count=0;S.links.forEach(l=>{if(l.tags){const i=l.tags.indexOf(tag);if(i>=0){l.tags.splice(i,1);count++;}}});save();renderLinks();toast('Removed "'+tag+'" from '+count+' links');}
+  else if(action.startsWith('merge:')){const parts=action.split(':');if(parts.length===3){const from=parts[1].trim(),to=parts[2].trim();let count=0;S.links.forEach(l=>{if(l.tags){const i=l.tags.indexOf(from);if(i>=0){l.tags[i]=to;l.tags=[...new Set(l.tags)];count++;}}});save();renderLinks();toast('Merged "'+from+'" into "'+to+'" ('+count+' links)');}}
+}
 async function checkAllLinks(){
   const btn=document.getElementById('link-check-btn');if(btn)btn.textContent='Checking...';
   let ok=0,fail=0,skip=0;
@@ -6118,6 +6130,15 @@ function cmdGetItems(q) {
     if(blocked.length){blocked.forEach(t=>{items.unshift({title:'BLOCKED: '+t.title,desc:'Blocked by: '+t.blockedBy,icon:'!',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}
     if(blocking.length){blocking.forEach(t=>{const deps=S.tasks.filter(x=>x.blockedBy&&x.blockedBy.toLowerCase().includes(t.title.toLowerCase())&&x.status!=='done');items.unshift({title:'BLOCKING ('+deps.length+'): '+t.title,desc:'Blocks: '+deps.map(d=>d.title).join(', ').substring(0,80),icon:'B',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}
     if(!blocked.length&&!blocking.length)items.unshift({title:'No dependencies found',desc:'No tasks are blocked or blocking others',icon:'*',type:'info'});
+  }
+  // Config prefix
+  if(ql && (ql.startsWith('config:') || ql==='config' || ql==='settings' || ql==='prefs')){
+    if(!S.config)S.config={};
+    items.unshift({title:'Word Goal: '+(S.wordGoal?.daily||500)+'/day',desc:'Type config:wordgoal:N to change',icon:'C',type:'action',action:()=>{const v=prompt('Daily word goal:',S.wordGoal?.daily||500);if(v&&parseInt(v)){if(!S.wordGoal)S.wordGoal={daily:500,log:{}};S.wordGoal.daily=parseInt(v);save();toast('Word goal: '+v);closeCommandPalette();}}});
+    items.unshift({title:'Auto-save: '+(S.config.autoSaveMs||800)+'ms',desc:'Debounce interval for auto-save',icon:'C',type:'action',action:()=>{const v=prompt('Auto-save debounce (ms):',S.config.autoSaveMs||800);if(v&&parseInt(v)){S.config.autoSaveMs=parseInt(v);save();toast('Auto-save: '+v+'ms');closeCommandPalette();}}});
+    items.unshift({title:'Board WIP limit: '+(S.config.wipLimit||5),desc:'Maximum tasks in "In Progress" before warning',icon:'C',type:'action',action:()=>{const v=prompt('WIP limit for In Progress:',S.config.wipLimit||5);if(v&&parseInt(v)){S.config.wipLimit=parseInt(v);save();toast('WIP limit: '+v);closeCommandPalette();}}});
+    items.unshift({title:'Quick-add syntax: title #tag @project !priority ~date',desc:'Available modifiers in task quick-add input',icon:'?',type:'info'});
+    items.unshift({title:'Data size: '+Math.round(JSON.stringify(S).length/1024)+'KB',desc:'Tasks: '+S.tasks.length+' | Content: '+S.content.length+' | Docs: '+S.docs.length,icon:'B',type:'info'});
   }
   // Word goal prefix
   if(ql && (ql.startsWith('wordgoal:') || ql==='wordgoal' || ql==='wgoal')){
