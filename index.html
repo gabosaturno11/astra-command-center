@@ -6170,6 +6170,12 @@ function cmdGetItems(q) {
       ['svg icons','SVG icon browser with copy-to-clipboard'],
       ['estimate accuracy','Task estimate vs actual time analysis'],
       ['ambient','Ambient noise generator for focus'],
+      ['regex','Regex tester with live matching'],
+      ['sla','Task SLA compliance tracker'],
+      ['focus score','Daily focus score based on activity'],
+      ['base64','Base64 encode and decode tool'],
+      ['productivity','Productivity dashboard with weekly stats'],
+      ['stopwatch','Stopwatch with lap tracking'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8849,6 +8855,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='ambient' || ql==='ambient sound' || ql==='white noise' || ql==='noise')){
     items.unshift({title:'Ambient Sound',desc:'Focus noise generator',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAmbientSound();}});
+  }
+  if(ql && (ql==='regex' || ql==='regex tester' || ql==='regexp' || ql==='regular expression')){
+    items.unshift({title:'Regex Tester',desc:'Live regex pattern matching',icon:'R',type:'action',action:()=>{closeCommandPalette();showRegexTester();}});
+  }
+  if(ql && (ql==='sla' || ql==='sla tracker' || ql==='compliance' || ql==='task sla')){
+    items.unshift({title:'SLA Tracker',desc:'Task SLA compliance',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSLATracker();}});
+  }
+  if(ql && (ql==='focus score' || ql==='focus' || ql==='daily score' || ql==='productivity score')){
+    items.unshift({title:'Focus Score',desc:'Daily productivity focus score',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFocusScore();}});
+  }
+  if(ql && (ql==='base64' || ql==='base 64' || ql==='encode decode' || ql==='b64')){
+    items.unshift({title:'Base64 Tool',desc:'Encode and decode base64',icon:'B',type:'action',action:()=>{closeCommandPalette();showBase64Tool();}});
+  }
+  if(ql && (ql==='productivity' || ql==='productivity dashboard' || ql==='weekly stats' || ql==='dashboard')){
+    items.unshift({title:'Productivity Dashboard',desc:'Weekly productivity overview',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProductivityDashboard();}});
+  }
+  if(ql && (ql==='stopwatch' || ql==='stop watch' || ql==='lap timer' || ql==='chrono')){
+    items.unshift({title:'Stopwatch',desc:'Stopwatch with laps',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
   }
   return items.slice(0, 20);
 }
@@ -22116,6 +22140,193 @@ function showQuickAmbientSound(){
   window._ambVol=function(v){
     if(gainNode)gainNode.gain.value=v/100;
     var lbl=document.getElementById('amb-vol-label');if(lbl)lbl.textContent=v+'%';
+  };
+  document.body.appendChild(d);
+  rend();
+}
+function showRegexTester(){
+  var ex=document.getElementById('regex-tester-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='regex-tester-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Regex Tester</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Pattern</label><div style="display:flex;gap:4px"><span style="color:#4ade80;font-size:14px;line-height:30px">/</span><input id="rx-pattern" placeholder="your regex here" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-family:monospace;font-size:12px"><span style="color:#4ade80;font-size:14px;line-height:30px">/</span><input id="rx-flags" value="g" placeholder="flags" style="width:40px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-family:monospace;font-size:12px;text-align:center"></div></div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Test String</label><textarea id="rx-test" rows="4" placeholder="Enter text to test..." style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:vertical;box-sizing:border-box"></textarea></div>'+
+    '<div id="rx-result" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:var(--text-muted);min-height:40px">Enter a pattern and test string</div>'+
+    '<div style="margin-top:8px;font-size:10px;color:var(--text-muted)"><strong>Quick patterns:</strong> '+
+    '<span onclick="document.getElementById(\'rx-pattern\').value=\'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\\\.[a-zA-Z]{2,}\';window._rxTest()" style="color:#4ade80;cursor:pointer;margin-right:8px">Email</span>'+
+    '<span onclick="document.getElementById(\'rx-pattern\').value=\'https?://[^\\\\s]+\';window._rxTest()" style="color:#4ade80;cursor:pointer;margin-right:8px">URL</span>'+
+    '<span onclick="document.getElementById(\'rx-pattern\').value=\'\\\\b\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\b\';window._rxTest()" style="color:#4ade80;cursor:pointer;margin-right:8px">IP</span>'+
+    '<span onclick="document.getElementById(\'rx-pattern\').value=\'\\\\d{4}-\\\\d{2}-\\\\d{2}\';window._rxTest()" style="color:#4ade80;cursor:pointer">Date</span>'+
+    '</div>';
+  document.body.appendChild(d);
+  window._rxTest=function(){
+    var pat=document.getElementById('rx-pattern').value;
+    var flags=document.getElementById('rx-flags').value;
+    var test=document.getElementById('rx-test').value;
+    var result=document.getElementById('rx-result');
+    if(!pat||!test){result.innerHTML='Enter a pattern and test string';return;}
+    try{
+      var re=new RegExp(pat,flags);
+      var matches=test.match(re);
+      if(!matches){result.innerHTML='<span style="color:#ef4444">No matches</span>';return;}
+      var h='<span style="color:#4ade80">'+matches.length+' match(es):</span><br>';
+      matches.forEach(function(m,i){h+='<span style="color:var(--text-primary)">['+i+'] "'+esc(m)+'"</span><br>';});
+      result.innerHTML=h;
+    }catch(e){result.innerHTML='<span style="color:#ef4444">Error: '+esc(e.message)+'</span>';}
+  };
+  d.querySelector('#rx-pattern').oninput=window._rxTest;
+  d.querySelector('#rx-flags').oninput=window._rxTest;
+  d.querySelector('#rx-test').oninput=window._rxTest;
+}
+function showTaskSLATracker(){
+  var ex=document.getElementById('sla-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]).filter(function(t){return t.status!=='done'&&t.due;});
+  var now=new Date();var today=now.toISOString().split('T')[0];
+  var withinSLA=0,nearBreach=0,breached=0;
+  tasks.forEach(function(t){
+    var diff=Math.floor((new Date(t.due)-now)/86400000);
+    if(diff<0)breached++;
+    else if(diff<=2)nearBreach++;
+    else withinSLA++;
+  });
+  var total=tasks.length||1;
+  var slaRate=Math.round(withinSLA/total*100);
+  var d=document.createElement('div');d.id='sla-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:380px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">SLA Tracker</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="text-align:center;margin-bottom:16px"><div style="font-size:40px;font-weight:700;color:'+(slaRate>=80?'#4ade80':slaRate>=50?'#f59e0b':'#ef4444')+'">'+slaRate+'%</div><div style="font-size:11px;color:var(--text-muted)">SLA Compliance</div></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:16px">'+
+    '<div style="flex:1;text-align:center;padding:10px;background:var(--bg-surface);border-radius:8px;border-top:3px solid #4ade80"><div style="font-size:20px;font-weight:700;color:#4ade80">'+withinSLA+'</div><div style="font-size:9px;color:var(--text-muted)">On Track</div></div>'+
+    '<div style="flex:1;text-align:center;padding:10px;background:var(--bg-surface);border-radius:8px;border-top:3px solid #f59e0b"><div style="font-size:20px;font-weight:700;color:#f59e0b">'+nearBreach+'</div><div style="font-size:9px;color:var(--text-muted)">Near Breach</div></div>'+
+    '<div style="flex:1;text-align:center;padding:10px;background:var(--bg-surface);border-radius:8px;border-top:3px solid #ef4444"><div style="font-size:20px;font-weight:700;color:#ef4444">'+breached+'</div><div style="font-size:9px;color:var(--text-muted)">Breached</div></div></div>'+
+    (tasks.length===0?'<div style="color:var(--text-muted);font-size:12px;text-align:center">Add tasks with due dates to track SLA</div>':'');
+  document.body.appendChild(d);
+}
+function showQuickFocusScore(){
+  var ex=document.getElementById('focus-score-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var today=new Date().toISOString().split('T')[0];
+  var doneToday=tasks.filter(function(t){return t.status==='done'&&t.completedAt&&t.completedAt.startsWith(today);}).length;
+  var createdToday=tasks.filter(function(t){return t.createdAt&&t.createdAt.startsWith(today);}).length;
+  var inProgress=tasks.filter(function(t){return t.status==='in-progress';}).length;
+  var overdue=tasks.filter(function(t){return t.due&&t.due<today&&t.status!=='done';}).length;
+  var score=Math.min(100,doneToday*15+inProgress*5-overdue*10-Math.max(0,createdToday-doneToday)*3);
+  score=Math.max(0,score);
+  var level=score>=80?'Focused':score>=60?'Productive':score>=40?'Getting There':score>=20?'Scattered':'Unfocused';
+  var color=score>=80?'#4ade80':score>=60?'#06b6d4':score>=40?'#f59e0b':'#ef4444';
+  var d=document.createElement('div');d.id='focus-score-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:320px;width:90vw;text-align:center';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><span style="font-weight:600;color:var(--text-primary)">Focus Score</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="width:120px;height:120px;border-radius:50%;border:4px solid '+color+';margin:0 auto 16px;display:flex;align-items:center;justify-content:center;flex-direction:column">'+
+    '<div style="font-size:36px;font-weight:700;color:'+color+'">'+score+'</div>'+
+    '<div style="font-size:10px;color:var(--text-muted)">'+level+'</div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;text-align:center">'+
+    '<div style="padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#4ade80">'+doneToday+'</div><div style="font-size:9px;color:var(--text-muted)">Done Today</div></div>'+
+    '<div style="padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#06b6d4">'+inProgress+'</div><div style="font-size:9px;color:var(--text-muted)">In Progress</div></div>'+
+    '<div style="padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#3b82f6">'+createdToday+'</div><div style="font-size:9px;color:var(--text-muted)">Created Today</div></div>'+
+    '<div style="padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:#ef4444">'+overdue+'</div><div style="font-size:9px;color:var(--text-muted)">Overdue</div></div></div>';
+  document.body.appendChild(d);
+}
+function showBase64Tool(){
+  var ex=document.getElementById('base64-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='base64-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Base64 Encode/Decode</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Input</label><textarea id="b64-input" rows="4" placeholder="Enter text or base64 string..." style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:vertical;box-sizing:border-box"></textarea></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:8px">'+
+    '<button onclick="window._b64Encode()" style="flex:1;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Encode</button>'+
+    '<button onclick="window._b64Decode()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:8px;border-radius:6px;cursor:pointer;font-size:12px">Decode</button>'+
+    '</div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Output</label><textarea id="b64-output" rows="4" readonly style="width:100%;background:var(--bg-surface);color:#4ade80;border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:vertical;box-sizing:border-box"></textarea></div>'+
+    '<button onclick="var o=document.getElementById(\'b64-output\');if(o)navigator.clipboard.writeText(o.value);this.textContent=\'Copied!\';var b=this;setTimeout(function(){b.textContent=\'Copy Output\'},800)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px">Copy Output</button>';
+  document.body.appendChild(d);
+  window._b64Encode=function(){
+    var inp=document.getElementById('b64-input');var out=document.getElementById('b64-output');
+    if(!inp||!out)return;try{out.value=btoa(unescape(encodeURIComponent(inp.value)));}catch(e){out.value='Error: '+e.message;}
+  };
+  window._b64Decode=function(){
+    var inp=document.getElementById('b64-input');var out=document.getElementById('b64-output');
+    if(!inp||!out)return;try{out.value=decodeURIComponent(escape(atob(inp.value.trim())));}catch(e){out.value='Error: '+e.message;}
+  };
+}
+function showTaskProductivityDashboard(){
+  var ex=document.getElementById('prod-dash-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var content=(S.content||[]);
+  var docs=(S.writerDocs||[]);
+  var now=new Date();var today=now.toISOString().split('T')[0];
+  var weekAgo=new Date(now);weekAgo.setDate(weekAgo.getDate()-7);var weekStr=weekAgo.toISOString().split('T')[0];
+  var doneThisWeek=tasks.filter(function(t){return t.status==='done'&&t.completedAt&&t.completedAt>=weekStr;}).length;
+  var createdThisWeek=tasks.filter(function(t){return t.createdAt&&t.createdAt>=weekStr;}).length;
+  var contentThisWeek=content.filter(function(c){return c.createdAt&&c.createdAt>=weekStr;}).length;
+  var totalWords=0;
+  docs.forEach(function(doc){totalWords+=(doc.content||'').split(/\s+/).filter(function(w){return w;}).length;});
+  var totalTasks=tasks.length;
+  var totalDone=tasks.filter(function(t){return t.status==='done';}).length;
+  var totalContent=content.length;
+  var streak=0;var dt=new Date(now);
+  for(var i=0;i<365;i++){
+    var key=dt.toISOString().split('T')[0];
+    var hasDone=tasks.some(function(t){return t.status==='done'&&t.completedAt&&t.completedAt.startsWith(key);});
+    if(hasDone)streak++;else break;
+    dt.setDate(dt.getDate()-1);
+  }
+  var d=document.createElement('div');d.id='prod-dash-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Productivity Dashboard</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">'+
+    '<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:24px;font-weight:700;color:#4ade80">'+doneThisWeek+'</div><div style="font-size:9px;color:var(--text-muted)">Done This Week</div></div>'+
+    '<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:24px;font-weight:700;color:#06b6d4">'+createdThisWeek+'</div><div style="font-size:9px;color:var(--text-muted)">Created This Week</div></div>'+
+    '<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:24px;font-weight:700;color:#a78bfa">'+contentThisWeek+'</div><div style="font-size:9px;color:var(--text-muted)">Content This Week</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px">'+
+    '<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:var(--text-primary)">'+totalTasks+'</div><div style="font-size:8px;color:var(--text-muted)">Total Tasks</div></div>'+
+    '<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#4ade80">'+totalDone+'</div><div style="font-size:8px;color:var(--text-muted)">Completed</div></div>'+
+    '<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#f59e0b">'+totalContent+'</div><div style="font-size:8px;color:var(--text-muted)">Content Items</div></div>'+
+    '<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#ec4899">'+totalWords.toLocaleString()+'</div><div style="font-size:8px;color:var(--text-muted)">Words Written</div></div>'+
+    '</div>'+
+    '<div style="text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><span style="font-size:28px;font-weight:700;color:#4ade80">'+streak+'</span><span style="font-size:12px;color:var(--text-muted);margin-left:6px">day streak</span></div>';
+  document.body.appendChild(d);
+}
+function showQuickStopwatch(){
+  var ex=document.getElementById('stopwatch-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='stopwatch-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:220px;text-align:center';
+  var elapsed=0,running=false,timer=null,laps=[];
+  function fmt(ms){
+    var s=Math.floor(ms/1000);var m=Math.floor(s/60);s=s%60;var cs=Math.floor((ms%1000)/10);
+    return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+String(cs).padStart(2,'0');
+  }
+  function rend(){
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Stopwatch</span><button onclick="window._swReset();document.getElementById(\'stopwatch-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button></div>';
+    h+='<div style="font-size:32px;font-weight:700;color:'+(running?'#4ade80':'var(--text-primary)')+';font-family:monospace;margin-bottom:12px">'+fmt(elapsed)+'</div>';
+    h+='<div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px">';
+    if(!running){
+      h+='<button onclick="window._swStart()" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Start</button>';
+      if(elapsed>0)h+='<button onclick="window._swReset()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px">Reset</button>';
+    } else {
+      h+='<button onclick="window._swStop()" style="background:#ef4444;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Stop</button>';
+      h+='<button onclick="window._swLap()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px">Lap</button>';
+    }
+    h+='</div>';
+    if(laps.length){
+      h+='<div style="max-height:80px;overflow-y:auto">';
+      laps.forEach(function(l,i){h+='<div style="display:flex;justify-content:space-between;padding:2px 0;font-size:10px"><span style="color:var(--text-muted)">Lap '+(i+1)+'</span><span style="color:var(--text-primary);font-family:monospace">'+fmt(l)+'</span></div>';});
+      h+='</div>';
+    }
+    d.innerHTML=h;
+  }
+  var startTime=0;
+  window._swStart=function(){
+    running=true;startTime=Date.now()-elapsed;
+    timer=setInterval(function(){elapsed=Date.now()-startTime;rend();},50);
+    rend();
+  };
+  window._swStop=function(){running=false;if(timer)clearInterval(timer);timer=null;rend();};
+  window._swLap=function(){laps.push(elapsed);rend();};
+  window._swReset=function(){
+    running=false;if(timer)clearInterval(timer);timer=null;elapsed=0;laps=[];
+    var el=document.getElementById('stopwatch-float');if(el)rend();
   };
   document.body.appendChild(d);
   rend();
