@@ -5889,6 +5889,9 @@ function cmdGetItems(q) {
       ['task templates','8 task templates: bug fix, feature, research, etc.'],
       ['lifetime focus','Lifetime Pomodoro/focus statistics'],
       ['creation calendar','Month grid showing when content was created'],
+      ['suggestions','Smart next-action suggestions based on current state'],
+      ['link categories','Visual breakdown of link categories'],
+      ['priority distribution','Bar chart of task priority levels'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7543,6 +7546,18 @@ function cmdGetItems(q) {
   // Creation calendar prefix
   if(ql && (ql==='creation calendar' || ql==='content creation' || ql==='created when' || ql==='creation cal')){
     items.unshift({title:'Creation Calendar',desc:'Month grid showing content creation dates',icon:'C',type:'action',action:()=>{closeCommandPalette();showCreationCalendar();}});
+  }
+  // Smart suggestions prefix
+  if(ql && (ql==='suggestions' || ql==='smart suggestions' || ql==='next actions' || ql==='what to do')){
+    items.unshift({title:'Smart Suggestions',desc:'AI-like suggestions based on current workspace state',icon:'S',type:'action',action:()=>{closeCommandPalette();showSmartSuggestions();}});
+  }
+  // Link categories prefix
+  if(ql && (ql==='link categories' || ql==='link chart' || ql==='link breakdown' || ql==='link stats')){
+    items.unshift({title:'Link Category Chart',desc:'Visual breakdown of link categories',icon:'L',type:'action',action:()=>{closeCommandPalette();showLinkCategoryChart();}});
+  }
+  // Priority distribution prefix
+  if(ql && (ql==='priority distribution' || ql==='priority chart' || ql==='priority stats' || ql==='task priority')){
+    items.unshift({title:'Priority Distribution',desc:'Bar chart showing P0/P1/P2/P3 distribution',icon:'P',type:'action',action:()=>{closeCommandPalette();showPriorityDistribution();}});
   }
   return items.slice(0, 20);
 }
@@ -11388,6 +11403,95 @@ function showCreationCalendar(){
   h+=`</div>`;
   const totalThisMonth=Object.values(dayMap).reduce((a,b)=>a+b,0);
   h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:12px">${totalThisMonth} items created this month</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showSmartSuggestions(){
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];
+  const now=new Date();const today=now.toISOString().split('T')[0];
+  const suggestions=[];
+  const overdue=tasks.filter(t=>t.due&&t.due<today&&t.status!=='done');
+  if(overdue.length)suggestions.push({icon:'!',color:'#ef4444',text:`You have ${overdue.length} overdue tasks. Review and reschedule them.`,action:'Cmd+K > due groups'});
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  if(inProgress.length>5)suggestions.push({icon:'W',color:'#f59e0b',text:`${inProgress.length} tasks in progress. Consider completing some before starting new ones.`,action:'Focus on finishing'});
+  if(inProgress.length===0&&tasks.filter(t=>t.status==='todo').length>0)suggestions.push({icon:'G',color:'#4ade80',text:'No tasks in progress. Start working on your highest priority todo.',action:'Move a task to in-progress'});
+  const untagged=content.filter(c=>!(c.tags&&c.tags.length));
+  if(untagged.length>5)suggestions.push({icon:'T',color:'#8b5cf6',text:`${untagged.length} content items lack tags. Tag them for better organization.`,action:'Cmd+K > auto tag'});
+  const unreadLinks=links.filter(l=>l.category==='read-later');
+  if(unreadLinks.length>10)suggestions.push({icon:'R',color:'#3b82f6',text:`${unreadLinks.length} links in "read later". Set aside time to review them.`,action:'Switch to Links section'});
+  const sd=S._streakData||{};
+  if(sd.lastActive!==today)suggestions.push({icon:'S',color:'#f59e0b',text:'You haven\'t logged activity today. Open any feature to start your streak!',action:'Track your streak'});
+  if(!suggestions.length)suggestions.push({icon:'v',color:'#4ade80',text:'Everything looks great! Keep up the good work.',action:'No action needed'});
+  const panel=document.createElement('div');panel.id='smart-suggestions-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Smart Suggestions (${suggestions.length})</span><button onclick="document.getElementById('smart-suggestions-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;gap:8px">`;
+  suggestions.forEach(s=>{
+    h+=`<div style="padding:12px;background:var(--bg-surface);border-radius:8px;border-left:3px solid ${s.color}">`;
+    h+=`<div style="display:flex;align-items:start;gap:10px"><div style="width:24px;height:24px;border-radius:50%;background:${s.color}20;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:11px;font-weight:700;color:${s.color}">${s.icon}</span></div>`;
+    h+=`<div><div style="font-size:11px;color:var(--text-primary);line-height:1.5">${esc(s.text)}</div>`;
+    h+=`<div style="font-size:9px;color:var(--accent);margin-top:4px">${esc(s.action)}</div></div></div></div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showLinkCategoryChart(){
+  const links=S.links||[];
+  const catMap={};links.forEach(l=>{const c=l.category||'uncategorized';catMap[c]=(catMap[c]||0)+1;});
+  const sorted=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const total=links.length||1;
+  const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+  const panel=document.createElement('div');panel.id='link-category-chart';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Link Categories (${sorted.length})</span><button onclick="document.getElementById('link-category-chart').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:flex;gap:3px;height:20px;border-radius:6px;overflow:hidden;margin-bottom:16px">`;
+  sorted.forEach(([cat,count],i)=>{
+    const pct=Math.max(3,(count/total)*100);
+    h+=`<div title="${cat}: ${count}" style="width:${pct}%;background:${colors[i%colors.length]};min-width:4px"></div>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:grid;gap:6px">`;
+  sorted.forEach(([cat,count],i)=>{
+    const pct=Math.round((count/total)*100);
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg-surface);border-radius:6px">`;
+    h+=`<div style="width:10px;height:10px;border-radius:3px;background:${colors[i%colors.length]};flex-shrink:0"></div>`;
+    h+=`<span style="flex:1;font-size:11px;color:var(--text-primary)">${esc(cat)}</span>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${count} (${pct}%)</span>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showPriorityDistribution(){
+  const tasks=S.tasks||[];
+  const pMap={p0:0,p1:0,p2:0,p3:0};
+  tasks.forEach(t=>{const p=t.priority||'p3';pMap[p]=(pMap[p]||0)+1;});
+  const total=tasks.length||1;
+  const items=[
+    {key:'p0',name:'P0 Critical',color:'#ef4444',count:pMap.p0},
+    {key:'p1',name:'P1 High',color:'#f59e0b',count:pMap.p1},
+    {key:'p2',name:'P2 Medium',color:'#3b82f6',count:pMap.p2},
+    {key:'p3',name:'P3 Low',color:'#6b7280',count:pMap.p3},
+  ];
+  const panel=document.createElement('div');panel.id='priority-dist-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Priority Distribution</span><button onclick="document.getElementById('priority-dist-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:flex;gap:3px;height:24px;border-radius:6px;overflow:hidden;margin-bottom:16px">`;
+  items.forEach(item=>{
+    const pct=Math.max(2,(item.count/total)*100);
+    h+=`<div style="width:${pct}%;background:${item.color};min-width:4px"></div>`;
+  });
+  h+=`</div>`;
+  h+=`<div style="display:grid;gap:8px">`;
+  items.forEach(item=>{
+    const pct=Math.round((item.count/total)*100);
+    h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-surface);border-radius:6px">`;
+    h+=`<div style="width:14px;height:14px;border-radius:4px;background:${item.color};flex-shrink:0"></div>`;
+    h+=`<span style="flex:1;font-size:12px;color:var(--text-primary)">${item.name}</span>`;
+    h+=`<span style="font-size:14px;font-weight:700;color:${item.color}">${item.count}</span>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${pct}%</span>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
