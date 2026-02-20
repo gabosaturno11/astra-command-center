@@ -6305,6 +6305,9 @@ function cmdGetItems(q) {
       ['redis','Redis command reference'],
       ['progress gauge','Overall progress gauge'],
       ['lorem ipsum','Lorem ipsum text generator'],
+      ['git commands','Git command reference'],
+      ['age histogram','Task age distribution histogram'],
+      ['char counter','Character and word counter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9389,6 +9392,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='lorem ipsum' || ql==='lorem' || ql==='placeholder text' || ql==='dummy text')){
     items.unshift({title:'Lorem Ipsum',desc:'Generate placeholder text paragraphs',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLoremIpsum();}});
+  }
+  if(ql && (ql==='git commands' || ql==='git ref' || ql==='git cheatsheet' || ql==='git reference')){
+    items.unshift({title:'Git Reference',desc:'Git command cheatsheet by category',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitCommandRef();}});
+  }
+  if(ql && (ql==='age histogram' || ql==='task age' || ql==='age distribution' || ql==='how old tasks')){
+    items.unshift({title:'Age Histogram',desc:'Distribution of open task ages',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAgeHistogram();}});
+  }
+  if(ql && (ql==='char counter' || ql==='character count' || ql==='word count' || ql==='text counter')){
+    items.unshift({title:'Character Counter',desc:'Count chars, words, lines, sentences',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCharCounter();}});
   }
   return items.slice(0, 20);
 }
@@ -26938,6 +26950,85 @@ function showQuickLoremIpsum(){
     </div>`;
   };
   window._setLorem=(n)=>{count=n;rend();};
+  document.body.appendChild(d);rend();
+}
+function showGitCommandRef(){
+  let ex=document.getElementById('git-ref-float');if(ex){ex.remove();return;}
+  const categories={
+    'Basics':['git init','git clone <url>','git status','git add <file>','git add .','git commit -m "msg"','git push','git pull','git fetch','git log --oneline'],
+    'Branching':['git branch','git branch <name>','git checkout <branch>','git checkout -b <name>','git merge <branch>','git branch -d <name>','git switch <branch>','git switch -c <name>'],
+    'Stash':['git stash','git stash pop','git stash list','git stash apply stash@{n}','git stash drop stash@{n}','git stash clear','git stash show -p'],
+    'Diff & Log':['git diff','git diff --staged','git diff HEAD~1','git log --graph --oneline','git log --author="name"','git log --since="2 weeks ago"','git blame <file>','git show <commit>'],
+    'Undo':['git reset HEAD <file>','git checkout -- <file>','git revert <commit>','git reset --soft HEAD~1','git reset --hard HEAD~1','git clean -fd','git restore <file>','git restore --staged <file>'],
+    'Remote':['git remote -v','git remote add origin <url>','git push -u origin main','git push origin --delete <branch>','git fetch --prune','git pull --rebase']
+  };
+  let sel='Basics';
+  const d=document.createElement('div');d.id='git-ref-float';
+  const rend=()=>{
+    const tabs=Object.keys(categories).map(k=>`<span onclick="window._gitTab('${k}')" style="padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;${k===sel?'background:var(--accent);color:#000':'color:var(--text-muted)'}">${k}</span>`).join('');
+    const cmds=categories[sel].map(c=>`<div onclick="navigator.clipboard.writeText('${c.replace(/'/g,"\\'")}');this.style.color='#4ade80';setTimeout(()=>this.style.color='',600)" style="padding:4px 8px;font-size:11px;color:var(--text-secondary);font-family:monospace;cursor:pointer;border-bottom:1px solid var(--border)">${esc(c)}</div>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Git Command Reference</span><span onclick="document.getElementById('git-ref-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">${cmds}</div>
+      <div style="margin-top:8px;font-size:9px;color:var(--text-muted)">Click any command to copy</div>
+    </div>`;
+  };
+  window._gitTab=(k)=>{sel=k;rend();};
+  document.body.appendChild(d);rend();
+}
+function showTaskAgeHistogram(){
+  let ex=document.getElementById('age-hist-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&t.createdAt);
+  const now=new Date();
+  const ages=tasks.map(t=>Math.floor((now-new Date(t.createdAt))/(86400000)));
+  const buckets=[0,0,0,0,0,0];
+  const labels=['0-1d','2-3d','4-7d','1-2w','2-4w','1m+'];
+  ages.forEach(a=>{
+    if(a<=1)buckets[0]++;
+    else if(a<=3)buckets[1]++;
+    else if(a<=7)buckets[2]++;
+    else if(a<=14)buckets[3]++;
+    else if(a<=30)buckets[4]++;
+    else buckets[5]++;
+  });
+  const mx=Math.max(...buckets,1);
+  const colors=['#4ade80','#22d3ee','#a78bfa','#facc15','#fb923c','#f87171'];
+  const bars=labels.map((l,i)=>{const h=Math.round((buckets[i]/mx)*120);return `<rect x="${i*52+5}" y="${140-h}" width="40" height="${h}" rx="3" fill="${colors[i]}" opacity="0.85"/><text x="${i*52+25}" y="${155}" text-anchor="middle" fill="var(--text-muted)" font-size="8">${l}</text><text x="${i*52+25}" y="${136-h}" text-anchor="middle" fill="var(--text-primary)" font-size="10" font-weight="600">${buckets[i]}</text>`;}).join('');
+  const avgAge=ages.length?Math.round(ages.reduce((s,a)=>s+a,0)/ages.length):0;
+  const d=document.createElement('div');d.id='age-hist-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Age Histogram</span><span onclick="document.getElementById('age-hist-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <svg width="320" height="165" viewBox="0 0 320 165">${bars}</svg>
+    <div style="margin-top:6px;font-size:10px;color:var(--text-muted)">${tasks.length} open tasks | Average age: ${avgAge} days</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickCharCounter(){
+  let ex=document.getElementById('char-counter-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='char-counter-float';
+  const rend=(text)=>{
+    text=text||'';
+    const chars=text.length;
+    const words=text.trim()?text.trim().split(/\s+/).length:0;
+    const lines=text?text.split('\n').length:0;
+    const sentences=text.trim()?text.split(/[.!?]+/).filter(s=>s.trim()).length:0;
+    const paras=text.trim()?text.split(/\n\n+/).filter(p=>p.trim()).length:0;
+    const readTime=Math.max(1,Math.ceil(words/200));
+    d.innerHTML=`<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:280px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Character Counter</span><span onclick="document.getElementById('char-counter-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <textarea id="char-input" placeholder="Type or paste text..." rows="4" oninput="window._countChars()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:11px;resize:vertical;box-sizing:border-box;margin-bottom:8px">${esc(text)}</textarea>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--accent)">${chars}</div><div style="font-size:8px;color:var(--text-muted)">Chars</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#22d3ee">${words}</div><div style="font-size:8px;color:var(--text-muted)">Words</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#a78bfa">${lines}</div><div style="font-size:8px;color:var(--text-muted)">Lines</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#fb923c">${sentences}</div><div style="font-size:8px;color:var(--text-muted)">Sentences</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:#facc15">${paras}</div><div style="font-size:8px;color:var(--text-muted)">Paragraphs</div></div>
+        <div style="text-align:center"><div style="font-size:16px;font-weight:700;color:var(--text-secondary)">${readTime}m</div><div style="font-size:8px;color:var(--text-muted)">Read Time</div></div>
+      </div>
+    </div>`;
+  };
+  window._countChars=()=>rend(document.getElementById('char-input').value);
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
