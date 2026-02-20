@@ -1006,6 +1006,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="writer-toolbar-btn" onclick="writerToContent()" title="Save to Content section">C+</button>
               <button class="writer-toolbar-btn" onclick="saveVersion()" title="Save Version">v+</button>
               <button class="writer-toolbar-btn" onclick="toggleWriterPanel()" title="History">H</button>
+              <button class="writer-toolbar-btn" onclick="writerDetailedStats()" title="Detailed writing statistics">St</button>
               <select class="writer-toolbar-select" id="writer-export-sel" onchange="writerExport(this.value);this.selectedIndex=0">
                 <option value="">Export</option>
                 <option value="md">Markdown</option>
@@ -3235,6 +3236,33 @@ function previewVersion(i){
 }
 function toggleWriterPanel(){writerPanelOpen=!writerPanelOpen;document.getElementById('writer-right-panel').classList.toggle('hidden',!writerPanelOpen);}
 function writerExport(fmt){const d=getActiveDoc();if(!d||!fmt)return;const t=d.title||'untitled',e=document.getElementById('writer-editor');if(fmt==='clipboard'){navigator.clipboard.writeText(e.innerText);toast('Copied');return;}let c,m,x;if(fmt==='txt'){c=e.innerText;m='text/plain';x='txt';}else if(fmt==='html'){c=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${esc(t)}</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#222}h1{font-size:28px}h2{font-size:22px}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}pre{background:#f4f4f4;padding:12px;border-radius:6px;overflow-x:auto}</style></head><body><h1>${esc(t)}</h1>${e.innerHTML}</body></html>`;m='text/html';x='html';}else if(fmt==='md'){c=htmlToMd(e.innerHTML,t);m='text/markdown';x='md';}const blob=new Blob([c],{type:m});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=t.replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.'+x;a.click();toast('Exported .'+x);}
+function writerDetailedStats(){
+  const d=getActiveDoc();if(!d)return;snapshotWriter();
+  const text=(document.getElementById('writer-editor')?.innerText||'').trim();
+  if(!text){toast('Document is empty');return;}
+  const words=text.split(/\s+/).filter(x=>x.length);const wc=words.length;
+  const chars=text.length;const charsNoSpace=text.replace(/\s/g,'').length;
+  const sentences=text.split(/[.!?]+\s/).filter(Boolean).length;
+  const paragraphs=text.split(/\n\s*\n/).filter(p=>p.trim()).length;
+  const avgWordLen=wc?Math.round(charsNoSpace/wc*10)/10:0;
+  const avgSentLen=sentences?Math.round(wc/sentences*10)/10:0;
+  const readTime=Math.max(1,Math.ceil(wc/238));
+  const speakTime=Math.max(1,Math.ceil(wc/150));
+  const uniqueWords=new Set(words.map(w=>w.toLowerCase().replace(/[^a-z]/g,''))).size;
+  const vocabRichness=wc?Math.round(uniqueWords/wc*100):0;
+  const headings=(document.getElementById('writer-editor')?.querySelectorAll('h1,h2,h3,h4')||[]).length;
+  const links=(document.getElementById('writer-editor')?.querySelectorAll('a')||[]).length;
+  const stats=[
+    'Words: '+wc.toLocaleString(),
+    'Characters: '+chars.toLocaleString()+' ('+charsNoSpace.toLocaleString()+' no spaces)',
+    'Sentences: '+sentences,'Paragraphs: '+paragraphs,
+    'Avg word length: '+avgWordLen+' chars','Avg sentence length: '+avgSentLen+' words',
+    'Reading time: ~'+readTime+' min','Speaking time: ~'+speakTime+' min',
+    'Unique words: '+uniqueWords+' ('+vocabRichness+'% vocabulary richness)',
+    'Headings: '+headings,'Links: '+links
+  ];
+  alert((d.title||'Untitled')+'\n\n'+stats.join('\n'));
+}
 function writerToContent(){const d=getActiveDoc();if(!d)return;snapshotWriter();const ed=document.getElementById('writer-editor');const text=ed.innerText||'';if(!text.trim()){toast('Document is empty');return;}S.content.unshift({id:Date.now(),type:'caption',theme:d.title||'writer',body:text,tags:['from-writer'],source:'writer-export',created:new Date().toISOString()});save();toast('Saved to Content: '+(d.title||'Untitled').substring(0,30));}
 function exportAllDocs(){
   if(!S.docs.length){toast('No documents');return;}
@@ -5666,6 +5694,41 @@ function cmdGetItems(q) {
     const sLabels={todo:'To Do',progress:'In Progress',blocked:'Blocked'};
     items.unshift({title:'Priority Matrix: '+active.length+' active tasks',desc:'Tasks grouped by priority x status',icon:'M',type:'info'});
     priorities.forEach(p=>{const pTasks=active.filter(t=>(t.priority||'p2')===p);if(pTasks.length){const statusCounts=statuses.map(s=>pTasks.filter(t=>t.status===s).length);items.push({title:pLabels[p]+': '+pTasks.length+' tasks',desc:'Todo: '+statusCounts[0]+' | In Progress: '+statusCounts[1]+' | Blocked: '+statusCounts[2],icon:p==='p0'?'!':p==='p1'?'*':'T',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);document.getElementById('task-sort').value='priority';renderTasks();}});}});
+  }
+  // Orphan prefix — find disconnected items
+  if(ql && (ql.startsWith('orphan:') || ql==='orphan' || ql==='orphans')){
+    const projNames=new Set((S.projects||[]).map(p=>p.name));
+    const projIds=new Set((S.projects||[]).map(p=>p.id));
+    const noProj=S.tasks.filter(t=>t.status!=='done'&&!t.project).length;
+    const badProj=S.tasks.filter(t=>t.project&&!projNames.has(t.project)).length;
+    const orphanSpecs=S.specs.filter(s=>s.projectId&&!projIds.has(s.projectId));
+    const emptyDocs=S.docs.filter(d=>(!d.body||d.body.trim().length<10)&&(!d.title||d.title==='Untitled'));
+    const oldTodo=S.tasks.filter(t=>t.status==='todo'&&t.created&&(Date.now()-new Date(t.created).getTime())>30*86400000);
+    items.unshift({title:'Orphans: '+noProj+' tasks no project, '+orphanSpecs.length+' specs orphaned',desc:badProj+' tasks with unknown project | '+emptyDocs.length+' empty docs | '+oldTodo.length+' stale todos',icon:'?',type:'info'});
+    if(noProj)items.push({title:noProj+' active tasks without a project',desc:'Click to filter unassigned',icon:'T',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);document.getElementById('task-search').value='';taskProjectFilter=null;renderTasks();}});
+    orphanSpecs.forEach(s=>{items.push({title:'Orphan spec: '+(s.title||'Untitled'),desc:'Project ID '+s.projectId+' no longer exists',icon:'S',type:'action',action:()=>{closeCommandPalette();switchSpec(String(s.id));switchSection('specs',null);}});});
+    oldTodo.slice(0,5).forEach(t=>{items.push({title:'Stale: '+t.title+' ('+timeAgo(t.created)+')',desc:'Todo for 30+ days',icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+  }
+  // Health prefix — system health check
+  if(ql && (ql.startsWith('health:') || ql==='health' || ql==='diagnostics')){
+    const size=JSON.stringify(S).length;const kb=Math.round(size/1024);
+    const maxKB=5000;const pct=Math.round(kb/maxKB*100);
+    const emptyTasks=S.tasks.filter(t=>!t.title||!t.title.trim()).length;
+    const dupLinks=S.links.filter((l,i)=>S.links.findIndex(x=>x.url===l.url)<i).length;
+    const orphanSpecs=S.specs.filter(s=>s.projectId&&!(S.projects||[]).find(p=>p.id===s.projectId)).length;
+    const oldBlocked=S.tasks.filter(t=>t.status==='blocked'&&t.created&&(Date.now()-new Date(t.created).getTime())>14*86400000).length;
+    const noTagTasks=S.tasks.filter(t=>t.status!=='done'&&(!t.tags||!t.tags.length)).length;
+    const noDueTasks=S.tasks.filter(t=>t.status!=='done'&&!t.due).length;
+    const issues=[];
+    if(pct>80)issues.push('Storage '+pct+'% full ('+kb+'KB/'+maxKB+'KB)');
+    if(emptyTasks)issues.push(emptyTasks+' empty tasks');
+    if(dupLinks)issues.push(dupLinks+' duplicate links');
+    if(orphanSpecs)issues.push(orphanSpecs+' orphan specs');
+    if(oldBlocked)issues.push(oldBlocked+' tasks blocked 14+ days');
+    items.unshift({title:'Health: '+(issues.length?issues.length+' issues':'All good!'),desc:'Storage: '+kb+'KB ('+pct+'%) | '+S.tasks.length+' tasks | '+S.content.length+' content | '+S.docs.length+' docs',icon:issues.length?'!':'*',type:'info'});
+    if(noDueTasks>5)items.push({title:noDueTasks+' active tasks without due dates',desc:'Consider adding dates for better planning',icon:'T',type:'info'});
+    if(noTagTasks>10)items.push({title:noTagTasks+' active tasks without tags',desc:'Tags help with filtering and organization',icon:'T',type:'info'});
+    issues.forEach(issue=>{items.push({title:issue,desc:'Click to run cleanup',icon:'!',type:'action',action:()=>{closeCommandPalette();openCommandPalette();document.getElementById('cmd-input').value='clean:';document.getElementById('cmd-input').dispatchEvent(new Event('input'));}});});
   }
   // Merge prefix — find similar tasks to merge
   if(ql && ql.startsWith('merge:')){
