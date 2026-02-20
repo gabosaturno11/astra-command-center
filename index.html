@@ -6158,6 +6158,12 @@ function cmdGetItems(q) {
       ['text shadow','CSS text-shadow generator with live preview'],
       ['streak calendar','GitHub-style task streak calendar'],
       ['tarot','Daily tarot card draw'],
+      ['css variables','CSS variable theme presets'],
+      ['cycle time','Task cycle time analysis'],
+      ['motivation','Motivational quote generator'],
+      ['clip-path','CSS clip-path shape presets'],
+      ['pareto','Task Pareto chart by project'],
+      ['breathwork','Guided breathing exercise patterns'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8801,6 +8807,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='tarot' || ql==='tarot card' || ql==='card draw' || ql==='daily card')){
     items.unshift({title:'Tarot Draw',desc:'Daily tarot card draw',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTarot();}});
+  }
+  if(ql && (ql==='css variables' || ql==='css vars' || ql==='theme variables' || ql==='variable themes')){
+    items.unshift({title:'CSS Variable Themes',desc:'Dark theme variable presets',icon:'V',type:'action',action:()=>{closeCommandPalette();showVariableGen();}});
+  }
+  if(ql && (ql==='cycle time' || ql==='cycle' || ql==='lead time' || ql==='task cycle')){
+    items.unshift({title:'Cycle Time',desc:'Task cycle time analysis',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCycleTime();}});
+  }
+  if(ql && (ql==='motivation' || ql==='quote' || ql==='motivational quote' || ql==='inspire me')){
+    items.unshift({title:'Motivation',desc:'Motivational quotes',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMotivation();}});
+  }
+  if(ql && (ql==='clip-path' || ql==='clip path' || ql==='css shape' || ql==='shape presets')){
+    items.unshift({title:'Clip-Path Presets',desc:'CSS clip-path shape library',icon:'C',type:'action',action:()=>{closeCommandPalette();showClipPathGen();}});
+  }
+  if(ql && (ql==='pareto' || ql==='pareto chart' || ql==='80/20' || ql==='task pareto')){
+    items.unshift({title:'Pareto Chart',desc:'Task Pareto analysis by project',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskParetoChart();}});
+  }
+  if(ql && (ql==='breathwork' || ql==='breathing' || ql==='breath' || ql==='box breathing')){
+    items.unshift({title:'Breathwork',desc:'Guided breathing exercises',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBreathwork();}});
   }
   return items.slice(0, 20);
 }
@@ -21551,6 +21575,249 @@ function showQuickTarot(){
       '<button onclick="document.getElementById(\'tarot-float\').remove()" style="background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Close</button>';
   }
   window._tarotDraw=function(){idx=Math.floor(Math.random()*cards.length);rend();};
+  document.body.appendChild(d);
+  rend();
+}
+function showVariableGen(){
+  var ex=document.getElementById('var-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='var-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  var themes=[
+    {name:'Dark Theme',vars:{'--bg-primary':'#0a0a0a','--bg-secondary':'#1a1a1a','--bg-surface':'#242424','--text-primary':'#e5e5e5','--text-secondary':'#a3a3a3','--accent':'#4ade80','--border':'#333333'}},
+    {name:'Ocean Dark',vars:{'--bg-primary':'#050711','--bg-secondary':'#0d1117','--bg-surface':'#161b22','--text-primary':'#e6edf3','--text-secondary':'#8b949e','--accent':'#06b6d4','--border':'#30363d'}},
+    {name:'Warm Dark',vars:{'--bg-primary':'#1c1410','--bg-secondary':'#27211c','--bg-surface':'#322b26','--text-primary':'#ede0d4','--text-secondary':'#b7a99a','--accent':'#f59e0b','--border':'#443d37'}},
+    {name:'Purple Night',vars:{'--bg-primary':'#0f0a1a','--bg-secondary':'#1a1225','--bg-surface':'#251b33','--text-primary':'#e8e0f0','--text-secondary':'#a898be','--accent':'#a78bfa','--border':'#362b4a'}}
+  ];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">CSS Variable Themes</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  themes.forEach(function(t,ti){
+    h+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:10px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+      '<span style="color:var(--text-primary);font-size:13px;font-weight:600">'+t.name+'</span>'+
+      '<button onclick="window._copyTheme('+ti+')" style="background:#4ade80;color:#000;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Copy</button></div>'+
+      '<div style="display:flex;gap:4px;margin-bottom:8px">';
+    Object.values(t.vars).forEach(function(v){h+='<div style="width:24px;height:24px;border-radius:4px;background:'+v+';border:1px solid rgba(255,255,255,0.1)"></div>';});
+    h+='</div><pre style="font-family:monospace;font-size:10px;color:#4ade80;margin:0;white-space:pre-wrap">:root {\n';
+    Object.keys(t.vars).forEach(function(k){h+='  '+k+': '+t.vars[k]+';\n';});
+    h+='}</pre></div>';
+  });
+  d.innerHTML=h;
+  window._copyTheme=function(ti){
+    var t=themes[ti];var css=':root {\n';
+    Object.keys(t.vars).forEach(function(k){css+='  '+k+': '+t.vars[k]+';\n';});
+    css+='}';
+    navigator.clipboard.writeText(css);
+    var btns=d.querySelectorAll('button');
+    var btn=btns[ti+1];
+    if(btn){btn.textContent='Copied!';setTimeout(function(){btn.textContent='Copy';},800);}
+  };
+  document.body.appendChild(d);
+}
+function showTaskCycleTime(){
+  var ex=document.getElementById('cycle-time-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var cycles=[];
+  tasks.forEach(function(t){
+    if(t.status==='done'&&t.completedAt&&t.createdAt){
+      var created=new Date(t.createdAt);
+      var completed=new Date(t.completedAt);
+      var days=Math.round((completed-created)/86400000);
+      if(days>=0)cycles.push({title:t.title,days:days,priority:t.priority||'p3'});
+    }
+  });
+  cycles.sort(function(a,b){return b.days-a.days;});
+  var avgDays=0;cycles.forEach(function(c){avgDays+=c.days;});
+  avgDays=cycles.length?Math.round(avgDays/cycles.length*10)/10:0;
+  var medianDays=0;
+  if(cycles.length){var sorted=cycles.map(function(c){return c.days;}).sort(function(a,b){return a-b;});medianDays=sorted[Math.floor(sorted.length/2)];}
+  var byBucket={'Same day':0,'1-3 days':0,'4-7 days':0,'1-2 weeks':0,'2+ weeks':0};
+  cycles.forEach(function(c){
+    if(c.days===0)byBucket['Same day']++;
+    else if(c.days<=3)byBucket['1-3 days']++;
+    else if(c.days<=7)byBucket['4-7 days']++;
+    else if(c.days<=14)byBucket['1-2 weeks']++;
+    else byBucket['2+ weeks']++;
+  });
+  var maxBucket=0;Object.values(byBucket).forEach(function(v){if(v>maxBucket)maxBucket=v;});
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Task Cycle Time</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  h+='<div style="display:flex;justify-content:space-around;margin-bottom:16px">'+
+    '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:#4ade80">'+avgDays+'d</div><div style="font-size:10px;color:var(--text-muted)">Avg Cycle</div></div>'+
+    '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:#06b6d4">'+medianDays+'d</div><div style="font-size:10px;color:var(--text-muted)">Median</div></div>'+
+    '<div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--text-primary)">'+cycles.length+'</div><div style="font-size:10px;color:var(--text-muted)">Tasks</div></div></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);font-weight:600;margin-bottom:6px">Distribution</div>';
+  Object.keys(byBucket).forEach(function(b){
+    var v=byBucket[b];
+    var pct=maxBucket?Math.round(v/maxBucket*100):0;
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'+
+      '<span style="color:var(--text-muted);font-size:10px;min-width:70px">'+b+'</span>'+
+      '<div style="flex:1;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:4px"></div></div>'+
+      '<span style="color:var(--text-muted);font-size:10px;min-width:20px;text-align:right">'+v+'</span></div>';
+  });
+  if(cycles.length){
+    h+='<div style="font-size:11px;color:var(--text-muted);font-weight:600;margin:12px 0 6px">Slowest Tasks</div>';
+    cycles.slice(0,5).forEach(function(c){
+      h+='<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)">'+
+        '<span style="color:var(--text-primary);font-size:11px">'+esc((c.title||'').substring(0,30))+'</span>'+
+        '<span style="color:var(--text-muted);font-size:10px">'+c.days+'d</span></div>';
+    });
+  }
+  var d=document.createElement('div');d.id='cycle-time-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showQuickMotivation(){
+  var ex=document.getElementById('motivation-float');if(ex){ex.remove();return;}
+  var quotes=[
+    {text:'The only way to do great work is to love what you do.',author:'Steve Jobs'},
+    {text:'It does not matter how slowly you go as long as you do not stop.',author:'Confucius'},
+    {text:'What you get by achieving your goals is not as important as what you become.',author:'Zig Ziglar'},
+    {text:'The future belongs to those who believe in the beauty of their dreams.',author:'Eleanor Roosevelt'},
+    {text:'Success is not final, failure is not fatal: it is the courage to continue that counts.',author:'Winston Churchill'},
+    {text:'The best time to plant a tree was 20 years ago. The second best time is now.',author:'Chinese Proverb'},
+    {text:'Do what you can, with what you have, where you are.',author:'Theodore Roosevelt'},
+    {text:'Everything you have ever wanted is on the other side of fear.',author:'George Addair'},
+    {text:'The only limit to our realization of tomorrow is our doubts of today.',author:'FDR'},
+    {text:'Believe you can and you are halfway there.',author:'Theodore Roosevelt'},
+    {text:'Act as if what you do makes a difference. It does.',author:'William James'},
+    {text:'You miss 100% of the shots you do not take.',author:'Wayne Gretzky'},
+    {text:'Ship it.',author:'Every Great Developer'}
+  ];
+  var idx=Math.floor(Math.random()*quotes.length);
+  var q=quotes[idx];
+  var d=document.createElement('div');d.id='motivation-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:40px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;text-align:center';
+  function rend(){
+    q=quotes[idx];
+    d.innerHTML='<div style="font-size:20px;color:var(--text-primary);line-height:1.6;font-weight:300;margin-bottom:16px;font-style:italic">"'+q.text+'"</div>'+
+      '<div style="font-size:13px;color:#4ade80;margin-bottom:24px">- '+q.author+'</div>'+
+      '<button onclick="window._nextQuote()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;margin-right:8px">Next</button>'+
+      '<button onclick="document.getElementById(\'motivation-float\').remove()" style="background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Go Ship!</button>';
+  }
+  window._nextQuote=function(){idx=(idx+1)%quotes.length;rend();};
+  document.body.appendChild(d);
+  rend();
+}
+function showClipPathGen(){
+  var ex=document.getElementById('clippath-gen-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='clippath-gen-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  var presets=[
+    {name:'Triangle',css:'polygon(50% 0%, 0% 100%, 100% 100%)'},
+    {name:'Trapezoid',css:'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)'},
+    {name:'Parallelogram',css:'polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%)'},
+    {name:'Rhombus',css:'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'},
+    {name:'Pentagon',css:'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)'},
+    {name:'Hexagon',css:'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)'},
+    {name:'Octagon',css:'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)'},
+    {name:'Star',css:'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)'},
+    {name:'Arrow Right',css:'polygon(0% 20%, 60% 20%, 60% 0%, 100% 50%, 60% 100%, 60% 80%, 0% 80%)'},
+    {name:'Circle',css:'circle(50% at 50% 50%)'},
+    {name:'Ellipse',css:'ellipse(50% 35% at 50% 50%)'},
+    {name:'Inset',css:'inset(10% 10% 10% 10% round 10px)'}
+  ];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Clip-Path Presets</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">';
+  presets.forEach(function(p,i){
+    h+='<div onclick="window._copyClip('+i+')" style="cursor:pointer;text-align:center;padding:12px 8px;background:var(--bg-surface);border-radius:8px">'+
+      '<div style="width:60px;height:60px;background:linear-gradient(135deg,#4ade80,#06b6d4);clip-path:'+p.css+';margin:0 auto 6px"></div>'+
+      '<div style="font-size:10px;color:var(--text-primary)">'+p.name+'</div>'+
+      '</div>';
+  });
+  h+='</div>';
+  h+='<div id="clip-output" style="background:var(--bg-surface);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:#4ade80;min-height:20px">Click a shape to copy</div>';
+  d.innerHTML=h;
+  window._copyClip=function(i){
+    var css='clip-path: '+presets[i].css+';';
+    navigator.clipboard.writeText(css);
+    var out=document.getElementById('clip-output');
+    if(out)out.textContent='Copied: '+css;
+  };
+  document.body.appendChild(d);
+}
+function showTaskParetoChart(){
+  var ex=document.getElementById('pareto-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var byProject={};
+  tasks.forEach(function(t){
+    var p=t.project||'No Project';
+    if(t.project){var found=(S.projects||[]).find(function(pr){return pr.id===t.project||pr.name===t.project;});if(found)p=found.name;}
+    byProject[p]=(byProject[p]||0)+1;
+  });
+  var sorted=Object.entries(byProject).sort(function(a,b){return b[1]-a[1];});
+  var total=tasks.length||1;
+  var cumulative=0;
+  var svgW=380,svgH=160,barW=sorted.length?Math.min(40,Math.floor((svgW-40)/sorted.length)):40;
+  var maxVal=sorted.length?sorted[0][1]:1;
+  var bars='',line='';
+  sorted.forEach(function(entry,i){
+    var name=entry[0],count=entry[1];
+    cumulative+=count;
+    var pct=Math.round(cumulative/total*100);
+    var bh=Math.round(count/maxVal*(svgH-40));
+    var x=20+i*(barW+4);
+    bars+='<rect x="'+x+'" y="'+(svgH-bh-20)+'" width="'+barW+'" height="'+bh+'" rx="3" fill="#4ade80" opacity="0.8"/>';
+    bars+='<text x="'+(x+barW/2)+'" y="'+(svgH-bh-24)+'" text-anchor="middle" fill="var(--text-muted)" font-size="9">'+count+'</text>';
+    var ly=20+(1-pct/100)*(svgH-40);
+    line+=(i===0?'M':'L')+(x+barW/2).toFixed(1)+','+ly.toFixed(1);
+  });
+  if(line)line='<path d="'+line+'" stroke="#ef4444" stroke-width="2" fill="none"/>';
+  var d=document.createElement('div');d.id='pareto-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Task Pareto Chart</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="display:flex;gap:12px;justify-content:center;margin-bottom:8px">'+
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;background:#4ade80;border-radius:2px"></div><span style="font-size:10px;color:var(--text-muted)">Task Count</span></div>'+
+    '<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:2px;background:#ef4444"></div><span style="font-size:10px;color:var(--text-muted)">Cumulative %</span></div></div>'+
+    '<svg width="'+svgW+'" height="'+svgH+'" style="display:block;margin:0 auto">'+bars+line+'</svg>'+
+    (sorted.length===0?'<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">Add tasks with projects to see Pareto chart</div>':'');
+  document.body.appendChild(d);
+}
+function showQuickBreathwork(){
+  var ex=document.getElementById('breathwork-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='breathwork-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:340px;width:90vw;text-align:center';
+  var phase='ready',timer=null,count=0;
+  var patterns=[
+    {name:'Box Breathing',steps:[{text:'Breathe In',dur:4},{text:'Hold',dur:4},{text:'Breathe Out',dur:4},{text:'Hold',dur:4}]},
+    {name:'4-7-8 Relaxing',steps:[{text:'Breathe In',dur:4},{text:'Hold',dur:7},{text:'Breathe Out',dur:8}]},
+    {name:'Energizing',steps:[{text:'Quick In',dur:2},{text:'Quick Out',dur:2}]}
+  ];
+  var patIdx=0,stepIdx=0,secLeft=0,cycles=0;
+  function rend(){
+    var p=patterns[patIdx];
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Breathwork</span><button onclick="window._bwStop();document.getElementById(\'breathwork-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+    if(phase==='ready'){
+      h+='<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Choose a pattern</div>';
+      patterns.forEach(function(pat,i){
+        h+='<button onclick="window._bwStart('+i+')" style="display:block;width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:10px;border-radius:8px;cursor:pointer;font-size:13px;margin-bottom:8px;text-align:left"><strong>'+pat.name+'</strong><br><span style="font-size:11px;color:var(--text-muted)">'+pat.steps.map(function(s){return s.text+' ('+s.dur+'s)';}).join(' > ')+'</span></button>';
+      });
+    } else {
+      var step=p.steps[stepIdx];
+      var size=60+Math.round((1-secLeft/step.dur)*40);
+      h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">'+p.name+' - Cycle '+(cycles+1)+'</div>';
+      h+='<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:rgba(74,222,128,0.2);border:2px solid #4ade80;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;transition:all 0.5s ease"><div style="font-size:24px;font-weight:700;color:#4ade80">'+secLeft+'</div></div>';
+      h+='<div style="font-size:18px;color:var(--text-primary);margin-bottom:16px;font-weight:600">'+step.text+'</div>';
+      h+='<button onclick="window._bwStop()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px 20px;border-radius:6px;cursor:pointer;font-size:12px">Stop</button>';
+    }
+    d.innerHTML=h;
+  }
+  window._bwStart=function(i){
+    patIdx=i;stepIdx=0;cycles=0;
+    var p=patterns[patIdx];secLeft=p.steps[0].dur;
+    phase='active';rend();
+    timer=setInterval(function(){
+      secLeft--;
+      if(secLeft<=0){
+        stepIdx++;
+        if(stepIdx>=p.steps.length){stepIdx=0;cycles++;}
+        secLeft=p.steps[stepIdx].dur;
+      }
+      rend();
+    },1000);
+  };
+  window._bwStop=function(){
+    if(timer)clearInterval(timer);timer=null;
+    phase='ready';rend();
+  };
   document.body.appendChild(d);
   rend();
 }
