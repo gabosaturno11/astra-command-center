@@ -6455,6 +6455,12 @@ function cmdGetItems(q) {
       ['wget','wget download manager reference'],
       ['recurrence calendar','View all recurring tasks schedule'],
       ['json formatter','Format validate and minify JSON'],
+      ['ssh','SSH connection and tunneling reference'],
+      ['project timeline','Task progress by project over time'],
+      ['regex','Regex pattern tester with match highlighting'],
+      ['npm','npm package manager scripts reference'],
+      ['tag breakdown','Task distribution by tags'],
+      ['base64','Base64 encode decode and URL encode tool'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9989,6 +9995,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='json' || ql==='json formatter' || ql==='format json' || ql==='json pretty')){
     items.unshift({title:'JSON Formatter',desc:'Format, validate and minify JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonFormatter();}});
+  }
+  if(ql && (ql==='ssh' || ql==='ssh ref' || ql==='ssh tunnel' || ql==='scp transfer')){
+    items.unshift({title:'SSH Reference',desc:'Connection, tunneling and key management',icon:'S',type:'action',action:()=>{closeCommandPalette();showSshRef();}});
+  }
+  if(ql && (ql==='project timeline' || ql==='timeline' || ql==='project progress' || ql==='project gantt')){
+    items.unshift({title:'Project Timeline',desc:'Task progress by project',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectTimeline();}});
+  }
+  if(ql && (ql==='regex' || ql==='regex tester' || ql==='regexp' || ql==='pattern test')){
+    items.unshift({title:'Regex Tester',desc:'Test regex patterns with match highlighting',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRegexTester();}});
+  }
+  if(ql && (ql==='npm' || ql==='npm ref' || ql==='npm scripts' || ql==='npm install')){
+    items.unshift({title:'npm Scripts Reference',desc:'Package management CLI cheatsheet',icon:'N',type:'action',action:()=>{closeCommandPalette();showNpmScriptsRef();}});
+  }
+  if(ql && (ql==='tag breakdown' || ql==='tags' || ql==='task tags' || ql==='tag stats')){
+    items.unshift({title:'Tag Breakdown',desc:'Task distribution by tags',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTagBreakdown();}});
+  }
+  if(ql && (ql==='base64' || ql==='encode' || ql==='decode' || ql==='url encode')){
+    items.unshift({title:'Base64 Tool',desc:'Encode, decode, URL encode/decode',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBase64Tool();}});
   }
   return items.slice(0, 20);
 }
@@ -31328,6 +31352,149 @@ function showQuickJsonFormatter(){
     const inp=document.getElementById('json-input');const st=document.getElementById('json-status');
     try{JSON.parse(inp.value);st.style.color='#4ade80';st.textContent='Valid JSON';}
     catch(e){st.style.color='#ef4444';st.textContent='Invalid: '+e.message;}
+  };
+}
+function showSshRef(){
+  const cmds={
+    'Connection':{'Basic connect':'ssh user@host','Custom port':'ssh -p 2222 user@host','Key auth':'ssh -i ~/.ssh/mykey user@host','Verbose mode':'ssh -v user@host','Jump host':'ssh -J jump@bastion user@target'},
+    'File Transfer':{'SCP upload':'scp file.txt user@host:/path/','SCP download':'scp user@host:/path/file.txt .','SCP recursive':'scp -r folder/ user@host:/path/','SFTP session':'sftp user@host','Rsync over SSH':'rsync -avz -e ssh src/ user@host:/dest/'},
+    'Tunneling':{'Local forward':'ssh -L 8080:localhost:80 user@host','Remote forward':'ssh -R 9090:localhost:3000 user@host','SOCKS proxy':'ssh -D 1080 user@host','Background tunnel':'ssh -fN -L 8080:localhost:80 user@host','Kill tunnel':'ssh -O exit user@host'},
+    'Key Management':{'Generate key':'ssh-keygen -t ed25519 -C "email@example.com"','Copy key to host':'ssh-copy-id user@host','List fingerprints':'ssh-keygen -l -f ~/.ssh/id_ed25519.pub','Change passphrase':'ssh-keygen -p -f ~/.ssh/id_ed25519','Add to agent':'ssh-add ~/.ssh/id_ed25519'},
+    'Config & Utility':{'Config file':'~/.ssh/config (Host alias)','Escape sequence':'~. (disconnect hung session)','Run remote cmd':'ssh user@host "ls -la /var/log"','Multiplex':'ControlMaster auto in config','Port check':'ssh -o ConnectTimeout=5 user@host'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">SSH Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskProjectTimeline(){
+  const tasks=S.tasks||[];const projects=S.projects||[];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Project Timeline</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const projMap={};tasks.forEach(t=>{const p=t.project||'Unassigned';if(!projMap[p])projMap[p]={total:0,done:0,todo:0,inprog:0,earliest:null,latest:null};projMap[p].total++;if(t.status==='done')projMap[p].done++;else if(t.status==='in-progress')projMap[p].inprog++;else projMap[p].todo++;if(t.due){if(!projMap[p].earliest||t.due<projMap[p].earliest)projMap[p].earliest=t.due;if(!projMap[p].latest||t.due>projMap[p].latest)projMap[p].latest=t.due;}});
+  const colors=['#4ade80','#06b6d4','#f59e0b','#8b5cf6','#ef4444','#ec4899','#14b8a6','#f97316'];
+  let ci=0;
+  Object.entries(projMap).sort((a,b)=>b[1].total-a[1].total).forEach(([name,data])=>{
+    const pct=data.total>0?Math.round(data.done/data.total*100):0;const color=colors[ci%colors.length];ci++;
+    html+='<div style="margin-bottom:14px;padding:12px;background:var(--bg-surface);border-radius:6px;border-left:3px solid '+color+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:var(--text-primary);font-size:13px;font-weight:600">'+esc(name)+'</span><span style="color:'+color+';font-size:12px;font-weight:600">'+pct+'%</span></div>';
+    html+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width 0.3s"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    html+='<span>Total: '+data.total+'</span><span style="color:#4ade80">Done: '+data.done+'</span><span style="color:#06b6d4">In Progress: '+data.inprog+'</span><span>Todo: '+data.todo+'</span>';
+    if(data.earliest)html+='<span>Range: '+data.earliest+' to '+(data.latest||'?')+'</span>';
+    html+='</div></div>';
+  });
+  if(Object.keys(projMap).length===0)html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No tasks found</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickRegexTester(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">Regex Tester</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Pattern</label><div style="display:flex;gap:6px"><span style="color:var(--text-muted);font-size:16px;line-height:32px">/</span><input id="regex-pattern" placeholder="your regex here" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px"/><span style="color:var(--text-muted);font-size:16px;line-height:32px">/</span><input id="regex-flags" value="g" placeholder="flags" style="width:40px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:4px;font-family:monospace;font-size:12px;text-align:center"/></div></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Test String</label><textarea id="regex-input" placeholder="Enter text to test against..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box"></textarea></div>';
+  html+='<button onclick="window._testRegex()" style="background:#4ade80;color:#000;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin-bottom:10px">Test</button>';
+  html+='<div id="regex-result" style="background:var(--bg-surface);border:1px solid var(--border);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;color:var(--text-secondary);min-height:40px"></div>';
+  html+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted)"><strong>Common patterns:</strong> \\d+ (digits) | \\w+ (word) | [a-z]+ (lower) | ^...$ (full match) | (?:...) (non-capture)</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._testRegex=function(){
+    const pat=document.getElementById('regex-pattern').value;const flags=document.getElementById('regex-flags').value;
+    const input=document.getElementById('regex-input').value;const out=document.getElementById('regex-result');
+    if(!pat){out.innerHTML='<span style="color:var(--text-muted)">Enter a pattern</span>';return;}
+    try{
+      const rx=new RegExp(pat,flags);const matches=[];let m;
+      if(flags.includes('g')){while((m=rx.exec(input))!==null){matches.push({match:m[0],index:m.index,groups:m.slice(1)});if(matches.length>50)break;}}
+      else{m=rx.exec(input);if(m)matches.push({match:m[0],index:m.index,groups:m.slice(1)});}
+      if(matches.length===0){out.innerHTML='<span style="color:#ef4444">No matches</span>';return;}
+      let r='<div style="color:#4ade80;margin-bottom:6px">'+matches.length+' match(es)</div>';
+      matches.forEach((mt,i)=>{
+        r+='<div style="padding:4px 8px;margin-bottom:3px;background:var(--bg-elevated);border-radius:3px"><span style="color:var(--text-muted)">'+i+':</span> <span style="color:#4ade80">"'+esc(mt.match)+'"</span> <span style="color:var(--text-muted)">at '+mt.index+'</span>';
+        if(mt.groups.length>0)r+=' <span style="color:#06b6d4">groups: ['+mt.groups.map(g=>'"'+esc(g||'')+'"').join(',')+']</span>';
+        r+='</div>';
+      });
+      out.innerHTML=r;
+    }catch(e){out.innerHTML='<span style="color:#ef4444">Error: '+esc(e.message)+'</span>';}
+  };
+}
+function showNpmScriptsRef(){
+  const cmds={
+    'Package Management':{'Install all deps':'npm install','Install specific':'npm install package-name','Install dev dep':'npm install -D package-name','Uninstall':'npm uninstall package-name','Update all':'npm update'},
+    'Running Scripts':{'Run script':'npm run script-name','Start app':'npm start','Run tests':'npm test','Build project':'npm run build','Run in production':'NODE_ENV=production npm start'},
+    'Package Info':{'List installed':'npm list --depth=0','Outdated packages':'npm outdated','Check vulnerabilities':'npm audit','Fix vulnerabilities':'npm audit fix','View package info':'npm info package-name'},
+    'Publishing':{'Login':'npm login','Publish package':'npm publish','Version bump':'npm version patch|minor|major','Pack (dry run)':'npm pack --dry-run','Deprecate':'npm deprecate pkg@ver "message"'},
+    'Config & Cache':{'View config':'npm config list','Set registry':'npm config set registry URL','Clean cache':'npm cache clean --force','Init project':'npm init -y','Create workspace':'npm init -w packages/name'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">npm Scripts Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskTagBreakdown(){
+  const tasks=S.tasks||[];const tagMap={};
+  tasks.forEach(t=>{
+    if(t.tags&&t.tags.length>0)t.tags.forEach(tag=>{if(!tagMap[tag])tagMap[tag]={total:0,done:0,todo:0,inprog:0};tagMap[tag].total++;if(t.status==='done')tagMap[tag].done++;else if(t.status==='in-progress')tagMap[tag].inprog++;else tagMap[tag].todo++;});
+    else{if(!tagMap['(untagged)'])tagMap['(untagged)']={total:0,done:0,todo:0,inprog:0};tagMap['(untagged)'].total++;if(t.status==='done')tagMap['(untagged)'].done++;else if(t.status==='in-progress')tagMap['(untagged)'].inprog++;else tagMap['(untagged)'].todo++;}
+  });
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Tag Breakdown</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const sorted=Object.entries(tagMap).sort((a,b)=>b[1].total-a[1].total);
+  const maxTotal=sorted.length>0?sorted[0][1].total:1;
+  const colors=['#4ade80','#06b6d4','#f59e0b','#8b5cf6','#ef4444','#ec4899','#14b8a6','#f97316'];
+  sorted.forEach(([tag,data],i)=>{
+    const color=colors[i%colors.length];const pct=Math.round(data.done/data.total*100);
+    const barW=Math.round(data.total/maxTotal*100);
+    html+='<div style="margin-bottom:8px;padding:8px 12px;background:var(--bg-surface);border-radius:4px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="color:var(--text-primary);font-size:12px">'+esc(tag)+'</span><span style="color:var(--text-muted);font-size:10px">'+data.total+' tasks ('+pct+'% done)</span></div>';
+    html+='<div style="height:4px;background:var(--bg-elevated);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+barW+'%;background:'+color+';border-radius:2px"></div></div>';
+    html+='<div style="display:flex;gap:8px;margin-top:4px;font-size:9px;color:var(--text-muted)"><span style="color:#4ade80">done:'+data.done+'</span><span style="color:#06b6d4">prog:'+data.inprog+'</span><span>todo:'+data.todo+'</span></div>';
+    html+='</div>';
+  });
+  if(sorted.length===0)html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No tags found</div>';
+  html+='<div style="margin-top:12px;font-size:10px;color:var(--text-muted)">'+sorted.length+' unique tags across '+tasks.length+' tasks</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickBase64Tool(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">Base64 Encode/Decode</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<textarea id="b64-input" placeholder="Enter text to encode or base64 string to decode..." style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box"></textarea>';
+  html+='<div style="display:flex;gap:6px;margin:10px 0">';
+  html+='<button onclick="window._b64encode()" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Encode</button>';
+  html+='<button onclick="window._b64decode()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Decode</button>';
+  html+='<button onclick="window._b64urlEncode()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">URL Encode</button>';
+  html+='<button onclick="window._b64urlDecode()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">URL Decode</button>';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'b64-output\').textContent)" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Copy</button></div>';
+  html+='<div id="b64-status" style="font-size:11px;margin-bottom:6px;color:var(--text-muted)"></div>';
+  html+='<pre id="b64-output" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-size:11px;max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-all"></pre>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._b64encode=function(){
+    const inp=document.getElementById('b64-input').value;const out=document.getElementById('b64-output');const st=document.getElementById('b64-status');
+    try{const result=btoa(unescape(encodeURIComponent(inp)));out.textContent=result;st.style.color='#4ade80';st.textContent='Encoded ('+result.length+' chars)';}
+    catch(e){st.style.color='#ef4444';st.textContent='Error: '+e.message;out.textContent='';}
+  };
+  window._b64decode=function(){
+    const inp=document.getElementById('b64-input').value;const out=document.getElementById('b64-output');const st=document.getElementById('b64-status');
+    try{const result=decodeURIComponent(escape(atob(inp.trim())));out.textContent=result;st.style.color='#4ade80';st.textContent='Decoded ('+result.length+' chars)';}
+    catch(e){st.style.color='#ef4444';st.textContent='Error: '+e.message;out.textContent='';}
+  };
+  window._b64urlEncode=function(){
+    const inp=document.getElementById('b64-input').value;const out=document.getElementById('b64-output');const st=document.getElementById('b64-status');
+    const result=encodeURIComponent(inp);out.textContent=result;st.style.color='#4ade80';st.textContent='URL Encoded ('+result.length+' chars)';
+  };
+  window._b64urlDecode=function(){
+    const inp=document.getElementById('b64-input').value;const out=document.getElementById('b64-output');const st=document.getElementById('b64-status');
+    try{const result=decodeURIComponent(inp.trim());out.textContent=result;st.style.color='#4ade80';st.textContent='URL Decoded ('+result.length+' chars)';}
+    catch(e){st.style.color='#ef4444';st.textContent='Error: '+e.message;out.textContent='';}
   };
 }
 function showProjectRoadmap(filterProject){
