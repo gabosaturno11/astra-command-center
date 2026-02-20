@@ -1023,6 +1023,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="writer-toolbar-btn" onclick="saveVersion()" title="Save Version">v+</button>
               <button class="writer-toolbar-btn" onclick="toggleWriterPanel()" title="History">H</button>
               <button class="writer-toolbar-btn" onclick="writerDetailedStats()" title="Detailed writing statistics">St</button>
+              <div style="display:inline-block;position:relative"><button class="writer-toolbar-btn" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='block'?'none':'block'" title="New doc from template">Tpl</button><div style="display:none;position:absolute;top:100%;left:0;z-index:100;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:4px;min-width:180px;box-shadow:0 8px 24px rgba(0,0,0,0.4)"><div style="font-size:8px;color:var(--text-muted);text-transform:uppercase;padding:4px 8px;letter-spacing:0.05em">Doc Templates</div><div style="padding:6px 8px;font-size:10px;cursor:pointer;color:var(--text-secondary);border-radius:3px" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="writerFromTemplate('meeting')">Meeting Notes</div><div style="padding:6px 8px;font-size:10px;cursor:pointer;color:var(--text-secondary);border-radius:3px" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="writerFromTemplate('blog')">Blog Post</div><div style="padding:6px 8px;font-size:10px;cursor:pointer;color:var(--text-secondary);border-radius:3px" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="writerFromTemplate('spec')">Project Spec</div><div style="padding:6px 8px;font-size:10px;cursor:pointer;color:var(--text-secondary);border-radius:3px" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="writerFromTemplate('journal')">Journal Entry</div><div style="padding:6px 8px;font-size:10px;cursor:pointer;color:var(--text-secondary);border-radius:3px" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background=''" onclick="writerFromTemplate('outline')">Outline</div></div></div>
               <button class="writer-toolbar-btn" onclick="mergeDocs()" title="Merge another doc into current">Mg</button>
               <button class="writer-toolbar-btn" onclick="writerOutline()" title="Show document outline (headings)">Out</button>
               <button class="writer-toolbar-btn" onclick="writerWordFreq()" title="Word frequency analysis">Fq</button>
@@ -1842,6 +1843,7 @@ function load() {
   if(!S.specs) S.specs=[];
   if(!S.specs.length) { seedKernel(); }
   if(!S.activeSpec&&S.specs.length) S.activeSpec=S.specs[0].id;
+  if(S._accentColor) document.documentElement.style.setProperty('--accent',S._accentColor);
 }
 
 function migrateV2() {
@@ -3587,6 +3589,19 @@ function writerSplitDoc(){
     S.docs.push({id:Date.now()+i,title,body:parts[i],created:new Date().toISOString(),updated:new Date().toISOString()});
   }
   save();renderDocList();updateWS();toast('Split into '+parts.length+' docs');
+}
+function writerFromTemplate(type){
+  const templates={
+    meeting:{title:'Meeting Notes — '+new Date().toLocaleDateString(),body:'## Attendees\n\n- \n\n## Agenda\n\n1. \n\n## Discussion\n\n\n\n## Action Items\n\n- [ ] \n\n## Next Steps\n\n'},
+    blog:{title:'Blog Post Draft',body:'# Title\n\n## Introduction\n\nHook the reader here.\n\n## Main Point 1\n\n\n\n## Main Point 2\n\n\n\n## Main Point 3\n\n\n\n## Conclusion\n\nCall to action.\n\n## Tags\n\n'},
+    spec:{title:'Project Spec — ',body:'# Project Name\n\n## Overview\n\nOne-paragraph summary.\n\n## Problem Statement\n\nWhat problem does this solve?\n\n## Goals\n\n- \n\n## Non-Goals\n\n- \n\n## Proposed Solution\n\n\n\n## Technical Approach\n\n\n\n## Timeline\n\n| Phase | Target | Status |\n|-------|--------|--------|\n| Phase 1 |  |  |\n\n## Open Questions\n\n- \n'},
+    journal:{title:'Journal — '+new Date().toLocaleDateString(),body:'## Today\n\n**Mood:** \n\n**Energy:** /10\n\n## What happened\n\n\n\n## What I learned\n\n\n\n## Gratitude\n\n1. \n2. \n3. \n\n## Tomorrow\n\n- \n'},
+    outline:{title:'Outline',body:'# Title\n\n## I. Introduction\n   A. \n   B. \n\n## II. First Section\n   A. \n   B. \n   C. \n\n## III. Second Section\n   A. \n   B. \n\n## IV. Third Section\n   A. \n   B. \n\n## V. Conclusion\n   A. \n   B. \n'}
+  };
+  const tpl=templates[type];if(!tpl)return;
+  const doc={id:Date.now(),title:tpl.title,body:tpl.body,created:new Date().toISOString(),updated:new Date().toISOString()};
+  S.docs.push(doc);save();switchDoc(doc.id);renderDocList();toast('Created from template: '+type);
+  document.querySelectorAll('.writer-toolbar-btn+div[style*="display: block"],.writer-toolbar-btn+div[style*="display:block"]').forEach(d=>d.style.display='none');
 }
 function exportAllTasksHTML(){
   if(!S.tasks.length){toast('No tasks');return;}
@@ -5671,6 +5686,7 @@ function cmdGetItems(q) {
       ['history:','Recent activity across all sections'],
       ['digest','Daily briefing + overdue + progress'],['goals:','Track daily + weekly goals'],
       ['streak','Activity streak + weekly heatmap'],['heatmap','90-day activity heatmap popup'],
+      ['deps','Task dependency chain visualization'],['accent','Change accent color (8 presets)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6653,6 +6669,27 @@ function cmdGetItems(q) {
   }
   // Heatmap prefix
   if(ql && (ql==='heatmap')){items.unshift({title:'Open Activity Heatmap',desc:'90-day contribution-style heatmap',icon:'H',type:'action',action:()=>{closeCommandPalette();showActivityHeatmap();}});}
+  // Deps prefix — task dependency visualization
+  if(ql && (ql==='deps' || ql.startsWith('deps:') || ql==='dependencies' || ql==='blocked')){
+    const blocked=S.tasks.filter(t=>t.status==='blocked'||t.blockedBy);
+    const blocking=S.tasks.filter(t=>t.status!=='done'&&blocked.some(b=>b.blockedBy&&b.blockedBy.toLowerCase().includes(t.title.toLowerCase())));
+    items.unshift({title:'Dependency Overview: '+blocked.length+' blocked, '+blocking.length+' blocking',desc:'Resolve blockers to unblock downstream tasks',icon:'D',type:'info'});
+    blocking.forEach(t=>{
+      const blockedTasks=blocked.filter(b=>b.blockedBy&&b.blockedBy.toLowerCase().includes(t.title.toLowerCase()));
+      items.unshift({title:'BLOCKING: '+esc(t.title),desc:'Blocks '+blockedTasks.length+' task'+(blockedTasks.length!==1?'s':'')+': '+blockedTasks.map(b=>b.title).join(', ').substring(0,60),icon:'!',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
+    });
+    blocked.forEach(t=>{
+      items.unshift({title:'BLOCKED: '+esc(t.title),desc:'Blocked by: '+(t.blockedBy||'unknown'),icon:'B',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
+    });
+    if(!blocked.length&&!blocking.length)items.unshift({title:'No blocked tasks',desc:'All tasks are free to work on',icon:'*',type:'info'});
+  }
+  // Accent color prefix
+  if(ql && (ql==='accent' || ql.startsWith('accent:') || ql==='color' || ql==='theme')){
+    const accents=[{name:'Mint Green',color:'#4ade80'},{name:'Cyan',color:'#22d3ee'},{name:'Purple',color:'#a855f7'},{name:'Blue',color:'#3b82f6'},{name:'Orange',color:'#f59e0b'},{name:'Pink',color:'#ec4899'},{name:'Red',color:'#ef4444'},{name:'Yellow',color:'#eab308'}];
+    accents.forEach(a=>{
+      items.unshift({title:a.name,desc:'Set accent color to '+a.color,icon:'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+a.color+'"></span>',type:'action',action:()=>{document.documentElement.style.setProperty('--accent',a.color);S._accentColor=a.color;save();toast('Accent: '+a.name);closeCommandPalette();}});
+    });
+  }
   return items.slice(0, 20);
 }
 function showActivityHeatmap(){
