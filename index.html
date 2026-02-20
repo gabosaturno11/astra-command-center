@@ -963,6 +963,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="cal-view-btn active" id="cal-view-month" onclick="setCalView('month')">Month</button>
               <button class="cal-view-btn" id="cal-view-week" onclick="setCalView('week')">Week</button>
               <button class="cal-view-btn" id="cal-view-year" onclick="setCalView('year')">Year</button>
+              <button class="cal-view-btn" id="cal-view-agenda" onclick="setCalView('agenda')">Agenda</button>
             </div>
             <div style="margin-left:auto;display:flex;gap:6px">
               <button class="btn btn-sm" onclick="window.open('https://calendar.google.com','_blank')">Google Cal</button>
@@ -3171,11 +3172,15 @@ function setCalView(v) {
   document.getElementById('cal-view-month').classList.toggle('active', v==='month');
   document.getElementById('cal-view-week').classList.toggle('active', v==='week');
   const yearBtn=document.getElementById('cal-view-year');if(yearBtn)yearBtn.classList.toggle('active', v==='year');
+  const agendaBtn=document.getElementById('cal-view-agenda');if(agendaBtn)agendaBtn.classList.toggle('active', v==='agenda');
   document.getElementById('cal-grid').style.display = v==='month' ? 'grid' : 'none';
   document.getElementById('cal-week-grid').style.display = v==='week' ? 'grid' : 'none';
   let yearGrid=document.getElementById('cal-year-grid');
   if(!yearGrid){yearGrid=document.createElement('div');yearGrid.id='cal-year-grid';document.getElementById('cal-week-grid').parentElement.appendChild(yearGrid);}
   yearGrid.style.display=v==='year'?'block':'none';
+  let agendaGrid=document.getElementById('cal-agenda-grid');
+  if(!agendaGrid){agendaGrid=document.createElement('div');agendaGrid.id='cal-agenda-grid';document.getElementById('cal-week-grid').parentElement.appendChild(agendaGrid);}
+  agendaGrid.style.display=v==='agenda'?'block':'none';
   if(v==='week' && !calWeekStart) {
     const now = new Date();
     const day = now.getDay();
@@ -3219,6 +3224,10 @@ function renderCalendar(){
   }
   if(calView === 'year') {
     renderYearHeatmap();
+    return;
+  }
+  if(calView === 'agenda') {
+    renderCalAgenda();
     return;
   }
   const monthTaskCount=S.tasks.filter(t=>{if(!t.due)return false;const d=new Date(t.due+'T12:00:00');return d.getMonth()===calMonth&&d.getFullYear()===calYear;}).length;
@@ -3268,6 +3277,35 @@ function renderWeekView() {
     </div>`;
   }
   document.getElementById('cal-week-grid').innerHTML=h;
+}
+function renderCalAgenda(){
+  const el=document.getElementById('cal-agenda-grid');if(!el)return;
+  const today=new Date().toISOString().split('T')[0];
+  const tasks=S.tasks.filter(t=>t.due&&t.status!=='done').sort((a,b)=>(a.due||'').localeCompare(b.due||''));
+  const overdue=tasks.filter(t=>t.due<today);
+  const upcoming=tasks.filter(t=>t.due>=today);
+  const groups={};
+  upcoming.forEach(t=>{const d=t.due;if(!groups[d])groups[d]=[];groups[d].push(t);});
+  let h='<div style="max-height:calc(100vh - 260px);overflow-y:auto;padding:4px">';
+  if(overdue.length){
+    h+=`<div style="padding:6px 8px;font-size:10px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border);margin-bottom:4px">Overdue (${overdue.length})</div>`;
+    overdue.forEach(t=>{h+=`<div onclick="openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-left:3px solid var(--red);margin-bottom:2px;background:rgba(239,68,68,0.05);border-radius:0 4px 4px 0"><div style="flex:1"><div style="font-size:11px;color:var(--text-primary)">${esc(t.title||'Untitled')}</div><div style="font-size:9px;color:var(--text-muted)">${t.due} (${relativeDate(t.due)}) | ${t.priority||'p2'}${t.project?' | '+esc(t.project):''}</div></div></div>`;});
+  }
+  const sortedDates=Object.keys(groups).sort();
+  sortedDates.forEach(ds=>{
+    const d=new Date(ds+'T12:00:00');
+    const label=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    const isToday=ds===today;
+    h+=`<div style="padding:6px 8px;font-size:10px;font-weight:600;color:${isToday?'var(--accent)':'var(--text-muted)'};text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border);margin-top:8px;margin-bottom:4px">${label}${isToday?' (Today)':''} (${groups[ds].length})</div>`;
+    groups[ds].forEach(t=>{
+      const pClr=t.priority==='p0'?'var(--red)':t.priority==='p1'?'var(--orange)':t.priority==='p2'?'var(--accent-cyan)':'var(--text-muted)';
+      h+=`<div onclick="openTaskDetail(${t.id})" style="display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-left:3px solid ${pClr};margin-bottom:2px;border-radius:0 4px 4px 0;transition:background 0.15s" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><div style="flex:1"><div style="font-size:11px;color:var(--text-primary)">${esc(t.title||'Untitled')}</div><div style="font-size:9px;color:var(--text-muted)">${t.priority||'p2'}${t.project?' | '+esc(t.project):''}${t.estimate?' | '+esc(t.estimate):''}${(t.subtasks&&t.subtasks.length)?' | '+t.subtasks.filter(s=>s.done).length+'/'+t.subtasks.length+' subtasks':''}</div></div></div>`;
+    });
+  });
+  if(!tasks.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No upcoming tasks with due dates</div>';
+  h+='</div>';
+  el.innerHTML=h;
+  document.getElementById('cal-month-label').innerHTML='Agenda View <span style="font-size:9px;color:var(--accent);font-family:var(--mono)">'+tasks.length+' tasks</span>';
 }
 function calNav(dir){
   if(calView==='week'){
@@ -5711,6 +5749,8 @@ function cmdGetItems(q) {
       ['notifications','Enable desktop notifications for overdue tasks'],
       ['timeline','Activity timeline across all sections'],
       ['backup','Schedule auto-backup (JSON download)'],
+      ['restore','Import JSON backup to restore data'],
+      ['export docs','Export all writer docs as single markdown'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6831,6 +6871,15 @@ function cmdGetItems(q) {
     items.unshift({title:'Download Full Backup Now',desc:'Export all data as JSON file',icon:'B',type:'action',action:()=>{closeCommandPalette();downloadBackup();}});
     items.unshift({title:'Toggle Auto-Backup (every 4h)',desc:S._autoBackup?'Currently ON - click to disable':'Currently OFF - click to enable',icon:'B',type:'action',action:()=>{closeCommandPalette();toggleAutoBackup();}});
   }
+  // Restore/import prefix
+  if(ql && (ql==='restore' || ql==='import' || ql==='import data' || ql==='restore backup')){
+    items.unshift({title:'Import JSON Backup',desc:'Upload a previously exported backup file to restore data',icon:'B',type:'action',action:()=>{closeCommandPalette();importBackup();}});
+  }
+  // Export docs prefix
+  if(ql && (ql==='export docs' || ql==='export all docs' || ql==='export writer' || ql==='docs export')){
+    items.unshift({title:'Export All Writer Docs (Markdown)',desc:'Download all '+S.docs.length+' documents as a single .md file',icon:'D',type:'action',action:()=>{closeCommandPalette();exportAllDocs();}});
+    items.unshift({title:'Export All Writer Docs (Individual)',desc:'Download each doc as separate .md file (zip)',icon:'D',type:'action',action:()=>{closeCommandPalette();exportAllDocsIndividual();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -6897,6 +6946,51 @@ function scheduleAutoBackup(){
     const lastB=S._lastBackup?new Date(S._lastBackup).getTime():0;
     if(Date.now()-lastB>=4*60*60*1000){downloadBackup();}
   },30*60*1000);
+}
+function importBackup(){
+  const input=document.createElement('input');input.type='file';input.accept='.json';
+  input.onchange=e=>{const f=e.target.files[0];if(!f)return;
+    const reader=new FileReader();reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!data.tasks&&!data.content&&!data.docs){toast('Invalid backup file');return;}
+        if(!confirm('This will MERGE backup data with current data. Continue?\\n\\nBackup contains: '+(data.tasks||[]).length+' tasks, '+(data.content||[]).length+' content, '+(data.docs||[]).length+' docs, '+(data.links||[]).length+' links'))return;
+        const existingIds=new Set(S.tasks.map(t=>t.id));
+        (data.tasks||[]).forEach(t=>{if(!existingIds.has(t.id))S.tasks.push(t);});
+        const existingContentIds=new Set(S.content.map(c=>c.id));
+        (data.content||[]).forEach(c=>{if(!existingContentIds.has(c.id))S.content.push(c);});
+        const existingDocIds=new Set(S.docs.map(d=>d.id));
+        (data.docs||[]).forEach(d=>{if(!existingDocIds.has(d.id))S.docs.push(d);});
+        const existingLinkIds=new Set(S.links.map(l=>l.id));
+        (data.links||[]).forEach(l=>{if(!existingLinkIds.has(l.id))S.links.push(l);});
+        if(data.focusSessions&&!S.focusSessions)S.focusSessions=data.focusSessions;
+        if(data.goals&&!S.goals)S.goals=data.goals;
+        save();renderAll();toast('Backup merged successfully');
+      }catch(err){toast('Error parsing backup: '+err.message);}
+    };reader.readAsText(f);
+  };input.click();
+}
+function renderAll(){renderContent();renderTasks();renderCalendar();renderWriter();renderSpecs();renderLinks();}
+function exportAllDocs(){
+  if(!S.docs.length){toast('No writer documents');return;}
+  let md='# Writer Documents Export\\n# '+new Date().toISOString().split('T')[0]+'\\n\\n';
+  S.docs.forEach(d=>{md+='---\\n\\n## '+esc(d.title||'Untitled')+'\\n\\n';md+=(d.body||'').replace(/<[^>]+>/g,' ').replace(/\\s+/g,' ').trim()+'\\n\\n';});
+  const blob=new Blob([md],{type:'text/markdown'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='all-docs-'+new Date().toISOString().split('T')[0]+'.md';
+  a.click();toast('Exported '+S.docs.length+' documents');
+}
+function exportAllDocsIndividual(){
+  if(!S.docs.length){toast('No writer documents');return;}
+  S.docs.forEach((d,i)=>{
+    const text=(d.body||'').replace(/<[^>]+>/g,' ').replace(/\\s+/g,' ').trim();
+    const md='# '+(d.title||'Untitled')+'\\n\\n'+text;
+    const blob=new Blob([md],{type:'text/markdown'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download=(d.title||'doc-'+i).replace(/[^a-z0-9]/gi,'-').toLowerCase()+'.md';
+    setTimeout(()=>{a.click();},i*200);
+  });
+  toast('Downloading '+S.docs.length+' files...');
 }
 function addTaskColorLabel(taskId,color){
   const t=S.tasks.find(x=>x.id===taskId);if(!t)return;
