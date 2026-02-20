@@ -6239,6 +6239,9 @@ function cmdGetItems(q) {
       ['github actions','GitHub Actions workflow templates'],
       ['done vs created','Task done vs created by project'],
       ['win streak','Daily wins tracker with streak'],
+      ['license','LICENSE file generator'],
+      ['blocked time','Blocked time analysis for tasks'],
+      ['reading log','Book reading tracker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9125,6 +9128,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='win streak' || ql==='wins' || ql==='daily wins' || ql==='celebrate')){
     items.unshift({title:'Win Streak',desc:'Track daily wins with streak counter',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWinStreak();}});
+  }
+  if(ql && (ql==='license' || ql==='license file' || ql==='mit license' || ql==='open source license')){
+    items.unshift({title:'LICENSE Generator',desc:'Generate LICENSE files (MIT, Apache, ISC, Unlicense)',icon:'L',type:'action',action:()=>{closeCommandPalette();showLicenseGen();}});
+  }
+  if(ql && (ql==='blocked time' || ql==='blocked analysis' || ql==='time blocked' || ql==='stuck tasks')){
+    items.unshift({title:'Blocked Time',desc:'How long tasks have been blocked',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBlockedTime();}});
+  }
+  if(ql && (ql==='reading log' || ql==='books' || ql==='reading' || ql==='book tracker')){
+    items.unshift({title:'Reading Log',desc:'Track books you are reading',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickReadingLog();}});
   }
   return items.slice(0, 20);
 }
@@ -24813,6 +24825,77 @@ function showQuickWinStreak(){
       S._wins.push({text:v,date:today,ts:Date.now()});save();rend();
     };
     document.getElementById('win-input').onkeydown=function(e){if(e.key==='Enter')document.getElementById('win-add').click();};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showLicenseGen(){
+  let p=document.getElementById('license-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='license-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let year=new Date().getFullYear();
+  let name=S._licenseName||'Your Name';
+  let licenses=[
+    {name:'MIT',text:'MIT License\n\nCopyright (c) '+year+' [NAME]\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.'},
+    {name:'Apache 2.0',text:'Apache License\nVersion 2.0, January 2004\n\nCopyright '+year+' [NAME]\n\nLicensed under the Apache License, Version 2.0 (the "License");\nyou may not use this file except in compliance with the License.\nYou may obtain a copy of the License at\n\n    http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.'},
+    {name:'ISC',text:'ISC License\n\nCopyright (c) '+year+' [NAME]\n\nPermission to use, copy, modify, and/or distribute this software for any\npurpose with or without fee is hereby granted, provided that the above\ncopyright notice and this permission notice appear in all copies.\n\nTHE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH\nREGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY\nAND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,\nINDIRECT, OR CONSEQUENTIAL DAMAGES.'},
+    {name:'Unlicense',text:'This is free and unencumbered software released into the public domain.\n\nAnyone is free to copy, modify, publish, use, compile, sell, or\ndistribute this software, either in source code form or as a compiled\nbinary, for any purpose, commercial or non-commercial, and by any\nmeans.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.'}
+  ];
+  let selected=0;
+  function getOutput(){return licenses[selected].text.replace(/\[NAME\]/g,name);}
+  function rend(){
+    let tabs=licenses.map((l,i)=>'<button data-li="'+i+'" style="padding:4px 10px;border-radius:var(--radius);border:1px solid '+(i===selected?'#4ade80':'var(--border)')+';background:'+(i===selected?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(i===selected?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:11px">'+l.name+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">LICENSE Generator</span><button onclick="document.getElementById(\'license-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:8px;align-items:center"><label style="font-size:11px;color:var(--text-muted)">Name:</label><input id="lic-name" value="'+esc(name)+'" style="flex:1;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">'+tabs+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:9px;color:#4ade80;overflow-x:auto;white-space:pre-wrap;margin-bottom:8px;line-height:1.4;max-height:250px;overflow-y:auto">'+esc(getOutput())+'</pre>'
+      +'<button id="lic-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy LICENSE</button>';
+    p.querySelectorAll('[data-li]').forEach(b=>{b.onclick=function(){selected=parseInt(this.dataset.li);rend();};});
+    document.getElementById('lic-name').oninput=function(){name=this.value;S._licenseName=name;save();rend();};
+    document.getElementById('lic-copy').onclick=function(){navigator.clipboard.writeText(getOutput());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy LICENSE';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskBlockedTime(){
+  let p=document.getElementById('blocked-time-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='blocked-time-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let blocked=tasks.filter(t=>t.blockedBy&&t.blockedBy.length>0&&t.status!=='done');
+  let now=Date.now();
+  let items=blocked.map(t=>{
+    let age=Math.round((now-(t.created||now))/86400000);
+    return {title:t.title,age,priority:t.priority||'p3',blockers:t.blockedBy.length};
+  }).sort((a,b)=>b.age-a.age);
+  let totalBlockedDays=items.reduce((s,i)=>s+i.age,0);
+  let priorityColors={p0:'#f87171',p1:'#fb923c',p2:'#60a5fa',p3:'#6b7280'};
+  let rows=items.map(i=>'<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:var(--radius);margin-bottom:4px"><span style="width:6px;height:6px;border-radius:50%;background:'+( priorityColors[i.priority]||'#6b7280')+'"></span><span style="flex:1;font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(i.title)+'</span><span style="font-size:10px;color:#f87171;font-weight:600;min-width:40px;text-align:right">'+i.age+'d</span><span style="font-size:9px;color:var(--text-muted);min-width:30px;text-align:right">'+i.blockers+' dep</span></div>').join('');
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Blocked Time Analysis</span><button onclick="document.getElementById(\'blocked-time-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:12px;margin-bottom:12px"><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:20px;font-weight:700;color:#f87171">'+items.length+'</div><div style="font-size:9px;color:var(--text-muted)">Blocked</div></div><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:20px;font-weight:700;color:var(--text-primary)">'+totalBlockedDays+'</div><div style="font-size:9px;color:var(--text-muted)">Total Days</div></div></div>'
+    +(rows||'<div style="text-align:center;color:var(--text-muted);padding:20px">No blocked tasks</div>');
+  document.body.appendChild(p);
+}
+function showQuickReadingLog(){
+  let p=document.getElementById('reading-log-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='reading-log-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  if(!S._readingLog)S._readingLog=[];
+  function rend(){
+    let current=S._readingLog.filter(b=>b.status==='reading');
+    let finished=S._readingLog.filter(b=>b.status==='finished').length;
+    let list=current.map((b,i)=>'<div style="padding:6px;background:var(--bg-surface);border-radius:var(--radius);margin-bottom:4px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:11px;font-weight:600;color:var(--text-primary)">'+esc(b.title)+'</span><button data-rf="'+b.id+'" style="background:none;border:none;color:#4ade80;cursor:pointer;font-size:9px">Done</button></div>'+(b.author?'<div style="font-size:9px;color:var(--text-muted)">by '+esc(b.author)+'</div>':'')+'<div style="height:3px;background:var(--bg-base);border-radius:2px;margin-top:4px;overflow:hidden"><div style="height:100%;width:'+(b.progress||0)+'%;background:#4ade80;border-radius:2px"></div></div><div style="font-size:8px;color:var(--text-muted);margin-top:2px">'+(b.progress||0)+'% complete</div></div>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Reading Log</span><button onclick="document.getElementById(\'reading-log-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:8px"><div style="flex:1;padding:6px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:16px;font-weight:700;color:#22d3ee">'+current.length+'</div><div style="font-size:9px;color:var(--text-muted)">Reading</div></div><div style="flex:1;padding:6px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:16px;font-weight:700;color:#4ade80">'+finished+'</div><div style="font-size:9px;color:var(--text-muted)">Finished</div></div></div>'
+      +(list||'<div style="font-size:10px;color:var(--text-muted);text-align:center;padding:6px">No books currently reading</div>')
+      +'<div style="display:grid;gap:3px;margin-top:6px"><input id="rl-title" placeholder="Book title" style="padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:10px"><input id="rl-author" placeholder="Author (optional)" style="padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:10px"><button id="rl-add" style="padding:5px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:10px">Add Book</button></div>';
+    p.querySelectorAll('[data-rf]').forEach(b=>{b.onclick=function(){let id=parseInt(this.dataset.rf);let book=S._readingLog.find(b=>b.id===id);if(book)book.status='finished';save();rend();};});
+    document.getElementById('rl-add').onclick=function(){
+      let title=document.getElementById('rl-title').value.trim();
+      if(!title)return;
+      S._readingLog.push({id:Date.now(),title,author:document.getElementById('rl-author').value.trim(),status:'reading',progress:0,ts:Date.now()});
+      save();rend();
+    };
   }
   document.body.appendChild(p);
   rend();
