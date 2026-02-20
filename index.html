@@ -6395,6 +6395,12 @@ function cmdGetItems(q) {
       ['pulumi','Pulumi IaC CLI reference'],
       ['creation hour','When do you create tasks by hour'],
       ['password','Generate secure random passwords'],
+      ['vagrant','Vagrant VM management reference'],
+      ['completion rate','Weekly task completion rate trend'],
+      ['countdown','Countdown timer widget'],
+      ['packer','Packer image builder CLI reference'],
+      ['overdue history','Overdue and late-completed task history'],
+      ['stopwatch','Stopwatch with lap times'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9749,6 +9755,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='password' || ql==='password gen' || ql==='pw gen' || ql==='generate password')){
     items.unshift({title:'Password Generator',desc:'Generate secure random passwords',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordGenerator();}});
+  }
+  if(ql && (ql==='vagrant' || ql==='vagrant cli' || ql==='vagrant ref' || ql==='vm vagrant')){
+    items.unshift({title:'Vagrant Reference',desc:'Vagrant VM management cheatsheet',icon:'V',type:'action',action:()=>{closeCommandPalette();showVagrantRef();}});
+  }
+  if(ql && (ql==='completion rate' || ql==='weekly rate' || ql==='done rate' || ql==='task rate')){
+    items.unshift({title:'Weekly Completion Rate',desc:'Created vs completed per week',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskCompletionRate();}});
+  }
+  if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='timer countdown' || ql==='count down')){
+    items.unshift({title:'Countdown Timer',desc:'Quick countdown timer widget',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
+  }
+  if(ql && (ql==='packer' || ql==='packer cli' || ql==='packer ref' || ql==='hashicorp packer')){
+    items.unshift({title:'Packer Reference',desc:'Packer image builder cheatsheet',icon:'P',type:'action',action:()=>{closeCommandPalette();showPackerRef();}});
+  }
+  if(ql && (ql==='overdue history' || ql==='overdue' || ql==='late tasks' || ql==='overdue report')){
+    items.unshift({title:'Overdue History',desc:'Overdue and late-completed tasks',icon:'O',type:'action',action:()=>{closeCommandPalette();showTaskOverdueHistory();}});
+  }
+  if(ql && (ql==='stopwatch' || ql==='stop watch' || ql==='lap timer' || ql==='sw')){
+    items.unshift({title:'Stopwatch',desc:'Stopwatch with lap times',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
   }
   return items.slice(0, 20);
 }
@@ -29565,6 +29589,190 @@ function showQuickPasswordGenerator(){
     label.style.color=color;
   };
   window._genPw();
+}
+function showVagrantRef(){
+  const cmds={
+    'Box Management':['vagrant box add ubuntu/focal64|Download a box from catalog','vagrant box list|List installed boxes','vagrant box remove ubuntu/focal64|Remove a local box','vagrant box update|Update box to latest version','vagrant box outdated|Check if box is outdated'],
+    'VM Lifecycle':['vagrant init ubuntu/focal64|Create a new Vagrantfile','vagrant up|Start and provision the VM','vagrant halt|Gracefully shut down the VM','vagrant destroy|Delete the VM completely','vagrant reload|Restart VM (applies Vagrantfile changes)','vagrant suspend|Suspend the VM (save state)','vagrant resume|Resume a suspended VM'],
+    'Access & Info':['vagrant ssh|SSH into the running VM','vagrant status|Show VM status','vagrant global-status|Show all VMs on this host','vagrant port|Show port mappings','vagrant ssh-config|Print SSH config for use with ssh command'],
+    'Provisioning':['vagrant provision|Re-run provisioners','vagrant up --provision|Start with forced provisioning','vagrant up --no-provision|Start without provisioning'],
+    'Snapshots':['vagrant snapshot save mysnap|Save a snapshot','vagrant snapshot restore mysnap|Restore a snapshot','vagrant snapshot list|List all snapshots','vagrant snapshot delete mysnap|Delete a snapshot'],
+    'Plugins':['vagrant plugin install NAME|Install a plugin','vagrant plugin list|List installed plugins','vagrant plugin uninstall NAME|Remove a plugin']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Vagrant Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskCompletionRate(){
+  const tasks=(S.tasks||[]);
+  const now=new Date();const weeks=[];
+  for(let w=7;w>=0;w--){
+    const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay()-w*7);
+    const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+6);
+    let created=0,completed=0;
+    tasks.forEach(t=>{
+      const cd=t.createdAt?new Date(t.createdAt):null;
+      const ud=t.updatedAt?new Date(t.updatedAt):null;
+      if(cd&&cd>=weekStart&&cd<=weekEnd)created++;
+      if(t.status==='done'&&ud&&ud>=weekStart&&ud<=weekEnd)completed++;
+    });
+    weeks.push({label:(weekStart.getMonth()+1)+'/'+weekStart.getDate(),created,completed,rate:created>0?Math.round((completed/created)*100):0});
+  }
+  const maxVal=Math.max(...weeks.map(w=>Math.max(w.created,w.completed)),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Weekly Completion Rate</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">Created vs completed per week (last 8 weeks)</div>';
+  html+='<svg viewBox="0 0 520 180" style="width:100%;margin-bottom:16px">';
+  weeks.forEach((w,i)=>{
+    const gw=56;const x=i*gw+20;const bw=20;
+    const hC=(w.created/maxVal)*130;const hD=(w.completed/maxVal)*130;
+    html+='<rect x="'+x+'" y="'+(150-hC)+'" width="'+bw+'" height="'+hC+'" fill="#4ade80" rx="3" opacity="0.7"/>';
+    html+='<rect x="'+(x+bw+2)+'" y="'+(150-hD)+'" width="'+bw+'" height="'+hD+'" fill="#60a5fa" rx="3" opacity="0.7"/>';
+    html+='<text x="'+(x+bw+1)+'" y="168" fill="var(--text-muted)" font-size="8" text-anchor="middle">'+w.label+'</text>';
+    if(w.rate>0)html+='<text x="'+(x+bw+1)+'" y="'+(Math.min(150-hC,150-hD)-6)+'" fill="var(--text-secondary)" font-size="8" text-anchor="middle">'+w.rate+'%</text>';
+  });
+  html+='</svg>';
+  html+='<div style="display:flex;gap:12px;font-size:10px;margin-bottom:12px"><span><span style="display:inline-block;width:10px;height:10px;background:#4ade80;border-radius:2px;margin-right:4px"></span>Created</span><span><span style="display:inline-block;width:10px;height:10px;background:#60a5fa;border-radius:2px;margin-right:4px"></span>Completed</span></div>';
+  const avgRate=weeks.length>0?Math.round(weeks.reduce((a,w)=>a+w.rate,0)/weeks.length):0;
+  const thisWeek=weeks[weeks.length-1];
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Avg Rate</div><div style="font-size:18px;color:#4ade80;font-weight:700">'+avgRate+'%</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">This Week</div><div style="font-size:18px;color:#60a5fa;font-weight:700">'+thisWeek.rate+'%</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Trend</div><div style="font-size:18px;font-weight:700;color:'+(thisWeek.rate>=avgRate?'#4ade80':'#ef4444')+'">'+(thisWeek.rate>=avgRate?'Up':'Down')+'</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickCountdownTimer(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">Countdown Timer</h4><button onclick="if(window._cdInterval)clearInterval(window._cdInterval);this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_cd-display" style="text-align:center;font-size:36px;color:#4ade80;font-weight:700;font-family:monospace;margin-bottom:12px">00:00</div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:10px">';
+  [5,10,15,25,30,60].forEach(m=>{
+    html+='<button onclick="window._startCd('+m+')" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 2px;border-radius:6px;cursor:pointer;font-size:10px">'+m+'m</button>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:6px"><input id="_cd-custom" type="number" min="1" max="999" placeholder="Min" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 8px;border-radius:6px;font-size:12px">';
+  html+='<button onclick="const v=parseInt(document.getElementById(\'_cd-custom\').value);if(v>0)window._startCd(v)" style="background:#4ade80;color:#000;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;font-weight:600;font-size:11px">Start</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-top:8px"><button id="_cd-pause" onclick="window._pauseCd()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px;border-radius:6px;cursor:pointer;font-size:11px;display:none">Pause</button>';
+  html+='<button onclick="window._resetCd()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px;border-radius:6px;cursor:pointer;font-size:11px">Reset</button></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._cdSeconds=0;window._cdPaused=false;
+  window._startCd=function(mins){
+    if(window._cdInterval)clearInterval(window._cdInterval);
+    window._cdSeconds=mins*60;window._cdPaused=false;
+    const pb=document.getElementById('_cd-pause');if(pb){pb.style.display='block';pb.textContent='Pause';}
+    window._cdInterval=setInterval(()=>{
+      if(window._cdPaused)return;
+      window._cdSeconds--;
+      const disp=document.getElementById('_cd-display');
+      if(disp){const m=Math.floor(window._cdSeconds/60);const s=window._cdSeconds%60;disp.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
+      if(window._cdSeconds<=0){clearInterval(window._cdInterval);if(disp){disp.textContent='DONE!';disp.style.color='#ef4444';}try{new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==').play();}catch(e){}}
+    },1000);
+    const disp=document.getElementById('_cd-display');if(disp){disp.style.color='#4ade80';const m=Math.floor(window._cdSeconds/60);const s=window._cdSeconds%60;disp.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
+  };
+  window._pauseCd=function(){
+    window._cdPaused=!window._cdPaused;
+    const pb=document.getElementById('_cd-pause');if(pb)pb.textContent=window._cdPaused?'Resume':'Pause';
+    const disp=document.getElementById('_cd-display');if(disp)disp.style.color=window._cdPaused?'#f59e0b':'#4ade80';
+  };
+  window._resetCd=function(){
+    if(window._cdInterval)clearInterval(window._cdInterval);window._cdSeconds=0;window._cdPaused=false;
+    const disp=document.getElementById('_cd-display');if(disp){disp.textContent='00:00';disp.style.color='#4ade80';}
+    const pb=document.getElementById('_cd-pause');if(pb)pb.style.display='none';
+  };
+}
+function showPackerRef(){
+  const cmds={
+    'Build':['packer build template.pkr.hcl|Build image from template','packer build -var "region=us-east-1" .|Build with variable','packer build -only=amazon-ebs .|Build only specific source','packer build -force .|Force overwrite existing artifacts','packer build -on-error=ask .|Ask what to do on error'],
+    'Init & Validate':['packer init .|Install required plugins','packer validate template.pkr.hcl|Validate template syntax','packer validate -var-file=vars.pkrvars.hcl .|Validate with var file','packer fmt -recursive .|Format all HCL files'],
+    'Inspect':['packer inspect template.pkr.hcl|Show template components','packer hcl2_upgrade template.json|Convert JSON to HCL2'],
+    'Plugins':['packer plugins install github.com/hashicorp/amazon|Install plugin','packer plugins installed|List installed plugins','packer plugins remove github.com/hashicorp/amazon|Remove plugin'],
+    'Console':['packer console|Interactive console for expressions','packer console -var-file=vars.pkrvars.hcl|Console with variables']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Packer Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskOverdueHistory(){
+  const tasks=(S.tasks||[]);const now=new Date();const today=now.toISOString().split('T')[0];
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+  const pastOverdue=tasks.filter(t=>t.status==='done'&&t.due&&t.updatedAt&&t.due<t.updatedAt.split('T')[0]);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Overdue History</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Currently Overdue</div><div style="font-size:24px;color:#ef4444;font-weight:700">'+overdue.length+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Completed Late</div><div style="font-size:24px;color:#f59e0b;font-weight:700">'+pastOverdue.length+'</div></div></div>';
+  if(overdue.length>0){
+    html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase">Currently Overdue</div>';
+    overdue.sort((a,b)=>a.due.localeCompare(b.due)).slice(0,15).forEach(t=>{
+      const days=Math.floor((now-new Date(t.due))/(86400000));
+      const color=days>7?'#ef4444':days>3?'#f59e0b':'#fb923c';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid '+color+'">';
+      html+='<span style="color:var(--text-primary);font-size:12px">'+esc(t.title)+'</span>';
+      html+='<span style="color:'+color+';font-size:11px;font-weight:600">'+days+'d overdue</span></div>';
+    });
+  }
+  if(pastOverdue.length>0){
+    html+='<div style="font-size:11px;color:var(--text-muted);margin:12px 0 8px;text-transform:uppercase">Completed Late (last 10)</div>';
+    pastOverdue.sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||'')).slice(0,10).forEach(t=>{
+      const daysLate=Math.floor((new Date(t.updatedAt)-new Date(t.due))/(86400000));
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid #f59e0b">';
+      html+='<span style="color:var(--text-secondary);font-size:12px">'+esc(t.title)+'</span>';
+      html+='<span style="color:#f59e0b;font-size:11px">'+daysLate+'d late</span></div>';
+    });
+  }
+  if(overdue.length===0&&pastOverdue.length===0){html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No overdue tasks! Great job.</div>';}
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickStopwatch(){
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">Stopwatch</h4><button onclick="if(window._swInterval)clearInterval(window._swInterval);this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_sw-display" style="text-align:center;font-size:32px;color:#4ade80;font-weight:700;font-family:monospace;margin-bottom:8px">00:00:00</div>';
+  html+='<div id="_sw-laps" style="max-height:100px;overflow-y:auto;margin-bottom:8px"></div>';
+  html+='<div style="display:flex;gap:6px">';
+  html+='<button id="_sw-start" onclick="window._swToggle()" style="flex:1;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Start</button>';
+  html+='<button onclick="window._swLap()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px;border-radius:6px;cursor:pointer;font-size:12px">Lap</button>';
+  html+='<button onclick="window._swReset()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px;border-radius:6px;cursor:pointer;font-size:12px">Reset</button></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._swMs=0;window._swRunning=false;window._swLaps=[];window._swLapCount=0;
+  window._swToggle=function(){
+    const btn=document.getElementById('_sw-start');
+    if(window._swRunning){
+      clearInterval(window._swInterval);window._swRunning=false;
+      if(btn){btn.textContent='Resume';btn.style.background='#f59e0b';}
+    } else {
+      window._swRunning=true;
+      if(btn){btn.textContent='Pause';btn.style.background='#ef4444';}
+      const start=Date.now()-window._swMs;
+      window._swInterval=setInterval(()=>{
+        window._swMs=Date.now()-start;
+        const disp=document.getElementById('_sw-display');
+        if(disp){const t=window._swMs;const h=Math.floor(t/3600000);const m=Math.floor((t%3600000)/60000);const s=Math.floor((t%60000)/1000);disp.textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
+      },100);
+    }
+  };
+  window._swLap=function(){
+    if(!window._swRunning)return;
+    window._swLapCount++;const t=window._swMs;
+    const h=Math.floor(t/3600000);const m=Math.floor((t%3600000)/60000);const s=Math.floor((t%60000)/1000);
+    const lapStr=(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    const el=document.getElementById('_sw-laps');
+    if(el)el.innerHTML='<div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:11px;color:var(--text-secondary)"><span>Lap '+window._swLapCount+'</span><span style="color:#4ade80;font-family:monospace">'+lapStr+'</span></div>'+el.innerHTML;
+  };
+  window._swReset=function(){
+    clearInterval(window._swInterval);window._swMs=0;window._swRunning=false;window._swLapCount=0;
+    const disp=document.getElementById('_sw-display');if(disp)disp.textContent='00:00:00';
+    const laps=document.getElementById('_sw-laps');if(laps)laps.innerHTML='';
+    const btn=document.getElementById('_sw-start');if(btn){btn.textContent='Start';btn.style.background='#4ade80';}
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
