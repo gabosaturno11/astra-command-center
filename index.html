@@ -5820,6 +5820,9 @@ function cmdGetItems(q) {
       ['ambient','Ambient sounds for focus sessions'],
       ['word frequency','Most common words across content and docs'],
       ['priority board','Kanban board grouped by priority level'],
+      ['wip limits','Configure WIP limits per board column'],
+      ['duplicates','Find duplicate content with similarity scoring'],
+      ['export csv','Export all tasks as CSV spreadsheet'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7188,6 +7191,18 @@ function cmdGetItems(q) {
   // Priority board prefix
   if(ql && (ql==='priority board' || ql==='priority kanban' || ql==='priority columns' || ql==='pri board')){
     items.unshift({title:'Priority Board',desc:'Kanban board with columns by priority (P0/P1/P2/P3)',icon:'P',type:'action',action:()=>{closeCommandPalette();showPriorityBoard();}});
+  }
+  // WIP limits prefix
+  if(ql && (ql==='wip limits' || ql==='wip config' || ql==='wip' || ql==='work in progress limits')){
+    items.unshift({title:'WIP Limits Config',desc:'Set work-in-progress limits per board column',icon:'W',type:'action',action:()=>{closeCommandPalette();showWipConfig();}});
+  }
+  // Duplicates prefix
+  if(ql && (ql==='duplicates' || ql==='find duplicates' || ql==='content duplicates' || ql==='dedup')){
+    items.unshift({title:'Duplicate Content Finder',desc:'Find similar/duplicate items with 70%+ word overlap',icon:'D',type:'action',action:()=>{closeCommandPalette();showDuplicateContent();}});
+  }
+  // Export CSV prefix
+  if(ql && (ql==='export csv' || ql==='csv export' || ql==='tasks csv' || ql==='spreadsheet export')){
+    items.unshift({title:'Export Tasks as CSV',desc:'Download all tasks as comma-separated spreadsheet',icon:'E',type:'action',action:()=>{closeCommandPalette();exportTasksCSV();}});
   }
   return items.slice(0, 20);
 }
@@ -8756,6 +8771,72 @@ function showPriorityBoard(){
   h+='</div>';
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Priority Board (${active.length} active)</span><button onclick="document.getElementById('pri-board-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
+}
+function showWipConfig(){
+  let panel=document.getElementById('wip-config-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='wip-config-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  if(!S._wipLimits)S._wipLimits={todo:0,'in-progress':5,done:0};
+  const statuses=['todo','in-progress','done'];
+  const statusLabels={todo:'To Do','in-progress':'In Progress',done:'Done'};
+  const counts={};statuses.forEach(s=>{counts[s]=S.tasks.filter(t=>t.status===s).length;});
+  let h='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Set WIP limits per column. 0 = unlimited. Board column turns red when over limit.</div>';
+  statuses.forEach(s=>{
+    const limit=S._wipLimits[s]||0;
+    const count=counts[s];
+    const over=limit>0&&count>limit;
+    h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="flex:1;font-size:11px;font-weight:600;color:var(--text-primary)">${statusLabels[s]}</span><span style="font-size:10px;color:${over?'#ef4444':'var(--text-muted)'}">${count} tasks</span><input type="number" min="0" value="${limit}" onchange="S._wipLimits['${s}']=parseInt(this.value)||0;save();showWipConfig()" style="width:50px;padding:4px 6px;background:var(--bg-surface);border:1px solid ${over?'#ef4444':'var(--border)'};border-radius:4px;color:var(--text-primary);font-size:11px;text-align:center">${over?'<span style="font-size:8px;color:#ef4444;font-weight:600">OVER</span>':''}</div>`;
+  });
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">WIP Limits</span><button onclick="document.getElementById('wip-config-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showDuplicateContent(){
+  let panel=document.getElementById('dup-content-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='dup-content-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const items=S.content||[];
+  const dupes=[];
+  const checked=new Set();
+  items.forEach((a,i)=>{
+    if(checked.has(a.id)||!a.body)return;
+    const aWords=a.body.toLowerCase().split(/\s+/).slice(0,20).join(' ');
+    const matches=[];
+    items.forEach((b,j)=>{
+      if(j<=i||checked.has(b.id)||!b.body)return;
+      const bWords=b.body.toLowerCase().split(/\s+/).slice(0,20).join(' ');
+      if(aWords===bWords){matches.push(b);checked.add(b.id);}
+      else{
+        const aSet=new Set(aWords.split(' '));const bSet=new Set(bWords.split(' '));
+        let overlap=0;aSet.forEach(w=>{if(bSet.has(w))overlap++;});
+        const similarity=overlap/Math.max(aSet.size,bSet.size);
+        if(similarity>0.7){matches.push({...b,similarity:Math.round(similarity*100)});checked.add(b.id);}
+      }
+    });
+    if(matches.length){dupes.push({original:a,matches});}
+  });
+  let h=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">${dupes.length} duplicate groups found across ${items.length} content items</div>`;
+  dupes.slice(0,15).forEach(group=>{
+    h+=`<div style="padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:6px;border-left:2px solid #f59e0b"><div style="font-size:10px;color:var(--text-primary);margin-bottom:4px">${esc((group.original.body||'').substring(0,80))}</div><div style="font-size:8px;color:var(--text-muted);margin-bottom:4px">Original (ID: ${group.original.id})</div>`;
+    group.matches.forEach(m=>{
+      h+=`<div style="display:flex;align-items:center;gap:6px;padding:2px 6px;margin:2px 0"><span style="flex:1;font-size:9px;color:var(--text-muted)">${esc((m.body||'').substring(0,60))} ${m.similarity?'('+m.similarity+'% match)':''}</span><button onclick="S.content=S.content.filter(c=>c.id!==${m.id});save();showDuplicateContent()" style="padding:2px 6px;background:#ef4444;border:none;border-radius:3px;color:#fff;font-size:7px;cursor:pointer">Remove</button></div>`;
+    });
+    h+='</div>';
+  });
+  if(!dupes.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No duplicates found!</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Duplicate Content Finder</span><button onclick="document.getElementById('dup-content-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function exportTasksCSV(){
+  const rows=[['ID','Title','Status','Priority','Project','Due','Estimate','Created','Description']];
+  S.tasks.forEach(t=>{
+    rows.push([t.id,'"'+(t.title||'').replace(/"/g,'""')+'"',t.status||'todo',t.priority||'p2','"'+(t.project||'')+'"',t.due||'',t.estimate||'',t.createdAt||'','"'+(t.description||'').replace(/"/g,'""').substring(0,200)+'"']);
+  });
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='astra-tasks-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click();
+  toast('Exported '+S.tasks.length+' tasks as CSV');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
