@@ -839,6 +839,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="batchImportContent()" title="Paste multiple items separated by ---">Batch</button>
           <button class="btn btn-sm" onclick="toggleAllContentCards()" title="Expand/collapse all cards">Exp/Col</button>
           <button class="btn btn-sm" onclick="copyAllContent()" title="Copy all visible content to clipboard">Copy All</button>
+          <button class="btn btn-sm" onclick="exportFilteredContentMD()" title="Copy filtered content as Markdown">Export MD</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -2461,6 +2462,22 @@ function exportContentHTML(){
   h+='<h1>Content Export</h1><p style="color:#888;font-size:13px">'+S.content.length+' items | Exported '+new Date().toLocaleDateString()+'</p>';
   Object.keys(groups).sort().forEach(g=>{h+='<h2>'+esc(g)+' ('+groups[g].length+')</h2>';groups[g].forEach(c=>{const wc=c.body.trim().split(/\s+/).filter(x=>x.length).length;h+='<div class="item"><div style="white-space:pre-wrap">'+esc(c.body)+'</div><div class="meta">'+c.type+(c.source?' | '+esc(c.source):'')+' | '+wc+'w'+(c.tags&&c.tags.length?' | '+c.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join(''):'')+'</div></div>';});});
   h+='</body></html>';const blob=new Blob([h],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-content-'+new Date().toISOString().split('T')[0]+'.html';a.click();toast('Exported '+S.content.length+' items as HTML');
+}
+function exportFilteredContentMD(){
+  let items=[...S.content];
+  if(contentType!=='all')items=items.filter(c=>c.type===contentType);
+  if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
+  if(contentTagFilter)items=items.filter(c=>(c.tags||[]).includes(contentTagFilter));
+  const q=(document.getElementById('content-search')?.value||'').toLowerCase();
+  if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
+  if(!items.length){toast('No visible items');return;}
+  let md='# Content Export\n\n'+items.length+' items | Exported '+new Date().toLocaleDateString()+'\n\n';
+  if(contentType!=='all')md+='Filter: type='+contentType+'\n';
+  if(contentTheme!=='all')md+='Filter: theme='+contentTheme+'\n';
+  if(contentTagFilter)md+='Filter: tag='+contentTagFilter+'\n';
+  md+='\n---\n\n';
+  items.forEach(c=>{md+=c.body+'\n\n*'+c.type+(c.theme?' / '+c.theme:'')+(c.tags&&c.tags.length?' / tags: '+c.tags.join(', '):'')+' / '+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length+'w*\n\n---\n\n';});
+  navigator.clipboard.writeText(md).then(()=>toast('Copied '+items.length+' items as Markdown'));
 }
 function toggleAllContentCards(){
   const cards=document.querySelectorAll('.content-card-body');
@@ -5548,6 +5565,22 @@ function cmdGetItems(q) {
     const filtered=tq?allTaskTags.filter(t=>t.includes(tq)):allTaskTags;
     filtered.slice(0,8).forEach(tag=>{const cnt=S.tasks.filter(t=>(t.tags||[]).includes(tag)).length;items.unshift({title:'Tag: '+tag,desc:cnt+' tasks',icon:'T',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);document.getElementById('task-search').value='#'+tag;renderTasks();toast('Filtered by tag: '+tag);}});});
     if(!filtered.length)items.unshift({title:'No task tags found',desc:tq?'No tags matching "'+tq+'"':'No tasks have tags yet',icon:'!',type:'info'});
+  }
+  // Find prefix — powerful cross-section search with counts
+  if(ql && ql.startsWith('find:')){
+    const fq=q.substring(5).trim().toLowerCase();
+    if(fq&&fq.length>=2){
+      const taskHits=S.tasks.filter(t=>(t.title+' '+(t.description||'')+' '+(t.tags||[]).join(' ')).toLowerCase().includes(fq));
+      const contentHits=S.content.filter(c=>(c.body+' '+c.theme+' '+(c.tags||[]).join(' ')).toLowerCase().includes(fq));
+      const docHits=S.docs.filter(d=>{const tmp=document.createElement('div');tmp.innerHTML=d.body||'';return((d.title||'')+' '+(tmp.innerText||'')).toLowerCase().includes(fq);});
+      const specHits=S.specs.filter(s=>(s.title||'').toLowerCase().includes(fq)||(s.sections||[]).some(sec=>((sec.title||'')+' '+(sec.body||'')).toLowerCase().includes(fq)));
+      const linkHits=S.links.filter(l=>(l.title+' '+l.url+' '+(l.desc||'')).toLowerCase().includes(fq));
+      items.unshift({title:'Found: '+taskHits.length+' tasks, '+contentHits.length+' content, '+docHits.length+' docs',desc:specHits.length+' specs, '+linkHits.length+' links | "'+fq+'"',icon:'?',type:'info'});
+      taskHits.slice(0,3).forEach(t=>{items.push({title:t.title,desc:'Task - '+t.status+' / '+t.priority,icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+      docHits.slice(0,2).forEach(d=>{items.push({title:d.title||'Untitled',desc:'Document - '+countW(d.body)+'w',icon:'W',type:'action',action:()=>{closeCommandPalette();switchDoc(d.id);switchSection('writer',null);}});});
+      contentHits.slice(0,2).forEach(c=>{items.push({title:c.body.substring(0,50),desc:'Content - '+c.type,icon:'C',type:'action',action:()=>{closeCommandPalette();switchSection('content',null);document.getElementById('content-search').value=fq;renderContent();}});});
+      linkHits.slice(0,2).forEach(l=>{items.push({title:l.title,desc:l.url,icon:'L',type:'action',action:()=>{closeCommandPalette();window.open(l.url,'_blank');}});});
+    }
   }
   // Streak prefix — consecutive days with completed tasks
   if(ql && (ql.startsWith('streak:') || ql==='streak' || ql==='streaks')){
