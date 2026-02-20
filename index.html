@@ -2222,6 +2222,20 @@ function updateSidebarCtx() {
     const totalSpecWords=S.specs.reduce((a,s)=>a+(s.sections||[]).reduce((b,sec)=>b+(sec.body||'').trim().split(/\s+/).filter(x=>x.length).length,0),0);
     const byProject={};S.specs.forEach(s=>{const p=s.project||'Global';byProject[p]=(byProject[p]||0)+1;});
     el.innerHTML=`<div class="sidebar-label">Living Docs Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.specs.length} specs / ${totalSections} sections / ${totalSpecWords.toLocaleString()} words</div>`+Object.entries(byProject).map(([p,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${p}: ${n} specs</div>`).join('');
+  } else if(currentSection==='links') {
+    const cats={};S.links.forEach(l=>{const c=l.category||'uncategorized';cats[c]=(cats[c]||0)+1;});
+    const pinned=S.links.filter(l=>l.pinned).length;
+    el.innerHTML=`<div class="sidebar-label">Link Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.links.length} links${pinned?` / ${pinned} pinned`:''}</div>`+Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${c}: ${n}</div>`).join('');
+  } else if(currentSection==='repos') {
+    const active=(S.repos||[]).filter(r=>r.status==='active').length;
+    const withLive=(S.repos||[]).filter(r=>r.live).length;
+    el.innerHTML=`<div class="sidebar-label">Repo Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${(S.repos||[]).length} repos / ${active} active / ${withLive} live</div>`;
+  } else if(currentSection==='calendar') {
+    const today=new Date().toISOString().split('T')[0];
+    const todayT=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+    const thisWeek=S.tasks.filter(t=>{if(!t.due||t.status==='done')return false;const d=new Date(t.due+'T12:00:00'),n=new Date();n.setHours(0,0,0,0);const diff=(d-n)/86400000;return diff>=0&&diff<7;});
+    const noDue=S.tasks.filter(t=>!t.due&&t.status!=='done').length;
+    el.innerHTML=`<div class="sidebar-label">Calendar Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${todayT.length} due today / ${thisWeek.length} this week</div>${noDue?`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${noDue} tasks without date</div>`:''}`;
   } else {
     const today=new Date().toISOString().split('T')[0];
     const active=S.tasks.filter(t=>t.status!=='done');
