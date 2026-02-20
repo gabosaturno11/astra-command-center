@@ -6623,6 +6623,12 @@ function cmdGetItems(q) {
       ['svelte','Svelte and SvelteKit reference'],
       ['productivity','Productivity score dashboard'],
       ['number format','Number formatter (dec hex bin)'],
+      ['vue','Vue.js composition API reference'],
+      ['delegation','Task delegation project overview'],
+      ['csv to json','CSV to JSON converter'],
+      ['express','Express.js routes middleware reference'],
+      ['milestones','Project milestone tracker'],
+      ['contrast','Color contrast WCAG checker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10661,6 +10667,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='number format' || ql==='number formatter' || ql==='num format' || ql==='format number')){
     items.unshift({title:'Number Formatter',desc:'Decimal, hex, binary, currency',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNumberFormatter();}});
+  }
+  if(ql && (ql==='vue' || ql==='vue ref' || ql==='vue.js' || ql==='vue reference')){
+    items.unshift({title:'Vue.js Reference',desc:'Composition API, router, Pinia',icon:'V',type:'action',action:()=>{closeCommandPalette();showVueRef();}});
+  }
+  if(ql && (ql==='delegation' || ql==='delegation overview' || ql==='workload' || ql==='task delegation')){
+    items.unshift({title:'Delegation Overview',desc:'Project workload distribution',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDelegationOverview();}});
+  }
+  if(ql && (ql==='csv to json' || ql==='csv' || ql==='csv convert' || ql==='csv json')){
+    items.unshift({title:'CSV to JSON',desc:'Convert CSV data to JSON',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCsvToJson();}});
+  }
+  if(ql && (ql==='express' || ql==='express ref' || ql==='express.js' || ql==='express reference')){
+    items.unshift({title:'Express.js Reference',desc:'Routes, middleware, error handling',icon:'E',type:'action',action:()=>{closeCommandPalette();showExpressRef();}});
+  }
+  if(ql && (ql==='milestones' || ql==='project milestones' || ql==='milestone tracker' || ql==='progress milestones')){
+    items.unshift({title:'Project Milestones',desc:'25/50/75/100% progress tracker',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskProjectMilestones();}});
+  }
+  if(ql && (ql==='contrast' || ql==='color contrast' || ql==='wcag' || ql==='contrast checker')){
+    items.unshift({title:'Color Contrast',desc:'WCAG contrast ratio checker',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorContrast();}});
   }
   return items.slice(0, 20);
 }
@@ -37121,6 +37145,177 @@ function showQuickNumberFormatter(){
     });
     out.innerHTML=r;
   };
+}
+function showVueRef(){
+  let d=document.getElementById('vue-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='vue-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Composition API':['const count = ref(0)','const doubled = computed(() => count.value * 2)','watch(source, (newVal, oldVal) => { ... })','watchEffect(() => { ... })','onMounted(() => { ... })','onUnmounted(() => { ... })','const { data } = toRefs(props)'],
+    'Template':['v-if="condition"','v-else-if="other"','v-else','v-for="item in items" :key="item.id"','v-bind:class="{ active: isActive }" / :class','v-on:click="handler" / @click','v-model="text"','v-show="visible"','{{ interpolation }}'],
+    'Components':['<script setup>...</script>','defineProps<{ msg: string }>()','defineEmits<{ (e: "update", val: string): void }>()','defineExpose({ publicMethod })','<slot />','<slot name="header" />','<Suspense>...</Suspense>','<Teleport to="body">...</Teleport>'],
+    'Router':['const router = useRouter()','const route = useRoute()','router.push("/path")','router.replace("/path")','<RouterLink to="/path">Link</RouterLink>','<RouterView />','beforeEach((to, from) => { ... })'],
+    'Pinia (State)':['const store = useStore()','defineStore("id", { state: () => ({ count: 0 }) })','actions: { increment() { this.count++ } }','getters: { doubled: (state) => state.count * 2 }','storeToRefs(store)'],
+    'CLI':['npm create vue@latest','npm run dev','npm run build','npm run preview']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Vue.js Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskDelegationOverview(){
+  let d=document.getElementById('delegation-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='delegation-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const projects=(S.projects||[]);
+  const byProject={};
+  tasks.forEach(t=>{
+    const pid=t.projectId||'_none';
+    if(!byProject[pid])byProject[pid]={name:'',todo:0,inProgress:0,done:0,blocked:0};
+    if(t.status==='done')byProject[pid].done++;
+    else if(t.status==='in-progress')byProject[pid].inProgress++;
+    else if(t.blockedBy&&t.blockedBy.length>0)byProject[pid].blocked++;
+    else byProject[pid].todo++;
+  });
+  projects.forEach(p=>{if(byProject[p.id])byProject[p.id].name=p.name;});
+  if(byProject['_none'])byProject['_none'].name='Unassigned';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Delegation Overview</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const sorted=Object.values(byProject).sort((a,b)=>(b.todo+b.inProgress)-(a.todo+a.inProgress));
+  sorted.forEach(p=>{
+    const total=p.todo+p.inProgress+p.done+p.blocked;if(total===0)return;
+    h+='<div style="margin:8px 0;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:6px">'+esc(p.name||'Unknown')+' <span style="color:var(--text-muted);font-weight:400">('+total+')</span></div>';
+    h+='<div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:1px">';
+    if(p.done>0)h+='<div style="flex:'+p.done+';background:#4ade80" title="Done: '+p.done+'"></div>';
+    if(p.inProgress>0)h+='<div style="flex:'+p.inProgress+';background:#38bdf8" title="In Progress: '+p.inProgress+'"></div>';
+    if(p.todo>0)h+='<div style="flex:'+p.todo+';background:#fbbf24" title="Todo: '+p.todo+'"></div>';
+    if(p.blocked>0)h+='<div style="flex:'+p.blocked+';background:#f87171" title="Blocked: '+p.blocked+'"></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:8px;margin-top:4px;font-size:10px"><span style="color:#4ade80">Done: '+p.done+'</span><span style="color:#38bdf8">WIP: '+p.inProgress+'</span><span style="color:#fbbf24">Todo: '+p.todo+'</span>'+(p.blocked>0?'<span style="color:#f87171">Blocked: '+p.blocked+'</span>':'')+'</div></div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickCsvToJson(){
+  let d=document.getElementById('csv-json-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='csv-json-widget';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:16px;color:var(--accent)">CSV to JSON</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="csv-input" placeholder="Paste CSV data (first row = headers)..." style="width:100%;height:100px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;resize:none;box-sizing:border-box;font-family:monospace;margin-bottom:6px"></textarea>';
+  h+='<button onclick="window._csvToJson()" style="width:100%;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;margin-bottom:6px">Convert</button>';
+  h+='<div id="csv-output" style="font-family:monospace;font-size:10px;padding:8px;background:var(--bg-surface);border-radius:4px;color:var(--text-secondary);max-height:200px;overflow:auto;white-space:pre-wrap;min-height:30px"></div>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'csv-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy JSON\',600)" style="width:100%;margin-top:6px;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:12px">Copy JSON</button>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._csvToJson=function(){
+    const csv=document.getElementById('csv-input').value.trim();
+    const out=document.getElementById('csv-output');if(!out||!csv)return;
+    try{
+      const lines=csv.split('\n').map(l=>l.trim()).filter(l=>l);
+      if(lines.length<2){out.textContent='Need at least 2 rows (header + data)';return;}
+      const headers=lines[0].split(',').map(h2=>h2.trim().replace(/^"|"$/g,''));
+      const result=[];
+      for(let i=1;i<lines.length;i++){
+        const vals=lines[i].split(',').map(v=>v.trim().replace(/^"|"$/g,''));
+        const obj={};headers.forEach((h2,j)=>{obj[h2]=vals[j]||'';});
+        result.push(obj);
+      }
+      out.textContent=JSON.stringify(result,null,2);
+    }catch(e){out.textContent='Error: '+e.message;}
+  };
+}
+function showExpressRef(){
+  let d=document.getElementById('express-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='express-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Setup':['const express = require("express")','const app = express()','app.listen(3000, () => console.log("Running"))','app.use(express.json())','app.use(express.urlencoded({ extended: true }))','app.use(cors())','app.use(express.static("public"))'],
+    'Routes':['app.get("/", (req, res) => res.send("Hello"))','app.post("/api/users", (req, res) => { ... })','app.put("/api/users/:id", (req, res) => { ... })','app.delete("/api/users/:id", (req, res) => { ... })','app.all("*", (req, res) => res.status(404).send("Not found"))'],
+    'Request':['req.params.id','req.query.search','req.body.name','req.headers["authorization"]','req.cookies.token','req.ip','req.method','req.path'],
+    'Response':['res.json({ data })','res.status(201).json({ created: true })','res.redirect("/login")','res.sendFile(path)','res.cookie("token", val, { httpOnly: true })','res.set("X-Custom", "value")'],
+    'Middleware':['app.use((req, res, next) => { console.log(req.method); next(); })','app.use("/api", authMiddleware)','const router = express.Router()','router.use(authMiddleware)','app.use("/api", router)'],
+    'Error Handling':['app.use((err, req, res, next) => { res.status(500).json({ error: err.message }); })','throw new Error("Not found")','next(new Error("Something broke"))']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Express.js Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskProjectMilestones(){
+  let d=document.getElementById('milestones-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='milestones-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=(S.projects||[]);
+  const tasks=(S.tasks||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Project Milestones</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id);
+    const total=pTasks.length;const done=pTasks.filter(t=>t.status==='done').length;
+    const pct=total>0?Math.round((done/total)*100):0;
+    const milestones=[
+      {threshold:25,label:'25% - Quarter Done',icon:'1/4'},
+      {threshold:50,label:'50% - Halfway',icon:'1/2'},
+      {threshold:75,label:'75% - Almost There',icon:'3/4'},
+      {threshold:100,label:'100% - Complete!',icon:'*'}
+    ];
+    h+='<div style="margin:10px 0;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:8px">'+esc(p.name)+' <span style="color:var(--accent)">'+pct+'%</span></div>';
+    h+='<div style="display:flex;gap:4px;margin-bottom:6px">';
+    milestones.forEach(m=>{
+      const reached=pct>=m.threshold;
+      h+='<div style="flex:1;text-align:center;padding:4px;border-radius:4px;background:'+(reached?'rgba(74,222,128,0.15)':'var(--bg-elevated)')+';font-size:10px;color:'+(reached?'#4ade80':'var(--text-muted)')+'">'+m.icon+'</div>';
+    });
+    h+='</div>';
+    h+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:3px;transition:width 0.3s"></div></div>';
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px">'+done+'/'+total+' tasks done</div></div>';
+  });
+  if(projects.length===0)h+='<div style="text-align:center;padding:20px;color:var(--text-muted)">No projects found</div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickColorContrast(){
+  let d=document.getElementById('contrast-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='contrast-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Color Contrast</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div style="display:flex;gap:8px;margin-bottom:8px">';
+  h+='<div style="flex:1"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Foreground</div><input id="cc-fg" value="#ffffff" style="width:100%;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-family:monospace;font-size:12px;box-sizing:border-box" oninput="window._ccCheck()"></div>';
+  h+='<div style="flex:1"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Background</div><input id="cc-bg" value="#050508" style="width:100%;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-family:monospace;font-size:12px;box-sizing:border-box" oninput="window._ccCheck()"></div>';
+  h+='</div>';
+  h+='<div id="cc-preview" style="padding:16px;border-radius:6px;text-align:center;margin-bottom:8px;background:#050508;color:#ffffff;font-size:16px;font-weight:600">Sample Text</div>';
+  h+='<div id="cc-result"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._ccCheck=function(){
+    const fg=document.getElementById('cc-fg').value;
+    const bg=document.getElementById('cc-bg').value;
+    const preview=document.getElementById('cc-preview');
+    const out=document.getElementById('cc-result');
+    if(!preview||!out)return;
+    preview.style.color=fg;preview.style.background=bg;
+    function luminance(hex){
+      const r=parseInt(hex.slice(1,3),16)/255;
+      const g=parseInt(hex.slice(3,5),16)/255;
+      const b=parseInt(hex.slice(5,7),16)/255;
+      const sr=r<=0.03928?r/12.92:Math.pow((r+0.055)/1.055,2.4);
+      const sg=g<=0.03928?g/12.92:Math.pow((g+0.055)/1.055,2.4);
+      const sb=b<=0.03928?b/12.92:Math.pow((b+0.055)/1.055,2.4);
+      return 0.2126*sr+0.7152*sg+0.0722*sb;
+    }
+    try{
+      const l1=luminance(fg);const l2=luminance(bg);
+      const ratio=(Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05);
+      const aaLarge=ratio>=3;const aaNormal=ratio>=4.5;const aaaLarge=ratio>=4.5;const aaaNormal=ratio>=7;
+      let r2='<div style="font-size:14px;font-weight:700;color:var(--accent);text-align:center;margin-bottom:6px">'+ratio.toFixed(2)+':1</div>';
+      r2+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:11px">';
+      r2+='<div style="padding:4px;text-align:center;border-radius:3px;background:'+(aaNormal?'rgba(74,222,128,0.15)':'rgba(248,113,113,0.15)')+';color:'+(aaNormal?'#4ade80':'#f87171')+'">AA Normal '+(aaNormal?'PASS':'FAIL')+'</div>';
+      r2+='<div style="padding:4px;text-align:center;border-radius:3px;background:'+(aaLarge?'rgba(74,222,128,0.15)':'rgba(248,113,113,0.15)')+';color:'+(aaLarge?'#4ade80':'#f87171')+'">AA Large '+(aaLarge?'PASS':'FAIL')+'</div>';
+      r2+='<div style="padding:4px;text-align:center;border-radius:3px;background:'+(aaaNormal?'rgba(74,222,128,0.15)':'rgba(248,113,113,0.15)')+';color:'+(aaaNormal?'#4ade80':'#f87171')+'">AAA Normal '+(aaaNormal?'PASS':'FAIL')+'</div>';
+      r2+='<div style="padding:4px;text-align:center;border-radius:3px;background:'+(aaaLarge?'rgba(74,222,128,0.15)':'rgba(248,113,113,0.15)')+';color:'+(aaaLarge?'#4ade80':'#f87171')+'">AAA Large '+(aaaLarge?'PASS':'FAIL')+'</div>';
+      r2+='</div>';
+      out.innerHTML=r2;
+    }catch(e){out.innerHTML='<span style="color:#f87171">Invalid hex color</span>';}
+  };
+  window._ccCheck();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
