@@ -6677,6 +6677,12 @@ function cmdGetItems(q) {
       ['npm scripts','npm scripts CLI workspace ref'],
       ['energy','Energy level tracker burnout risk'],
       ['password','Secure password generator'],
+      ['makefile','Makefile targets variables patterns ref'],
+      ['completion heatmap','90 day task completion heatmap'],
+      ['notepad','Quick notepad auto-saved'],
+      ['systemd','systemd journalctl service ref'],
+      ['project budget','Project time budget tracker'],
+      ['binary','Binary hex octal decimal converter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10877,6 +10883,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='password' || ql==='password generator' || ql==='passgen' || ql==='generate password')){
     items.unshift({title:'Password Generator',desc:'Secure random password generator',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordGenerator();}});
+  }
+  if(ql && (ql==='makefile' || ql==='make' || ql==='makefile ref' || ql==='make targets')){
+    items.unshift({title:'Makefile Reference',desc:'Targets, variables, patterns',icon:'M',type:'action',action:()=>{closeCommandPalette();showMakefileRef();}});
+  }
+  if(ql && (ql==='completion heatmap' || ql==='heatmap' || ql==='github heatmap' || ql==='activity heatmap')){
+    items.unshift({title:'Completion Heatmap',desc:'90-day task completion heatmap',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskCompletionHeatmap();}});
+  }
+  if(ql && (ql==='notepad' || ql==='quick note' || ql==='scratchpad' || ql==='scratch')){
+    items.unshift({title:'Quick Notepad',desc:'Auto-saved scratchpad',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNotepad();}});
+  }
+  if(ql && (ql==='systemd' || ql==='journalctl' || ql==='systemctl' || ql==='systemd ref')){
+    items.unshift({title:'systemd Reference',desc:'systemctl, journalctl, services',icon:'S',type:'action',action:()=>{closeCommandPalette();showSystemdRef();}});
+  }
+  if(ql && (ql==='project budget' || ql==='time budget' || ql==='budget tracker' || ql==='project time')){
+    items.unshift({title:'Project Time Budget',desc:'Time estimates vs tracked per project',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskProjectBudget();}});
+  }
+  if(ql && (ql==='binary' || ql==='binary converter' || ql==='hex converter' || ql==='base converter')){
+    items.unshift({title:'Number Base Converter',desc:'Dec/Bin/Hex/Oct converter',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBinaryConverter();}});
   }
   return items.slice(0, 20);
 }
@@ -38587,6 +38611,145 @@ function showQuickPasswordGenerator(){
     document.getElementById('passgen-output').textContent=pass;
   };
   window._genPassword();
+}
+function showMakefileRef(){
+  let p=document.getElementById('makefile-ref-panel');if(p)p.remove();
+  const cmds={'Common Targets':['make','make all','make build','make test','make clean','make install','make uninstall','make dist','make check','make deploy','make run','make help'],'Variables & Flags':['make -j4 (parallel jobs)','make -n (dry run)','make -B (force rebuild)','make -f custom.mk','make VAR=value','make -C subdir/','make --debug','make -k (keep going on error)','make -s (silent)','make --print-data-base'],'Syntax Patterns':['target: dependencies','\\t command','VAR := value (simple expansion)','VAR = value (recursive expansion)','VAR ?= default (conditional)','VAR += append','$(wildcard *.c)','$(patsubst %.c,%.o,$(SRC))','$(shell command)','$(foreach var,list,text)','$(if condition,then,else)','$(call func,arg1,arg2)','.PHONY: clean test','%.o: %.c (pattern rule)','$@ (target)','$< (first dependency)','$^ (all dependencies)','$* (stem in pattern)'],'Docker Makefile':['docker-build:\\n\\tdocker build -t app .','docker-run:\\n\\tdocker run -p 8080:80 app','docker-push:\\n\\tdocker push registry/app','docker-clean:\\n\\tdocker system prune -f'],'Go / Python Makefile':['go-build:\\n\\tgo build -o bin/app .','go-test:\\n\\tgo test ./...','go-lint:\\n\\tgolangci-lint run','py-venv:\\n\\tpython -m venv venv','py-install:\\n\\tpip install -r requirements.txt','py-test:\\n\\tpytest tests/']};
+  p=document.createElement('div');p.id='makefile-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Makefile Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{const display=c.replace(/\\n/g,' ').replace(/\\t/g,'  ');h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'").replace(/\\n/g,'\\n').replace(/\\t/g,'\\t')+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary);white-space:pre-wrap">'+display+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskCompletionHeatmap(){
+  let p=document.getElementById('completion-heatmap-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const now=new Date();const startDate=new Date(now);startDate.setDate(startDate.getDate()-90);
+  const dayMap={};
+  tasks.forEach(t=>{if(t.status!=='done')return;const d=(t.completedAt||t.created||'').split('T')[0];if(d)dayMap[d]=(dayMap[d]||0)+1;});
+  const maxCount=Math.max(...Object.values(dayMap),1);
+  const weeks=13;const days=7;
+  p=document.createElement('div');p.id='completion-heatmap-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Completion Heatmap (90 days)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  const totalDone=Object.values(dayMap).reduce((s,v)=>s+v,0);
+  const activeDays=Object.keys(dayMap).length;
+  h+='<div style="display:flex;gap:16px;margin-bottom:12px"><div style="font-size:12px;color:var(--text-muted)">Total completed: <span style="color:#4ade80">'+totalDone+'</span></div><div style="font-size:12px;color:var(--text-muted)">Active days: <span style="color:#60a5fa">'+activeDays+'</span></div></div>';
+  h+='<div style="display:flex;gap:2px">';
+  const dayLabels=['','M','','W','','F',''];
+  h+='<div style="display:flex;flex-direction:column;gap:2px;margin-right:4px">';
+  dayLabels.forEach(l=>{h+='<div style="width:12px;height:12px;font-size:8px;color:var(--text-muted);line-height:12px;text-align:right">'+l+'</div>';});
+  h+='</div>';
+  for(let w=0;w<weeks;w++){
+    h+='<div style="display:flex;flex-direction:column;gap:2px">';
+    for(let d=0;d<days;d++){
+      const date=new Date(startDate);date.setDate(date.getDate()+(w*7)+d);
+      const ds=date.toISOString().split('T')[0];
+      const count=dayMap[ds]||0;
+      const intensity=count===0?0:Math.ceil((count/maxCount)*4);
+      const colors=['var(--bg-surface)','#0e4429','#006d32','#26a641','#4ade80'];
+      h+='<div title="'+ds+': '+count+' tasks" style="width:12px;height:12px;background:'+colors[intensity]+';border-radius:2px"></div>';
+    }
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;align-items:center;gap:4px;margin-top:8px;justify-content:flex-end"><span style="font-size:9px;color:var(--text-muted)">Less</span>';
+  ['var(--bg-surface)','#0e4429','#006d32','#26a641','#4ade80'].forEach(c=>{h+='<div style="width:10px;height:10px;background:'+c+';border-radius:2px"></div>';});
+  h+='<span style="font-size:9px;color:var(--text-muted)">More</span></div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickNotepad(){
+  let w=document.getElementById('notepad-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='notepad-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  const saved=localStorage.getItem('astra_quicknote')||'';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Quick Notepad</div><div style="display:flex;gap:6px;align-items:center"><span id="notepad-status" style="font-size:9px;color:var(--text-muted)">Saved</span><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div></div><textarea id="notepad-area" oninput="window._notepadSave()" placeholder="Quick notes... auto-saved to localStorage" style="width:100%;height:200px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:10px;color:var(--text-primary);font-size:12px;resize:vertical;line-height:1.6;font-family:inherit">'+saved.replace(/</g,'&lt;')+'</textarea><div style="display:flex;justify-content:space-between;margin-top:6px"><span id="notepad-count" style="font-size:10px;color:var(--text-muted)">'+saved.split(/\s+/).filter(w=>w).length+' words</span><button onclick="navigator.clipboard.writeText(document.getElementById(\'notepad-area\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer">Copy</button></div>';
+  document.body.appendChild(w);
+  window._notepadTimer=null;
+  window._notepadSave=function(){
+    clearTimeout(window._notepadTimer);
+    document.getElementById('notepad-status').textContent='Typing...';
+    document.getElementById('notepad-status').style.color='#fbbf24';
+    const text=document.getElementById('notepad-area').value;
+    document.getElementById('notepad-count').textContent=text.split(/\s+/).filter(w=>w).length+' words';
+    window._notepadTimer=setTimeout(()=>{
+      localStorage.setItem('astra_quicknote',text);
+      document.getElementById('notepad-status').textContent='Saved';
+      document.getElementById('notepad-status').style.color='#4ade80';
+    },500);
+  };
+}
+function showSystemdRef(){
+  let p=document.getElementById('systemd-ref-panel');if(p)p.remove();
+  const cmds={'Service Management':['systemctl start myservice','systemctl stop myservice','systemctl restart myservice','systemctl reload myservice','systemctl status myservice','systemctl enable myservice','systemctl disable myservice','systemctl is-active myservice','systemctl is-enabled myservice','systemctl mask myservice','systemctl unmask myservice','systemctl daemon-reload'],'System Commands':['systemctl list-units','systemctl list-units --type=service','systemctl list-units --state=failed','systemctl list-unit-files','systemctl get-default','systemctl set-default multi-user.target','systemctl isolate rescue.target','systemctl poweroff','systemctl reboot','systemctl suspend'],'Journal (journalctl)':['journalctl','journalctl -u myservice','journalctl -u myservice -f','journalctl -u myservice --since today','journalctl -u myservice --since "1 hour ago"','journalctl -u myservice -n 50','journalctl -p err','journalctl -p warning..err','journalctl --disk-usage','journalctl --vacuum-size=500M','journalctl --vacuum-time=7d','journalctl -b (current boot)','journalctl -b -1 (previous boot)','journalctl --list-boots'],'Timer Units':['systemctl list-timers','systemctl list-timers --all','systemctl status mytimer.timer','systemctl enable --now mytimer.timer'],'Unit File Paths':['/etc/systemd/system/ (admin)','/lib/systemd/system/ (packages)','/run/systemd/system/ (runtime)','~/.config/systemd/user/ (user units)','systemctl edit myservice (override)','systemctl cat myservice (view file)','systemctl show myservice (properties)']};
+  p=document.createElement('div');p.id='systemd-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">systemd / journalctl Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskProjectBudget(){
+  let p=document.getElementById('budget-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);
+  const projData={};
+  tasks.forEach(t=>{
+    const pid=t.project||t.projectId||'unassigned';
+    if(!projData[pid])projData[pid]={total:0,done:0,inProgress:0,estimated:0,tracked:0};
+    projData[pid].total++;
+    if(t.status==='done')projData[pid].done++;
+    else if(t.status==='in-progress'||t.status==='inprogress')projData[pid].inProgress++;
+    if(t.estimate){const m=t.estimate.match(/(\d+)\s*(h|m)/);if(m){projData[pid].estimated+=m[2]==='h'?parseInt(m[1])*60:parseInt(m[1]);}}
+    if(t.timeTracked)projData[pid].tracked+=t.timeTracked;
+  });
+  p=document.createElement('div');p.id='budget-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Project Time Budget</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(projData).forEach(([pid,data])=>{
+    const proj=projects.find(pr=>pr.id===pid);const name=proj?proj.name:pid;
+    const pct=data.total>0?Math.round(data.done/data.total*100):0;
+    const estH=(data.estimated/60).toFixed(1);const trackH=(data.tracked/60).toFixed(1);
+    const overBudget=data.tracked>data.estimated&&data.estimated>0;
+    h+='<div style="padding:10px;background:var(--bg-surface);border-radius:8px;margin-bottom:8px'+(overBudget?';border-left:3px solid #f87171':'')+'">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">'+esc(name)+'</span><span style="font-size:11px;color:'+(pct===100?'#4ade80':'var(--text-muted)')+'">'+pct+'% done</span></div>';
+    h+='<div style="width:100%;height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:6px"><div style="width:'+pct+'%;height:100%;background:'+(pct===100?'#4ade80':'var(--accent)')+';border-radius:3px"></div></div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    h+='<span>Tasks: '+data.done+'/'+data.total+'</span>';
+    h+='<span>In Progress: '+data.inProgress+'</span>';
+    if(data.estimated>0)h+='<span>Est: '+estH+'h</span>';
+    if(data.tracked>0)h+='<span style="color:'+(overBudget?'#f87171':'#4ade80')+'">Tracked: '+trackH+'h</span>';
+    h+='</div></div>';
+  });
+  if(Object.keys(projData).length===0)h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">No tasks found.</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickBinaryConverter(){
+  let w=document.getElementById('binary-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='binary-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Number Base Converter</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted)">Decimal</label><input type="text" id="bin-dec" oninput="window._binConvert(\'dec\')" placeholder="e.g. 255" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;font-family:monospace;margin-top:2px"></div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted)">Binary</label><input type="text" id="bin-bin" oninput="window._binConvert(\'bin\')" placeholder="e.g. 11111111" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;font-family:monospace;margin-top:2px"></div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted)">Hexadecimal</label><input type="text" id="bin-hex" oninput="window._binConvert(\'hex\')" placeholder="e.g. FF" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;font-family:monospace;margin-top:2px"></div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted)">Octal</label><input type="text" id="bin-oct" oninput="window._binConvert(\'oct\')" placeholder="e.g. 377" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;font-family:monospace;margin-top:2px"></div>';
+  document.body.appendChild(w);
+  window._binConvert=function(from){
+    let val;
+    try{
+      if(from==='dec')val=parseInt(document.getElementById('bin-dec').value,10);
+      else if(from==='bin')val=parseInt(document.getElementById('bin-bin').value,2);
+      else if(from==='hex')val=parseInt(document.getElementById('bin-hex').value,16);
+      else if(from==='oct')val=parseInt(document.getElementById('bin-oct').value,8);
+      if(isNaN(val))return;
+      if(from!=='dec')document.getElementById('bin-dec').value=val.toString(10);
+      if(from!=='bin')document.getElementById('bin-bin').value=val.toString(2);
+      if(from!=='hex')document.getElementById('bin-hex').value=val.toString(16).toUpperCase();
+      if(from!=='oct')document.getElementById('bin-oct').value=val.toString(8);
+    }catch(e){}
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
