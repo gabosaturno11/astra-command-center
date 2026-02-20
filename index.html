@@ -6332,6 +6332,12 @@ function cmdGetItems(q) {
       ['aws','AWS CLI command reference'],
       ['created vs done','Created vs done task chart'],
       ['color converter','Color format converter'],
+      ['vercel','Vercel CLI command reference'],
+      ['wip age','WIP task age report'],
+      ['string encoder','Base64, URL, HTML encoder/decoder'],
+      ['gh cli','GitHub CLI command reference'],
+      ['priority distribution','Task priority pie chart'],
+      ['ip lookup','IP address lookup'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9497,6 +9503,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='color converter' || ql==='color convert' || ql==='hex to rgb' || ql==='rgb to hex')){
     items.unshift({title:'Color Converter',desc:'Convert between HEX, RGB, HSL',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorConverter();}});
+  }
+  if(ql && (ql==='vercel' || ql==='vercel cli' || ql==='vercel commands' || ql==='vercel ref')){
+    items.unshift({title:'Vercel CLI Reference',desc:'Vercel CLI cheatsheet by category',icon:'V',type:'action',action:()=>{closeCommandPalette();showVercelCliRef();}});
+  }
+  if(ql && (ql==='wip age' || ql==='wip report' || ql==='in progress age' || ql==='work in progress')){
+    items.unshift({title:'WIP Age Report',desc:'Age of in-progress tasks',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWipAge();}});
+  }
+  if(ql && (ql==='string encoder' || ql==='base64' || ql==='url encode' || ql==='encode decode')){
+    items.unshift({title:'String Encoder',desc:'Base64, URL, HTML encode/decode',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStringEncoder();}});
+  }
+  if(ql && (ql==='gh cli' || ql==='github cli' || ql==='gh commands' || ql==='gh reference')){
+    items.unshift({title:'GitHub CLI Reference',desc:'gh CLI cheatsheet by category',icon:'G',type:'action',action:()=>{closeCommandPalette();showGhCliRef();}});
+  }
+  if(ql && (ql==='priority distribution' || ql==='priority pie' || ql==='priority chart' || ql==='priority breakdown')){
+    items.unshift({title:'Priority Distribution',desc:'Open tasks by priority pie chart',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityTrend();}});
+  }
+  if(ql && (ql==='ip lookup' || ql==='ip address' || ql==='my ip' || ql==='whats my ip')){
+    items.unshift({title:'IP Lookup',desc:'Your current IP and location info',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIpLookup();}});
   }
   return items.slice(0, 20);
 }
@@ -27764,6 +27788,158 @@ function showQuickColorConverter(){
   };
   window._ccFromHex=function(val){if(/^#[0-9a-fA-F]{6}$/.test(val))window._ccUpdate(val);};
   window._ccUpdate('#4ade80');
+}
+function showVercelCliRef(){
+  const d=document.createElement('div');d.id='vercel-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Deploy':['vercel','vercel --prod','vercel deploy','vercel deploy --prebuilt','vercel build'],
+    'Projects':['vercel project ls','vercel project add','vercel project rm <name>','vercel link','vercel inspect <url>'],
+    'Env':['vercel env ls','vercel env add <key>','vercel env rm <key>','vercel env pull .env.local'],
+    'Domains':['vercel domains ls','vercel domains add <domain>','vercel domains rm <domain>','vercel dns ls'],
+    'Dev':['vercel dev','vercel dev --listen 3001','vercel logs <url>','vercel whoami','vercel login'],
+    'Other':['vercel --version','vercel help','vercel switch','vercel teams ls','vercel certs ls']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Vercel CLI Reference</h3><button onclick="document.getElementById(\'vercel-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskWipAge(){
+  const d=document.createElement('div');d.id='wip-age-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status==='in-progress');
+  const now=Date.now();
+  const sorted=tasks.map(t=>{
+    const created=t.createdAt?new Date(t.createdAt).getTime():now;
+    const age=Math.floor((now-created)/86400000);
+    return{...t,age};
+  }).sort((a,b)=>b.age-a.age);
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">WIP Age Report</h3><button onclick="document.getElementById(\'wip-age-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">'+sorted.length+' tasks in progress</div>';
+  if(sorted.length){
+    const avgAge=sorted.length?Math.round(sorted.reduce((s,t)=>s+t.age,0)/sorted.length):0;
+    html+='<div style="display:flex;gap:12px;margin-bottom:14px"><div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:18px;color:#4ade80;font-weight:700">'+avgAge+'d</div><div style="font-size:10px;color:var(--text-muted)">avg age</div></div>';
+    html+='<div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:18px;color:'+(sorted[0].age>14?'#ef4444':'#4ade80')+';font-weight:700">'+sorted[0].age+'d</div><div style="font-size:10px;color:var(--text-muted)">oldest</div></div></div>';
+    sorted.forEach(t=>{
+      const col=t.age>14?'#ef4444':t.age>7?'#f59e0b':'#4ade80';
+      html+='<div style="padding:8px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid '+col+'"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:var(--text-primary)">'+esc(t.title)+'</span><span style="font-size:11px;color:'+col+';font-weight:600">'+t.age+'d</span></div></div>';
+    });
+  } else {
+    html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">No tasks in progress.</div>';
+  }
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickStringEncoder(){
+  const d=document.createElement('div');d.id='string-encoder-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">String Encoder</h3><button onclick="document.getElementById(\'string-encoder-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<textarea id="se-input" placeholder="Enter text to encode/decode..." rows="3" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-bottom:8px"></textarea>';
+  html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px">';
+  const ops=['Base64 Enc','Base64 Dec','URL Enc','URL Dec','HTML Enc','HTML Dec'];
+  ops.forEach(op=>{
+    html+='<button onclick="window._seEncode(\''+op+'\')" style="padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary);font-size:10px;cursor:pointer">'+op+'</button>';
+  });
+  html+='</div>';
+  html+='<div id="se-output" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:11px;color:#4ade80;word-break:break-all;min-height:40px;cursor:pointer" onclick="if(this.textContent)navigator.clipboard.writeText(this.textContent)"></div>';
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click output to copy</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._seEncode=function(op){
+    const input=document.getElementById('se-input').value;const out=document.getElementById('se-output');
+    try{
+      if(op==='Base64 Enc')out.textContent=btoa(input);
+      else if(op==='Base64 Dec')out.textContent=atob(input);
+      else if(op==='URL Enc')out.textContent=encodeURIComponent(input);
+      else if(op==='URL Dec')out.textContent=decodeURIComponent(input);
+      else if(op==='HTML Enc'){const t=document.createElement('textarea');t.textContent=input;out.textContent=t.innerHTML;}
+      else if(op==='HTML Dec'){const t=document.createElement('textarea');t.innerHTML=input;out.textContent=t.value;}
+    }catch(e){out.textContent='Error: '+e.message;}
+  };
+}
+function showGhCliRef(){
+  const d=document.createElement('div');d.id='gh-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Repos':['gh repo create','gh repo clone <repo>','gh repo fork <repo>','gh repo view','gh repo list'],
+    'PRs':['gh pr create','gh pr list','gh pr view <n>','gh pr checkout <n>','gh pr merge <n>','gh pr diff <n>'],
+    'Issues':['gh issue create','gh issue list','gh issue view <n>','gh issue close <n>','gh issue reopen <n>'],
+    'Workflow':['gh run list','gh run view <id>','gh run watch <id>','gh workflow list','gh workflow run <name>'],
+    'Release':['gh release create <tag>','gh release list','gh release view <tag>','gh release download <tag>'],
+    'Other':['gh auth login','gh auth status','gh api repos/<owner>/<repo>','gh gist create <file>','gh codespace list']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">GitHub CLI Reference</h3><button onclick="document.getElementById(\'gh-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskPriorityTrend(){
+  const d=document.createElement('div');d.id='priority-trend-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const priorities={p0:0,p1:0,p2:0,p3:0,none:0};
+  tasks.forEach(t=>{
+    if(priorities[t.priority]!==undefined)priorities[t.priority]++;
+    else priorities.none++;
+  });
+  const total=tasks.length||1;
+  const colors={p0:'#ef4444',p1:'#f59e0b',p2:'#3b82f6',p3:'#6b7280',none:'#4b5563'};
+  const labels={p0:'Critical',p1:'High',p2:'Medium',p3:'Low',none:'None'};
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Priority Distribution</h3><button onclick="document.getElementById(\'priority-trend-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:16px;font-size:11px;color:var(--text-muted)">'+tasks.length+' open tasks</div>';
+  let startAngle=0;
+  let svg='<svg width="200" height="200" viewBox="-1 -1 2 2" style="transform:rotate(-90deg);display:block;margin:0 auto 16px">';
+  Object.entries(priorities).forEach(([p,count])=>{
+    if(count===0)return;
+    const pct=count/total;const endAngle=startAngle+pct*2*Math.PI;
+    const x1=Math.cos(startAngle);const y1=Math.sin(startAngle);
+    const x2=Math.cos(endAngle);const y2=Math.sin(endAngle);
+    const large=pct>0.5?1:0;
+    svg+='<path d="M 0 0 L '+x1+' '+y1+' A 1 1 0 '+large+' 1 '+x2+' '+y2+' Z" fill="'+colors[p]+'" opacity="0.85"/>';
+    startAngle=endAngle;
+  });
+  svg+='</svg>';
+  html+=svg;
+  Object.entries(priorities).forEach(([p,count])=>{
+    const pct=Math.round(count/total*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:12px;height:12px;border-radius:2px;background:'+colors[p]+'"></div><span style="font-size:12px;color:var(--text-primary);flex:1">'+labels[p]+'</span><span style="font-size:12px;color:var(--text-secondary)">'+count+'</span><span style="font-size:11px;color:var(--text-muted)">'+pct+'%</span></div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickIpLookup(){
+  const d=document.createElement('div');d.id='ip-lookup-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">IP Lookup</h3><button onclick="document.getElementById(\'ip-lookup-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div id="ip-result" style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px">Loading...</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  fetch('https://ipapi.co/json/').then(r=>r.json()).then(data=>{
+    const el=document.getElementById('ip-result');if(!el)return;
+    let rhtml='';
+    const fields=[
+      {label:'IP',val:data.ip},
+      {label:'City',val:data.city},
+      {label:'Region',val:data.region},
+      {label:'Country',val:data.country_name},
+      {label:'ISP',val:data.org},
+      {label:'Timezone',val:data.timezone},
+      {label:'Lat/Lng',val:(data.latitude||'')+', '+(data.longitude||'')}
+    ];
+    fields.forEach(f=>{
+      if(f.val)rhtml+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="font-size:11px;color:var(--text-muted)">'+f.label+'</span><span style="font-size:11px;color:var(--text-primary)">'+f.val+'</span></div>';
+    });
+    el.innerHTML=rhtml;
+  }).catch(()=>{
+    const el=document.getElementById('ip-result');if(el)el.innerHTML='<div style="color:#ef4444;font-size:11px">Failed to fetch IP info</div>';
+  });
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
