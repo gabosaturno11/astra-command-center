@@ -6725,6 +6725,12 @@ function cmdGetItems(q) {
       ['regex','Regex patterns classes quantifiers ref'],
       ['pareto','Pareto 80/20 task analysis'],
       ['math','Math expression evaluator'],
+      ['jq','jq JSON processor filter reference'],
+      ['task age','Task age distribution histogram'],
+      ['metronome','Metronome BPM with Web Audio'],
+      ['rsync','rsync sync backup reference'],
+      ['project pace','Project pace week over week trend'],
+      ['text to speech','Text to speech synthesis'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -11069,6 +11075,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='math' || ql==='calculator' || ql==='math solver' || ql==='evaluate')){
     items.unshift({title:'Math Solver',desc:'Evaluate math expressions',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMathSolver();}});
+  }
+  if(ql && (ql==='jq' || ql==='jq ref' || ql==='json processor' || ql==='jq filter')){
+    items.unshift({title:'jq Reference',desc:'JSON filter, transform, select',icon:'J',type:'action',action:()=>{closeCommandPalette();showJqRef();}});
+  }
+  if(ql && (ql==='task age' || ql==='age distribution' || ql==='task age distribution' || ql==='how old')){
+    items.unshift({title:'Task Age Distribution',desc:'Active tasks by age histogram',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAgeDistribution();}});
+  }
+  if(ql && (ql==='metronome' || ql==='bpm' || ql==='beat' || ql==='tempo')){
+    items.unshift({title:'Metronome',desc:'BPM metronome with presets',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMetronome();}});
+  }
+  if(ql && (ql==='rsync' || ql==='rsync ref' || ql==='sync files' || ql==='rsync commands')){
+    items.unshift({title:'rsync Reference',desc:'Sync, backup, deploy commands',icon:'R',type:'action',action:()=>{closeCommandPalette();showRsyncRef();}});
+  }
+  if(ql && (ql==='project pace' || ql==='pace' || ql==='project speed' || ql==='pace tracker')){
+    items.unshift({title:'Project Pace',desc:'Week-over-week completion trend',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectPace();}});
+  }
+  if(ql && (ql==='text to speech' || ql==='tts' || ql==='speak' || ql==='speech')){
+    items.unshift({title:'Text to Speech',desc:'Read text aloud with rate/pitch control',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSpeechSynth();}});
   }
   return items.slice(0, 20);
 }
@@ -39827,6 +39851,127 @@ function showQuickMathSolver(){
       const result=Function('"use strict"; return ('+safe+')')();
       document.getElementById('math-result').textContent=typeof result==='number'?result:'?';
     }catch(e){document.getElementById('math-result').textContent='?';}
+  };
+}
+function showJqRef(){
+  let p=document.getElementById('jq-ref-panel');if(p)p.remove();
+  const cmds={'Basic':['jq . file.json (pretty print)','jq -r .name file.json (raw output)','jq -c . file.json (compact)','jq .key file.json','jq .key.nested file.json','jq .array[0] file.json','jq .array[-1] file.json','jq .array[2:5] file.json','jq length file.json','jq keys file.json','jq type file.json'],'Filters':['jq ".[] | .name" file.json','jq "[.[] | .name]" file.json','jq "map(.name)" file.json','jq "map(select(.age > 18))" file.json','jq "sort_by(.name)" file.json','jq "group_by(.category)" file.json','jq "unique_by(.id)" file.json','jq "flatten" file.json','jq "reverse" file.json','jq "limit(5; .[])" file.json'],'Transform':['jq "{name, age}" file.json','jq "{full_name: .name, years: .age}" file.json','jq ". + {new_key: \"value\"}" file.json','jq "del(.unwanted)" file.json','jq ".key |= . + 1" file.json','jq "to_entries" file.json','jq "from_entries" file.json','jq "with_entries(.key |= \"prefix_\" + .)" file.json'],'String & Math':['jq ".name | length" file.json','jq ".name | ascii_downcase" file.json','jq ".name | split(\" \")" file.json','jq ".items | add" file.json','jq "[.items[].price] | add" file.json','jq ".items | min_by(.price)" file.json','jq ".items | max_by(.price)" file.json','jq "\"\\(.first) \\(.last)\"" file.json'],'Conditionals':['jq "if .age >= 18 then \"adult\" else \"minor\" end" file.json','jq ".[] | select(.active)" file.json','jq ".[] | select(.name | test(\"pattern\"))" file.json','jq "try .key catch \"default\"" file.json','jq ".value // \"fallback\"" file.json']};
+  p=document.createElement('div');p.id='jq-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">jq JSON Processor Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskAgeDistribution(){
+  let p=document.getElementById('age-dist-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();
+  const buckets=[{label:'< 1 day',max:1,count:0,color:'#4ade80'},{label:'1-3 days',max:3,count:0,color:'#a3e635'},{label:'3-7 days',max:7,count:0,color:'#fbbf24'},{label:'1-2 weeks',max:14,count:0,color:'#fb923c'},{label:'2-4 weeks',max:28,count:0,color:'#f87171'},{label:'1-3 months',max:90,count:0,color:'#ef4444'},{label:'3+ months',max:Infinity,count:0,color:'#dc2626'}];
+  tasks.forEach(t=>{const days=(now-new Date(t.created||''))/(1000*60*60*24);for(const b of buckets){if(days<b.max){b.count++;break;}}});
+  const maxCount=Math.max(...buckets.map(b=>b.count),1);
+  p=document.createElement('div');p.id='age-dist-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Task Age Distribution</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">'+tasks.length+' active tasks by age</div>';
+  buckets.forEach(b=>{
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:10px;color:var(--text-muted);width:80px;text-align:right">'+b.label+'</span><div style="flex:1;height:20px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="width:'+(b.count/maxCount*100)+'%;height:100%;background:'+b.color+';border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px"><span style="font-size:9px;color:#000;font-weight:600">'+(b.count>0?b.count:'')+'</span></div></div></div>';
+  });
+  const avgAge=tasks.length>0?(tasks.reduce((s,t)=>s+(now-new Date(t.created||''))/(1000*60*60*24),0)/tasks.length).toFixed(1):0;
+  h+='<div style="margin-top:12px;font-size:11px;color:var(--text-muted)">Average age: <span style="color:var(--accent)">'+avgAge+' days</span></div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickMetronome(){
+  let w=document.getElementById('metronome-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='metronome-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:220px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Metronome</div><button onclick="window._stopMetronome();this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="met-bpm" style="font-size:36px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:4px;font-family:monospace">120</div><div style="text-align:center;font-size:10px;color:var(--text-muted);margin-bottom:8px">BPM</div><input type="range" id="met-slider" min="30" max="300" value="120" oninput="document.getElementById(\'met-bpm\').textContent=this.value" style="width:100%;margin-bottom:8px"><div style="display:flex;gap:4px;margin-bottom:8px;justify-content:center"><button onclick="document.getElementById(\'met-slider\').value=60;document.getElementById(\'met-bpm\').textContent=60" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:9px;cursor:pointer">60</button><button onclick="document.getElementById(\'met-slider\').value=90;document.getElementById(\'met-bpm\').textContent=90" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:9px;cursor:pointer">90</button><button onclick="document.getElementById(\'met-slider\').value=120;document.getElementById(\'met-bpm\').textContent=120" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:9px;cursor:pointer">120</button><button onclick="document.getElementById(\'met-slider\').value=140;document.getElementById(\'met-bpm\').textContent=140" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:9px;cursor:pointer">140</button></div><div style="display:flex;gap:6px"><button onclick="window._startMetronome()" id="met-btn" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Start</button><button onclick="window._stopMetronome()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Stop</button></div>';
+  document.body.appendChild(w);
+  window._metInterval=null;window._metCtx=null;
+  window._startMetronome=function(){
+    window._stopMetronome();
+    window._metCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const bpm=parseInt(document.getElementById('met-slider').value)||120;
+    const interval=60000/bpm;
+    window._metInterval=setInterval(()=>{
+      const osc=window._metCtx.createOscillator();const gain=window._metCtx.createGain();
+      osc.connect(gain);gain.connect(window._metCtx.destination);
+      osc.frequency.value=800;gain.gain.value=0.3;
+      osc.start();gain.gain.exponentialRampToValueAtTime(0.001,window._metCtx.currentTime+0.1);
+      osc.stop(window._metCtx.currentTime+0.1);
+    },interval);
+    document.getElementById('met-btn').textContent='Playing';
+  };
+  window._stopMetronome=function(){
+    if(window._metInterval)clearInterval(window._metInterval);window._metInterval=null;
+    if(window._metCtx){try{window._metCtx.close();}catch(e){}}window._metCtx=null;
+    const btn=document.getElementById('met-btn');if(btn)btn.textContent='Start';
+  };
+}
+function showRsyncRef(){
+  let p=document.getElementById('rsync-ref-panel');if(p)p.remove();
+  const cmds={'Basic':['rsync -av source/ dest/','rsync -av source/ user@host:dest/','rsync -av user@host:source/ dest/','rsync -avz source/ dest/ (compress)','rsync -avn source/ dest/ (dry run)','rsync -avP source/ dest/ (progress)','rsync --delete source/ dest/','rsync -av --exclude="*.tmp" source/ dest/'],'Common Flags':['-a (archive: -rlptgoD)','-v (verbose)','-z (compress during transfer)','-P (--partial --progress)','-n (dry run)','-r (recursive)','--delete (delete extraneous files)','--exclude="pattern"','--include="pattern"','--exclude-from=file','--backup --backup-dir=backup/','--max-size=100M','--min-size=1K'],'SSH & Remote':['rsync -avz -e "ssh -p 2222" source/ user@host:dest/','rsync -avz --rsh=ssh source/ user@host:dest/','rsync -avz -e "ssh -i key.pem" source/ user@host:dest/'],'Sync Patterns':['rsync -av --delete --exclude=".git" ./ dest/ (deploy)','rsync -avz ~/backup/ /Volumes/External/backup/ (local backup)','rsync -avz --progress large_file.iso user@host:/data/','rsync -av --link-dest=../prev/ source/ dest/ (incremental)'],'Useful Combos':['rsync -avzP --delete source/ dest/','rsync -av --dry-run --delete source/ dest/','rsync -av --checksum source/ dest/ (verify by checksum)','rsync -av --update source/ dest/ (skip newer on dest)','rsync -av --ignore-existing source/ dest/']};
+  p=document.createElement('div');p.id='rsync-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">rsync Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskProjectPace(){
+  let p=document.getElementById('pace-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);
+  const now=new Date();const weekMs=7*24*60*60*1000;
+  const projPace={};
+  tasks.forEach(t=>{
+    const pid=t.project||t.projectId||'unassigned';
+    if(!projPace[pid])projPace[pid]={thisWeek:0,lastWeek:0,total:0,done:0};
+    projPace[pid].total++;
+    if(t.status==='done'){
+      projPace[pid].done++;
+      const completed=new Date(t.completedAt||t.created||'');
+      if(now-completed<weekMs)projPace[pid].thisWeek++;
+      else if(now-completed<2*weekMs)projPace[pid].lastWeek++;
+    }
+  });
+  p=document.createElement('div');p.id='pace-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Project Pace Tracker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(projPace).forEach(([pid,data])=>{
+    const proj=projects.find(pr=>pr.id===pid);const name=proj?proj.name:pid;
+    const trend=data.thisWeek>data.lastWeek?'up':data.thisWeek<data.lastWeek?'down':'flat';
+    const trendColor=trend==='up'?'#4ade80':trend==='down'?'#f87171':'#fbbf24';
+    const trendArrow=trend==='up'?'&#8593;':trend==='down'?'&#8595;':'&#8594;';
+    h+='<div style="padding:10px;background:var(--bg-surface);border-radius:8px;margin-bottom:6px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">'+esc(name)+'</span><span style="font-size:16px;color:'+trendColor+'">'+trendArrow+'</span></div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    h+='<span>This week: <span style="color:#4ade80;font-weight:600">'+data.thisWeek+'</span></span>';
+    h+='<span>Last week: <span style="color:var(--text-secondary)">'+data.lastWeek+'</span></span>';
+    h+='<span>Done: '+data.done+'/'+data.total+'</span>';
+    h+='</div></div>';
+  });
+  if(Object.keys(projPace).length===0)h+='<div style="text-align:center;padding:30px;color:var(--text-muted)">No tasks found.</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickSpeechSynth(){
+  let w=document.getElementById('speech-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='speech-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Text to Speech</div><button onclick="speechSynthesis.cancel();this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><textarea id="tts-input" placeholder="Enter text to speak..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:12px;resize:vertical;line-height:1.5"></textarea><div style="display:flex;gap:6px;margin-top:6px;margin-bottom:6px"><div style="flex:1"><label style="font-size:9px;color:var(--text-muted)">Rate</label><input type="range" id="tts-rate" min="0.5" max="2" step="0.1" value="1" style="width:100%"></div><div style="flex:1"><label style="font-size:9px;color:var(--text-muted)">Pitch</label><input type="range" id="tts-pitch" min="0.5" max="2" step="0.1" value="1" style="width:100%"></div></div><div style="display:flex;gap:6px"><button onclick="window._speak()" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Speak</button><button onclick="speechSynthesis.pause()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Pause</button><button onclick="speechSynthesis.resume()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Resume</button><button onclick="speechSynthesis.cancel()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Stop</button></div>';
+  document.body.appendChild(w);
+  window._speak=function(){
+    const text=document.getElementById('tts-input').value.trim();if(!text)return;
+    speechSynthesis.cancel();
+    const utterance=new SpeechSynthesisUtterance(text);
+    utterance.rate=parseFloat(document.getElementById('tts-rate').value)||1;
+    utterance.pitch=parseFloat(document.getElementById('tts-pitch').value)||1;
+    speechSynthesis.speak(utterance);
   };
 }
 function showProjectRoadmap(filterProject){
