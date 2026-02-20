@@ -6491,6 +6491,12 @@ function cmdGetItems(q) {
       ['gcloud','Google Cloud CLI reference'],
       ['task content','Task and content correlation analysis'],
       ['unit converter','Length weight temperature data converter'],
+      ['azure','Azure CLI reference'],
+      ['priority history','Task priority trends over time'],
+      ['color converter','HEX RGB HSL color conversion'],
+      ['heroku','Heroku CLI reference'],
+      ['monthly overview','Six month task creation and completion'],
+      ['number base','Decimal binary octal hex converter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10133,6 +10139,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='unit' || ql==='unit converter' || ql==='convert' || ql==='measurement')){
     items.unshift({title:'Unit Converter',desc:'Length, weight, temperature, data',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUnitConverter();}});
+  }
+  if(ql && (ql==='azure' || ql==='az cli' || ql==='azure cli' || ql==='az webapp')){
+    items.unshift({title:'Azure CLI Reference',desc:'App Service, VMs, Storage, Resource Groups',icon:'A',type:'action',action:()=>{closeCommandPalette();showAzureCliRef();}});
+  }
+  if(ql && (ql==='priority history' || ql==='priority trend' || ql==='priority chart' || ql==='p0 trend')){
+    items.unshift({title:'Priority History',desc:'Task priority trends over 8 weeks',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityHistory();}});
+  }
+  if(ql && (ql==='color converter' || ql==='hex to rgb' || ql==='rgb to hsl' || ql==='color picker')){
+    items.unshift({title:'Color Converter',desc:'HEX, RGB, HSL color conversion',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorConverter();}});
+  }
+  if(ql && (ql==='heroku' || ql==='heroku cli' || ql==='heroku deploy' || ql==='heroku logs')){
+    items.unshift({title:'Heroku CLI Reference',desc:'Apps, deploy, config, dynos, logs',icon:'H',type:'action',action:()=>{closeCommandPalette();showHerokuRef();}});
+  }
+  if(ql && (ql==='monthly' || ql==='monthly overview' || ql==='month summary' || ql==='6 month')){
+    items.unshift({title:'Monthly Overview',desc:'Six month task creation and completion',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskMonthlyOverview();}});
+  }
+  if(ql && (ql==='number base' || ql==='binary' || ql==='hex convert' || ql==='base converter')){
+    items.unshift({title:'Number Base Converter',desc:'Decimal, binary, octal, hex',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNumberBaseConverter();}});
   }
   return items.slice(0, 20);
 }
@@ -32323,6 +32347,151 @@ function showQuickUnitConverter(){
     else if(cat==='temp'){r='<div style="padding:4px 0">'+val+' C = '+((val*9/5)+32).toFixed(1)+' F</div><div style="padding:4px 0">'+val+' C = '+(val+273.15).toFixed(1)+' K</div><div style="padding:4px 0">'+val+' F = '+((val-32)*5/9).toFixed(1)+' C</div><div style="padding:4px 0">'+val+' F = '+((val-32)*5/9+273.15).toFixed(1)+' K</div>';}
     else if(cat==='data'){r='<div style="padding:4px 0">'+val+' MB = '+(val/1024).toFixed(4)+' GB</div><div style="padding:4px 0">'+val+' MB = '+(val*1024).toFixed(0)+' KB</div><div style="padding:4px 0">'+val+' MB = '+(val*1048576).toFixed(0)+' B</div><div style="padding:4px 0">'+val+' MB = '+(val/1048576).toFixed(6)+' TB</div>';}
     out.innerHTML=r;
+  };
+}
+function showAzureCliRef(){
+  const cmds={
+    'Auth & Account':{'Login':'az login','Set subscription':'az account set --subscription "Sub Name"','List subscriptions':'az account list --output table','Show current':'az account show','Logout':'az logout'},
+    'Resource Groups':{'List groups':'az group list --output table','Create group':'az group create --name mygroup --location eastus','Delete group':'az group delete --name mygroup','Show group':'az group show --name mygroup','List resources':'az resource list --resource-group mygroup'},
+    'App Service':{'Create web app':'az webapp create --resource-group mygroup --plan myplan --name myapp','Deploy from git':'az webapp deployment source config --name myapp --repo-url URL --branch main','View logs':'az webapp log tail --name myapp --resource-group mygroup','Restart app':'az webapp restart --name myapp --resource-group mygroup','List apps':'az webapp list --output table'},
+    'Virtual Machines':{'List VMs':'az vm list --output table','Create VM':'az vm create --name myvm --resource-group mygroup --image Ubuntu2204','Start VM':'az vm start --name myvm --resource-group mygroup','Stop VM':'az vm stop --name myvm --resource-group mygroup','SSH into VM':'az ssh vm --name myvm --resource-group mygroup'},
+    'Storage':{'Create account':'az storage account create --name mystorage --resource-group mygroup','List accounts':'az storage account list --output table','Upload blob':'az storage blob upload --account-name acc --container cont --file f.txt --name f.txt','List blobs':'az storage blob list --account-name acc --container cont --output table','Create container':'az storage container create --name cont --account-name acc'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Azure CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskPriorityHistory(){
+  const tasks=S.tasks||[];const now=new Date();
+  const weeks=[];for(let w=7;w>=0;w--){
+    const ws=new Date(now);ws.setDate(now.getDate()-w*7);const we=new Date(ws);we.setDate(ws.getDate()+7);
+    const counts={'p0':0,'p1':0,'p2':0,'p3':0};
+    tasks.forEach(t=>{const d=new Date(t.created||t.createdAt||0);if(d>=ws&&d<we){const p=t.priority||'p2';if(counts[p]!==undefined)counts[p]++;}});
+    weeks.push({label:'W'+(8-w),...counts});
+  }
+  const maxV=Math.max(...weeks.map(w=>w.p0+w.p1+w.p2+w.p3),1);
+  const colors={'p0':'#ef4444','p1':'#f59e0b','p2':'#06b6d4','p3':'#64748b'};
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Priority History</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:12px;margin-bottom:12px;font-size:10px">';
+  Object.entries(colors).forEach(([p,c])=>html+='<span style="color:'+c+'">'+p.toUpperCase()+'</span>');
+  html+='</div>';
+  html+='<svg width="100%" viewBox="0 0 560 180" style="display:block">';
+  weeks.forEach((w,i)=>{
+    const x=i*70+10;let y=160;
+    ['p3','p2','p1','p0'].forEach(p=>{
+      const h=w[p]/maxV*140;
+      html+='<rect x="'+x+'" y="'+(y-h)+'" width="50" height="'+h+'" fill="'+colors[p]+'" rx="2" opacity="0.8"/>';
+      if(w[p]>0)html+='<text x="'+(x+25)+'" y="'+(y-h/2+4)+'" fill="#fff" font-size="8" text-anchor="middle">'+w[p]+'</text>';
+      y-=h;
+    });
+    html+='<text x="'+(x+25)+'" y="175" fill="var(--text-muted)" font-size="10" text-anchor="middle">'+w.label+'</text>';
+  });
+  html+='</svg>';
+  const totals={'p0':0,'p1':0,'p2':0,'p3':0};tasks.forEach(t=>{const p=t.priority||'p2';if(totals[p]!==undefined)totals[p]++;});
+  html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;display:flex;gap:16px;font-size:11px">';
+  Object.entries(totals).forEach(([p,c])=>html+='<span style="color:'+colors[p]+'">'+p.toUpperCase()+': '+c+'</span>');
+  html+='</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickColorConverter(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Color Converter</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:10px"><input type="color" id="color-pick" value="#4ade80" onchange="window._colorConv(this.value)" style="width:50px;height:36px;border:none;cursor:pointer;background:none"/><input id="color-hex" placeholder="#4ade80" value="#4ade80" oninput="window._colorConv(this.value)" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px"/></div>';
+  html+='<div id="color-output"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._colorConv=function(hex){
+    hex=hex.replace('#','');if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+    if(hex.length!==6)return;
+    const r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);
+    document.getElementById('color-pick').value='#'+hex;
+    const max=Math.max(r,g,b)/255,min=Math.min(r,g,b)/255,d2=max-min;
+    let h=0;if(d2!==0){if(max===r/255)h=((g/255-b/255)/d2)%6;else if(max===g/255)h=(b/255-r/255)/d2+2;else h=(r/255-g/255)/d2+4;h=Math.round(h*60);if(h<0)h+=360;}
+    const l=Math.round((max+min)/2*100);const s=d2===0?0:Math.round(d2/(1-Math.abs(2*(max+min)/2-1))*100);
+    let out='<div style="width:100%;height:40px;border-radius:6px;margin-bottom:10px;background:#'+hex+'"></div>';
+    const vals=[['HEX','#'+hex.toUpperCase()],['RGB','rgb('+r+', '+g+', '+b+')'],['HSL','hsl('+h+', '+s+'%, '+l+'%)'],['RGBA','rgba('+r+', '+g+', '+b+', 1)']];
+    vals.forEach(([label,val])=>{
+      out+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;margin-bottom:3px;background:var(--bg-surface);border-radius:3px"><div><span style="color:var(--text-muted);font-size:9px;width:30px;display:inline-block">'+label+'</span><span style="color:var(--text-primary);font-size:11px;font-family:monospace">'+val+'</span></div>';
+      out+='<button onclick="navigator.clipboard.writeText(\''+val+'\');this.textContent=\'ok\';setTimeout(()=>this.textContent=\'cp\',500)" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:1px 6px;border-radius:3px;cursor:pointer;font-size:9px">cp</button></div>';
+    });
+    document.getElementById('color-output').innerHTML=out;
+  };
+  window._colorConv('#4ade80');
+}
+function showHerokuRef(){
+  const cmds={
+    'App Management':{'Create app':'heroku create myapp','List apps':'heroku apps','App info':'heroku info -a myapp','Rename app':'heroku rename newname -a myapp','Delete app':'heroku apps:destroy myapp --confirm myapp'},
+    'Deploy':{'Deploy (git)':'git push heroku main','Deploy container':'heroku container:push web -a myapp','Release container':'heroku container:release web -a myapp','Rollback':'heroku rollback v42 -a myapp','Build logs':'heroku builds -a myapp'},
+    'Config & Env':{'Set config var':'heroku config:set KEY=value -a myapp','Get config vars':'heroku config -a myapp','Unset var':'heroku config:unset KEY -a myapp','Get one var':'heroku config:get KEY -a myapp','Edit config':'heroku config:edit -a myapp'},
+    'Dynos & Scaling':{'Scale dynos':'heroku ps:scale web=2 -a myapp','Restart':'heroku restart -a myapp','Run command':'heroku run bash -a myapp','Process status':'heroku ps -a myapp','Stop dyno':'heroku ps:stop web.1 -a myapp'},
+    'Logs & Debug':{'View logs':'heroku logs --tail -a myapp','Drain logs':'heroku drains:add URL -a myapp','Maintenance on':'heroku maintenance:on -a myapp','Release info':'heroku releases -a myapp','Pg info':'heroku pg:info -a myapp'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Heroku CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskMonthlyOverview(){
+  const tasks=S.tasks||[];const now=new Date();
+  const months=[];for(let m=5;m>=0;m--){
+    const ms=new Date(now.getFullYear(),now.getMonth()-m,1);
+    const me=new Date(now.getFullYear(),now.getMonth()-m+1,0);
+    const label=ms.toLocaleString('en',{month:'short'})+' '+ms.getFullYear();
+    let created=0,completed=0;
+    tasks.forEach(t=>{
+      const d=new Date(t.created||t.createdAt||0);
+      if(d.getMonth()===ms.getMonth()&&d.getFullYear()===ms.getFullYear())created++;
+      if(t.status==='done'){const cd=t.completedAt?new Date(t.completedAt):d;if(cd.getMonth()===ms.getMonth()&&cd.getFullYear()===ms.getFullYear())completed++;}
+    });
+    months.push({label,created,completed,net:created-completed});
+  }
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Monthly Overview</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+  html+='<tr><th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);color:var(--text-muted)">Month</th><th style="padding:8px;text-align:center;border-bottom:1px solid var(--border);color:#06b6d4">Created</th><th style="padding:8px;text-align:center;border-bottom:1px solid var(--border);color:#4ade80">Completed</th><th style="padding:8px;text-align:center;border-bottom:1px solid var(--border);color:var(--text-muted)">Net</th></tr>';
+  months.forEach(m=>{
+    html+='<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-primary)">'+m.label+'</td>';
+    html+='<td style="padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#06b6d4">'+m.created+'</td>';
+    html+='<td style="padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:#4ade80">'+m.completed+'</td>';
+    html+='<td style="padding:6px 8px;text-align:center;border-bottom:1px solid var(--border);color:'+(m.net>0?'#ef4444':'#4ade80')+'">'+(m.net>0?'+':'')+m.net+'</td></tr>';
+  });
+  html+='</table></div>';
+  const totalOpen=tasks.filter(t=>t.status!=='done').length;const totalDone=tasks.filter(t=>t.status==='done').length;
+  html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">Total: '+tasks.length+' tasks | Open: '+totalOpen+' | Done: '+totalDone+'</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickNumberBaseConverter(){
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Number Base Converter</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<select id="nbase-from" onchange="window._convertBase()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:4px;font-size:11px;margin-bottom:6px"><option value="10">Decimal (Base 10)</option><option value="2">Binary (Base 2)</option><option value="8">Octal (Base 8)</option><option value="16">Hexadecimal (Base 16)</option></select>';
+  html+='<input id="nbase-input" placeholder="Enter number..." oninput="window._convertBase()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:4px;font-family:monospace;font-size:12px;box-sizing:border-box;margin-bottom:8px"/>';
+  html+='<div id="nbase-output"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._convertBase=function(){
+    const base=parseInt(document.getElementById('nbase-from').value);const inp=document.getElementById('nbase-input').value.trim();const out=document.getElementById('nbase-output');
+    if(!inp){out.innerHTML='';return;}
+    try{
+      const num=parseInt(inp,base);if(isNaN(num)){out.innerHTML='<span style="color:#ef4444;font-size:11px">Invalid number</span>';return;}
+      const bases=[['Decimal (10)',num.toString(10)],['Binary (2)',num.toString(2)],['Octal (8)',num.toString(8)],['Hex (16)',num.toString(16).toUpperCase()]];
+      let r='';bases.forEach(([label,val])=>{
+        r+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;margin-bottom:3px;background:var(--bg-surface);border-radius:3px"><div><span style="color:var(--text-muted);font-size:9px">'+label+'</span><div style="color:var(--text-primary);font-size:11px;font-family:monospace">'+val+'</div></div>';
+        r+='<button onclick="navigator.clipboard.writeText(\''+val+'\');this.textContent=\'ok\';setTimeout(()=>this.textContent=\'cp\',500)" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:1px 6px;border-radius:3px;cursor:pointer;font-size:9px">cp</button></div>';
+      });
+      out.innerHTML=r;
+    }catch(e){out.innerHTML='<span style="color:#ef4444;font-size:11px">Error: '+e.message+'</span>';}
   };
 }
 function showProjectRoadmap(filterProject){
