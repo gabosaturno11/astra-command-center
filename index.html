@@ -5825,6 +5825,8 @@ function cmdGetItems(q) {
       ['export csv','Export all tasks as CSV spreadsheet'],
       ['inbox','View unsorted/uncategorized items across all sections'],
       ['session','Show current ASTRA session time'],
+      ['undo','Undo last destructive action (delete task/content/link)'],
+      ['favorites','Quick access to starred and pinned items'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7214,6 +7216,16 @@ function cmdGetItems(q) {
   if(ql && (ql==='session' || ql==='session timer' || ql==='uptime' || ql==='session time')){
     const elapsed=Date.now()-_sessionStart;const mins=Math.floor(elapsed/60000);
     items.unshift({title:'Session Time: '+Math.floor(mins/60)+'h '+mins%60+'m',desc:'Time since ASTRA was opened this session',icon:'T',type:'action',action:()=>{closeCommandPalette();showSessionTimer();}});
+  }
+  // Undo prefix
+  if(ql && (ql==='undo' || ql==='undo last' || ql==='revert' || ql==='undo delete')){
+    const last=_undoStack.length?_undoStack[_undoStack.length-1]:null;
+    items.unshift({title:'Undo Last Action',desc:last?'Undo: '+last.type+' ('+new Date(last.ts).toLocaleTimeString()+')':'No actions to undo',icon:'U',type:'action',action:()=>{closeCommandPalette();globalUndo();}});
+  }
+  // Favorites prefix
+  if(ql && (ql==='favorites' || ql==='starred' || ql==='pinned' || ql==='bookmarks')){
+    const total=S.content.filter(c=>c.starred).length+S.content.filter(c=>c.pinned).length+(S.links||[]).filter(l=>l.pinned).length;
+    items.unshift({title:'Favorites ('+total+' items)',desc:'Starred and pinned content and links',icon:'*',type:'action',action:()=>{closeCommandPalette();showFavorites();}});
   }
   return items.slice(0, 20);
 }
@@ -8895,6 +8907,54 @@ function showSessionTimer(){
   const hrs=Math.floor(mins/60);
   const m=mins%60;
   toast('Session time: '+(hrs?hrs+'h ':'')+(m)+'m');
+}
+var _undoStack=[];
+function pushUndo(type,data){_undoStack.push({type,data,ts:Date.now()});if(_undoStack.length>50)_undoStack.shift();}
+function globalUndo(){
+  if(!_undoStack.length){toast('Nothing to undo');return;}
+  const action=_undoStack.pop();
+  if(action.type==='deleteTask'){S.tasks.push(action.data);save();renderTasks();toast('Task restored: '+action.data.title);}
+  else if(action.type==='deleteContent'){S.content.push(action.data);save();renderContent();toast('Content restored');}
+  else if(action.type==='deleteLink'){S.links.push(action.data);save();renderLinks();toast('Link restored: '+action.data.title);}
+  else if(action.type==='statusChange'){const t=S.tasks.find(x=>x.id===action.data.id);if(t){t.status=action.data.oldStatus;save();renderTasks();toast('Status reverted');}}
+  else{toast('Undo: '+action.type);}
+}
+function showFavorites(){
+  let panel=document.getElementById('favorites-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='favorites-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const starredContent=S.content.filter(c=>c.starred);
+  const pinnedContent=S.content.filter(c=>c.pinned&&!c.starred);
+  const pinnedLinks=(S.links||[]).filter(l=>l.pinned);
+  const total=starredContent.length+pinnedContent.length+pinnedLinks.length;
+  let h='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#f59e0b">${starredContent.length}</div><div style="font-size:7px;color:var(--text-muted)">Starred</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:var(--accent)">${pinnedContent.length}</div><div style="font-size:7px;color:var(--text-muted)">Pinned Content</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#8b5cf6">${pinnedLinks.length}</div><div style="font-size:7px;color:var(--text-muted)">Pinned Links</div></div>`;
+  h+='</div>';
+  if(starredContent.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#f59e0b;margin-bottom:4px">Starred Content</div>';
+    starredContent.forEach(c=>{
+      h+=`<div onclick="document.getElementById('favorites-panel').remove();openContentModal(${c.id})" style="padding:4px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;border-left:2px solid #f59e0b;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc((c.body||'').substring(0,70))}<span style="font-size:8px;color:var(--text-muted)"> ${c.type||''}</span></div>`;
+    });
+    h+='<div style="height:8px"></div>';
+  }
+  if(pinnedContent.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--accent);margin-bottom:4px">Pinned Content</div>';
+    pinnedContent.slice(0,10).forEach(c=>{
+      h+=`<div onclick="document.getElementById('favorites-panel').remove();openContentModal(${c.id})" style="padding:4px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;border-left:2px solid var(--accent);margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc((c.body||'').substring(0,70))}</div>`;
+    });
+    h+='<div style="height:8px"></div>';
+  }
+  if(pinnedLinks.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#8b5cf6;margin-bottom:4px">Pinned Links</div>';
+    pinnedLinks.forEach(l=>{
+      h+=`<div onclick="window.open('${(l.url||'').replace(/'/g,"\\'")}','_blank')" style="padding:4px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;border-left:2px solid #8b5cf6;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(l.title||l.url)}</div>`;
+    });
+  }
+  if(!total)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No favorites yet. Star or pin items to see them here.</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Favorites (${total} items)</span><button onclick="document.getElementById('favorites-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
