@@ -5993,6 +5993,9 @@ function cmdGetItems(q) {
       ['weekly digest','Full weekly summary with highlights and priorities'],
       ['task tags','Task-specific tag cloud with completion rates'],
       ['calculator','Quick floating calculator with live evaluation'],
+      ['markdown','Live markdown editor with side-by-side preview'],
+      ['task dashboard','Comprehensive task dashboard with metrics and donut'],
+      ['changelog','Version changelog with entries and dates'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8063,6 +8066,18 @@ function cmdGetItems(q) {
   // Calculator prefix
   if(ql && (ql==='calculator' || ql==='calc' || ql==='calculate' || ql==='math')){
     items.unshift({title:'Quick Calculator',desc:'Floating calculator with live evaluation',icon:'=',type:'action',action:()=>{closeCommandPalette();showQuickCalculator();}});
+  }
+  // Markdown prefix
+  if(ql && (ql==='markdown' || ql==='md preview' || ql==='markdown preview' || ql==='md editor')){
+    items.unshift({title:'Markdown Preview',desc:'Live markdown editor with preview',icon:'M',type:'action',action:()=>{closeCommandPalette();showMarkdownPreview();}});
+  }
+  // Task dashboard prefix
+  if(ql && (ql==='task dashboard' || ql==='dashboard' || ql==='task overview' || ql==='tasks dashboard')){
+    items.unshift({title:'Task Dashboard',desc:'Comprehensive metrics + completion donut',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDashboard();}});
+  }
+  // Changelog prefix
+  if(ql && (ql==='changelog' || ql==='change log' || ql==='versions' || ql==='release notes')){
+    items.unshift({title:'Changelog',desc:'Version changelog with entries',icon:'V',type:'action',action:()=>{closeCommandPalette();showRepoChangelog();}});
   }
   return items.slice(0, 20);
 }
@@ -15176,6 +15191,82 @@ function showQuickCalculator(){
   h+='<div style="font-size:9px;color:var(--text-muted)">Supports: +, -, *, /, %, Math.sqrt(), Math.PI</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
   setTimeout(()=>{const i=document.getElementById('calc-input');if(i)i.focus();},100);
+}
+function showMarkdownPreview(){
+  let panel=document.getElementById('md-preview-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='md-preview-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:85vh;overflow:hidden;display:flex;flex-direction:column';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:var(--accent)">Markdown Preview</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;overflow:hidden">';
+  h+='<div style="display:flex;flex-direction:column"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Markdown</div><textarea id="md-input" style="flex:1;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;font-family:monospace;resize:none;box-sizing:border-box" oninput="(function(v){const p=document.getElementById(\'md-output\');let h=v.replace(/^### (.*$)/gm,\'<h3>$1</h3>\').replace(/^## (.*$)/gm,\'<h2 style=color:var(--accent)>$1</h2>\').replace(/^# (.*$)/gm,\'<h1 style=color:var(--accent)>$1</h1>\').replace(/\\*\\*(.*?)\\*\\*/g,\'<strong>$1</strong>\').replace(/\\*(.*?)\\*/g,\'<em>$1</em>\').replace(/`(.*?)`/g,\'<code style=background:var(--bg-surface);padding:2px\\ 4px;border-radius:3px>$1</code>\').replace(/^- (.*$)/gm,\'<div style=padding-left:16px>- $1</div>\').replace(/^\\d+\\. (.*$)/gm,\'<div style=padding-left:16px>$1</div>\').replace(/\\n/g,\'<br>\');p.innerHTML=h;})(this.value)">## Hello World\n\nThis is **bold** and *italic* text.\n\n### Features\n- Item one\n- Item two\n- Item three\n\n`inline code` works too.</textarea></div>';
+  h+='<div style="display:flex;flex-direction:column"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Preview</div><div id="md-output" style="flex:1;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;overflow-y:auto;font-size:12px;line-height:1.6;color:var(--text-primary)"></div></div>';
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  // Trigger initial render
+  const inp=document.getElementById('md-input');if(inp)inp.dispatchEvent(new Event('input'));
+}
+function showTaskDashboard(){
+  let panel=document.getElementById('task-dashboard-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-dashboard-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:95vw;max-height:85vh;overflow-y:auto';
+  const tasks=S.tasks||[];
+  const total=tasks.length;const done=tasks.filter(t=>t.status==='done').length;
+  const active=total-done;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length;
+  const today=new Date().toISOString().split('T')[0];
+  const dueToday=tasks.filter(t=>t.status!=='done'&&t.due===today).length;
+  const p0=tasks.filter(t=>t.status!=='done'&&t.priority==='p0').length;
+  const p1=tasks.filter(t=>t.status!=='done'&&t.priority==='p1').length;
+  const inProg=tasks.filter(t=>t.status==='in-progress').length;
+  const blocked=tasks.filter(t=>t.status==='blocked').length;
+  const completionRate=total>0?Math.round(done/total*100):0;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Dashboard</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  // Key metrics grid
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">';
+  const metrics=[
+    {val:active,label:'Active',color:'var(--accent)'},
+    {val:done,label:'Done',color:'#4ade80'},
+    {val:overdue,label:'Overdue',color:overdue>0?'#ef4444':'var(--accent)'},
+    {val:dueToday,label:'Due Today',color:dueToday>0?'#f97316':'var(--accent)'},
+    {val:p0,label:'P0 Critical',color:p0>0?'#ef4444':'var(--accent)'},
+    {val:p1,label:'P1 High',color:p1>0?'#f97316':'var(--accent)'},
+    {val:inProg,label:'In Progress',color:'#22d3ee'},
+    {val:blocked,label:'Blocked',color:blocked>0?'#ef4444':'var(--accent)'},
+  ];
+  metrics.forEach(m=>{
+    h+='<div style="padding:10px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:bold;color:'+m.color+'">'+m.val+'</div><div style="font-size:9px;color:var(--text-muted)">'+m.label+'</div></div>';
+  });
+  h+='</div>';
+  // Completion donut (simple)
+  h+='<div style="display:flex;align-items:center;gap:16px;padding:12px;background:var(--bg-surface);border-radius:8px;margin-bottom:16px">';
+  h+='<div style="width:60px;height:60px;border-radius:50%;background:conic-gradient(var(--accent) '+completionRate+'%,var(--bg-elevated) '+completionRate+'%);display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border-radius:50%;background:var(--bg-surface);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;color:var(--accent)">'+completionRate+'%</div></div>';
+  h+='<div><div style="font-size:12px;font-weight:600">Completion Rate</div><div style="font-size:10px;color:var(--text-muted)">'+done+' of '+total+' tasks completed</div></div></div>';
+  // Recent completions
+  const recentDone=tasks.filter(t=>t.status==='done'&&t.completedAt).sort((a,b)=>b.completedAt.localeCompare(a.completedAt)).slice(0,5);
+  if(recentDone.length>0){
+    h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Recently Completed</h4>';
+    recentDone.forEach(t=>{
+      h+='<div style="padding:4px 0;border-bottom:1px solid var(--border);font-size:11px;display:flex;justify-content:space-between"><span style="color:var(--text-muted);text-decoration:line-through">'+esc(t.title)+'</span><span style="font-size:9px;color:var(--text-muted)">'+(t.completedAt||'').split('T')[0]+'</span></div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showRepoChangelog(){
+  let panel=document.getElementById('repo-changelog-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='repo-changelog-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._changelog)S._changelog=[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Changelog</h3><div><button onclick="(function(){const ver=prompt(\'Version (e.g. v1.2.0):\');if(!ver)return;const changes=prompt(\'Changes (comma-separated):\');if(!changes)return;S._changelog.unshift({id:Date.now(),version:ver,changes:changes.split(\',\').map(c=>c.trim()),date:new Date().toISOString()});save();showRepoChangelog();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">+ Entry</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  if(S._changelog.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No changelog entries yet. Add one!</div>';}
+  S._changelog.forEach(entry=>{
+    h+='<div style="padding:12px;border-left:3px solid var(--accent);margin-bottom:12px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><strong style="font-size:14px;color:var(--accent)">'+esc(entry.version)+'</strong><span style="font-size:10px;color:var(--text-muted)">'+(entry.date||'').split('T')[0]+'</span></div>';
+    h+='<ul style="margin:0;padding-left:16px;list-style:disc">';
+    (entry.changes||[]).forEach(c=>{h+='<li style="font-size:11px;color:var(--text-primary);margin-bottom:4px">'+esc(c)+'</li>';});
+    h+='</ul>';
+    h+='<button onclick="(function(){S._changelog=S._changelog.filter(x=>x.id!=='+entry.id+');save();showRepoChangelog();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px;margin-top:4px">Delete</button></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
