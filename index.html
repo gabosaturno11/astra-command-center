@@ -5984,6 +5984,12 @@ function cmdGetItems(q) {
       ['focus','Full-screen focus mode showing top P0/P1 task'],
       ['time estimates','Task time estimates breakdown by priority'],
       ['deep search','Global deep search across all workspace data'],
+      ['snippets','Code snippet library with copy-to-clipboard'],
+      ['daily report','Generate comprehensive daily report with copy'],
+      ['switch project','Quick project switcher with stats'],
+      ['pomodoro stats','Pomodoro session stats with 7-day chart'],
+      ['content gallery','Visual card gallery of all content items'],
+      ['task flow','Visual flow of tasks through statuses'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8018,6 +8024,30 @@ function cmdGetItems(q) {
   // Deep search prefix
   if(ql && (ql==='deep search' || ql==='search all' || ql==='global search' || ql==='find all')){
     items.unshift({title:'Global Deep Search',desc:'Search across all workspace sections',icon:'S',type:'action',action:()=>{closeCommandPalette();showGlobalSearch();}});
+  }
+  // Snippets prefix
+  if(ql && (ql==='snippets' || ql==='snippet library' || ql==='code snippets' || ql==='code library')){
+    items.unshift({title:'Snippet Library',desc:'Code snippets with copy-to-clipboard',icon:'<',type:'action',action:()=>{closeCommandPalette();showSnippetLibrary();}});
+  }
+  // Daily report prefix
+  if(ql && (ql==='daily report' || ql==='report' || ql==='day report' || ql==='eod report')){
+    items.unshift({title:'Daily Report',desc:'Comprehensive daily report with copy',icon:'R',type:'action',action:()=>{closeCommandPalette();showDailyReport();}});
+  }
+  // Switch project prefix
+  if(ql && (ql==='switch project' || ql==='project switcher' || ql==='switch' || ql==='projects')){
+    items.unshift({title:'Project Switcher',desc:'Quick switch between projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showProjectSwitcher();}});
+  }
+  // Pomodoro stats prefix
+  if(ql && (ql==='pomodoro stats' || ql==='pomodoro' || ql==='pomo stats' || ql==='focus stats')){
+    items.unshift({title:'Pomodoro Stats',desc:'Session stats with 7-day chart',icon:'P',type:'action',action:()=>{closeCommandPalette();showPomodoroStats();}});
+  }
+  // Content gallery prefix
+  if(ql && (ql==='content gallery' || ql==='gallery' || ql==='card view' || ql==='content cards')){
+    items.unshift({title:'Content Gallery',desc:'Visual card gallery of all content',icon:'G',type:'action',action:()=>{closeCommandPalette();showContentCardView();}});
+  }
+  // Task flow prefix
+  if(ql && (ql==='task flow' || ql==='flow' || ql==='status flow' || ql==='task pipeline')){
+    items.unshift({title:'Task Flow',desc:'Visual flow of tasks through statuses',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFlow();}});
   }
   return items.slice(0, 20);
 }
@@ -14881,6 +14911,185 @@ function showGlobalSearch(){
   h+='<div id="gs-results"></div>';
   panel.innerHTML=h;document.body.appendChild(panel);
   setTimeout(()=>{const i=document.getElementById('gs-input');if(i)i.focus();},100);
+}
+function showSnippetLibrary(){
+  let panel=document.getElementById('snippet-library-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='snippet-library-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._snippets)S._snippets=[
+    {id:1,title:'CSS Flexbox Center',lang:'css',code:'display: flex;\nalign-items: center;\njustify-content: center;'},
+    {id:2,title:'Fetch JSON',lang:'js',code:'const res = await fetch(url);\nconst data = await res.json();\nreturn data;'},
+    {id:3,title:'Array Unique',lang:'js',code:'const unique = [...new Set(arr)];'},
+    {id:4,title:'Date Format',lang:'js',code:'new Date().toISOString().split("T")[0]'},
+  ];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Snippet Library</h3><div><button onclick="(function(){const title=prompt(\'Snippet title:\');if(!title)return;const lang=prompt(\'Language (js, css, html, py):\',\'js\');const code=prompt(\'Code:\');if(!code)return;S._snippets.push({id:Date.now(),title:title,lang:lang||\'js\',code:code});save();showSnippetLibrary();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">+ Snippet</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  S._snippets.forEach(s=>{
+    h+='<div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    h+='<div><strong style="font-size:12px">'+esc(s.title)+'</strong><span style="font-size:9px;color:var(--accent);margin-left:8px;text-transform:uppercase">'+esc(s.lang)+'</span></div>';
+    h+='<div><button onclick="(function(){navigator.clipboard.writeText(S._snippets.find(x=>x.id==='+s.id+').code);if(typeof showNotification===\'function\')showNotification(\'Copied!\');})()" style="background:none;border:1px solid var(--accent);color:var(--accent);padding:2px 6px;border-radius:3px;cursor:pointer;font-size:9px;margin-right:4px">Copy</button>';
+    h+='<button onclick="(function(){S._snippets=S._snippets.filter(x=>x.id!=='+s.id+');save();showSnippetLibrary();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">X</button></div></div>';
+    h+='<pre style="font-size:11px;color:var(--text-primary);background:var(--bg-surface);padding:8px;border-radius:4px;margin:0;white-space:pre-wrap;font-family:monospace;line-height:1.5;overflow:auto;max-height:120px">'+esc(s.code)+'</pre></div>';
+  });
+  if(S._snippets.length===0)h+='<div style="color:var(--text-muted);text-align:center;padding:30px 0">No snippets saved yet.</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDailyReport(){
+  let panel=document.getElementById('daily-report-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='daily-report-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];
+  const todayTasks=tasks.filter(t=>t.due===today||((t.created||'').startsWith(today)));
+  const doneTasks=tasks.filter(t=>t.status==='done'&&t.completedAt&&t.completedAt.startsWith(today));
+  const todayContent=content.filter(c=>(c.created||'').startsWith(today));
+  const todayLinks=links.filter(l=>(l.created||'').startsWith(today));
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+  const totalActive=tasks.filter(t=>t.status!=='done').length;
+  let report='# Daily Report - '+today+'\n\n';
+  report+='## Summary\n';
+  report+='- Tasks completed today: '+doneTasks.length+'\n';
+  report+='- Content created today: '+todayContent.length+'\n';
+  report+='- Links saved today: '+todayLinks.length+'\n';
+  report+='- Active tasks: '+totalActive+'\n';
+  report+='- Overdue tasks: '+overdue.length+'\n\n';
+  if(doneTasks.length>0){report+='## Completed Today\n';doneTasks.forEach(t=>{report+='- [x] '+t.title+'\n';});report+='\n';}
+  if(overdue.length>0){report+='## Overdue\n';overdue.slice(0,10).forEach(t=>{report+='- [ ] '+t.title+' (due: '+t.due+')\n';});report+='\n';}
+  const upcoming=tasks.filter(t=>t.status!=='done'&&t.due&&t.due>today&&t.due<=new Date(Date.now()+3*24*60*60*1000).toISOString().split('T')[0]);
+  if(upcoming.length>0){report+='## Upcoming (3 days)\n';upcoming.forEach(t=>{report+='- '+t.title+' ('+t.due+')\n';});report+='\n';}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Daily Report</h3><div><button onclick="(function(){navigator.clipboard.writeText(document.getElementById(\'daily-report-text\').textContent);if(typeof showNotification===\'function\')showNotification(\'Report copied!\');})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  h+='<pre id="daily-report-text" style="font-size:11px;color:var(--text-primary);background:var(--bg-surface);padding:16px;border-radius:8px;white-space:pre-wrap;font-family:inherit;line-height:1.6;max-height:60vh;overflow-y:auto">'+esc(report)+'</pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectSwitcher(){
+  let panel=document.getElementById('project-switcher-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='project-switcher-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=S.projects||[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Quick Project Switcher</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  if(projects.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:30px 0">No projects found.</div>';}
+  projects.forEach(p=>{
+    const taskCount=(S.tasks||[]).filter(t=>t.projectId===p.id&&t.status!=='done').length;
+    const doneCount=(S.tasks||[]).filter(t=>t.projectId===p.id&&t.status==='done').length;
+    const contentCount=(S.content||[]).filter(c=>c.projectId===p.id).length;
+    h+='<div onclick="document.getElementById(\'project-switcher-panel\').remove();if(typeof openProject===\'function\')openProject(\''+p.id+'\');else switchSection(\'tasks\')" style="padding:14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color 0.2s" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
+    h+='<div style="font-size:13px;font-weight:600;margin-bottom:4px">'+esc(p.name)+'</div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    h+='<span>Active: '+taskCount+'</span><span>Done: '+doneCount+'</span><span>Content: '+contentCount+'</span></div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showPomodoroStats(){
+  let panel=document.getElementById('pomodoro-stats-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='pomodoro-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._pomodoroLog)S._pomodoroLog=[];
+  const logs=S._pomodoroLog;
+  const today=new Date().toISOString().split('T')[0];
+  const todayLogs=logs.filter(l=>l.date&&l.date.startsWith(today));
+  const weekStart=new Date();weekStart.setDate(weekStart.getDate()-weekStart.getDay());
+  const weekKey=weekStart.toISOString().split('T')[0];
+  const weekLogs=logs.filter(l=>l.date&&l.date>=weekKey);
+  const totalPomos=logs.length;
+  const totalMinutes=logs.reduce((s,l)=>s+(l.duration||25),0);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Pomodoro Stats</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+todayLogs.length+'</div><div style="font-size:10px;color:var(--text-muted)">Today</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+weekLogs.length+'</div><div style="font-size:10px;color:var(--text-muted)">This Week</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+Math.floor(totalMinutes/60)+'h</div><div style="font-size:10px;color:var(--text-muted)">All Time</div></div></div>';
+  // 7-day chart
+  h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Last 7 Days</h4>';
+  const days7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days7.push(d.toISOString().split('T')[0]);}
+  const maxDay=Math.max(...days7.map(d=>logs.filter(l=>l.date&&l.date.startsWith(d)).length),1);
+  h+='<div style="display:flex;align-items:flex-end;gap:4px;height:80px;margin-bottom:4px">';
+  days7.forEach(d=>{
+    const count=logs.filter(l=>l.date&&l.date.startsWith(d)).length;
+    const pct=count/maxDay*100;
+    h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:100%;background:var(--accent);border-radius:3px 3px 0 0;height:'+Math.max(2,pct)+'%;opacity:'+(count>0?1:0.2)+'"></div></div>';
+  });
+  h+='</div><div style="display:flex;gap:4px">';
+  days7.forEach(d=>{h+='<div style="flex:1;text-align:center;font-size:8px;color:var(--text-muted)">'+d.slice(5)+'</div>';});
+  h+='</div>';
+  // Recent sessions
+  if(logs.length>0){
+    h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Recent Sessions</h4>';
+    logs.slice(0,8).forEach(l=>{
+      h+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px"><span>'+(l.task||'Untitled session')+'</span><span style="color:var(--text-muted)">'+(l.duration||25)+'min - '+(l.date||'').split('T')[0]+'</span></div>';
+    });
+  }
+  h+='<div style="margin-top:12px"><button onclick="(function(){const task=prompt(\'What did you work on?\');S._pomodoroLog.unshift({date:new Date().toISOString(),duration:25,task:task||\'Focus session\'});save();showPomodoroStats();})()" style="background:var(--accent);color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Log Pomodoro</button></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentCardView(){
+  let panel=document.getElementById('content-card-view-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-card-view-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:900px;width:95vw;max-height:85vh;overflow-y:auto';
+  const content=S.content||[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Card Gallery</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">';
+  content.slice(0,30).forEach(c=>{
+    const words=(c.body||'').split(/\s+/).filter(w=>w).length;
+    const preview=(c.body||'').substring(0,120);
+    const themeColors={'general':'#4ade80','business':'#3b82f6','creative':'#a78bfa','personal':'#f97316','technical':'#22d3ee'};
+    const color=themeColors[c.theme]||'var(--text-muted)';
+    h+='<div style="padding:14px;border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:8px;border-top:3px solid '+color+'">';
+    h+='<div style="font-size:12px;font-weight:600">'+esc(c.title)+'</div>';
+    if(preview)h+='<div style="font-size:10px;color:var(--text-muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden">'+esc(preview)+'</div>';
+    h+='<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:auto">';
+    h+='<span>'+words+' words</span>';
+    if(c.theme)h+='<span style="color:'+color+'">'+esc(c.theme)+'</span>';
+    h+='</div>';
+    if(c.tags&&c.tags.length>0){
+      h+='<div style="display:flex;flex-wrap:wrap;gap:3px">';
+      c.tags.slice(0,3).forEach(t=>{h+='<span style="padding:1px 6px;background:var(--bg-surface);border-radius:8px;font-size:8px;color:var(--accent)">'+esc(t)+'</span>';});
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  h+='</div>';
+  if(content.length>30)h+='<div style="font-size:10px;color:var(--text-muted);text-align:center;padding:12px 0">Showing 30 of '+content.length+'</div>';
+  if(content.length===0)h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No content items yet.</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskFlow(){
+  let panel=document.getElementById('task-flow-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-flow-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:85vh;overflow-y:auto';
+  const tasks=S.tasks||[];
+  const statuses=['todo','in-progress','review','blocked','done'];
+  const statusColors={'todo':'#6b7280','in-progress':'#4ade80','review':'#22d3ee','blocked':'#ef4444','done':'#4ade80'};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Flow</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Visual flow of tasks through statuses. Width = task count.</div>';
+  // Sankey-like horizontal flow
+  const counts=statuses.map(s=>tasks.filter(t=>t.status===s).length);
+  const maxCount=Math.max(...counts,1);
+  h+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:16px">';
+  statuses.forEach((s,i)=>{
+    const count=counts[i];
+    const width=Math.max(60,count/maxCount*200);
+    h+='<div style="display:flex;flex-direction:column;align-items:center;gap:4px">';
+    h+='<div style="width:'+width+'px;height:40px;background:'+statusColors[s]+';border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;color:#000;opacity:0.8">'+count+'</div>';
+    h+='<div style="font-size:9px;color:var(--text-muted);text-transform:uppercase">'+s+'</div></div>';
+    if(i<statuses.length-1)h+='<div style="font-size:16px;color:var(--text-muted)">-></div>';
+  });
+  h+='</div>';
+  // Top movers
+  const inProg=tasks.filter(t=>t.status==='in-progress').slice(0,5);
+  if(inProg.length>0){
+    h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Currently In Progress</h4>';
+    inProg.forEach(t=>{
+      const color=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':'var(--text-primary)';
+      h+='<div style="padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px;color:'+color+'">'+esc(t.title)+'</div>';
+    });
+  }
+  const blocked=tasks.filter(t=>t.status==='blocked').slice(0,5);
+  if(blocked.length>0){
+    h+='<h4 style="margin:12px 0 8px;font-size:12px;color:#ef4444">Blocked</h4>';
+    blocked.forEach(t=>{
+      h+='<div style="padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px;color:#ef4444">'+esc(t.title)+'</div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
