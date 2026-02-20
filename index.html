@@ -5702,6 +5702,7 @@ function cmdGetItems(q) {
       ['scratch','Persistent floating scratchpad'],['review','Weekly review + copy markdown'],
       ['workspace','Full workspace stats overview'],
       ['chart','SVG charts: status pie, priority bars, themes, weekly'],
+      ['plan','7-day task plan with quick-add'],['bookmarks','Import browser bookmarks HTML'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6781,7 +6782,45 @@ function cmdGetItems(q) {
     items.unshift({title:'Content by Theme',desc:'SVG chart of content themes',icon:'T',type:'action',action:()=>{closeCommandPalette();showChart('theme');}});
     items.unshift({title:'Weekly Activity',desc:'SVG chart of 7-day activity',icon:'W',type:'action',action:()=>{closeCommandPalette();showChart('weekly');}});
   }
+  // Plan prefix — weekly plan view
+  if(ql && (ql==='plan' || ql.startsWith('plan:') || ql==='weekly plan' || ql==='week plan')){
+    const today=new Date();
+    for(let i=0;i<7;i++){
+      const d=new Date(today);d.setDate(d.getDate()+i);const ds=d.toISOString().split('T')[0];
+      const dayLabel=i===0?'Today':i===1?'Tomorrow':['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]+' '+d.getDate();
+      const dayTasks=S.tasks.filter(t=>t.due===ds&&t.status!=='done');
+      if(dayTasks.length){
+        dayTasks.forEach(t=>{items.unshift({title:dayLabel+': '+esc(t.title),desc:(t.priority||'p2').toUpperCase()+' | '+(t.project||'No project'),icon:i===0?'>':'D',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+      }else{
+        items.unshift({title:dayLabel+': (no tasks)',desc:'Click to add a task for '+ds,icon:'.',type:'action',action:()=>{closeCommandPalette();S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p2',project:'',due:ds,created:new Date().toISOString()});save();switchSection('tasks',null);renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},100);}});
+      }
+    }
+  }
+  // Import bookmarks prefix
+  if(ql && (ql==='import bookmarks' || ql==='bookmarks' || ql==='import links')){
+    items.unshift({title:'Import Browser Bookmarks',desc:'Upload HTML bookmarks file (Chrome/Firefox export)',icon:'L',type:'action',action:()=>{closeCommandPalette();importBookmarks();}});
+    items.unshift({title:'Batch Import URLs',desc:'Paste multiple URLs (one per line)',icon:'L',type:'action',action:()=>{closeCommandPalette();batchImportLinks();}});
+  }
   return items.slice(0, 20);
+}
+function importBookmarks(){
+  const input=document.createElement('input');input.type='file';input.accept='.html,.htm';
+  input.onchange=e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();
+    reader.onload=ev=>{
+      const html=ev.target.result;const parser=new DOMParser();const doc=parser.parseFromString(html,'text/html');
+      const links=doc.querySelectorAll('a[href]');let count=0;
+      links.forEach(a=>{
+        const url=a.href;const title=a.textContent.trim()||url;
+        if(!url.startsWith('http'))return;
+        if(S.links.some(l=>l.url===url))return;
+        let category='imported';
+        const parent=a.closest('dl');if(parent){const h3=parent.previousElementSibling;if(h3&&h3.tagName==='H3')category=h3.textContent.trim().toLowerCase().substring(0,30);}
+        S.links.push({id:Date.now()+count,title:title.substring(0,120),url,category,desc:'',tags:['imported'],created:new Date().toISOString()});
+        count++;
+      });
+      save();renderLinks();toast('Imported '+count+' bookmarks ('+links.length+' total, dupes skipped)');
+    };reader.readAsText(f);
+  };input.click();
 }
 function showChart(type){
   let panel=document.getElementById('chart-panel');if(panel)panel.remove();
