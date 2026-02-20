@@ -5940,6 +5940,9 @@ function cmdGetItems(q) {
       ['reading list','Read/unread tracking for saved links'],
       ['project status','Status board for all projects (on-track, at-risk, blocked)'],
       ['dashboard','ASTRA dashboard with stats, overdue, quick actions'],
+      ['captures','Summary of quick captures by type'],
+      ['notes explorer','Tree-view content browser organized by category'],
+      ['deadlines','Countdown tracker for upcoming task deadlines'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7798,6 +7801,18 @@ function cmdGetItems(q) {
   // Dashboard prefix
   if(ql && (ql==='dashboard' || ql==='astra dashboard' || ql==='home' || ql==='main dashboard')){
     items.unshift({title:'ASTRA Dashboard',desc:'Stats, overdue, and quick actions',icon:'H',type:'action',action:()=>{closeCommandPalette();showCustomDashboard();}});
+  }
+  // Captures prefix
+  if(ql && (ql==='captures' || ql==='capture summary' || ql==='quick captures' || ql==='nexus captures')){
+    items.unshift({title:'Capture Summary',desc:'Quick captures by type with recent list',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCaptureSummary();}});
+  }
+  // Notes explorer prefix
+  if(ql && (ql==='notes explorer' || ql==='browse notes' || ql==='content tree' || ql==='folder view')){
+    items.unshift({title:'Notes Explorer',desc:'Tree-view content organized by category',icon:'N',type:'action',action:()=>{closeCommandPalette();showNotesExplorer();}});
+  }
+  // Deadlines prefix
+  if(ql && (ql==='deadlines' || ql==='deadline tracker' || ql==='countdowns' || ql==='due soon')){
+    items.unshift({title:'Deadline Tracker',desc:'Countdown to upcoming task deadlines',icon:'!',type:'action',action:()=>{closeCommandPalette();showDeadlineTracker();}});
   }
   return items.slice(0, 20);
 }
@@ -13334,6 +13349,87 @@ function showCustomDashboard(){
     h+=`<button onclick="${fn}" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:10px;cursor:pointer">${label}</button>`;
   });
   h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickCaptureSummary(){
+  let panel=document.getElementById('capture-sum-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='capture-sum-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const captures=(S._captures||[]);
+  const typeCounts={};
+  captures.forEach(c=>{const t=c.type||'general';typeCounts[t]=(typeCounts[t]||0)+1;});
+  const types=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Capture Summary</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${captures.length} total captures</div>`;
+  if(!captures.length){
+    h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No captures yet. Use Quick Capture (Cmd+Shift+C) or the Nexus extension to capture items.</div>';
+  }
+  const colors={idea:'#facc15',quote:'#a78bfa',code:'#4ade80',insight:'#60a5fa',todo:'#f87171',book:'#fb923c',research:'#38bdf8',thought:'#f472b6',general:'#6b7280'};
+  if(types.length){
+    const maxC=types[0][1];
+    types.forEach(([type,count])=>{
+      const pct=Math.round(count/maxC*100);
+      h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:70px;font-size:10px;color:var(--text-secondary);text-align:right">${type}</div><div style="flex:1;height:14px;background:var(--bg-surface);border-radius:7px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${colors[type]||'#6b7280'};border-radius:7px"></div></div><div style="font-size:10px;color:var(--text-muted);width:25px">${count}</div></div>`;
+    });
+  }
+  if(captures.length){
+    h+='<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--text-muted);margin-bottom:6px">Recent captures:</div>';
+    captures.slice(0,10).forEach(c=>{
+      const d=c.createdAt?new Date(c.createdAt).toLocaleDateString('en',{month:'short',day:'numeric'}):'';
+      h+=`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10px;border-bottom:1px solid var(--border)"><span style="color:var(--text-secondary);flex:1">${esc((c.text||c.title||'').substring(0,50))}</span><span style="color:${colors[c.type]||'#6b7280'}">${c.type||'general'}</span><span style="color:var(--text-muted);margin-left:8px">${d}</span></div>`;
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showNotesExplorer(){
+  let panel=document.getElementById('notes-explorer-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='notes-explorer-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const categories={};
+  content.forEach(c=>{const cat=c.theme||c.category||'Uncategorized';if(!categories[cat])categories[cat]=[];categories[cat].push(c);});
+  const cats=Object.entries(categories).sort((a,b)=>a[0].localeCompare(b[0]));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Notes Explorer</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${content.length} items in ${cats.length} categories</div>`;
+  if(!cats.length){h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No content found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  cats.forEach(([cat,items])=>{
+    h+=`<div style="margin-bottom:4px"><div onclick="const el=document.getElementById('ne-${cat.replace(/[^a-zA-Z0-9]/g,'')}');el.style.display=el.style.display==='none'?'block':'none'" style="display:flex;justify-content:space-between;padding:8px;background:var(--bg-surface);border-radius:6px;cursor:pointer"><span style="font-size:12px;color:var(--accent);font-weight:500">${esc(cat)}</span><span style="font-size:10px;color:var(--text-muted)">${items.length}</span></div>`;
+    h+=`<div id="ne-${cat.replace(/[^a-zA-Z0-9]/g,'')}" style="display:none;padding:4px 0 4px 16px;border-left:2px solid var(--border);margin-left:8px">`;
+    items.forEach(c=>{
+      const words=(c.body||'').trim().split(/\s+/).filter(Boolean).length;
+      h+=`<div style="padding:4px 0;font-size:11px;border-bottom:1px solid var(--border)"><span style="color:var(--text-primary)">${esc((c.title||'Untitled').substring(0,35))}</span><span style="color:var(--text-muted);margin-left:8px;font-size:9px">${words}w</span></div>`;
+    });
+    h+=`</div></div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDeadlineTracker(){
+  let panel=document.getElementById('deadline-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='deadline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&t.due).sort((a,b)=>new Date(a.due)-new Date(b.due));
+  const now=new Date();
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Deadline Tracker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!tasks.length){h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No tasks with due dates found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  tasks.forEach(t=>{
+    const due=new Date(t.due);
+    const diffMs=due-now;
+    const diffDays=Math.ceil(diffMs/(1000*60*60*24));
+    const isOverdue=diffDays<0;
+    const isToday=diffDays===0;
+    const isUrgent=diffDays>0&&diffDays<=3;
+    const color=isOverdue?'#f87171':isToday?'#facc15':isUrgent?'#fb923c':diffDays<=7?'#60a5fa':'#4ade80';
+    let countdown='';
+    if(isOverdue)countdown=Math.abs(diffDays)+' days overdue';
+    else if(isToday)countdown='TODAY';
+    else if(diffDays===1)countdown='Tomorrow';
+    else countdown=diffDays+' days';
+    h+=`<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-surface);border-radius:8px;margin-bottom:6px;border-left:3px solid ${color}">`;
+    h+=`<div style="min-width:60px;text-align:center"><div style="font-size:16px;font-weight:700;color:${color}">${isOverdue?'-'+Math.abs(diffDays):diffDays}</div><div style="font-size:8px;color:var(--text-muted)">${isOverdue?'overdue':'days left'}</div></div>`;
+    h+=`<div style="flex:1"><div style="font-size:12px;color:var(--text-primary);font-weight:500">${esc(t.title||'').substring(0,35)}</div><div style="font-size:10px;color:var(--text-muted)">${t.due} | ${t.priority||'no priority'}</div></div>`;
+    h+=`<div style="font-size:9px;color:${color};font-weight:600">${countdown}</div>`;
+    h+=`</div>`;
+  });
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
