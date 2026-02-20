@@ -2230,6 +2230,15 @@ function updateSidebarCtx() {
     const active=(S.repos||[]).filter(r=>r.status==='active').length;
     const withLive=(S.repos||[]).filter(r=>r.live).length;
     el.innerHTML=`<div class="sidebar-label">Repo Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${(S.repos||[]).length} repos / ${active} active / ${withLive} live</div>`;
+  } else if(currentSection==='pipeline') {
+    const hist=(S.pipelineHistory||[]).length;
+    const templates=(S.pipelineTemplates||[]).length;
+    el.innerHTML=`<div class="sidebar-label">Pipeline Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${hist} history entries / ${templates} templates</div>`;
+  } else if(currentSection==='whiteboard') {
+    const nodes=(S.whiteboard&&S.whiteboard.nodes||[]).length;
+    const conns=(S.whiteboard&&S.whiteboard.conns||[]).length;
+    const locked=(S.whiteboard&&S.whiteboard.nodes||[]).filter(n=>n.locked).length;
+    el.innerHTML=`<div class="sidebar-label">Whiteboard Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${nodes} nodes / ${conns} connections${locked?` / ${locked} locked`:''}</div>`;
   } else if(currentSection==='calendar') {
     const today=new Date().toISOString().split('T')[0];
     const todayT=S.tasks.filter(t=>t.due===today&&t.status!=='done');
@@ -2264,6 +2273,31 @@ function weeklyProductivity(){
   const contentThisWeek=S.content.filter(c=>c.created&&c.created>=weekStart.toISOString()).length;
   if(!doneThisWeek&&!createdThisWeek&&!contentThisWeek)return'';
   return `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)"><div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">This Week</div>${doneThisWeek?`<div style="font-size:10px;color:var(--accent)">${doneThisWeek} tasks completed</div>`:''}<div style="font-size:10px;color:var(--text-muted)">${createdThisWeek} tasks created</div>${contentThisWeek?`<div style="font-size:10px;color:var(--text-muted)">${contentThisWeek} content added</div>`:''}</div>`;
+}
+
+function weeklyReport(){
+  const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());weekStart.setHours(0,0,0,0);
+  const ws=weekStart.toISOString();
+  const done=S.tasks.filter(t=>t.status==='done'&&t.log&&t.log.some(e=>e.to==='done'&&e.at>=ws));
+  const created=S.tasks.filter(t=>t.created&&t.created>=ws);
+  const content=S.content.filter(c=>c.created&&c.created>=ws);
+  const docs=S.docs.filter(d=>d.updated&&d.updated>=ws);
+  const overdue=S.tasks.filter(t=>t.due&&t.due<now.toISOString().split('T')[0]&&t.status!=='done');
+  const totalTime=done.reduce((a,t)=>a+(t.timeSpent||0),0);
+  let md='# Weekly Report\n';
+  md+='*'+weekStart.toLocaleDateString('en-US',{month:'long',day:'numeric'})+' - '+now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})+'*\n\n';
+  md+='## Summary\n';
+  md+='- '+done.length+' tasks completed\n';
+  md+='- '+created.length+' tasks created\n';
+  md+='- '+content.length+' content items added\n';
+  md+='- '+docs.length+' documents edited\n';
+  if(totalTime)md+='- '+formatTimeSpent(totalTime)+' tracked\n';
+  if(overdue.length)md+='- '+overdue.length+' tasks overdue\n';
+  if(done.length){md+='\n## Completed\n';done.forEach(t=>{md+='- [x] '+t.title+(t.project?' ('+t.project+')':'')+'\n';});}
+  if(overdue.length){md+='\n## Overdue\n';overdue.forEach(t=>{md+='- [ ] '+t.title+' (due '+t.due+')\n';});}
+  const inProg=S.tasks.filter(t=>t.status==='progress');
+  if(inProg.length){md+='\n## In Progress\n';inProg.forEach(t=>{md+='- [ ] '+t.title+(t.estimate?' ['+t.estimate+']':'')+'\n';});}
+  navigator.clipboard.writeText(md).then(()=>toast('Weekly report copied'));
 }
 
 // === CONTENT ===
@@ -4936,6 +4970,7 @@ function cmdGetItems(q) {
   if(!ql || 'export tasks'.includes(ql)) items.push({title:'Export Tasks', desc:'Copy filtered tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportTasks();}});
   if(!ql || 'export links bookmarks'.includes(ql)) items.push({title:'Export Links', desc:'Copy all links as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportLinks();}});
   if(!ql || 'export week calendar summary'.includes(ql)) items.push({title:'Export Week', desc:'Copy this weeks tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportWeek();}});
+  if(!ql || 'weekly report summary productivity'.includes(ql)) items.push({title:'Weekly Report', desc:'Copy weekly productivity report as markdown', icon:'W', type:'action', action:()=>{closeCommandPalette();weeklyReport();}});
   if(!ql || 'export month calendar'.includes(ql)) items.push({title:'Export Month', desc:'Copy current months tasks as markdown', icon:'E', type:'action', action:()=>{closeCommandPalette();exportMonth();}});
   if(!ql || 'archive'.includes(ql)) items.push({title:'Archive Completed', desc:'Move done tasks to archive', icon:'A', type:'action', action:()=>{closeCommandPalette();archiveCompletedTasks();}});
   if(!ql || 'overdue late past due'.includes(ql)){const ot=new Date().toISOString().split('T')[0];const od=S.tasks.filter(t=>t.due&&t.due<ot&&t.status!=='done');if(od.length)items.push({title:'Overdue Tasks ('+od.length+')',desc:od.slice(0,3).map(t=>t.title).join(', '),icon:'!',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='due';renderTasks();toast(od.length+' overdue tasks');}});}
