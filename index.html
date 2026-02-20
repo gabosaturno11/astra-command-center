@@ -2244,10 +2244,12 @@ function updateSidebarCtx() {
     const totalWords=S.content.reduce((a,c)=>a+c.body.trim().split(/\s+/).filter(x=>x.length).length,0);
     const starred=S.content.filter(c=>c.starred).length;
     const pinned=S.content.filter(c=>c.pinned).length;
-    el.innerHTML=`<div class="sidebar-label">Content Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.content.length} items / ${totalWords.toLocaleString()} words</div>${starred?`<div style="padding:2px 12px;font-size:10px;color:var(--yellow)">${starred} starred</div>`:''}${pinned?`<div style="padding:2px 12px;font-size:10px;color:var(--accent)">${pinned} pinned</div>`:''}`+Object.entries(types).map(([t,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${t}: ${n}</div>`).join('');
+    const themes={};S.content.forEach(c=>{const th=c.theme||'unthemed';if(!themes[th])themes[th]={count:0,words:0};themes[th].count++;themes[th].words+=c.body.trim().split(/\s+/).filter(x=>x.length).length;});
+    el.innerHTML=`<div class="sidebar-label">Content Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.content.length} items / ${totalWords.toLocaleString()} words</div>${starred?`<div style="padding:2px 12px;font-size:10px;color:var(--yellow)">${starred} starred</div>`:''}${pinned?`<div style="padding:2px 12px;font-size:10px;color:var(--accent)">${pinned} pinned</div>`:''}<div class="sidebar-label" style="margin-top:6px">By Type</div>`+Object.entries(types).map(([t,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${t}: ${n}</div>`).join('')+`<div class="sidebar-label" style="margin-top:6px">By Theme</div>`+Object.entries(themes).sort((a,b)=>b[1].words-a[1].words).slice(0,8).map(([t,d])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted);cursor:pointer" onclick="contentTheme='${t==='unthemed'?'all':t}';renderContent()">${esc(t)}: ${d.count} (${d.words.toLocaleString()}w)</div>`).join('');
   } else if(currentSection==='writer') {
     const totalWords=S.docs.reduce((a,d)=>a+(d.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
-    el.innerHTML=`<div class="sidebar-label">Writer Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.docs.length} docs / ${totalWords.toLocaleString()} words</div>`;
+    const topDocs=[...S.docs].sort((a,b)=>countW(b.body)-countW(a.body)).slice(0,5);
+    el.innerHTML=`<div class="sidebar-label">Writer Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.docs.length} docs / ${totalWords.toLocaleString()} words</div><div class="sidebar-label" style="margin-top:6px">Largest Docs</div>`+topDocs.map(d=>`<div class="sidebar-item" onclick="switchDoc(${d.id})" style="cursor:pointer"><span style="font-size:10px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.title||'Untitled')}</span><span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">${countW(d.body)}w</span></div>`).join('');
   } else if(currentSection==='specs') {
     const totalSections=S.specs.reduce((a,s)=>a+(s.sections||[]).length,0);
     const totalSpecWords=S.specs.reduce((a,s)=>a+(s.sections||[]).reduce((b,sec)=>b+(sec.body||'').trim().split(/\s+/).filter(x=>x.length).length,0),0);
@@ -5119,7 +5121,7 @@ function cmdGetItems(q) {
   if(!ql || 'overdue late past due'.includes(ql)){const ot=new Date().toISOString().split('T')[0];const od=S.tasks.filter(t=>t.due&&t.due<ot&&t.status!=='done');if(od.length)items.push({title:'Overdue Tasks ('+od.length+')',desc:od.slice(0,3).map(t=>t.title).join(', '),icon:'!',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='due';renderTasks();toast(od.length+' overdue tasks');}});}
   if(!ql || 'archive archived completed old'.includes(ql)){const ac=(S.archivedTasks||[]).length;if(ac)items.push({title:'View Archived Tasks ('+ac+')',desc:'Browse and restore archived tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);showArchivedTasks();}});}
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
-  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due: status: p: recent: count: overdue:', icon:'?', type:'info'});
+  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due: status: p: recent: count: overdue: today:', icon:'?', type:'info'});
   if(!ql || 'clear reset filters'.includes(ql)) items.push({title:'Clear All Filters', desc:'Reset search, filters, and sort to defaults', icon:'X', type:'action', action:()=>{closeCommandPalette();taskFilter='all';taskProjectFilter=null;contentType='all';contentTheme='all';contentTagFilter=null;contentShowAll=false;const ts=document.getElementById('task-search');if(ts)ts.value='';const cs=document.getElementById('content-search');if(cs)cs.value='';const tsort=document.getElementById('task-sort');if(tsort)tsort.value='manual';renderTasks();renderContent();renderLinks();toast('All filters cleared');}});
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
@@ -5195,6 +5197,16 @@ function cmdGetItems(q) {
         items.unshift({title:'Focus: '+t.title,desc:'Start 25min Pomodoro + time tracking',icon:'F',type:'action',action:()=>{closeCommandPalette();ftStartForTask(t.id);toast('Focus started: '+t.title);}});
       });
     }
+  }
+  // Today prefix
+  if(ql && (ql.startsWith('today:') || ql==='today')){
+    const today=new Date().toISOString().split('T')[0];
+    const todayTasks=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+    const tq=q.substring(q.indexOf(':')+1).trim().toLowerCase();
+    todayTasks.filter(t=>!tq||t.title.toLowerCase().includes(tq)).forEach(t=>{
+      items.unshift({title:t.title||'Untitled',desc:'Due today | '+(t.priority||'p2')+' | '+(t.project||'no project'),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
+    });
+    if(!todayTasks.length)items.unshift({title:'No tasks due today',desc:'Use task: to create one',icon:'T',type:'info'});
   }
   // Overdue tasks prefix
   if(ql && ql.startsWith('overdue:') || (ql && ql==='overdue')){
