@@ -6737,6 +6737,12 @@ function cmdGetItems(q) {
       ['ssh','SSH keys tunnels SCP reference'],
       ['completion rate','Task completion rate over time'],
       ['quick timer','Countdown timer with presets'],
+      ['nginx','nginx server proxy SSL reference'],
+      ['cycle time','Task cycle time analysis'],
+      ['color converter','HEX RGB HSL color converter'],
+      ['apache','Apache httpd virtualhost reference'],
+      ['workload','Workload balance across projects'],
+      ['char counter','Character word sentence counter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -11117,6 +11123,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='quick timer' || ql==='timer' || ql==='countdown' || ql==='timer presets')){
     items.unshift({title:'Quick Timer',desc:'Countdown timer with preset durations',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTimer();}});
+  }
+  if(ql && (ql==='nginx' || ql==='nginx ref' || ql==='nginx config' || ql==='nginx proxy')){
+    items.unshift({title:'nginx Reference',desc:'Server blocks, proxy, SSL, caching',icon:'N',type:'action',action:()=>{closeCommandPalette();showNginxRef();}});
+  }
+  if(ql && (ql==='cycle time' || ql==='cycle' || ql==='task cycle' || ql==='lead time')){
+    items.unshift({title:'Cycle Time Analysis',desc:'How long tasks take to complete',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCycleTime();}});
+  }
+  if(ql && (ql==='color converter' || ql==='hex to rgb' || ql==='rgb to hex' || ql==='hsl')){
+    items.unshift({title:'Color Converter',desc:'HEX, RGB, HSL converter with preview',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorConverter();}});
+  }
+  if(ql && (ql==='apache' || ql==='httpd' || ql==='apache ref' || ql==='apache config')){
+    items.unshift({title:'Apache Reference',desc:'VirtualHost, modules, rewrite, security',icon:'A',type:'action',action:()=>{closeCommandPalette();showApacheRef();}});
+  }
+  if(ql && (ql==='workload' || ql==='workload balance' || ql==='project workload' || ql==='task balance')){
+    items.unshift({title:'Workload Balance',desc:'Task distribution across projects',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWorkloadBalance();}});
+  }
+  if(ql && (ql==='char counter' || ql==='character count' || ql==='word count' || ql==='text stats')){
+    items.unshift({title:'Character Counter',desc:'Chars, words, sentences with limit bar',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCharCounter();}});
   }
   return items.slice(0, 20);
 }
@@ -40182,6 +40206,190 @@ function showQuickTimer(){
   window._qtPause=function(){
     window._qtPaused=!window._qtPaused;
     document.getElementById('_qt-pause').textContent=window._qtPaused?'Resume':'Pause';
+  };
+}
+function showNginxRef(){
+  const cmds={
+    'Server Block':['server { listen 80; server_name example.com; root /var/www/html; }','location / { try_files $uri $uri/ =404; }','location ~ \\.php$ { fastcgi_pass 127.0.0.1:9000; }'],
+    'Proxy':['proxy_pass http://localhost:3000;','proxy_set_header Host $host;','proxy_set_header X-Real-IP $remote_addr;','proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;'],
+    'SSL':['listen 443 ssl;','ssl_certificate /path/cert.pem;','ssl_certificate_key /path/key.pem;','ssl_protocols TLSv1.2 TLSv1.3;'],
+    'Redirect':['return 301 https://$host$request_uri;','rewrite ^/old(.*)$ /new$1 permanent;','return 302 /maintenance;'],
+    'Commands':['nginx -t','nginx -s reload','nginx -s stop','nginx -V','systemctl restart nginx'],
+    'Caching':['proxy_cache_path /tmp/cache levels=1:2 keys_zone=my_cache:10m;','proxy_cache my_cache;','expires 30d;','add_header Cache-Control "public, immutable";']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">nginx Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8022\';setTimeout(()=>this.style.background=\'\',400)" style="font-family:monospace;font-size:12px;color:var(--text-primary);padding:4px 8px;cursor:pointer;border-radius:4px;margin-bottom:2px">'+c+'</div>';});
+    html+='</div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showTaskCycleTime(){
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&t.createdAt&&(t.completedAt||t.updatedAt));
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Cycle Time Analysis</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  if(!tasks.length){html+='<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No completed tasks with timestamps</div></div>';document.body.insertAdjacentHTML('beforeend',html);return;}
+  const cycles=tasks.map(t=>{
+    const created=new Date(t.createdAt);
+    const done=new Date(t.completedAt||t.updatedAt);
+    const days=Math.max(0,Math.round((done-created)/(1000*60*60*24)));
+    return {title:t.title,days,priority:t.priority||'p3'};
+  }).sort((a,b)=>a.days-b.days);
+  const avg=Math.round(cycles.reduce((s,c)=>s+c.days,0)/cycles.length);
+  const median=cycles[Math.floor(cycles.length/2)].days;
+  const maxD=Math.max(...cycles.map(c=>c.days),1);
+  html+='<div style="display:flex;gap:20px;margin-bottom:16px">';
+  html+='<div style="text-align:center;flex:1;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:24px;font-weight:700;color:#4ade80">'+avg+'d</div><div style="font-size:10px;color:var(--text-muted)">Average</div></div>';
+  html+='<div style="text-align:center;flex:1;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:24px;font-weight:700;color:#06b6d4">'+median+'d</div><div style="font-size:10px;color:var(--text-muted)">Median</div></div>';
+  html+='<div style="text-align:center;flex:1;background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:24px;font-weight:700;color:var(--text-primary)">'+cycles.length+'</div><div style="font-size:10px;color:var(--text-muted)">Tasks</div></div>';
+  html+='</div>';
+  const buckets={'0-1d':0,'2-3d':0,'4-7d':0,'1-2w':0,'2w+':0};
+  cycles.forEach(c=>{if(c.days<=1)buckets['0-1d']++;else if(c.days<=3)buckets['2-3d']++;else if(c.days<=7)buckets['4-7d']++;else if(c.days<=14)buckets['1-2w']++;else buckets['2w+']++;});
+  const maxB=Math.max(...Object.values(buckets),1);
+  html+='<div style="margin-bottom:12px">';
+  Object.entries(buckets).forEach(([k,v])=>{
+    const pct=Math.round(v/maxB*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:40px;font-size:10px;color:var(--text-muted);text-align:right">'+k+'</span><div style="flex:1;height:16px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:4px"></div></div><span style="width:20px;font-size:10px;color:var(--text-primary)">'+v+'</span></div>';
+  });
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-top:8px">Sorted fastest to slowest (top 10):</div>';
+  cycles.slice(0,10).forEach(c=>{
+    const pColor=c.priority==='p0'?'#ef4444':c.priority==='p1'?'#f97316':c.priority==='p2'?'#3b82f6':'#6b7280';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px"><span style="color:var(--text-primary);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.title)+'</span><span style="color:'+pColor+';margin:0 8px;font-size:10px">'+c.priority+'</span><span style="color:#4ade80;font-weight:600">'+c.days+'d</span></div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showQuickColorConverter(){
+  let w=document.getElementById('color-conv-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='color-conv-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Color Converter</h4><button onclick="document.getElementById(\'color-conv-widget\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  h+='<div id="_cc-preview" style="width:100%;height:40px;border-radius:8px;background:#4ade80;margin-bottom:10px;border:1px solid var(--border)"></div>';
+  h+='<input id="_cc-hex" type="text" value="#4ade80" placeholder="#hex" oninput="window._ccFromHex()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;font-family:monospace;margin-bottom:6px">';
+  h+='<div style="display:flex;gap:4px;margin-bottom:6px"><input id="_cc-r" type="number" min="0" max="255" value="74" placeholder="R" oninput="window._ccFromRGB()" style="width:33%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center"><input id="_cc-g" type="number" min="0" max="255" value="173" placeholder="G" oninput="window._ccFromRGB()" style="width:33%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center"><input id="_cc-b" type="number" min="0" max="255" value="128" placeholder="B" oninput="window._ccFromRGB()" style="width:33%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center"></div>';
+  h+='<div style="display:flex;gap:4px;margin-bottom:8px"><input id="_cc-h" type="number" min="0" max="360" value="152" placeholder="H" oninput="window._ccFromHSL()" style="width:33%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center"><input id="_cc-s" type="number" min="0" max="100" value="52" placeholder="S%" oninput="window._ccFromHSL()" style="width:33%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center"><input id="_cc-l" type="number" min="0" max="100" value="48" placeholder="L%" oninput="window._ccFromHSL()" style="width:33%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:12px;text-align:center"></div>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_cc-hex\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy HEX\',600)" style="width:100%;background:#4ade80;border:none;color:#000;padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Copy HEX</button>';
+  w.innerHTML=h;
+  document.body.appendChild(w);
+  window._ccFromHex=function(){
+    const hex=document.getElementById('_cc-hex').value.replace('#','');
+    if(hex.length!==6)return;
+    const r=parseInt(hex.substring(0,2),16),g=parseInt(hex.substring(2,4),16),b=parseInt(hex.substring(4,6),16);
+    document.getElementById('_cc-r').value=r;document.getElementById('_cc-g').value=g;document.getElementById('_cc-b').value=b;
+    document.getElementById('_cc-preview').style.background='#'+hex;
+    const rf=r/255,gf=g/255,bf=b/255;const max=Math.max(rf,gf,bf),min=Math.min(rf,gf,bf);
+    let hue=0,sat=0,light=(max+min)/2;
+    if(max!==min){const d=max-min;sat=light>0.5?d/(2-max-min):d/(max+min);if(max===rf)hue=((gf-bf)/d+(gf<bf?6:0))*60;else if(max===gf)hue=((bf-rf)/d+2)*60;else hue=((rf-gf)/d+4)*60;}
+    document.getElementById('_cc-h').value=Math.round(hue);document.getElementById('_cc-s').value=Math.round(sat*100);document.getElementById('_cc-l').value=Math.round(light*100);
+  };
+  window._ccFromRGB=function(){
+    const r=parseInt(document.getElementById('_cc-r').value)||0,g=parseInt(document.getElementById('_cc-g').value)||0,b=parseInt(document.getElementById('_cc-b').value)||0;
+    const hex='#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    document.getElementById('_cc-hex').value=hex;document.getElementById('_cc-preview').style.background=hex;
+    const rf=r/255,gf=g/255,bf=b/255;const max=Math.max(rf,gf,bf),min=Math.min(rf,gf,bf);
+    let hue=0,sat=0,light=(max+min)/2;
+    if(max!==min){const d=max-min;sat=light>0.5?d/(2-max-min):d/(max+min);if(max===rf)hue=((gf-bf)/d+(gf<bf?6:0))*60;else if(max===gf)hue=((bf-rf)/d+2)*60;else hue=((rf-gf)/d+4)*60;}
+    document.getElementById('_cc-h').value=Math.round(hue);document.getElementById('_cc-s').value=Math.round(sat*100);document.getElementById('_cc-l').value=Math.round(light*100);
+  };
+  window._ccFromHSL=function(){
+    const h=(parseInt(document.getElementById('_cc-h').value)||0)/360,s=(parseInt(document.getElementById('_cc-s').value)||0)/100,l=(parseInt(document.getElementById('_cc-l').value)||0)/100;
+    let r,g,b;
+    if(s===0){r=g=b=l;}else{
+      const hue2rgb=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
+      const q=l<0.5?l*(1+s):l+s-l*s;const p=2*l-q;
+      r=hue2rgb(p,q,h+1/3);g=hue2rgb(p,q,h);b=hue2rgb(p,q,h-1/3);
+    }
+    r=Math.round(r*255);g=Math.round(g*255);b=Math.round(b*255);
+    document.getElementById('_cc-r').value=r;document.getElementById('_cc-g').value=g;document.getElementById('_cc-b').value=b;
+    const hex='#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+    document.getElementById('_cc-hex').value=hex;document.getElementById('_cc-preview').style.background=hex;
+  };
+}
+function showApacheRef(){
+  const cmds={
+    'VirtualHost':['<VirtualHost *:80>','  ServerName example.com','  DocumentRoot /var/www/html','  ErrorLog ${APACHE_LOG_DIR}/error.log','</VirtualHost>'],
+    'Modules':['a2enmod rewrite','a2enmod ssl','a2enmod proxy','a2enmod headers','a2dismod status'],
+    'Rewrite':['RewriteEngine On','RewriteCond %{HTTPS} off','RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]','RewriteRule ^old /new [R=301]'],
+    'Commands':['apachectl start','apachectl stop','apachectl restart','apachectl graceful','apachectl configtest','apache2ctl -S'],
+    'Security':['Header set X-Frame-Options SAMEORIGIN','Header set X-Content-Type-Options nosniff','Header set X-XSS-Protection "1; mode=block"','ServerTokens Prod','ServerSignature Off']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Apache/httpd Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8022\';setTimeout(()=>this.style.background=\'\',400)" style="font-family:monospace;font-size:12px;color:var(--text-primary);padding:4px 8px;cursor:pointer;border-radius:4px;margin-bottom:2px">'+c+'</div>';});
+    html+='</div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showTaskWorkloadBalance(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const projects={};
+  tasks.forEach(t=>{
+    const p=t.project||'No Project';
+    if(!projects[p])projects[p]={total:0,p0:0,p1:0,p2:0,p3:0};
+    projects[p].total++;
+    projects[p][t.priority||'p3']++;
+  });
+  const entries=Object.entries(projects).sort((a,b)=>b[1].total-a[1].total);
+  const maxT=entries.length?Math.max(...entries.map(e=>e[1].total)):1;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Workload Balance</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  if(!entries.length){html+='<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No active tasks</div></div>';document.body.insertAdjacentHTML('beforeend',html);return;}
+  const totalAll=entries.reduce((s,e)=>s+e[1].total,0);
+  entries.forEach(([proj,data])=>{
+    const pct=Math.round(data.total/totalAll*100);
+    const barW=Math.round(data.total/maxT*100);
+    html+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px;color:var(--text-primary);font-weight:600">'+esc(proj)+'</span><span style="font-size:11px;color:var(--text-muted)">'+data.total+' tasks ('+pct+'%)</span></div>';
+    html+='<div style="height:20px;background:var(--bg-surface);border-radius:4px;overflow:hidden;display:flex">';
+    const p0w=data.total?Math.round(data.p0/data.total*barW):0;
+    const p1w=data.total?Math.round(data.p1/data.total*barW):0;
+    const p2w=data.total?Math.round(data.p2/data.total*barW):0;
+    const p3w=barW-p0w-p1w-p2w;
+    if(p0w)html+='<div style="width:'+p0w+'%;background:#ef4444;height:100%" title="P0: '+data.p0+'"></div>';
+    if(p1w)html+='<div style="width:'+p1w+'%;background:#f97316;height:100%" title="P1: '+data.p1+'"></div>';
+    if(p2w)html+='<div style="width:'+p2w+'%;background:#3b82f6;height:100%" title="P2: '+data.p2+'"></div>';
+    if(p3w)html+='<div style="width:'+p3w+'%;background:#6b7280;height:100%" title="P3: '+data.p3+'"></div>';
+    html+='</div></div>';
+  });
+  html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted);margin-top:8px;flex-wrap:wrap"><span><span style="display:inline-block;width:8px;height:8px;background:#ef4444;border-radius:2px;margin-right:3px"></span>P0</span><span><span style="display:inline-block;width:8px;height:8px;background:#f97316;border-radius:2px;margin-right:3px"></span>P1</span><span><span style="display:inline-block;width:8px;height:8px;background:#3b82f6;border-radius:2px;margin-right:3px"></span>P2</span><span><span style="display:inline-block;width:8px;height:8px;background:#6b7280;border-radius:2px;margin-right:3px"></span>P3</span></div>';
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showQuickCharCounter(){
+  let w=document.getElementById('char-counter-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='char-counter-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Character Counter</h4><button onclick="document.getElementById(\'char-counter-widget\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  h+='<textarea id="_chc-input" rows="5" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:8px;font-size:12px;resize:vertical" placeholder="Paste or type text..." oninput="window._chcUpdate()"></textarea>';
+  h+='<div style="display:flex;gap:4px;margin:8px 0"><span style="font-size:10px;color:var(--text-muted)">Limit:</span>';
+  [280,500,1000,2000,5000].forEach(lim=>{
+    h+='<button onclick="window._chcLimit='+lim+';window._chcUpdate();document.querySelectorAll(\'#char-counter-widget .lim-btn\').forEach(b=>b.style.background=\'\');this.style.background=\'#4ade8033\'" class="lim-btn" style="background:none;border:1px solid var(--border);color:var(--text-primary);padding:2px 6px;border-radius:4px;font-size:10px;cursor:pointer">'+lim+'</button>';
+  });
+  h+='</div>';
+  h+='<div id="_chc-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px"></div>';
+  h+='<div id="_chc-bar" style="height:6px;background:var(--bg-surface);border-radius:3px;margin-top:8px;overflow:hidden"><div id="_chc-bar-fill" style="height:100%;background:#4ade80;border-radius:3px;width:0%;transition:width 0.2s"></div></div>';
+  w.innerHTML=h;
+  document.body.appendChild(w);
+  window._chcLimit=280;
+  window._chcUpdate=function(){
+    const text=document.getElementById('_chc-input').value;
+    const chars=text.length;
+    const words=text.trim()?text.trim().split(/\s+/).length:0;
+    const sentences=text.trim()?text.split(/[.!?]+/).filter(s=>s.trim()).length:0;
+    const paragraphs=text.trim()?text.split(/\n\n+/).filter(s=>s.trim()).length:0;
+    const lines=text?text.split('\n').length:0;
+    const pct=window._chcLimit?Math.min(100,Math.round(chars/window._chcLimit*100)):0;
+    const stats=document.getElementById('_chc-stats');
+    stats.innerHTML='<div style="color:var(--text-primary)"><strong>'+chars+'</strong> <span style="color:var(--text-muted)">chars</span></div><div style="color:var(--text-primary)"><strong>'+words+'</strong> <span style="color:var(--text-muted)">words</span></div><div style="color:var(--text-primary)"><strong>'+sentences+'</strong> <span style="color:var(--text-muted)">sentences</span></div><div style="color:var(--text-primary)"><strong>'+paragraphs+'</strong> <span style="color:var(--text-muted)">paragraphs</span></div><div style="color:var(--text-primary)"><strong>'+lines+'</strong> <span style="color:var(--text-muted)">lines</span></div><div style="color:'+(pct>100?'#ef4444':pct>80?'#fbbf24':'#4ade80')+'"><strong>'+pct+'%</strong> <span style="color:var(--text-muted)">of '+window._chcLimit+'</span></div>';
+    const bar=document.getElementById('_chc-bar-fill');
+    bar.style.width=Math.min(100,pct)+'%';
+    bar.style.background=pct>100?'#ef4444':pct>80?'#fbbf24':'#4ade80';
   };
 }
 function showProjectRoadmap(filterProject){
