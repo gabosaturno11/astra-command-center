@@ -6308,6 +6308,12 @@ function cmdGetItems(q) {
       ['git commands','Git command reference'],
       ['age histogram','Task age distribution histogram'],
       ['char counter','Character and word counter'],
+      ['npm','npm command reference'],
+      ['flow board','Mini kanban flow board'],
+      ['emoji','Emoji picker with categories'],
+      ['yarn','Yarn command reference'],
+      ['velocity','Task completion velocity trend'],
+      ['unit converter','Unit converter (length, weight, temp)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9401,6 +9407,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='char counter' || ql==='character count' || ql==='word count' || ql==='text counter')){
     items.unshift({title:'Character Counter',desc:'Count chars, words, lines, sentences',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCharCounter();}});
+  }
+  if(ql && (ql==='npm' || ql==='npm commands' || ql==='npm ref' || ql==='npm scripts')){
+    items.unshift({title:'npm Reference',desc:'npm command cheatsheet by category',icon:'N',type:'action',action:()=>{closeCommandPalette();showNpmScriptsRef();}});
+  }
+  if(ql && (ql==='flow board' || ql==='kanban' || ql==='flow' || ql==='mini board')){
+    items.unshift({title:'Flow Board',desc:'Mini kanban board overview',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFlowBoard();}});
+  }
+  if(ql && (ql==='emoji' || ql==='emoji picker' || ql==='emojis' || ql==='emoticon')){
+    items.unshift({title:'Emoji Picker',desc:'Pick and copy emojis by category',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEmojiPicker();}});
+  }
+  if(ql && (ql==='yarn' || ql==='yarn commands' || ql==='yarn ref' || ql==='yarn reference')){
+    items.unshift({title:'Yarn Reference',desc:'Yarn command cheatsheet by category',icon:'Y',type:'action',action:()=>{closeCommandPalette();showYarnCommandRef();}});
+  }
+  if(ql && (ql==='velocity' || ql==='velocity trend' || ql==='completion speed' || ql==='task velocity')){
+    items.unshift({title:'Velocity Trend',desc:'Task completion velocity over 8 weeks',icon:'V',type:'action',action:()=>{closeCommandPalette();showTaskVelocityTrend();}});
+  }
+  if(ql && (ql==='unit converter' || ql==='convert' || ql==='units' || ql==='conversion')){
+    items.unshift({title:'Unit Converter',desc:'Convert length, weight, temperature',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUnitConverter();}});
   }
   return items.slice(0, 20);
 }
@@ -27030,6 +27054,196 @@ function showQuickCharCounter(){
   };
   window._countChars=()=>rend(document.getElementById('char-input').value);
   document.body.appendChild(d);rend();
+}
+function showNpmScriptsRef(){
+  let ex=document.getElementById('npm-ref-float');if(ex){ex.remove();return;}
+  const categories={
+    'Common':['npm init -y','npm install <pkg>','npm install -D <pkg>','npm uninstall <pkg>','npm update','npm outdated','npm list --depth=0','npm run <script>','npm test','npm start','npm run build'],
+    'Publishing':['npm login','npm publish','npm version patch','npm version minor','npm version major','npm pack','npm deprecate <pkg> "msg"','npm unpublish <pkg>'],
+    'Config':['npm config list','npm config set registry <url>','npm config get prefix','npm cache clean --force','npm config set save-exact true'],
+    'Info':['npm info <pkg>','npm search <query>','npm view <pkg> versions','npm docs <pkg>','npm bugs <pkg>','npm ls <pkg>','npm audit','npm audit fix','npm doctor'],
+    'Workspaces':['npm init -w packages/<name>','npm install -w <workspace>','npm run test --workspaces','npm run build -w <name>','npm ls --workspaces'],
+    'npx':['npx create-react-app my-app','npx create-next-app@latest','npx degit user/repo','npx ts-node script.ts','npx prettier --write .','npx eslint .']
+  };
+  let sel='Common';
+  const d=document.createElement('div');d.id='npm-ref-float';
+  const rend=()=>{
+    const tabs=Object.keys(categories).map(k=>`<span onclick="window._npmTab('${k}')" style="padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;${k===sel?'background:var(--accent);color:#000':'color:var(--text-muted)'}">${k}</span>`).join('');
+    const cmds=categories[sel].map(c=>`<div onclick="navigator.clipboard.writeText('${c.replace(/'/g,"\\'")}');this.style.color='#4ade80';setTimeout(()=>this.style.color='',600)" style="padding:4px 8px;font-size:11px;color:var(--text-secondary);font-family:monospace;cursor:pointer;border-bottom:1px solid var(--border)">${esc(c)}</div>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">npm Command Reference</span><span onclick="document.getElementById('npm-ref-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">${cmds}</div>
+      <div style="margin-top:8px;font-size:9px;color:var(--text-muted)">Click any command to copy</div>
+    </div>`;
+  };
+  window._npmTab=(k)=>{sel=k;rend();};
+  document.body.appendChild(d);rend();
+}
+function showTaskFlowBoard(){
+  let ex=document.getElementById('flow-board-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const cols={todo:[],inProgress:[],review:[],done:[]};
+  tasks.forEach(t=>{
+    if(t.status==='done')cols.done.push(t);
+    else if(t.status==='in-progress')cols.inProgress.push(t);
+    else if(t.status==='blocked')cols.review.push(t);
+    else cols.todo.push(t);
+  });
+  const renderCol=(title,items,color,limit)=>{
+    const over=limit&&items.length>limit;
+    const cards=items.slice(0,8).map(t=>{
+      const pCol=t.priority==='p0'?'#f87171':t.priority==='p1'?'#fb923c':t.priority==='p2'?'#22d3ee':'#6b7280';
+      return `<div style="background:var(--bg-elevated);border-radius:4px;padding:6px;border-left:3px solid ${pCol};font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(t.title)}">${esc(t.title)}</div>`;
+    }).join('');
+    return `<div style="flex:1;min-width:120px">
+      <div style="font-size:10px;font-weight:600;color:${color};margin-bottom:6px;display:flex;justify-content:space-between"><span>${title}</span><span style="background:var(--bg-surface);border-radius:10px;padding:0 6px;color:${over?'#f87171':'var(--text-muted)'}">${items.length}</span></div>
+      <div style="display:flex;flex-direction:column;gap:4px;background:var(--bg-surface);border-radius:6px;padding:6px;min-height:80px">${cards||'<div style="font-size:9px;color:var(--text-muted);text-align:center;padding:20px">Empty</div>'}</div>
+      ${items.length>8?`<div style="font-size:9px;color:var(--text-muted);text-align:center;margin-top:4px">+${items.length-8} more</div>`:''}
+    </div>`;
+  };
+  const d=document.createElement('div');d.id='flow-board-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Flow Board</span><span onclick="document.getElementById('flow-board-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="display:flex;gap:8px;overflow-x:auto">
+      ${renderCol('To Do',cols.todo,'#6b7280')}
+      ${renderCol('In Progress',cols.inProgress,'#22d3ee',5)}
+      ${renderCol('Blocked',cols.review,'#f87171')}
+      ${renderCol('Done',cols.done,'#4ade80')}
+    </div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickEmojiPicker(){
+  let ex=document.getElementById('emoji-picker-float');if(ex){ex.remove();return;}
+  const categories={
+    'Smileys':['grinning','joy','heart_eyes','thinking','sunglasses','fire','sparkles','rocket','star','zap','100','thumbsup','wave','clap','muscle'],
+    'Objects':['laptop','keyboard','books','pencil','bulb','gear','wrench','hammer','package','link','lock','key','bell','clock','calendar'],
+    'Nature':['sun','moon','cloud','rainbow','snowflake','tree','flower','leaf','ocean','mountain','earth','tornado','lightning','comet','star2'],
+    'Arrows':['arrow_right','arrow_left','arrow_up','arrow_down','arrows_clockwise','fast_forward','rewind','top','end','check','x','warning','info','question','exclamation']
+  };
+  const emojiMap={grinning:'😀',joy:'😂',heart_eyes:'😍',thinking:'🤔',sunglasses:'😎',fire:'🔥',sparkles:'✨',rocket:'🚀',star:'⭐',zap:'⚡',100:'💯',thumbsup:'👍',wave:'👋',clap:'👏',muscle:'💪',laptop:'💻',keyboard:'⌨️',books:'📚',pencil:'✏️',bulb:'💡',gear:'⚙️',wrench:'🔧',hammer:'🔨',package:'📦',link:'🔗',lock:'🔒',key:'🔑',bell:'🔔',clock:'🕐',calendar:'📅',sun:'☀️',moon:'🌙',cloud:'☁️',rainbow:'🌈',snowflake:'❄️',tree:'🌲',flower:'🌸',leaf:'🍃',ocean:'🌊',mountain:'⛰️',earth:'🌍',tornado:'🌪️',lightning:'⚡',comet:'☄️',star2:'🌟',arrow_right:'→',arrow_left:'←',arrow_up:'↑',arrow_down:'↓',arrows_clockwise:'🔄',fast_forward:'⏩',rewind:'⏪',top:'🔝',end:'🔚',check:'✅',x:'❌',warning:'⚠️',info:'ℹ️',question:'❓',exclamation:'❗'};
+  let sel='Smileys',recent=[];
+  const d=document.createElement('div');d.id='emoji-picker-float';
+  const rend=()=>{
+    const tabs=Object.keys(categories).map(k=>`<span onclick="window._emojiTab('${k}')" style="padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;${k===sel?'background:var(--accent);color:#000':'color:var(--text-muted)'}">${k}</span>`).join('');
+    const emojis=categories[sel].map(e=>`<span onclick="navigator.clipboard.writeText('${emojiMap[e]||e}');window._emojiRecent('${e}')" style="font-size:22px;cursor:pointer;padding:4px;border-radius:4px;display:inline-block" title="${e}">${emojiMap[e]||e}</span>`).join('');
+    const recentHtml=recent.length?recent.map(e=>`<span onclick="navigator.clipboard.writeText('${emojiMap[e]||e}')" style="font-size:18px;cursor:pointer;padding:2px" title="${e}">${emojiMap[e]||e}</span>`).join(''):'';
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:280px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Emoji Picker</span><span onclick="document.getElementById('emoji-picker-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      ${recent.length?`<div style="margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:4px"><div style="font-size:9px;color:var(--text-muted);margin-bottom:2px">Recent</div>${recentHtml}</div>`:''}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">${tabs}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:2px">${emojis}</div>
+      <div style="margin-top:6px;font-size:9px;color:var(--text-muted)">Click to copy</div>
+    </div>`;
+  };
+  window._emojiTab=(k)=>{sel=k;rend();};
+  window._emojiRecent=(e)=>{recent=recent.filter(r=>r!==e);recent.unshift(e);if(recent.length>10)recent.length=10;rend();};
+  document.body.appendChild(d);rend();
+}
+function showYarnCommandRef(){
+  const d=document.createElement('div');d.id='yarn-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Dependencies':['yarn add <pkg>','yarn add -D <pkg>','yarn remove <pkg>','yarn upgrade','yarn upgrade-interactive'],
+    'Scripts':['yarn start','yarn build','yarn test','yarn run <script>','yarn dlx <pkg>'],
+    'Workspace':['yarn workspaces list','yarn workspace <name> add <pkg>','yarn workspace <name> run <cmd>','yarn workspaces foreach run build'],
+    'Info':['yarn info <pkg>','yarn why <pkg>','yarn list','yarn config list','yarn --version'],
+    'Cache':['yarn cache clean','yarn cache list','yarn cache dir'],
+    'Publishing':['yarn pack','yarn publish','yarn npm publish','yarn version patch','yarn version minor']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Yarn Reference</h3><button onclick="document.getElementById(\'yarn-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskVelocityTrend(){
+  const d=document.createElement('div');d.id='velocity-trend-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const weeks={};const now=new Date();
+  tasks.forEach(t=>{
+    if(t.status==='done'&&t.updatedAt){
+      const d2=new Date(t.updatedAt);const wk=Math.floor((now-d2)/(7*86400000));
+      if(wk<8){const label='W-'+wk;weeks[label]=(weeks[label]||0)+1;}
+    }
+  });
+  const labels=[];const vals=[];
+  for(let i=7;i>=0;i--){const l='W-'+i;labels.push(i===0?'This Wk':i===1?'Last Wk':i+'w ago');vals.push(weeks[l]||0);}
+  const mx=Math.max(...vals,1);
+  let svg='<svg width="500" height="200" viewBox="0 0 500 200">';
+  svg+='<rect width="500" height="200" fill="var(--bg-surface)" rx="8"/>';
+  const pts=vals.map((v,i)=>{const x=30+i*(460/7);const y=180-((v/mx)*150);return x+','+y;}).join(' ');
+  svg+='<polyline points="'+pts+'" fill="none" stroke="#4ade80" stroke-width="2"/>';
+  vals.forEach((v,i)=>{
+    const x=30+i*(460/7);const y=180-((v/mx)*150);
+    svg+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="#4ade80"/>';
+    svg+='<text x="'+x+'" y="195" text-anchor="middle" fill="var(--text-muted)" font-size="9">'+labels[i]+'</text>';
+    if(v>0)svg+='<text x="'+x+'" y="'+(y-8)+'" text-anchor="middle" fill="var(--text-secondary)" font-size="10">'+v+'</text>';
+  });
+  svg+='</svg>';
+  const total=vals.reduce((a,b)=>a+b,0);const avg=(total/8).toFixed(1);
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Velocity Trend</h3><button onclick="document.getElementById(\'velocity-trend-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;gap:16px;margin-bottom:14px"><div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:20px;color:#4ade80;font-weight:700">'+total+'</div><div style="font-size:10px;color:var(--text-muted)">8-wk total</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:20px;color:#4ade80;font-weight:700">'+avg+'</div><div style="font-size:10px;color:var(--text-muted)">avg/week</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px 14px;border-radius:6px;text-align:center"><div style="font-size:20px;color:#4ade80;font-weight:700">'+(vals[7]||0)+'</div><div style="font-size:10px;color:var(--text-muted)">this week</div></div></div>';
+  html+=svg;
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickUnitConverter(){
+  const d=document.createElement('div');d.id='unit-converter-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  const cats={
+    'Length':[{n:'km',f:1000},{n:'m',f:1},{n:'cm',f:0.01},{n:'in',f:0.0254},{n:'ft',f:0.3048},{n:'mi',f:1609.34}],
+    'Weight':[{n:'kg',f:1},{n:'g',f:0.001},{n:'lb',f:0.453592},{n:'oz',f:0.0283495}],
+    'Temperature':[{n:'C',t:'c'},{n:'F',t:'f'},{n:'K',t:'k'}]
+  };
+  let selCat='Length';
+  function rend(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Unit Converter</h3><button onclick="document.getElementById(\'unit-converter-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+    html+='<div style="display:flex;gap:4px;margin-bottom:10px">';
+    Object.keys(cats).forEach(c=>{
+      html+='<button onclick="window._ucCat=\''+c+'\';window._ucRend()" style="padding:4px 10px;border-radius:4px;border:1px solid '+(selCat===c?'#4ade80':'var(--border)')+';background:'+(selCat===c?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(selCat===c?'#4ade80':'var(--text-secondary)')+';font-size:11px;cursor:pointer">'+c+'</button>';
+    });
+    html+='</div>';
+    html+='<input id="uc-val" type="number" value="1" oninput="window._ucRend()" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:14px;margin-bottom:10px;box-sizing:border-box"/>';
+    html+='<select id="uc-from" onchange="window._ucRend()" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px">';
+    const units=cats[selCat];
+    units.forEach(u=>{html+='<option value="'+u.n+'">'+u.n+'</option>';});
+    html+='</select>';
+    html+='<div id="uc-results" style="font-size:12px"></div>';
+    d.innerHTML=html;
+    calcResults();
+  }
+  function calcResults(){
+    const valEl=document.getElementById('uc-val');const fromEl=document.getElementById('uc-from');const resEl=document.getElementById('uc-results');
+    if(!valEl||!fromEl||!resEl)return;
+    const val=parseFloat(valEl.value)||0;const from=fromEl.value;const units=cats[selCat];
+    let html='';
+    if(selCat==='Temperature'){
+      let cVal;
+      if(from==='C')cVal=val;else if(from==='F')cVal=(val-32)*5/9;else cVal=val-273.15;
+      units.forEach(u=>{
+        let r;if(u.n==='C')r=cVal;else if(u.n==='F')r=cVal*9/5+32;else r=cVal+273.15;
+        if(u.n!==from)html+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-muted)">'+u.n+'</span><span style="color:var(--text-primary)">'+r.toFixed(2)+'</span></div>';
+      });
+    } else {
+      const fromU=units.find(u=>u.n===from);const baseVal=val*(fromU?fromU.f:1);
+      units.forEach(u=>{
+        if(u.n!==from){const r=baseVal/u.f;html+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-muted)">'+u.n+'</span><span style="color:var(--text-primary)">'+r.toFixed(4)+'</span></div>';}
+      });
+    }
+    resEl.innerHTML=html;
+  }
+  window._ucCat=selCat;
+  window._ucRend=function(){selCat=window._ucCat||'Length';rend();};
+  rend();
+  document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
