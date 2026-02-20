@@ -6008,6 +6008,9 @@ function cmdGetItems(q) {
       ['standup report','Generate standup: done, in-progress, blocked, focus'],
       ['project overview','Grid overview of all projects with stats'],
       ['swimlanes','Task swimlanes grouped by project, sorted by priority'],
+      ['decisions','Decision log: record decisions with context and reasoning'],
+      ['word cloud','Visual word cloud from all content and documents'],
+      ['clipboard','Persistent clipboard history with copy-to-clipboard'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8138,6 +8141,18 @@ function cmdGetItems(q) {
   // Swimlanes prefix
   if(ql && (ql==='swimlanes' || ql==='swim lanes' || ql==='by project' || ql==='task lanes')){
     items.unshift({title:'Task Swimlanes',desc:'Tasks grouped by project, sorted by priority',icon:'L',type:'action',action:()=>{closeCommandPalette();showTaskSwimlanes();}});
+  }
+  // Decisions prefix
+  if(ql && (ql==='decisions' || ql==='decision log' || ql==='decision' || ql==='why did we')){
+    items.unshift({title:'Decision Log',desc:'Record decisions with context',icon:'D',type:'action',action:()=>{closeCommandPalette();showDecisionLog();}});
+  }
+  // Word cloud prefix
+  if(ql && (ql==='word cloud' || ql==='words' || ql==='content words' || ql==='top words')){
+    items.unshift({title:'Content Word Cloud',desc:'Visual word cloud from all content',icon:'W',type:'action',action:()=>{closeCommandPalette();showContentWordCloud();}});
+  }
+  // Clipboard prefix
+  if(ql && (ql==='clipboard' || ql==='clip' || ql==='clipboard history' || ql==='paste')){
+    items.unshift({title:'Clipboard History',desc:'Persistent clipboard with copy',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickClipboard();}});
   }
   return items.slice(0, 20);
 }
@@ -15601,6 +15616,67 @@ function showTaskSwimlanes(){
       h+='<div style="padding:6px 10px;border:1px solid '+color+'44;border-radius:6px;font-size:10px;border-left:3px solid '+color+';background:'+color+'08"><span style="color:'+color+';font-weight:600;margin-right:4px">'+esc((t.priority||'p3').toUpperCase())+'</span>'+esc(t.title)+'</div>';
     });
     h+='</div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDecisionLog(){
+  let panel=document.getElementById('decision-log-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='decision-log-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._decisions)S._decisions=[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Decision Log</h3><div><button onclick="(function(){const title=prompt(\'Decision:\');if(!title)return;const context=prompt(\'Context/reasoning:\');const outcome=prompt(\'Expected outcome:\');S._decisions.unshift({id:Date.now(),title:title,context:context||\'\'  ,outcome:outcome||\'\',date:new Date().toISOString()});save();showDecisionLog();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">+ Decision</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Record important decisions with context. Never ask "why did we do X?" again.</div>';
+  if(S._decisions.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:30px 0">No decisions logged yet.</div>';}
+  S._decisions.forEach(d=>{
+    h+='<div style="padding:12px;border-left:3px solid var(--accent);background:var(--bg-surface);border-radius:0 8px 8px 0;margin-bottom:10px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><strong style="font-size:12px">'+esc(d.title)+'</strong><span style="font-size:9px;color:var(--text-muted)">'+(d.date||'').split('T')[0]+'</span></div>';
+    if(d.context)h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px"><em>Context:</em> '+esc(d.context)+'</div>';
+    if(d.outcome)h+='<div style="font-size:11px;color:var(--accent)"><em>Outcome:</em> '+esc(d.outcome)+'</div>';
+    h+='<button onclick="(function(){S._decisions=S._decisions.filter(x=>x.id!=='+d.id+');save();showDecisionLog();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px;margin-top:4px">Delete</button></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentWordCloud(){
+  let panel=document.getElementById('content-word-cloud-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-word-cloud-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=S.content||[];const docs=S.writerDocs||[];
+  const allText=content.map(c=>c.title+' '+(c.body||'')).join(' ')+' '+docs.map(d=>d.title+' '+(d.content||'')).join(' ');
+  const stops=new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','is','was','are','were','be','been','being','have','has','had','do','does','did','will','would','could','should','can','may','might','shall','this','that','these','those','it','its','i','we','you','he','she','they','me','him','her','us','them','my','your','our','their','not','no','from','as','if','then','than','so','very','just','about','also','more','all','each','every','some','any','much','many','such','what','which','who','how','when','where','why']);
+  const words={};
+  allText.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).forEach(w=>{if(w.length>2&&!stops.has(w))words[w]=(words[w]||0)+1;});
+  const sorted=Object.entries(words).sort((a,b)=>b[1]-a[1]).slice(0,40);
+  const maxCount=sorted.length>0?sorted[0][1]:1;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Word Cloud</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:16px 0">';
+  const colors=['var(--accent)','#22d3ee','#a78bfa','#f97316','#ef4444','#eab308'];
+  sorted.forEach(([word,count],i)=>{
+    const size=Math.max(12,Math.min(36,12+count/maxCount*24));
+    const color=colors[i%colors.length];
+    const opacity=0.5+count/maxCount*0.5;
+    h+='<span style="font-size:'+size+'px;color:'+color+';opacity:'+opacity+';padding:2px;cursor:default" title="'+count+' occurrences">'+esc(word)+'</span>';
+  });
+  h+='</div>';
+  h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Top 15 Words</h4>';
+  sorted.slice(0,15).forEach(([word,count])=>{
+    const pct=Math.round(count/maxCount*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="font-size:11px;width:80px;overflow:hidden;text-overflow:ellipsis">'+esc(word)+'</span><div style="flex:1;height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--accent);width:'+pct+'%"></div></div><span style="font-size:10px;color:var(--text-muted);width:30px;text-align:right">'+count+'</span></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickClipboard(){
+  let panel=document.getElementById('quick-clipboard-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-clipboard-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px;max-height:400px;overflow-y:auto';
+  if(!S._clipboard)S._clipboard=[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Clipboard History</h4><div><button onclick="(function(){const t=prompt(\'Save to clipboard:\');if(!t)return;S._clipboard.unshift({id:Date.now(),text:t,date:new Date().toISOString()});if(S._clipboard.length>20)S._clipboard.length=20;save();showQuickClipboard();})()" style="background:var(--accent);color:#000;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;font-size:10px;margin-right:4px">+</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div></div>';
+  if(S._clipboard.length===0){h+='<div style="color:var(--text-muted);font-size:11px;text-align:center;padding:16px 0">No clipboard items. Click + to save text.</div>';}
+  S._clipboard.forEach(c=>{
+    h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:6px;border:1px solid var(--border);border-radius:4px;margin-bottom:4px">';
+    h+='<div style="font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:8px" title="'+esc(c.text)+'">'+esc(c.text.substring(0,60))+'</div>';
+    h+='<div style="display:flex;gap:2px;flex-shrink:0">';
+    h+='<button onclick="(function(){navigator.clipboard.writeText(S._clipboard.find(x=>x.id==='+c.id+').text);if(typeof showNotification===\'function\')showNotification(\'Copied!\');})()" style="background:none;border:1px solid var(--accent);color:var(--accent);padding:1px 5px;border-radius:3px;cursor:pointer;font-size:9px">C</button>';
+    h+='<button onclick="(function(){S._clipboard=S._clipboard.filter(x=>x.id!=='+c.id+');save();showQuickClipboard();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">X</button></div></div>';
   });
   panel.innerHTML=h;document.body.appendChild(panel);
 }
