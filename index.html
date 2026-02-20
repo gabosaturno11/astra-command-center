@@ -6418,6 +6418,34 @@ function cmdGetItems(q) {
       items.unshift({title:r.title,desc:'Recent '+r.type+' ('+timeAgo(r.time)+')',icon:sMap[r.type]||'*',type:'action',action:()=>{closeCommandPalette();if(r.type==='task')openTaskDetail(r.id);else if(r.type==='doc'){switchDoc(r.id);switchSection('writer',null);}else if(r.type==='spec'){switchSpec(r.id);switchSection('specs',null);}else if(r.type==='project')openProject(r.id);}});
     });
   }
+  // Sentiment prefix
+  if(ql && (ql==='sentiment' || ql.startsWith('sentiment:') || ql==='mood' || ql==='tone')){
+    const posWords=new Set(['great','good','amazing','excellent','love','happy','success','win','perfect','best','awesome','beautiful','wonderful','fantastic','brilliant','incredible']);
+    const negWords=new Set(['bad','terrible','awful','hate','fail','wrong','broken','worst','ugly','problem','error','bug','issue','stuck','frustrated','angry']);
+    let posCount=0,negCount=0,total=0;
+    S.content.forEach(c=>{const words=(c.body||'').toLowerCase().split(/\s+/);words.forEach(w=>{const clean=w.replace(/[^a-z]/g,'');if(posWords.has(clean))posCount++;if(negWords.has(clean))negCount++;total++;});});
+    const sentiment=posCount>negCount*1.5?'Positive':negCount>posCount*1.5?'Negative':'Neutral';
+    const color=sentiment==='Positive'?'var(--accent)':sentiment==='Negative'?'var(--red)':'var(--yellow)';
+    items.unshift({title:'Content Mood: '+sentiment,desc:posCount+' positive words, '+negCount+' negative words ('+S.content.length+' items, '+total+' total words)',icon:'M',type:'info'});
+    const topPos=[];const topNeg=[];S.content.forEach(c=>{let p=0,n=0;(c.body||'').toLowerCase().split(/\s+/).forEach(w=>{const cl=w.replace(/[^a-z]/g,'');if(posWords.has(cl))p++;if(negWords.has(cl))n++;});if(p>n&&p>2)topPos.push({c,score:p});if(n>p&&n>2)topNeg.push({c,score:n});});
+    topPos.sort((a,b)=>b.score-a.score).slice(0,3).forEach(x=>{items.unshift({title:'Positive: '+(x.c.body||'').substring(0,50)+'...',desc:x.score+' positive words',icon:'+',type:'info'});});
+    topNeg.sort((a,b)=>b.score-a.score).slice(0,3).forEach(x=>{items.unshift({title:'Negative: '+(x.c.body||'').substring(0,50)+'...',desc:x.score+' negative words',icon:'-',type:'info'});});
+  }
+  // Timeline prefix
+  if(ql && (ql==='timeline' || ql.startsWith('timeline:') || ql==='tl')){
+    const days=parseInt(ql.startsWith('timeline:')?q.substring(9):'')||14;
+    let tlHtml='';const now=new Date();
+    for(let i=0;i<days;i++){
+      const d=new Date(now);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];
+      const created=S.tasks.filter(t=>t.created&&t.created.startsWith(ds)).length;
+      const completed=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(ds)).length;
+      const content=S.content.filter(c=>c.created&&c.created.startsWith(ds)).length;
+      const total=created+completed+content;
+      if(total){const bar='|'.repeat(Math.min(total*2,20));const label=i===0?'Today':i===1?'Yesterday':ds.substring(5);tlHtml+=label.padEnd(8)+' '+bar+' +'+created+'t/'+completed+'d/'+content+'c\n';}
+    }
+    if(tlHtml)items.unshift({title:'Activity Timeline ('+days+' days)',desc:tlHtml.split('\n').slice(0,8).join(' / '),icon:'T',type:'info'});
+    else items.unshift({title:'No activity in last '+days+' days',desc:'Type timeline:N for custom range',icon:'!',type:'info'});
+  }
   // Cleanup prefix
   if(ql && (ql==='cleanup' || ql.startsWith('cleanup:') || ql==='clean')){
     const emptyTasks=S.tasks.filter(t=>!t.title||!t.title.trim());
