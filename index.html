@@ -6188,6 +6188,12 @@ function cmdGetItems(q) {
       ['jwt','JWT token decoder and inspector'],
       ['cumulative flow','Cumulative flow diagram for tasks'],
       ['typing test','Typing speed test with WPM tracking'],
+      ['qr code','QR code generator from text or URL'],
+      ['wip history','Work in progress history over 12 weeks'],
+      ['eye break','Guided eye break exercises'],
+      ['curl','cURL command generator'],
+      ['task age','Task age distribution chart'],
+      ['white noise','White/pink/brown noise generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8921,6 +8927,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='typing test' || ql==='typing' || ql==='wpm' || ql==='typing speed')){
     items.unshift({title:'Typing Test',desc:'Typing speed test with WPM',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTypingTest();}});
+  }
+  if(ql && (ql==='qr code' || ql==='qr' || ql==='qr generator' || ql==='barcode')){
+    items.unshift({title:'QR Code Generator',desc:'Generate QR codes from text or URLs',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQrGenerator();}});
+  }
+  if(ql && (ql==='wip history' || ql==='wip' || ql==='work in progress' || ql==='wip chart')){
+    items.unshift({title:'WIP History',desc:'Work in progress over 12 weeks',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWIPHistory();}});
+  }
+  if(ql && (ql==='eye break' || ql==='eye' || ql==='eye rest' || ql==='20 20 20')){
+    items.unshift({title:'Eye Break',desc:'Guided eye break exercises',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEyeBreak();}});
+  }
+  if(ql && (ql==='curl' || ql==='curl generator' || ql==='curl command' || ql==='http request')){
+    items.unshift({title:'cURL Generator',desc:'Build cURL commands visually',icon:'C',type:'action',action:()=>{closeCommandPalette();showCurlGenerator();}});
+  }
+  if(ql && (ql==='task age' || ql==='age distribution' || ql==='task aging' || ql==='stale tasks')){
+    items.unshift({title:'Task Age Distribution',desc:'How old are your open tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAgeDistribution();}});
+  }
+  if(ql && (ql==='white noise' || ql==='noise' || ql==='pink noise' || ql==='brown noise')){
+    items.unshift({title:'White Noise',desc:'White/pink/brown noise generator',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWhiteNoise();}});
   }
   return items.slice(0, 20);
 }
@@ -22822,6 +22846,262 @@ function showQuickTypingTest(){
     started=false;done=false;startTime=0;rend();
   };
   document.body.appendChild(d);
+  rend();
+}
+function showQrGenerator(){
+  let p=document.getElementById('qr-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='qr-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  let txt=S._qrText||'https://example.com';
+  let sz=S._qrSize||200;
+  function gen(){
+    let d=txt;let mods=[];let size=sz;
+    let ec='M';let matrix=qrEncode(d,ec);
+    if(!matrix)return '<div style="color:var(--text-muted);padding:20px;text-align:center">Too long for QR</div>';
+    let n=matrix.length;let cell=Math.floor(size/n);
+    let svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+cell*n+'" height="'+cell*n+'" viewBox="0 0 '+n+' '+n+'">';
+    svg+='<rect width="'+n+'" height="'+n+'" fill="white"/>';
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(matrix[r][c])svg+='<rect x="'+c+'" y="'+r+'" width="1" height="1" fill="black"/>';
+    svg+='</svg>';
+    return svg;
+  }
+  function qrEncode(data,ecl){
+    let s=data.length;if(s>120)return null;
+    let size=0;let versions=[0,21,25,29,33,37,41,45,49,53,57,61,65,69,73,77,81,85,89,93,97];
+    for(let v=1;v<=20;v++){if(s<=(v*3+6)){size=versions[v];break;}}
+    if(!size)return null;
+    let n=size;let m=[];for(let r=0;r<n;r++){m[r]=[];for(let c=0;c<n;c++)m[r][c]=0;}
+    function setMod(r,c,v){if(r>=0&&r<n&&c>=0&&c<n)m[r][c]=v?1:0;}
+    function finderPattern(row,col){
+      for(let r=-1;r<=7;r++)for(let c=-1;c<=7;c++){
+        let v=(r>=0&&r<=6&&c>=0&&c<=6)&&(r===0||r===6||c===0||c===6||(r>=2&&r<=4&&c>=2&&c<=4));
+        let rr=row+r,cc=col+c;
+        if(rr>=0&&rr<n&&cc>=0&&cc<n)setMod(rr,cc,v);
+      }
+    }
+    finderPattern(0,0);finderPattern(0,n-7);finderPattern(n-7,0);
+    for(let i=8;i<n-8;i++){setMod(6,i,i%2===0);setMod(i,6,i%2===0);}
+    setMod(n-8,8,1);
+    let bits=[];for(let i=0;i<data.length;i++){let b=data.charCodeAt(i);for(let j=7;j>=0;j--)bits.push((b>>j)&1);}
+    let idx=0;let upward=true;
+    for(let col=n-1;col>=1;col-=2){
+      if(col===6)col=5;
+      let rows=upward?Array.from({length:n},(_,i)=>n-1-i):Array.from({length:n},(_,i)=>i);
+      for(let row of rows){
+        for(let dc=0;dc<=1;dc++){
+          let c=col-dc;
+          if(m[row][c]===0){setMod(row,c,idx<bits.length?bits[idx]:0);idx++;}
+        }
+      }
+      upward=!upward;
+    }
+    return m;
+  }
+  function rend(){
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">QR Code Generator</span><button onclick="document.getElementById(\'qr-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<input id="qr-text-in" value="'+esc(txt)+'" placeholder="URL or text..." style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);margin-bottom:8px;box-sizing:border-box">'
+      +'<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center"><label style="color:var(--text-muted);font-size:11px">Size:</label><input id="qr-size-in" type="range" min="100" max="400" value="'+sz+'" style="flex:1"><span id="qr-size-lbl" style="color:var(--text-muted);font-size:11px;min-width:32px">'+sz+'</span></div>'
+      +'<div id="qr-preview" style="display:flex;justify-content:center;padding:16px;background:white;border-radius:var(--radius);margin-bottom:8px">'+gen()+'</div>'
+      +'<div style="display:flex;gap:6px"><button id="qr-copy-btn" style="flex:1;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy SVG</button></div>';
+    document.getElementById('qr-text-in').oninput=function(){txt=this.value;S._qrText=txt;save();document.getElementById('qr-preview').innerHTML=gen();};
+    document.getElementById('qr-size-in').oninput=function(){sz=parseInt(this.value);S._qrSize=sz;save();document.getElementById('qr-size-lbl').textContent=sz;document.getElementById('qr-preview').innerHTML=gen();};
+    document.getElementById('qr-copy-btn').onclick=function(){let svg=document.getElementById('qr-preview').innerHTML;navigator.clipboard.writeText(svg);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy SVG';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskWIPHistory(){
+  let p=document.getElementById('wip-hist-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='wip-hist-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let weeks=12;
+  let now=new Date();
+  let data=[];
+  for(let w=weeks-1;w>=0;w--){
+    let wEnd=new Date(now);wEnd.setDate(wEnd.getDate()-w*7);
+    let wStart=new Date(wEnd);wStart.setDate(wStart.getDate()-7);
+    let label=(wEnd.getMonth()+1)+'/'+wEnd.getDate();
+    let inProgress=0;
+    tasks.forEach(t=>{
+      let created=new Date(t.created||t.id);
+      let isDone=t.status==='done';
+      let doneDate=t.completedAt?new Date(t.completedAt):null;
+      if(created<=wEnd && (!isDone || (doneDate && doneDate>wEnd))){
+        if(t.status==='in-progress'||(created<=wEnd && !isDone))inProgress++;
+      }
+    });
+    data.push({label,wip:inProgress});
+  }
+  let maxW=Math.max(...data.map(d=>d.wip),1);
+  let svgW=480,svgH=200,pad=30;
+  let barW=(svgW-pad*2)/data.length*0.7;
+  let gap=(svgW-pad*2)/data.length;
+  let bars='';
+  data.forEach((d,i)=>{
+    let x=pad+i*gap+gap*0.15;
+    let h=(d.wip/maxW)*(svgH-pad*2);
+    let y=svgH-pad-h;
+    bars+='<rect x="'+x+'" y="'+y+'" width="'+barW+'" height="'+h+'" fill="#4ade80" rx="2"/>';
+    bars+='<text x="'+(x+barW/2)+'" y="'+(svgH-pad+14)+'" text-anchor="middle" fill="#888" font-size="9">'+d.label+'</text>';
+    bars+='<text x="'+(x+barW/2)+'" y="'+(y-4)+'" text-anchor="middle" fill="#4ade80" font-size="10">'+d.wip+'</text>';
+  });
+  let svg='<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%"><rect width="'+svgW+'" height="'+svgH+'" fill="transparent"/>'+bars+'</svg>';
+  let total=tasks.filter(t=>t.status!=='done').length;
+  let ip=tasks.filter(t=>t.status==='in-progress').length;
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">WIP History (12 Weeks)</span><button onclick="document.getElementById(\'wip-hist-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:16px;margin-bottom:12px"><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);flex:1;text-align:center"><div style="font-size:20px;font-weight:700;color:#4ade80">'+ip+'</div><div style="font-size:10px;color:var(--text-muted)">In Progress</div></div><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);flex:1;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--text-primary)">'+total+'</div><div style="font-size:10px;color:var(--text-muted)">Open Tasks</div></div></div>'
+    +svg;
+  document.body.appendChild(p);
+}
+function showQuickEyeBreak(){
+  let p=document.getElementById('eye-break-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='eye-break-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  let phase=0;let timer=null;let secs=20;
+  let exercises=[
+    {name:'20-20-20 Rule',desc:'Look at something 20 feet away for 20 seconds',dur:20},
+    {name:'Blink Break',desc:'Blink rapidly 15 times then close eyes',dur:15},
+    {name:'Eye Circles',desc:'Roll your eyes in slow circles',dur:15},
+    {name:'Palm Rest',desc:'Cover eyes with warm palms, relax',dur:30},
+    {name:'Focus Shift',desc:'Focus near (thumb) then far, alternate',dur:20}
+  ];
+  let ex=exercises[Math.floor(Math.random()*exercises.length)];
+  function rend(){
+    if(phase===0){
+      p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Eye Break</span><button onclick="document.getElementById(\'eye-break-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+        +'<div style="text-align:center;padding:12px 0"><div style="font-size:14px;font-weight:600;color:#4ade80;margin-bottom:6px">'+esc(ex.name)+'</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+esc(ex.desc)+'</div><button id="eye-start-btn" style="padding:8px 20px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Start ('+ex.dur+'s)</button></div>';
+      document.getElementById('eye-start-btn').onclick=function(){phase=1;secs=ex.dur;startTimer();};
+    } else if(phase===1){
+      let pct=((ex.dur-secs)/ex.dur)*100;
+      p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Eye Break</span><button onclick="clearInterval(window._eyeTimer);document.getElementById(\'eye-break-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+        +'<div style="text-align:center;padding:8px 0"><div style="font-size:13px;color:#4ade80;margin-bottom:8px">'+esc(ex.name)+'</div>'
+        +'<div style="font-size:36px;font-weight:700;color:var(--text-primary);margin-bottom:8px">'+secs+'s</div>'
+        +'<div style="height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;transition:width 1s linear"></div></div></div>';
+    } else {
+      if(timer)clearInterval(timer);
+      p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Eye Break</span><button onclick="document.getElementById(\'eye-break-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+        +'<div style="text-align:center;padding:12px 0"><div style="font-size:16px;color:#4ade80;margin-bottom:6px">Done!</div><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">Great job. Your eyes thank you.</div><button onclick="document.getElementById(\'eye-break-panel\').remove()" style="padding:6px 16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);cursor:pointer">Close</button></div>';
+    }
+  }
+  function startTimer(){
+    rend();
+    window._eyeTimer=setInterval(()=>{secs--;if(secs<=0){phase=2;clearInterval(window._eyeTimer);}rend();},1000);
+    timer=window._eyeTimer;
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showCurlGenerator(){
+  let p=document.getElementById('curl-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='curl-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let cfg=S._curlCfg||{method:'GET',url:'https://api.example.com/data',headers:[{k:'Content-Type',v:'application/json'}],body:''};
+  function gen(){
+    let c='curl';
+    if(cfg.method!=='GET')c+=' -X '+cfg.method;
+    cfg.headers.forEach(h=>{if(h.k&&h.v)c+=" -H '"+h.k+': '+h.v+"'";});
+    if(cfg.body&&(cfg.method==='POST'||cfg.method==='PUT'||cfg.method==='PATCH'))c+=" -d '"+cfg.body+"'";
+    c+=' "'+cfg.url+'"';
+    return c;
+  }
+  function rend(){
+    let hdrs=cfg.headers.map((h,i)=>'<div style="display:flex;gap:4px;margin-bottom:4px"><input data-hi="'+i+'" data-hf="k" value="'+esc(h.k)+'" placeholder="Key" style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:11px"><input data-hi="'+i+'" data-hf="v" value="'+esc(h.v)+'" placeholder="Value" style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:11px"><button data-hd="'+i+'" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:14px">x</button></div>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">cURL Generator</span><button onclick="document.getElementById(\'curl-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;gap:6px;margin-bottom:8px"><select id="curl-method" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary)">'+['GET','POST','PUT','PATCH','DELETE','HEAD','OPTIONS'].map(m=>'<option'+(m===cfg.method?' selected':'')+'>'+m+'</option>').join('')+'</select><input id="curl-url" value="'+esc(cfg.url)+'" placeholder="URL" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:12px"></div>'
+      +'<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted)">Headers</span><button id="curl-add-h" style="font-size:10px;padding:2px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);cursor:pointer">+ Add</button></div>'+hdrs+'</div>'
+      +'<div style="margin-bottom:8px"><span style="font-size:11px;color:var(--text-muted)">Body</span><textarea id="curl-body" rows="3" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-top:4px">'+esc(cfg.body)+'</textarea></div>'
+      +'<div style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;margin-bottom:8px;font-family:monospace;font-size:11px;color:#4ade80;word-break:break-all;line-height:1.5">'+esc(gen())+'</div>'
+      +'<button id="curl-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy Command</button>';
+    document.getElementById('curl-method').onchange=function(){cfg.method=this.value;S._curlCfg=cfg;save();rend();};
+    document.getElementById('curl-url').oninput=function(){cfg.url=this.value;S._curlCfg=cfg;save();rend();};
+    document.getElementById('curl-body').oninput=function(){cfg.body=this.value;S._curlCfg=cfg;save();};
+    document.getElementById('curl-add-h').onclick=function(){cfg.headers.push({k:'',v:''});S._curlCfg=cfg;save();rend();};
+    document.getElementById('curl-copy').onclick=function(){navigator.clipboard.writeText(gen());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy Command';},1200);};
+    p.querySelectorAll('[data-hd]').forEach(b=>{b.onclick=function(){cfg.headers.splice(parseInt(this.dataset.hd),1);S._curlCfg=cfg;save();rend();};});
+    p.querySelectorAll('[data-hi]').forEach(inp=>{inp.oninput=function(){let i=parseInt(this.dataset.hi);cfg.headers[i][this.dataset.hf]=this.value;S._curlCfg=cfg;save();};});
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskAgeDistribution(){
+  let p=document.getElementById('task-age-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='task-age-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  let now=Date.now();
+  let buckets=[
+    {label:'< 1 day',max:86400000,count:0,color:'#4ade80'},
+    {label:'1-3 days',max:259200000,count:0,color:'#22d3ee'},
+    {label:'3-7 days',max:604800000,count:0,color:'#a78bfa'},
+    {label:'1-2 weeks',max:1209600000,count:0,color:'#fbbf24'},
+    {label:'2-4 weeks',max:2419200000,count:0,color:'#fb923c'},
+    {label:'> 1 month',max:Infinity,count:0,color:'#f87171'}
+  ];
+  tasks.forEach(t=>{
+    let age=now-(t.created||Date.parse(t.id)||now);
+    for(let b of buckets){if(age<b.max){b.count++;break;}}
+  });
+  let maxC=Math.max(...buckets.map(b=>b.count),1);
+  let rows=buckets.map(b=>{
+    let pct=Math.round(b.count/maxC*100);
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="min-width:80px;font-size:11px;color:var(--text-muted);text-align:right">'+b.label+'</span><div style="flex:1;height:18px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+b.color+';border-radius:3px;transition:width 0.3s"></div></div><span style="min-width:24px;font-size:11px;color:var(--text-primary);font-weight:600">'+b.count+'</span></div>';
+  }).join('');
+  let avg=tasks.length?Math.round(tasks.reduce((s,t)=>s+(now-(t.created||Date.parse(t.id)||now)),0)/tasks.length/86400000):0;
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Age Distribution</span><button onclick="document.getElementById(\'task-age-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:12px;margin-bottom:14px"><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;flex:1"><div style="font-size:18px;font-weight:700;color:#4ade80">'+tasks.length+'</div><div style="font-size:10px;color:var(--text-muted)">Open Tasks</div></div><div style="padding:8px 12px;background:var(--bg-surface);border-radius:var(--radius);text-align:center;flex:1"><div style="font-size:18px;font-weight:700;color:var(--text-primary)">'+avg+'d</div><div style="font-size:10px;color:var(--text-muted)">Avg Age</div></div></div>'
+    +rows;
+  document.body.appendChild(p);
+}
+function showQuickWhiteNoise(){
+  let p=document.getElementById('white-noise-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='white-noise-panel';
+  p.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  let playing=false;let ctx=null;let node=null;let gain=null;
+  let vol=S._wnVol||0.3;
+  let type=S._wnType||'white';
+  function start(){
+    ctx=new(window.AudioContext||window.webkitAudioContext)();
+    let bufSize=4096;
+    node=ctx.createScriptProcessor(bufSize,1,1);
+    gain=ctx.createGain();
+    gain.gain.value=vol;
+    let b1=0;let b2=0;let b3=0;let b4=0;let b5=0;let b6=0;
+    node.onaudioprocess=function(e){
+      let out=e.outputBuffer.getChannelData(0);
+      for(let i=0;i<bufSize;i++){
+        let white=Math.random()*2-1;
+        if(type==='white'){out[i]=white;}
+        else if(type==='pink'){
+          b0=0.99886*b1+white*0.0555179;b1=b0;
+          b2=0.99332*b2+white*0.0750759;
+          b3=0.96900*b3+white*0.1538520;
+          b4=0.86650*b4+white*0.3104856;
+          b5=0.55000*b5+white*0.5329522;
+          b6=-0.7616*b6-white*0.0168980;
+          out[i]=(b0+b2+b3+b4+b5+b6+white*0.5362)*0.11;
+        } else {
+          b0=b1+(0.02*(white-b1));b1=b0;out[i]=b0*3.5;
+        }
+      }
+    };
+    node.connect(gain);gain.connect(ctx.destination);
+    playing=true;
+  }
+  function stop(){if(ctx){node.disconnect();gain.disconnect();ctx.close();ctx=null;playing=false;}}
+  function rend(){
+    let types=['white','pink','brown'];
+    let btns=types.map(t=>'<button data-nt="'+t+'" style="padding:4px 10px;border-radius:var(--radius);border:1px solid '+(type===t?'#4ade80':'var(--border)')+';background:'+(type===t?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(type===t?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:11px">'+t+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">White Noise</span><button onclick="if(window._wnStop)window._wnStop();document.getElementById(\'white-noise-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="display:flex;gap:4px;margin-bottom:10px;justify-content:center">'+btns+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:10px;color:var(--text-muted)">Vol</span><input id="wn-vol" type="range" min="0" max="100" value="'+Math.round(vol*100)+'" style="flex:1"><span id="wn-vol-lbl" style="font-size:10px;color:var(--text-muted);min-width:28px">'+Math.round(vol*100)+'%</span></div>'
+      +'<button id="wn-toggle" style="width:100%;padding:8px;background:'+(playing?'#f87171':'#4ade80')+';color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">'+(playing?'Stop':'Play')+'</button>';
+    p.querySelectorAll('[data-nt]').forEach(b=>{b.onclick=function(){type=this.dataset.nt;S._wnType=type;save();if(playing){stop();start();}rend();};});
+    document.getElementById('wn-vol').oninput=function(){vol=parseInt(this.value)/100;S._wnVol=vol;save();document.getElementById('wn-vol-lbl').textContent=Math.round(vol*100)+'%';if(gain)gain.gain.value=vol;};
+    document.getElementById('wn-toggle').onclick=function(){if(playing)stop();else start();rend();};
+  }
+  window._wnStop=stop;
+  document.body.appendChild(p);
   rend();
 }
 function showProjectRoadmap(filterProject){
