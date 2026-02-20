@@ -6176,6 +6176,9 @@ function cmdGetItems(q) {
       ['base64','Base64 encode and decode tool'],
       ['productivity','Productivity dashboard with weekly stats'],
       ['stopwatch','Stopwatch with lap tracking'],
+      ['url encode','URL encode/decode tool'],
+      ['workspace','Workspace summary with item counts'],
+      ['metronome','Audio metronome with BPM control'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8873,6 +8876,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='stopwatch' || ql==='stop watch' || ql==='lap timer' || ql==='chrono')){
     items.unshift({title:'Stopwatch',desc:'Stopwatch with laps',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
+  }
+  if(ql && (ql==='url encode' || ql==='url decode' || ql==='urlencode' || ql==='percent encode')){
+    items.unshift({title:'URL Encode/Decode',desc:'URL encoding tool',icon:'U',type:'action',action:()=>{closeCommandPalette();showUrlEncoder();}});
+  }
+  if(ql && (ql==='workspace' || ql==='workspace summary' || ql==='data overview' || ql==='item counts')){
+    items.unshift({title:'Workspace Summary',desc:'Full workspace overview',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWorkspaceSummary();}});
+  }
+  if(ql && (ql==='metronome' || ql==='bpm' || ql==='tempo' || ql==='beat')){
+    items.unshift({title:'Metronome',desc:'Audio metronome with BPM control',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMetronome();}});
   }
   return items.slice(0, 20);
 }
@@ -22328,6 +22340,105 @@ function showQuickStopwatch(){
     running=false;if(timer)clearInterval(timer);timer=null;elapsed=0;laps=[];
     var el=document.getElementById('stopwatch-float');if(el)rend();
   };
+  document.body.appendChild(d);
+  rend();
+}
+function showUrlEncoder(){
+  var ex=document.getElementById('url-encoder-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='url-encoder-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">URL Encode/Decode</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Input</label><textarea id="url-enc-input" rows="3" placeholder="Enter URL or encoded string..." style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:vertical;box-sizing:border-box"></textarea></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:8px">'+
+    '<button onclick="window._urlEnc()" style="flex:1;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Encode</button>'+
+    '<button onclick="window._urlDec()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:8px;border-radius:6px;cursor:pointer;font-size:12px">Decode</button>'+
+    '<button onclick="window._urlComp()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:8px;border-radius:6px;cursor:pointer;font-size:12px">encodeComponent</button>'+
+    '</div>'+
+    '<div style="margin-bottom:8px"><label style="color:var(--text-muted);font-size:11px">Output</label><textarea id="url-enc-output" rows="3" readonly style="width:100%;background:var(--bg-surface);color:#4ade80;border:1px solid var(--border);border-radius:6px;padding:8px;font-family:monospace;font-size:12px;resize:vertical;box-sizing:border-box"></textarea></div>'+
+    '<button onclick="var o=document.getElementById(\'url-enc-output\');if(o)navigator.clipboard.writeText(o.value)" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px">Copy Output</button>';
+  document.body.appendChild(d);
+  window._urlEnc=function(){var i=document.getElementById('url-enc-input');var o=document.getElementById('url-enc-output');if(i&&o)try{o.value=encodeURI(i.value);}catch(e){o.value='Error: '+e.message;}};
+  window._urlDec=function(){var i=document.getElementById('url-enc-input');var o=document.getElementById('url-enc-output');if(i&&o)try{o.value=decodeURI(i.value);}catch(e){o.value='Error: '+e.message;}};
+  window._urlComp=function(){var i=document.getElementById('url-enc-input');var o=document.getElementById('url-enc-output');if(i&&o)try{o.value=encodeURIComponent(i.value);}catch(e){o.value='Error: '+e.message;}};
+}
+function showTaskWorkspaceSummary(){
+  var ex=document.getElementById('workspace-summary-float');if(ex){ex.remove();return;}
+  var tasks=(S.tasks||[]);
+  var content=(S.content||[]);
+  var links=(S.links||[]);
+  var docs=(S.writerDocs||[]);
+  var specs=(S.specs||[]);
+  var repos=(S.repos||[]);
+  var projects=(S.projects||[]);
+  var totalSize=JSON.stringify(S).length;
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Workspace Summary</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">x</button></div>';
+  var sections=[
+    {name:'Tasks',count:tasks.length,color:'#4ade80'},
+    {name:'Content',count:content.length,color:'#06b6d4'},
+    {name:'Links',count:links.length,color:'#a78bfa'},
+    {name:'Writer Docs',count:docs.length,color:'#f59e0b'},
+    {name:'Living Docs',count:specs.length,color:'#ec4899'},
+    {name:'Repos',count:repos.length,color:'#3b82f6'},
+    {name:'Projects',count:projects.length,color:'#ef4444'}
+  ];
+  var maxCount=0;sections.forEach(function(s){if(s.count>maxCount)maxCount=s.count;});
+  sections.forEach(function(s){
+    var pct=maxCount?Math.round(s.count/maxCount*100):0;
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<div style="width:8px;height:8px;border-radius:50%;background:'+s.color+'"></div>'+
+      '<span style="color:var(--text-primary);font-size:12px;min-width:80px">'+s.name+'</span>'+
+      '<div style="flex:1;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+s.color+';border-radius:4px"></div></div>'+
+      '<span style="color:var(--text-muted);font-size:11px;min-width:30px;text-align:right">'+s.count+'</span></div>';
+  });
+  h+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center">'+
+    '<div style="font-size:11px;color:var(--text-muted)">Total workspace size</div>'+
+    '<div style="font-size:20px;font-weight:700;color:#4ade80">'+(totalSize/1024).toFixed(1)+' KB</div></div>';
+  var d=document.createElement('div');d.id='workspace-summary-float';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw;max-height:80vh;overflow-y:auto';
+  d.innerHTML=h;
+  document.body.appendChild(d);
+}
+function showQuickMetronome(){
+  var ex=document.getElementById('metronome-float');if(ex){ex.remove();return;}
+  var d=document.createElement('div');d.id='metronome-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:220px;text-align:center';
+  var bpm=120,running=false,timer=null,ctx=null,beat=0;
+  function rend(){
+    var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Metronome</span><button onclick="window._metStop();document.getElementById(\'metronome-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">x</button></div>';
+    h+='<div style="font-size:36px;font-weight:700;color:'+(running?'#4ade80':'var(--text-primary)')+';margin-bottom:8px">'+bpm+'</div>';
+    h+='<div style="color:var(--text-muted);font-size:11px;margin-bottom:8px">BPM</div>';
+    h+='<input type="range" min="40" max="240" value="'+bpm+'" id="met-bpm" style="width:100%;margin-bottom:8px">';
+    h+='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">';
+    [60,80,100,120,140].forEach(function(b){
+      h+='<button onclick="window._metBPM('+b+')" style="background:'+(bpm===b?'#4ade80':'var(--bg-surface)')+';color:'+(bpm===b?'#000':'var(--text-primary)')+';border:1px solid var(--border);padding:3px 6px;border-radius:4px;cursor:pointer;font-size:10px">'+b+'</button>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;gap:8px;justify-content:center">';
+    for(var i=0;i<4;i++){
+      h+='<div style="width:16px;height:16px;border-radius:50%;background:'+(beat%4===i&&running?'#4ade80':'var(--bg-surface)')+';border:1px solid var(--border)"></div>';
+    }
+    h+='</div>';
+    h+='<button onclick="window._metToggle()" style="background:'+(running?'#ef4444':'#4ade80')+';color:'+(running?'#fff':'#000')+';border:none;padding:8px 24px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;width:100%;margin-top:8px">'+(running?'Stop':'Start')+'</button>';
+    d.innerHTML=h;
+    var slider=d.querySelector('#met-bpm');
+    if(slider)slider.oninput=function(e){bpm=parseInt(e.target.value);if(running){window._metStop();window._metToggle();}else{rend();}};
+  }
+  function tick(){
+    beat++;
+    if(!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var osc=ctx.createOscillator();osc.frequency.value=beat%4===0?880:660;
+    var g=ctx.createGain();g.gain.value=0.3;g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.1);
+    osc.connect(g);g.connect(ctx.destination);
+    osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.1);
+    rend();
+  }
+  window._metToggle=function(){
+    if(running){window._metStop();return;}
+    running=true;beat=0;
+    timer=setInterval(tick,60000/bpm);tick();
+  };
+  window._metStop=function(){running=false;if(timer)clearInterval(timer);timer=null;rend();};
+  window._metBPM=function(b){bpm=b;if(running){window._metStop();window._metToggle();}else rend();};
   document.body.appendChild(d);
   rend();
 }
