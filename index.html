@@ -6056,6 +6056,9 @@ function cmdGetItems(q) {
       ['json viewer','JSON formatter and pretty-printer'],
       ['task templates','Manage custom task creation templates'],
       ['workspace mood','Visual mood indicator from health metrics'],
+      ['regex','Live regex pattern tester with matches'],
+      ['ics export','Export tasks as ICS calendar file'],
+      ['dice','Random number generator and decision maker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8378,6 +8381,18 @@ function cmdGetItems(q) {
   // Workspace mood prefix
   if(ql && (ql==='workspace mood' || ql==='mood' || ql==='vibe' || ql==='workspace health')){
     items.unshift({title:'Workspace Mood',desc:'Visual mood from health metrics',icon:'M',type:'action',action:()=>{closeCommandPalette();showWorkspaceMood();}});
+  }
+  // Regex prefix
+  if(ql && (ql==='regex' || ql==='regex tester' || ql==='pattern test' || ql==='regexp')){
+    items.unshift({title:'Regex Tester',desc:'Live pattern matcher',icon:'R',type:'action',action:()=>{closeCommandPalette();showRegexTester();}});
+  }
+  // ICS export prefix
+  if(ql && (ql==='ics export' || ql==='ics' || ql==='calendar export' || ql==='export ics')){
+    items.unshift({title:'ICS Export',desc:'Download tasks as calendar file',icon:'I',type:'action',action:()=>{closeCommandPalette();showCalendarExporter();}});
+  }
+  // Dice prefix
+  if(ql && (ql==='dice' || ql==='random' || ql==='coin flip' || ql==='decide')){
+    items.unshift({title:'Random / Dice',desc:'Random number and decision maker',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDice();}});
   }
   return items.slice(0, 20);
 }
@@ -17569,6 +17584,94 @@ function showWorkspaceMood(){
     h+='</div>';
   });
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showRegexTester(){
+  let panel=document.getElementById('regex-tester-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='regex-tester-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  function render(){
+    const pattern=(panel.querySelector('#rx-pattern')||{}).value||'';
+    const flags=(panel.querySelector('#rx-flags')||{}).value||'gi';
+    const text=(panel.querySelector('#rx-text')||{}).value||'';
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Regex Tester</span><button onclick="this.closest(\'#regex-tester-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+    h+='<input id="rx-pattern" value="'+esc(pattern)+'" placeholder="Regex pattern..." oninput="this.closest(\'#regex-tester-panel\')._render()" style="flex:1;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:#4ade80;font-size:12px;font-family:monospace;box-sizing:border-box">';
+    h+='<input id="rx-flags" value="'+esc(flags)+'" placeholder="gi" oninput="this.closest(\'#regex-tester-panel\')._render()" style="width:50px;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;font-family:monospace;box-sizing:border-box">';
+    h+='</div>';
+    h+='<textarea id="rx-text" placeholder="Test string..." oninput="this.closest(\'#regex-tester-panel\')._render()" style="width:100%;height:80px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:monospace;margin-bottom:8px">'+esc(text)+'</textarea>';
+    // Test results
+    if(pattern&&text){
+      try{
+        const rx=new RegExp(pattern,flags);
+        const matches=text.match(rx);
+        if(matches){
+          h+='<div style="font-size:11px;color:#4ade80;margin-bottom:6px">'+matches.length+' match'+(matches.length>1?'es':'')+'</div>';
+          h+='<div style="background:var(--bg-surface);border-radius:var(--radius);padding:8px;font-family:monospace;font-size:11px;max-height:120px;overflow-y:auto">';
+          matches.forEach((m,i)=>{
+            h+='<div style="padding:2px 0;color:var(--text)"><span style="color:var(--text-muted);font-size:9px">['+(i+1)+']</span> <span style="background:#4ade8022;padding:1px 3px;border-radius:2px">'+esc(m)+'</span></div>';
+          });
+          h+='</div>';
+        } else {
+          h+='<div style="font-size:11px;color:#ef4444">No matches</div>';
+        }
+      }catch(e){
+        h+='<div style="font-size:11px;color:#ef4444">Error: '+esc(e.message)+'</div>';
+      }
+    }
+    panel.innerHTML=h;panel._render=render;
+    if(pattern){const inp=panel.querySelector('#rx-pattern');inp.setSelectionRange(pattern.length,pattern.length);}
+  }
+  render();document.body.appendChild(panel);
+}
+function showCalendarExporter(){
+  let panel=document.getElementById('cal-export-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='cal-export-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.due&&t.status!=='done');
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Calendar Export (ICS)</span><button onclick="this.closest(\'#cal-export-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+tasks.length+' tasks with due dates (excluding done)</div>';
+  // Preview
+  tasks.slice(0,10).forEach(t=>{
+    const pCol=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f59e0b':'#3b82f6';
+    h+='<div style="padding:4px 8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+    h+='<span style="font-size:9px;color:'+pCol+';font-weight:600">'+t.priority.toUpperCase()+'</span>';
+    h+='<span style="flex:1;font-size:11px;color:var(--text)">'+esc(t.title)+'</span>';
+    h+='<span style="font-size:10px;color:var(--text-muted)">'+t.due.substring(0,10)+'</span>';
+    h+='</div>';
+  });
+  if(tasks.length>10)h+='<div style="font-size:10px;color:var(--text-muted);padding:4px">+'+(tasks.length-10)+' more</div>';
+  h+='<button onclick="const tasks=(S.tasks||[]).filter(t=>t.due&&t.status!==\'done\');let ics=\'BEGIN:VCALENDAR\\nVERSION:2.0\\nPRODID:-//ASTRA//Tasks//EN\\n\';tasks.forEach(t=>{const d=(t.due||\'\').replace(/[-:]/g,\'\').substring(0,8);ics+=\'BEGIN:VEVENT\\nDTSTART;VALUE=DATE:\'+d+\'\\nSUMMARY:\'+t.title.replace(/[\\n,;]/g,\' \')+\'\\nDESCRIPTION:\'+((t.description||\'\').replace(/[\\n]/g,\'\\\\n\').replace(/[,;]/g,\' \').substring(0,200))+\'\\nEND:VEVENT\\n\';});ics+=\'END:VCALENDAR\';const blob=new Blob([ics],{type:\'text/calendar\'});const a=document.createElement(\'a\');a.href=URL.createObjectURL(blob);a.download=\'astra-tasks.ics\';a.click()" style="width:100%;margin-top:10px;padding:8px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:600">Download ICS File</button>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickDice(){
+  let panel=document.getElementById('quick-dice-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-dice-widget';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  function render(result){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:12px;color:var(--text)">Random / Decide</span><button onclick="this.closest(\'#quick-dice-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+    if(result!==undefined){
+      h+='<div style="text-align:center;padding:12px 0;font-size:24px;font-weight:700;color:#4ade80">'+result+'</div>';
+    }
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+    const options=[
+      {label:'d6',fn:'Math.floor(Math.random()*6)+1'},
+      {label:'d20',fn:'Math.floor(Math.random()*20)+1'},
+      {label:'d100',fn:'Math.floor(Math.random()*100)+1'},
+      {label:'Coin',fn:'Math.random()>0.5?"Heads":"Tails"'},
+      {label:'Yes/No',fn:'Math.random()>0.5?"Yes":"No"'},
+      {label:'1-10',fn:'Math.floor(Math.random()*10)+1'},
+    ];
+    options.forEach(o=>{
+      h+='<button onclick="this.closest(\'#quick-dice-widget\')._render(eval(\''+o.fn+'\'))" style="flex:1;min-width:60px;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">'+o.label+'</button>';
+    });
+    h+='</div>';
+    h+='<div style="display:flex;gap:4px">';
+    h+='<input id="dice-custom" placeholder="Comma-separated options..." style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px;box-sizing:border-box">';
+    h+='<button onclick="const v=document.getElementById(\'dice-custom\').value.split(\',\').map(s=>s.trim()).filter(Boolean);if(!v.length)return;this.closest(\'#quick-dice-widget\')._render(v[Math.floor(Math.random()*v.length)])" style="padding:4px 8px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:10px;font-weight:600">Pick</button>';
+    h+='</div>';
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
