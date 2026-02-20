@@ -6344,6 +6344,12 @@ function cmdGetItems(q) {
       ['netlify','Netlify CLI command reference'],
       ['weekly pattern','Task completion day-of-week pattern'],
       ['csv to table','CSV data to formatted table'],
+      ['supabase','Supabase CLI command reference'],
+      ['sla report','Task SLA on-time delivery report'],
+      ['regex tester','Regular expression tester'],
+      ['railway','Railway CLI command reference'],
+      ['streak','Task completion streak tracker'],
+      ['qr code','QR code generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9545,6 +9551,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='csv to table' || ql==='csv' || ql==='csv viewer' || ql==='csv render')){
     items.unshift({title:'CSV to Table',desc:'Render CSV data as a formatted table',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickCsvToTable();}});
+  }
+  if(ql && (ql==='supabase' || ql==='supabase cli' || ql==='supabase commands' || ql==='supabase ref')){
+    items.unshift({title:'Supabase CLI Reference',desc:'Supabase CLI cheatsheet by category',icon:'S',type:'action',action:()=>{closeCommandPalette();showSupabaseCliRef();}});
+  }
+  if(ql && (ql==='sla report' || ql==='sla' || ql==='on time' || ql==='delivery rate')){
+    items.unshift({title:'SLA Report',desc:'On-time task delivery rate gauge',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSlaReport();}});
+  }
+  if(ql && (ql==='regex tester' || ql==='regex' || ql==='regexp' || ql==='regular expression')){
+    items.unshift({title:'Regex Tester',desc:'Test regular expressions with live matches',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRegexTester();}});
+  }
+  if(ql && (ql==='railway' || ql==='railway cli' || ql==='railway commands' || ql==='railway ref')){
+    items.unshift({title:'Railway CLI Reference',desc:'Railway CLI cheatsheet by category',icon:'R',type:'action',action:()=>{closeCommandPalette();showRailwayCliRef();}});
+  }
+  if(ql && (ql==='streak' || ql==='completion streak' || ql==='task streak' || ql==='daily streak')){
+    items.unshift({title:'Completion Streak',desc:'Task completion streak and active days',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskCompletionStreak();}});
+  }
+  if(ql && (ql==='qr code' || ql==='qr' || ql==='qr generator' || ql==='generate qr')){
+    items.unshift({title:'QR Code Generator',desc:'Generate QR codes from text or URLs',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickQrGen();}});
   }
   return items.slice(0, 20);
 }
@@ -28110,6 +28134,158 @@ function showQuickCsvToTable(){
     thtml+='</tbody></table>';
     thtml+='<div style="font-size:10px;color:var(--text-muted);margin-top:6px">'+rows.length+' rows, '+rows[0].length+' columns</div>';
     outEl.innerHTML=thtml;
+  };
+}
+function showSupabaseCliRef(){
+  const d=document.createElement('div');d.id='supabase-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Project':['supabase init','supabase start','supabase stop','supabase status','supabase link --project-ref <ref>'],
+    'Database':['supabase db push','supabase db pull','supabase db reset','supabase db diff','supabase db lint'],
+    'Migration':['supabase migration new <name>','supabase migration list','supabase migration repair --status applied <ver>'],
+    'Functions':['supabase functions new <name>','supabase functions serve','supabase functions deploy <name>','supabase functions delete <name>'],
+    'Auth':['supabase login','supabase projects list','supabase orgs list','supabase secrets set KEY=val','supabase secrets list']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Supabase CLI Reference</h3><button onclick="document.getElementById(\'supabase-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskSlaReport(){
+  const d=document.createElement('div');d.id='sla-report-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const withDue=tasks.filter(t=>t.due&&t.status==='done'&&t.updatedAt);
+  let onTime=0;let late=0;
+  withDue.forEach(t=>{
+    const due=new Date(t.due);const completed=new Date(t.updatedAt);
+    if(completed<=new Date(due.getTime()+86400000))onTime++;else late++;
+  });
+  const total=onTime+late;const pct=total?Math.round(onTime/total*100):0;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">SLA Report</h3><button onclick="document.getElementById(\'sla-report-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  const gaugeColor=pct>=80?'#4ade80':pct>=60?'#f59e0b':'#ef4444';
+  const circumference=2*Math.PI*80;const offset=circumference-(pct/100)*circumference;
+  let svg='<svg width="200" height="200" viewBox="0 0 200 200" style="display:block;margin:0 auto 16px">';
+  svg+='<circle cx="100" cy="100" r="80" fill="none" stroke="var(--bg-surface)" stroke-width="12"/>';
+  svg+='<circle cx="100" cy="100" r="80" fill="none" stroke="'+gaugeColor+'" stroke-width="12" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(-90 100 100)"/>';
+  svg+='<text x="100" y="90" text-anchor="middle" fill="'+gaugeColor+'" font-size="36" font-weight="700">'+pct+'%</text>';
+  svg+='<text x="100" y="115" text-anchor="middle" fill="var(--text-muted)" font-size="12">on time</text>';
+  svg+='</svg>';
+  html+=svg;
+  html+='<div style="display:flex;gap:16px;justify-content:center">';
+  html+='<div style="text-align:center"><div style="font-size:20px;color:#4ade80;font-weight:700">'+onTime+'</div><div style="font-size:10px;color:var(--text-muted)">On Time</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:20px;color:#ef4444;font-weight:700">'+late+'</div><div style="font-size:10px;color:var(--text-muted)">Late</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:20px;color:var(--text-secondary);font-weight:700">'+total+'</div><div style="font-size:10px;color:var(--text-muted)">Total</div></div></div>';
+  if(!total)html+='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px;margin-top:12px">Complete tasks with due dates to see SLA metrics.</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickRegexTester(){
+  const d=document.createElement('div');d.id='regex-tester-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Regex Tester</h3><button onclick="document.getElementById(\'regex-tester-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Pattern</label><div style="display:flex;gap:4px"><span style="color:var(--text-muted);padding-top:6px">/</span><input id="rx-pattern" type="text" placeholder="[a-z]+" oninput="window._rxTest()" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:#4ade80;font-size:13px;font-family:monospace"/><span style="color:var(--text-muted);padding-top:6px">/</span><input id="rx-flags" type="text" value="g" oninput="window._rxTest()" style="width:40px;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;font-family:monospace"/></div></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Test String</label><textarea id="rx-input" rows="4" placeholder="Enter test text..." oninput="window._rxTest()" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box"></textarea></div>';
+  html+='<div id="rx-status" style="font-size:11px;margin-bottom:6px;color:var(--text-muted)"></div>';
+  html+='<div id="rx-matches" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:11px;color:var(--text-secondary);min-height:40px;max-height:200px;overflow-y:auto"></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._rxTest=function(){
+    const pattern=document.getElementById('rx-pattern').value;const flags=document.getElementById('rx-flags').value;
+    const input=document.getElementById('rx-input').value;const statusEl=document.getElementById('rx-status');const matchEl=document.getElementById('rx-matches');
+    if(!pattern){statusEl.textContent='';matchEl.innerHTML='';return;}
+    try{
+      const rx=new RegExp(pattern,flags);const matches=[...input.matchAll(rx)];
+      statusEl.textContent=matches.length+' match'+(matches.length!==1?'es':'');statusEl.style.color='#4ade80';
+      let mhtml='';
+      matches.forEach((m,i)=>{
+        mhtml+='<div style="margin-bottom:4px;padding:4px 6px;background:var(--bg-base);border-radius:3px"><span style="color:var(--text-muted);font-size:10px">#'+(i+1)+' ['+m.index+']</span> <span style="color:#4ade80">'+esc(m[0])+'</span>';
+        if(m.length>1){for(let g=1;g<m.length;g++){mhtml+=' <span style="color:#f59e0b">$'+g+'='+esc(m[g]||'')+'</span>';}}
+        mhtml+='</div>';
+      });
+      if(!matches.length)mhtml='<div style="color:var(--text-muted);font-size:11px">No matches</div>';
+      matchEl.innerHTML=mhtml;
+    }catch(e){statusEl.textContent='Error: '+e.message;statusEl.style.color='#ef4444';matchEl.innerHTML='';}
+  };
+}
+function showRailwayCliRef(){
+  const d=document.createElement('div');d.id='railway-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Project':['railway init','railway link','railway up','railway status','railway open'],
+    'Service':['railway service','railway add','railway run <cmd>','railway logs','railway shell'],
+    'Deploy':['railway up --detach','railway deploy','railway redeploy'],
+    'Variables':['railway variables','railway variables set KEY=val','railway variables delete KEY'],
+    'Domain':['railway domain','railway domain add <domain>'],
+    'Other':['railway login','railway logout','railway whoami','railway --version','railway help']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Railway CLI Reference</h3><button onclick="document.getElementById(\'railway-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskCompletionStreak(){
+  const d=document.createElement('div');d.id='streak-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&t.updatedAt);
+  const daySet=new Set();
+  tasks.forEach(t=>{daySet.add(new Date(t.updatedAt).toISOString().split('T')[0]);});
+  const today=new Date();let currentStreak=0;let longestStreak=0;let tempStreak=0;
+  const cursor=new Date(today);
+  for(let i=0;i<365;i++){
+    const key=cursor.toISOString().split('T')[0];
+    if(daySet.has(key)){
+      if(i===currentStreak)currentStreak++;
+    }
+    cursor.setDate(cursor.getDate()-1);
+  }
+  const sorted=[...daySet].sort().reverse();
+  tempStreak=0;
+  for(let i=0;i<sorted.length;i++){
+    const d2=new Date(sorted[i]);
+    if(i===0){tempStreak=1;continue;}
+    const prev=new Date(sorted[i-1]);
+    const diff=Math.round((prev-d2)/86400000);
+    if(diff===1){tempStreak++;}else{if(tempStreak>longestStreak)longestStreak=tempStreak;tempStreak=1;}
+  }
+  if(tempStreak>longestStreak)longestStreak=tempStreak;
+  const totalDays=daySet.size;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Completion Streak</h3><button onclick="document.getElementById(\'streak-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;gap:16px;justify-content:center;margin-bottom:20px">';
+  html+='<div style="text-align:center;background:var(--bg-surface);padding:16px 20px;border-radius:8px"><div style="font-size:36px;color:#4ade80;font-weight:700">'+currentStreak+'</div><div style="font-size:11px;color:var(--text-muted)">Current Streak</div></div>';
+  html+='<div style="text-align:center;background:var(--bg-surface);padding:16px 20px;border-radius:8px"><div style="font-size:36px;color:#f59e0b;font-weight:700">'+longestStreak+'</div><div style="font-size:11px;color:var(--text-muted)">Longest Streak</div></div></div>';
+  html+='<div style="text-align:center;color:var(--text-muted);font-size:12px">'+totalDays+' active days total / '+tasks.length+' tasks completed</div>';
+  const last7=[];const cursor2=new Date(today);
+  for(let i=0;i<7;i++){const key=cursor2.toISOString().split('T')[0];const active=daySet.has(key);last7.push({day:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][cursor2.getDay()],active});cursor2.setDate(cursor2.getDate()-1);}
+  last7.reverse();
+  html+='<div style="display:flex;justify-content:center;gap:6px;margin-top:16px">';
+  last7.forEach(d2=>{
+    html+='<div style="text-align:center"><div style="width:28px;height:28px;border-radius:50%;background:'+(d2.active?'#4ade80':'var(--bg-surface)')+';border:2px solid '+(d2.active?'#4ade80':'var(--border)')+';display:flex;align-items:center;justify-content:center;margin-bottom:4px">'+(d2.active?'<span style="color:#000;font-size:12px;font-weight:700">&#10003;</span>':'')+'</div><div style="font-size:9px;color:var(--text-muted)">'+d2.day+'</div></div>';
+  });
+  html+='</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickQrGen(){
+  const d=document.createElement('div');d.id='qr-gen-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">QR Code Generator</h3><button onclick="document.getElementById(\'qr-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<input id="qr-text" type="text" placeholder="Enter URL or text..." style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box;margin-bottom:8px"/>';
+  html+='<button onclick="window._qrGenerate()" style="width:100%;padding:8px;background:#4ade80;color:#000;border:none;border-radius:4px;font-weight:600;cursor:pointer;font-size:12px;margin-bottom:10px">Generate</button>';
+  html+='<div id="qr-result" style="text-align:center"></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._qrGenerate=function(){
+    const text=document.getElementById('qr-text').value;const resEl=document.getElementById('qr-result');
+    if(!text){resEl.innerHTML='<div style="color:var(--text-muted);font-size:11px">Enter text first</div>';return;}
+    const url='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(text);
+    resEl.innerHTML='<img src="'+url+'" alt="QR Code" style="width:200px;height:200px;border-radius:4px;background:#fff;padding:8px"/><div style="font-size:10px;color:var(--text-muted);margin-top:6px">Right-click to save image</div>';
   };
 }
 function showProjectRoadmap(filterProject){
