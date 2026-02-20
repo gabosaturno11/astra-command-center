@@ -6287,6 +6287,12 @@ function cmdGetItems(q) {
       ['kubernetes','Kubernetes YAML generator'],
       ['creation heatmap','Task creation heatmap'],
       ['world clock','World clock widget'],
+      ['terraform','Terraform config generator'],
+      ['lead time','Task lead time analysis'],
+      ['metronome','Audio metronome widget'],
+      ['api endpoint','REST API endpoint generator'],
+      ['cycle time','Task cycle time distribution'],
+      ['tip calculator','Tip calculator with split'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9317,6 +9323,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='world clock' || ql==='time zones' || ql==='timezone' || ql==='clocks')){
     items.unshift({title:'World Clock',desc:'Live clocks for 8 time zones',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWorldClock();}});
+  }
+  if(ql && (ql==='terraform' || ql==='tf' || ql==='infrastructure' || ql==='iac')){
+    items.unshift({title:'Terraform Config',desc:'Generate Terraform for AWS EC2, S3, Variables',icon:'T',type:'action',action:()=>{closeCommandPalette();showTerraformGen();}});
+  }
+  if(ql && (ql==='lead time' || ql==='cycle time' || ql==='task time' || ql==='time to complete')){
+    items.unshift({title:'Lead Time',desc:'Time from creation to completion per task',icon:'L',type:'action',action:()=>{closeCommandPalette();showTaskLeadTime();}});
+  }
+  if(ql && (ql==='metronome' || ql==='beat' || ql==='tempo' || ql==='bpm')){
+    items.unshift({title:'Metronome',desc:'Audio metronome with BPM control',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMetronome();}});
+  }
+  if(ql && (ql==='api endpoint' || ql==='rest api' || ql==='api generator' || ql==='express api')){
+    items.unshift({title:'API Endpoint Gen',desc:'Generate REST API routes for Express, Next, Fastify',icon:'A',type:'action',action:()=>{closeCommandPalette();showApiEndpointGen();}});
+  }
+  if(ql && (ql==='cycle time' || ql==='cycle distribution' || ql==='completion time' || ql==='how long tasks take')){
+    items.unshift({title:'Cycle Time Distribution',desc:'How long tasks take from creation to done',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCycleTimeDistribution();}});
+  }
+  if(ql && (ql==='tip calculator' || ql==='tip' || ql==='calculate tip' || ql==='tip calc')){
+    items.unshift({title:'Tip Calculator',desc:'Calculate tip with bill split',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTipCalculator();}});
   }
   return items.slice(0, 20);
 }
@@ -26386,6 +26410,152 @@ function showQuickWorldClock(){
   };
   document.body.appendChild(d);rend();
   window._wcInt=setInterval(rend,30000);
+}
+function showTerraformGen(){
+  let ex=document.getElementById('terraform-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'AWS EC2':`provider "aws" {\n  region = "us-east-1"\n}\n\nresource "aws_instance" "app" {\n  ami           = "ami-0c55b159cbfafe1f0"\n  instance_type = "t3.micro"\n\n  tags = {\n    Name        = "my-app"\n    Environment = "production"\n  }\n\n  vpc_security_group_ids = [aws_security_group.app.id]\n}\n\nresource "aws_security_group" "app" {\n  name = "app-sg"\n\n  ingress {\n    from_port   = 80\n    to_port     = 80\n    protocol    = "tcp"\n    cidr_blocks = ["0.0.0.0/0"]\n  }\n\n  ingress {\n    from_port   = 443\n    to_port     = 443\n    protocol    = "tcp"\n    cidr_blocks = ["0.0.0.0/0"]\n  }\n\n  egress {\n    from_port   = 0\n    to_port     = 0\n    protocol    = "-1"\n    cidr_blocks = ["0.0.0.0/0"]\n  }\n}`,
+    'AWS S3':`resource "aws_s3_bucket" "assets" {\n  bucket = "my-app-assets"\n\n  tags = {\n    Name        = "Assets Bucket"\n    Environment = "production"\n  }\n}\n\nresource "aws_s3_bucket_versioning" "assets" {\n  bucket = aws_s3_bucket.assets.id\n  versioning_configuration {\n    status = "Enabled"\n  }\n}\n\nresource "aws_s3_bucket_public_access_block" "assets" {\n  bucket                  = aws_s3_bucket.assets.id\n  block_public_acls       = true\n  block_public_policy     = true\n  ignore_public_acls      = true\n  restrict_public_buckets = true\n}`,
+    'Variables':`variable "environment" {\n  description = "Deployment environment"\n  type        = string\n  default     = "production"\n}\n\nvariable "instance_type" {\n  description = "EC2 instance type"\n  type        = string\n  default     = "t3.micro"\n}\n\nvariable "app_name" {\n  description = "Application name"\n  type        = string\n}\n\nlocals {\n  common_tags = {\n    Environment = var.environment\n    Application = var.app_name\n    ManagedBy   = "terraform"\n  }\n}\n\noutput "instance_ip" {\n  value = aws_instance.app.public_ip\n}`
+  };
+  let sel='AWS EC2';
+  const d=document.createElement('div');d.id='terraform-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-tfpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-tfpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Terraform Generator</span><span onclick="document.getElementById('terraform-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#terraform-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy .tf',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy .tf</button>
+    </div>`;
+    d.querySelectorAll('[data-tfpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.tfpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskLeadTime(){
+  let ex=document.getElementById('lead-time-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&t.createdAt&&t.completedAt);
+  const data=tasks.map(t=>{
+    const created=new Date(t.createdAt);const completed=new Date(t.completedAt);
+    const days=Math.max(0,Math.floor((completed-created)/(86400000)));
+    return{title:t.title,days,project:t.projectId};
+  }).sort((a,b)=>b.days-a.days).slice(0,20);
+  const avg=data.length?Math.round(data.reduce((s,d)=>s+d.days,0)/data.length):0;
+  const median=data.length?data[Math.floor(data.length/2)].days:0;
+  const mx=data.length?data[0].days:1;
+  const bars=data.map(d=>{
+    const w=Math.round((d.days/mx)*100);
+    const col=d.days>14?'#f87171':d.days>7?'#fb923c':d.days>3?'#facc15':'#4ade80';
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+      <div style="width:120px;font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(d.title)}">${esc(d.title)}</div>
+      <div style="flex:1;background:var(--bg-surface);height:12px;border-radius:3px;overflow:hidden"><div style="height:100%;width:${w}%;background:${col};border-radius:3px"></div></div>
+      <div style="width:30px;font-size:10px;color:var(--text-muted);text-align:right">${d.days}d</div>
+    </div>`;
+  }).join('');
+  const d=document.createElement('div');d.id='lead-time-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:460px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Lead Time</span><span onclick="document.getElementById('lead-time-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="display:flex;gap:16px;margin-bottom:12px">
+      <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent)">${avg}</div><div style="font-size:9px;color:var(--text-muted)">Avg Days</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#22d3ee">${median}</div><div style="font-size:9px;color:var(--text-muted)">Median</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--text-secondary)">${data.length}</div><div style="font-size:9px;color:var(--text-muted)">Completed</div></div>
+    </div>
+    ${data.length?bars:'<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No completed tasks with dates</div>'}
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickMetronome(){
+  let ex=document.getElementById('metronome-float');if(ex){ex.remove();return;}
+  let bpm=120,running=false,beat=0;
+  const d=document.createElement('div');d.id='metronome-float';
+  const tick=()=>{
+    try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.value=beat%4===0?880:440;gain.gain.value=0.3;osc.start();osc.stop(ctx.currentTime+0.05);beat++;}catch(e){}
+  };
+  const rend=()=>{
+    const dots=[0,1,2,3].map(i=>`<div style="width:16px;height:16px;border-radius:50%;${beat%4===i&&running?'background:var(--accent)':'background:var(--bg-surface);border:1px solid var(--border)'}"></div>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:180px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Metronome</span><span onclick="clearInterval(window._metInt);document.getElementById('metronome-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="font-size:32px;font-weight:200;color:var(--text-primary)">${bpm}</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">BPM</div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-bottom:10px">${dots}</div>
+      <input type="range" min="40" max="220" value="${bpm}" oninput="window._setBpm(parseInt(this.value))" style="width:100%;margin-bottom:8px;accent-color:var(--accent)">
+      <div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">
+        ${[60,90,120,140,180].map(b=>`<button onclick="window._setBpm(${b})" style="background:${bpm===b?'var(--accent)':'var(--bg-surface)'};color:${bpm===b?'#000':'var(--text-secondary)'};border:1px solid var(--border);padding:3px 6px;border-radius:4px;cursor:pointer;font-size:9px">${b}</button>`).join('')}
+      </div>
+      <button onclick="window._toggleMetronome()" style="background:${running?'#f87171':'var(--accent)'};color:${running?'#fff':'#000'};border:none;padding:6px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">${running?'Stop':'Start'}</button>
+    </div>`;
+  };
+  window._setBpm=(b)=>{bpm=b;if(running){clearInterval(window._metInt);window._metInt=setInterval(()=>{tick();rend();},60000/bpm);}rend();};
+  window._toggleMetronome=()=>{running=!running;if(running){beat=0;window._metInt=setInterval(()=>{tick();rend();},60000/bpm);}else{clearInterval(window._metInt);}rend();};
+  document.body.appendChild(d);rend();
+}
+function showApiEndpointGen(){
+  let ex=document.getElementById('api-endpoint-float');if(ex){ex.remove();return;}
+  const presets={
+    'Express REST':`const express = require('express');\nconst router = express.Router();\n\n// GET all items\nrouter.get('/items', async (req, res) => {\n  try {\n    const items = await Item.find();\n    res.json(items);\n  } catch (err) {\n    res.status(500).json({ error: err.message });\n  }\n});\n\n// GET single item\nrouter.get('/items/:id', async (req, res) => {\n  try {\n    const item = await Item.findById(req.params.id);\n    if (!item) return res.status(404).json({ error: 'Not found' });\n    res.json(item);\n  } catch (err) {\n    res.status(500).json({ error: err.message });\n  }\n});\n\n// POST create item\nrouter.post('/items', async (req, res) => {\n  try {\n    const item = new Item(req.body);\n    await item.save();\n    res.status(201).json(item);\n  } catch (err) {\n    res.status(400).json({ error: err.message });\n  }\n});\n\n// PUT update item\nrouter.put('/items/:id', async (req, res) => {\n  try {\n    const item = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });\n    if (!item) return res.status(404).json({ error: 'Not found' });\n    res.json(item);\n  } catch (err) {\n    res.status(400).json({ error: err.message });\n  }\n});\n\n// DELETE item\nrouter.delete('/items/:id', async (req, res) => {\n  try {\n    const item = await Item.findByIdAndDelete(req.params.id);\n    if (!item) return res.status(404).json({ error: 'Not found' });\n    res.json({ message: 'Deleted' });\n  } catch (err) {\n    res.status(500).json({ error: err.message });\n  }\n});\n\nmodule.exports = router;`,
+    'Next.js API':`import { NextResponse } from 'next/server';\n\nexport async function GET(request) {\n  const { searchParams } = new URL(request.url);\n  const id = searchParams.get('id');\n\n  if (id) {\n    const item = await db.item.findUnique({ where: { id } });\n    if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });\n    return NextResponse.json(item);\n  }\n\n  const items = await db.item.findMany();\n  return NextResponse.json(items);\n}\n\nexport async function POST(request) {\n  const body = await request.json();\n  const item = await db.item.create({ data: body });\n  return NextResponse.json(item, { status: 201 });\n}\n\nexport async function PUT(request) {\n  const body = await request.json();\n  const item = await db.item.update({\n    where: { id: body.id },\n    data: body\n  });\n  return NextResponse.json(item);\n}\n\nexport async function DELETE(request) {\n  const { searchParams } = new URL(request.url);\n  const id = searchParams.get('id');\n  await db.item.delete({ where: { id } });\n  return NextResponse.json({ message: 'Deleted' });\n}`,
+    'Fastify':`const itemRoutes = async (fastify) => {\n  fastify.get('/items', async (request, reply) => {\n    const items = await fastify.db.items.find();\n    return items;\n  });\n\n  fastify.get('/items/:id', {\n    schema: {\n      params: { type: 'object', properties: { id: { type: 'string' } } }\n    }\n  }, async (request, reply) => {\n    const item = await fastify.db.items.findOne({ id: request.params.id });\n    if (!item) return reply.code(404).send({ error: 'Not found' });\n    return item;\n  });\n\n  fastify.post('/items', {\n    schema: {\n      body: { type: 'object', required: ['name'], properties: { name: { type: 'string' } } }\n    }\n  }, async (request, reply) => {\n    const item = await fastify.db.items.insert(request.body);\n    return reply.code(201).send(item);\n  });\n};\n\nmodule.exports = itemRoutes;`
+  };
+  let sel='Express REST';
+  const d=document.createElement('div');d.id='api-endpoint-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-apipre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-apipre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:640px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">API Endpoint Generator</span><span onclick="document.getElementById('api-endpoint-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#api-endpoint-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Code',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Code</button>
+    </div>`;
+    d.querySelectorAll('[data-apipre]').forEach(b=>b.onclick=()=>{sel=b.dataset.apipre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskCycleTimeDistribution(){
+  let ex=document.getElementById('cycle-dist-float');if(ex){ex.remove();return;}
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&t.createdAt&&t.completedAt);
+  const buckets={'Same Day':0,'1-2 Days':0,'3-5 Days':0,'1-2 Weeks':0,'2-4 Weeks':0,'1+ Month':0};
+  tasks.forEach(t=>{
+    const days=Math.floor((new Date(t.completedAt)-new Date(t.createdAt))/(86400000));
+    if(days<1) buckets['Same Day']++;
+    else if(days<=2) buckets['1-2 Days']++;
+    else if(days<=5) buckets['3-5 Days']++;
+    else if(days<=14) buckets['1-2 Weeks']++;
+    else if(days<=30) buckets['2-4 Weeks']++;
+    else buckets['1+ Month']++;
+  });
+  const keys=Object.keys(buckets);const vals=Object.values(buckets);
+  const mx=Math.max(...vals,1);
+  const colors=['#4ade80','#22d3ee','#a78bfa','#facc15','#fb923c','#f87171'];
+  const bars=keys.map((k,i)=>{const h=Math.round((vals[i]/mx)*120);return `<rect x="${i*52+5}" y="${140-h}" width="40" height="${h}" rx="3" fill="${colors[i]}" opacity="0.85"/><text x="${i*52+25}" y="${155}" text-anchor="middle" fill="var(--text-muted)" font-size="7">${k}</text><text x="${i*52+25}" y="${136-h}" text-anchor="middle" fill="var(--text-primary)" font-size="10" font-weight="600">${vals[i]}</text>`;}).join('');
+  const d=document.createElement('div');d.id='cycle-dist-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Cycle Time Distribution</span><span onclick="document.getElementById('cycle-dist-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <svg width="320" height="165" viewBox="0 0 320 165">${bars}</svg>
+    <div style="margin-top:6px;font-size:10px;color:var(--text-muted)">${tasks.length} completed tasks analyzed</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickTipCalculator(){
+  let ex=document.getElementById('tip-calc-float');if(ex){ex.remove();return;}
+  let bill=0,tipPct=18,split=1;
+  const d=document.createElement('div');d.id='tip-calc-float';
+  const rend=()=>{
+    const tip=bill*(tipPct/100);const total=bill+tip;const perPerson=split>0?total/split:total;
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:220px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Tip Calculator</span><span onclick="document.getElementById('tip-calc-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Bill Amount</label><input type="number" value="${bill||''}" placeholder="0.00" oninput="window._tipBill=parseFloat(this.value)||0;window._tipRend()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:14px;box-sizing:border-box;margin-top:2px"></div>
+      <div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Tip %</label><div style="display:flex;gap:4px;margin-top:4px">${[10,15,18,20,25].map(p=>`<button onclick="window._tipPct=${p};window._tipRend()" style="background:${tipPct===p?'var(--accent)':'var(--bg-surface)'};color:${tipPct===p?'#000':'var(--text-secondary)'};border:1px solid var(--border);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;flex:1">${p}%</button>`).join('')}</div></div>
+      <div style="margin-bottom:10px"><label style="font-size:10px;color:var(--text-muted)">Split</label><input type="number" value="${split}" min="1" oninput="window._tipSplit=parseInt(this.value)||1;window._tipRend()" style="width:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px;margin-top:2px"></div>
+      <div style="border-top:1px solid var(--border);padding-top:8px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);margin-bottom:4px"><span>Tip</span><span>$${tip.toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-secondary);margin-bottom:4px"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+        ${split>1?`<div style="display:flex;justify-content:space-between;font-size:13px;color:var(--accent);font-weight:600"><span>Per Person</span><span>$${perPerson.toFixed(2)}</span></div>`:''}
+      </div>
+    </div>`;
+  };
+  window._tipBill=bill;window._tipPct=tipPct;window._tipSplit=split;
+  window._tipRend=()=>{bill=window._tipBill;tipPct=window._tipPct;split=window._tipSplit;rend();};
+  document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
