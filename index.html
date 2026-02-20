@@ -6227,6 +6227,9 @@ function cmdGetItems(q) {
       ['prettier','Prettier config generator'],
       ['eisenhower','Eisenhower matrix for task prioritization'],
       ['idea','Quick idea capture pad'],
+      ['vercel.json','Vercel config preset generator'],
+      ['quarterly review','Quarterly task performance review'],
+      ['binaural','Binaural focus tones generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9077,6 +9080,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='idea' || ql==='ideas' || ql==='quick idea' || ql==='brain dump')){
     items.unshift({title:'Quick Ideas',desc:'Capture and save ideas fast',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIdea();}});
+  }
+  if(ql && (ql==='vercel.json' || ql==='vercel' || ql==='vercel config' || ql==='deploy config')){
+    items.unshift({title:'vercel.json Generator',desc:'Vercel deployment config presets',icon:'V',type:'action',action:()=>{closeCommandPalette();showVercelJsonGen();}});
+  }
+  if(ql && (ql==='quarterly review' || ql==='quarterly' || ql==='quarter' || ql==='q1 review')){
+    items.unshift({title:'Quarterly Review',desc:'Quarter task performance review',icon:'Q',type:'action',action:()=>{closeCommandPalette();showTaskQuarterlyReview();}});
+  }
+  if(ql && (ql==='binaural' || ql==='focus music' || ql==='binaural beats' || ql==='focus tones')){
+    items.unshift({title:'Binaural Focus',desc:'Binaural beat focus tones',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickFocusMusic();}});
   }
   return items.slice(0, 20);
 }
@@ -24431,6 +24443,106 @@ function showQuickIdea(){
     };
     document.getElementById('idea-text').onkeydown=function(e){if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))document.getElementById('idea-save').click();};
   }
+  document.body.appendChild(p);
+  rend();
+}
+function showVercelJsonGen(){
+  let p=document.getElementById('vercel-json-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='vercel-json-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let presets=[
+    {name:'Static HTML',code:'{\n  "version": 2,\n  "builds": [\n    { "src": "*.html", "use": "@vercel/static" }\n  ],\n  "routes": [\n    { "src": "/(.*)", "dest": "/$1" }\n  ]\n}'},
+    {name:'Node.js API',code:'{\n  "version": 2,\n  "builds": [\n    { "src": "api/**/*.js", "use": "@vercel/node" },\n    { "src": "public/**", "use": "@vercel/static" }\n  ],\n  "routes": [\n    { "src": "/api/(.*)", "dest": "/api/$1" },\n    { "src": "/(.*)", "dest": "/public/$1" }\n  ]\n}'},
+    {name:'Single Page App',code:'{\n  "version": 2,\n  "rewrites": [\n    { "source": "/((?!api/).*)", "destination": "/index.html" }\n  ],\n  "headers": [\n    {\n      "source": "/(.*)",\n      "headers": [\n        { "key": "X-Frame-Options", "value": "DENY" },\n        { "key": "X-Content-Type-Options", "value": "nosniff" }\n      ]\n    }\n  ]\n}'},
+    {name:'CORS API',code:'{\n  "version": 2,\n  "builds": [\n    { "src": "api/**/*.js", "use": "@vercel/node" }\n  ],\n  "headers": [\n    {\n      "source": "/api/(.*)",\n      "headers": [\n        { "key": "Access-Control-Allow-Origin", "value": "*" },\n        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },\n        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }\n      ]\n    }\n  ]\n}'},
+    {name:'Redirects',code:'{\n  "version": 2,\n  "redirects": [\n    { "source": "/old-page", "destination": "/new-page", "permanent": true },\n    { "source": "/blog/:slug", "destination": "/posts/:slug", "permanent": false }\n  ],\n  "cleanUrls": true,\n  "trailingSlash": false\n}'}
+  ];
+  let selected=0;
+  function rend(){
+    let tabs=presets.map((pr,i)=>'<button data-vi="'+i+'" style="padding:4px 8px;border-radius:var(--radius);border:1px solid '+(i===selected?'#4ade80':'var(--border)')+';background:'+(i===selected?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(i===selected?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:10px">'+pr.name+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">vercel.json Generator</span><button onclick="document.getElementById(\'vercel-json-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">'+tabs+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.4;max-height:280px;overflow-y:auto">'+esc(presets[selected].code)+'</pre>'
+      +'<button id="vcl-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy vercel.json</button>';
+    p.querySelectorAll('[data-vi]').forEach(b=>{b.onclick=function(){selected=parseInt(this.dataset.vi);rend();};});
+    document.getElementById('vcl-copy').onclick=function(){navigator.clipboard.writeText(presets[selected].code);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy vercel.json';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskQuarterlyReview(){
+  let p=document.getElementById('quarterly-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='quarterly-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let now=new Date();
+  let qMonth=Math.floor(now.getMonth()/3)*3;
+  let qStart=new Date(now.getFullYear(),qMonth,1);
+  let qEnd=new Date(now.getFullYear(),qMonth+3,0);
+  let qLabel='Q'+(Math.floor(now.getMonth()/3)+1)+' '+now.getFullYear();
+  let months=[0,1,2].map(i=>{
+    let mStart=new Date(now.getFullYear(),qMonth+i,1);
+    let mEnd=new Date(now.getFullYear(),qMonth+i+1,0);
+    let mName=mStart.toLocaleDateString('en',{month:'short'});
+    let created=tasks.filter(t=>{let c=new Date(t.created||t.id);return c>=mStart&&c<=mEnd;}).length;
+    let completed=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=mStart&&new Date(t.completedAt)<=mEnd).length;
+    return {name:mName,created,completed};
+  });
+  let totalCreated=months.reduce((s,m)=>s+m.created,0);
+  let totalCompleted=months.reduce((s,m)=>s+m.completed,0);
+  let maxVal=Math.max(...months.map(m=>Math.max(m.created,m.completed)),1);
+  let chart=months.map(m=>{
+    let cPct=Math.round(m.created/maxVal*100);
+    let dPct=Math.round(m.completed/maxVal*100);
+    return '<div style="flex:1;text-align:center"><div style="height:80px;display:flex;align-items:flex-end;justify-content:center;gap:4px"><div style="width:20px;height:'+cPct+'%;background:#22d3ee;border-radius:3px 3px 0 0"></div><div style="width:20px;height:'+dPct+'%;background:#4ade80;border-radius:3px 3px 0 0"></div></div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">'+m.name+'</div><div style="font-size:9px;color:var(--text-muted)">'+m.created+'/'+m.completed+'</div></div>';
+  }).join('');
+  let velocity=totalCompleted>0?Math.round(totalCompleted/((now-qStart)/604800000)*10)/10:0;
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Quarterly Review: '+qLabel+'</span><button onclick="document.getElementById(\'quarterly-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"><div style="padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:18px;font-weight:700;color:#22d3ee">'+totalCreated+'</div><div style="font-size:9px;color:var(--text-muted)">Created</div></div><div style="padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">'+totalCompleted+'</div><div style="font-size:9px;color:var(--text-muted)">Completed</div></div><div style="padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:18px;font-weight:700;color:var(--text-primary)">'+velocity+'/wk</div><div style="font-size:9px;color:var(--text-muted)">Velocity</div></div></div>'
+    +'<div style="display:flex;gap:4px;margin-bottom:10px">'+chart+'</div>'
+    +'<div style="display:flex;gap:8px;justify-content:center;font-size:9px;color:var(--text-muted);margin-bottom:8px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#22d3ee;border-radius:2px;display:inline-block"></span>Created</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;background:#4ade80;border-radius:2px;display:inline-block"></span>Completed</span></div>';
+  document.body.appendChild(p);
+}
+function showQuickFocusMusic(){
+  let p=document.getElementById('focus-music-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='focus-music-panel';
+  p.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  let playing=false;let ctx=null;let osc1=null;let osc2=null;let gainNode=null;
+  let vol=S._fmVol||0.2;
+  let tones=[
+    {name:'Deep Focus',f1:200,f2:210,desc:'Alpha waves (10Hz binaural)'},
+    {name:'Calm',f1:200,f2:206,desc:'Theta waves (6Hz binaural)'},
+    {name:'Energize',f1:200,f2:240,desc:'Beta waves (40Hz binaural)'},
+    {name:'Sleep',f1:150,f2:154,desc:'Delta waves (4Hz binaural)'},
+    {name:'Meditation',f1:250,f2:257.83,desc:'Schumann resonance (7.83Hz)'}
+  ];
+  let selected=S._fmTone||0;
+  function start(){
+    ctx=new(window.AudioContext||window.webkitAudioContext)();
+    gainNode=ctx.createGain();
+    gainNode.gain.value=vol;
+    gainNode.connect(ctx.destination);
+    osc1=ctx.createOscillator();osc1.type='sine';osc1.frequency.value=tones[selected].f1;
+    let pan1=ctx.createStereoPanner();pan1.pan.value=-1;
+    osc1.connect(pan1);pan1.connect(gainNode);osc1.start();
+    osc2=ctx.createOscillator();osc2.type='sine';osc2.frequency.value=tones[selected].f2;
+    let pan2=ctx.createStereoPanner();pan2.pan.value=1;
+    osc2.connect(pan2);pan2.connect(gainNode);osc2.start();
+    playing=true;
+  }
+  function stop(){if(ctx){osc1.stop();osc2.stop();ctx.close();ctx=null;playing=false;}}
+  function rend(){
+    let btns=tones.map((t,i)=>'<button data-ft="'+i+'" style="width:100%;padding:6px 8px;border-radius:var(--radius);border:1px solid '+(i===selected?'#4ade80':'var(--border)')+';background:'+(i===selected?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(i===selected?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:10px;text-align:left;margin-bottom:3px"><span style="font-weight:600">'+t.name+'</span> <span style="opacity:0.6;font-size:9px">'+t.desc+'</span></button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Binaural Focus</span><button onclick="if(window._fmStop)window._fmStop();document.getElementById(\'focus-music-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="margin-bottom:8px">'+btns+'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span style="font-size:10px;color:var(--text-muted)">Vol</span><input id="fm-vol" type="range" min="0" max="100" value="'+Math.round(vol*100)+'" style="flex:1"><span style="font-size:10px;color:var(--text-muted);min-width:28px">'+Math.round(vol*100)+'%</span></div>'
+      +'<div style="display:flex;gap:4px"><button id="fm-toggle" style="flex:1;padding:8px;background:'+(playing?'#f87171':'#4ade80')+';color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">'+(playing?'Stop':'Play')+'</button></div>'
+      +'<div style="font-size:8px;color:var(--text-muted);text-align:center;margin-top:6px">Use headphones for binaural effect</div>';
+    p.querySelectorAll('[data-ft]').forEach(b=>{b.onclick=function(){selected=parseInt(this.dataset.ft);S._fmTone=selected;save();if(playing){stop();start();}rend();};});
+    document.getElementById('fm-vol').oninput=function(){vol=parseInt(this.value)/100;S._fmVol=vol;save();if(gainNode)gainNode.gain.value=vol;};
+    document.getElementById('fm-toggle').onclick=function(){if(playing)stop();else start();rend();};
+  }
+  window._fmStop=stop;
   document.body.appendChild(p);
   rend();
 }
