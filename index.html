@@ -5808,6 +5808,9 @@ function cmdGetItems(q) {
       ['workspace search','Deep search across all sections with results'],
       ['batch edit','Edit multiple tasks at once (priority, status, project)'],
       ['content stats','Content analytics: types, themes, tags, word counts'],
+      ['swimlane','Kanban by project (project x status grid)'],
+      ['daily planner','Today\'s schedule with time slots and tasks'],
+      ['export workspace','Download full ASTRA workspace as JSON'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7129,6 +7132,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='content stats' || ql==='content analytics' || ql==='content dashboard' || ql==='content report')){
     items.unshift({title:'Content Stats Dashboard',desc:'Types, themes, tags, word counts, trends',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentStats();}});
   }
+  // Swimlane prefix
+  if(ql && (ql==='swimlane' || ql==='swimlanes' || ql==='project kanban' || ql==='project board')){
+    items.unshift({title:'Swimlane View',desc:'Tasks grouped by project x status (kanban by project)',icon:'S',type:'action',action:()=>{closeCommandPalette();showSwimlaneView();}});
+  }
+  // Daily planner prefix
+  if(ql && (ql==='daily planner' || ql==='day planner' || ql==='today plan' || ql==='schedule')){
+    items.unshift({title:'Daily Planner',desc:'Today\'s time slots, tasks, overdue, and time blocks',icon:'D',type:'action',action:()=>{closeCommandPalette();showDailyPlanner();}});
+  }
+  // Export workspace prefix
+  if(ql && (ql==='export workspace' || ql==='export all' || ql==='full export' || ql==='download workspace')){
+    items.unshift({title:'Export Full Workspace',desc:'Download everything as single JSON (tasks, content, docs, links, etc.)',icon:'E',type:'action',action:()=>{closeCommandPalette();exportFullWorkspace();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -8316,6 +8331,91 @@ function showContentStats(){
   h+=`<div style="font-size:9px;color:var(--text-muted)">Pinned: ${pinned} | Starred: ${starred} | ${(totalChars/1024).toFixed(1)}KB total</div>`;
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Stats Dashboard</span><button onclick="document.getElementById('content-stats-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
+}
+function showSwimlaneView(){
+  let panel=document.getElementById('swimlane-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='swimlane-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:85vh;overflow-y:auto';
+  const projects=[...new Set(S.tasks.map(t=>t.project||'No Project'))].sort();
+  const statuses=['todo','in-progress','done'];
+  const statusLabels={todo:'Todo','in-progress':'In Progress',done:'Done'};
+  const statusColors={todo:'var(--text-muted)','in-progress':'#3b82f6',done:'#22c55e'};
+  let h='<div style="overflow-x:auto">';
+  h+='<table style="width:100%;border-collapse:collapse;font-size:10px">';
+  h+='<thead><tr><th style="text-align:left;padding:6px;color:var(--text-muted);font-size:9px;border-bottom:1px solid var(--border);min-width:100px">Project</th>';
+  statuses.forEach(s=>{h+=`<th style="text-align:center;padding:6px;color:${statusColors[s]};font-size:9px;border-bottom:1px solid var(--border);min-width:150px">${statusLabels[s]}</th>`;});
+  h+='</tr></thead><tbody>';
+  projects.forEach(proj=>{
+    const projTasks=S.tasks.filter(t=>(t.project||'No Project')===proj);
+    h+=`<tr><td style="padding:8px;vertical-align:top;border-bottom:1px solid var(--border)"><div style="font-weight:600;color:var(--text-primary)">${esc(proj)}</div><div style="font-size:8px;color:var(--text-muted)">${projTasks.length} tasks</div></td>`;
+    statuses.forEach(s=>{
+      const tasks=projTasks.filter(t=>t.status===s);
+      h+='<td style="padding:4px;vertical-align:top;border-bottom:1px solid var(--border)">';
+      tasks.slice(0,8).forEach(t=>{
+        const priColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':'var(--text-muted)';
+        h+=`<div onclick="document.getElementById('swimlane-panel').remove();openTaskDetail(${t.id})" style="padding:3px 6px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;border-left:2px solid ${priColor}" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='var(--bg-surface)'"><div style="font-size:9px;color:var(--text-primary)">${esc(t.title||'Untitled')}</div></div>`;
+      });
+      if(tasks.length>8)h+=`<div style="font-size:8px;color:var(--text-muted);padding:2px 6px">+${tasks.length-8} more</div>`;
+      if(!tasks.length)h+='<div style="font-size:8px;color:var(--text-muted);padding:4px;text-align:center">-</div>';
+      h+='</td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table></div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Swimlane View (${projects.length} projects)</span><button onclick="document.getElementById('swimlane-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showDailyPlanner(){
+  let panel=document.getElementById('daily-plan-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='daily-plan-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:85vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const todayLabel=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const todayTasks=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+  const overdue=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+  const timeBlocks=(S._timeBlocks||[]).filter(b=>b.date===today);
+  const hours=['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00'];
+  const nowHour=new Date().getHours();
+  let h=`<div style="font-size:11px;color:var(--text-secondary);margin-bottom:12px">${todayLabel}</div>`;
+  if(overdue.length){
+    h+=`<div style="font-size:10px;font-weight:600;color:#ef4444;margin-bottom:4px">Overdue (${overdue.length})</div>`;
+    overdue.slice(0,5).forEach(t=>{h+=`<div onclick="document.getElementById('daily-plan-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:9px;color:var(--text-primary);cursor:pointer;border-left:2px solid #ef4444;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(t.title)} <span style="color:#ef4444;font-size:8px">(${t.due})</span></div>`;});
+    h+='<div style="height:8px"></div>';
+  }
+  h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Daily Schedule</div>';
+  hours.forEach(hour=>{
+    const hourNum=parseInt(hour);
+    const isCurrent=hourNum===nowHour;
+    const block=timeBlocks.find(b=>b.start&&parseInt(b.start)===hourNum);
+    h+=`<div style="display:flex;align-items:stretch;gap:8px;min-height:28px;${isCurrent?'background:var(--accent)08;border-left:2px solid var(--accent);':''};padding:2px 0"><span style="min-width:40px;font-size:9px;color:${isCurrent?'var(--accent)':'var(--text-muted)'};font-family:var(--mono);padding-top:4px">${hour}</span><div style="flex:1;border-bottom:1px solid var(--border);padding:2px 4px;font-size:9px">`;
+    if(block)h+=`<span style="padding:1px 6px;background:var(--accent)20;border-radius:3px;color:var(--accent)">${esc(block.title)}</span>`;
+    h+='</div></div>';
+  });
+  h+='<div style="margin-top:12px;font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Today\'s Tasks ('+todayTasks.length+')</div>';
+  todayTasks.forEach(t=>{
+    const priColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':'#3b82f6';
+    h+=`<div onclick="document.getElementById('daily-plan-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:9px;color:var(--text-primary);cursor:pointer;border-left:2px solid ${priColor};margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(t.title||'Untitled')} <span style="font-size:8px;color:${priColor}">${(t.priority||'p2').toUpperCase()}</span></div>`;
+  });
+  if(!todayTasks.length)h+='<div style="font-size:9px;color:var(--text-muted);padding:4px 8px">No tasks due today</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Daily Planner</span><button onclick="document.getElementById('daily-plan-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function exportFullWorkspace(){
+  const data={
+    tasks:S.tasks,content:S.content,docs:S.docs,links:S.links,
+    projects:S.projects,specs:S.specs,repos:S.repos,
+    focusSessions:S.focusSessions,goals:S.goals,
+    habits:S._habits,snippets:S._snippets,stickies:S._stickies,
+    timeBlocks:S._timeBlocks,clips:S._clips,
+    exportedAt:new Date().toISOString(),version:'astra-full-export-v1'
+  };
+  const json=JSON.stringify(data,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='astra-workspace-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  const sizeKB=(json.length/1024).toFixed(1);
+  toast('Exported full workspace ('+sizeKB+'KB)');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
