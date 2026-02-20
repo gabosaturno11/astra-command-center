@@ -6053,6 +6053,9 @@ function cmdGetItems(q) {
       ['text transform','Text utilities - uppercase, slug, trim, reverse'],
       ['link archive','Archive and restore links'],
       ['merge docs','Merge two writer documents into one'],
+      ['json viewer','JSON formatter and pretty-printer'],
+      ['task templates','Manage custom task creation templates'],
+      ['workspace mood','Visual mood indicator from health metrics'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8363,6 +8366,18 @@ function cmdGetItems(q) {
   // Merge docs prefix
   if(ql && (ql==='merge docs' || ql==='merge documents' || ql==='doc merge' || ql==='combine docs')){
     items.unshift({title:'Merge Documents',desc:'Merge two docs into one',icon:'M',type:'action',action:()=>{closeCommandPalette();showDocMerge();}});
+  }
+  // JSON viewer prefix
+  if(ql && (ql==='json viewer' || ql==='json' || ql==='json format' || ql==='json pretty')){
+    items.unshift({title:'JSON Viewer',desc:'Format and pretty-print JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showJsonViewer();}});
+  }
+  // Task templates prefix
+  if(ql && (ql==='task templates' || ql==='templates' || ql==='template manager' || ql==='custom templates')){
+    items.unshift({title:'Task Templates',desc:'Manage task creation templates',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTemplateManager();}});
+  }
+  // Workspace mood prefix
+  if(ql && (ql==='workspace mood' || ql==='mood' || ql==='vibe' || ql==='workspace health')){
+    items.unshift({title:'Workspace Mood',desc:'Visual mood from health metrics',icon:'M',type:'action',action:()=>{closeCommandPalette();showWorkspaceMood();}});
   }
   return items.slice(0, 20);
 }
@@ -17453,6 +17468,107 @@ function showDocMerge(){
     panel.innerHTML=h;panel._render=render;panel._selA=selA;panel._selB=selB;
   }
   render();document.body.appendChild(panel);
+}
+function showJsonViewer(){
+  let panel=document.getElementById('json-viewer-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='json-viewer-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">JSON Viewer</span><button onclick="this.closest(\'#json-viewer-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="jv-input" placeholder="Paste JSON here..." style="width:100%;height:80px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:monospace;margin-bottom:6px"></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  h+='<button onclick="try{const v=JSON.parse(document.getElementById(\'jv-input\').value);document.getElementById(\'jv-output\').textContent=JSON.stringify(v,null,2);document.getElementById(\'jv-error\').textContent=\'\'}catch(e){document.getElementById(\'jv-error\').textContent=e.message;document.getElementById(\'jv-output\').textContent=\'\'}" style="padding:5px 12px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Format</button>';
+  h+='<button onclick="try{const v=JSON.parse(document.getElementById(\'jv-input\').value);const m=JSON.stringify(v);document.getElementById(\'jv-output\').textContent=m;navigator.clipboard.writeText(m);document.getElementById(\'jv-error\').textContent=\'Minified + copied!\'}catch(e){document.getElementById(\'jv-error\').textContent=e.message}" style="padding:5px 12px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Minify</button>';
+  h+='<button onclick="const o=document.getElementById(\'jv-output\').textContent;if(o)navigator.clipboard.writeText(o);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Output\',1000)" style="padding:5px 12px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Copy Output</button>';
+  h+='</div>';
+  h+='<div id="jv-error" style="font-size:11px;color:#ef4444;margin-bottom:6px"></div>';
+  h+='<pre id="jv-output" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;font-family:monospace;white-space:pre-wrap;word-break:break-word;max-height:250px;overflow-y:auto"></pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskTemplateManager(){
+  let panel=document.getElementById('task-tmpl-mgr-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-tmpl-mgr-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._taskTemplates)S._taskTemplates=[];
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Templates</span><button onclick="this.closest(\'#task-tmpl-mgr-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+S._taskTemplates.length+' custom templates</div>';
+    // Add new template form
+    h+='<div style="background:var(--bg-surface);border-radius:var(--radius);padding:10px;margin-bottom:10px">';
+    h+='<input id="ttm-title" placeholder="Template title" style="width:100%;padding:5px 8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:4px;box-sizing:border-box">';
+    h+='<input id="ttm-desc" placeholder="Default description" style="width:100%;padding:5px 8px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:4px;box-sizing:border-box">';
+    h+='<div style="display:flex;gap:4px">';
+    h+='<select id="ttm-pri" style="flex:1;padding:4px 6px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px">';
+    ['p0','p1','p2','p3'].forEach(p=>{h+='<option value="'+p+'"'+(p==='p2'?' selected':'')+'>'+p.toUpperCase()+'</option>';});
+    h+='</select>';
+    h+='<button onclick="const t=document.getElementById(\'ttm-title\').value.trim();if(!t)return;S._taskTemplates.push({title:t,description:document.getElementById(\'ttm-desc\').value.trim(),priority:document.getElementById(\'ttm-pri\').value});save();this.closest(\'#task-tmpl-mgr-panel\')._render()" style="padding:4px 12px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:10px;font-weight:600">Add Template</button>';
+    h+='</div></div>';
+    // Template list
+    S._taskTemplates.forEach((tmpl,i)=>{
+      const pCol=tmpl.priority==='p0'?'#ef4444':tmpl.priority==='p1'?'#f59e0b':tmpl.priority==='p2'?'#3b82f6':'#6b7280';
+      h+='<div style="padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+      h+='<span style="width:6px;height:24px;border-radius:3px;background:'+pCol+';flex-shrink:0"></span>';
+      h+='<div style="flex:1"><div style="font-size:12px;color:var(--text)">'+esc(tmpl.title)+'</div>';
+      if(tmpl.description)h+='<div style="font-size:10px;color:var(--text-muted)">'+esc(tmpl.description).substring(0,60)+'</div>';
+      h+='</div>';
+      h+='<button onclick="if(!S.tasks)S.tasks=[];S.tasks.push({id:\'t_\'+Date.now(),title:\''+esc(tmpl.title).replace(/'/g,"\\'")+'\',description:\''+esc(tmpl.description||'').replace(/'/g,"\\'")+'\',status:\'todo\',priority:\''+tmpl.priority+'\',project:\'\',tags:[],subtasks:[],created:new Date().toISOString()});save();if(typeof renderTasks===\'function\')renderTasks();this.textContent=\'Created!\';setTimeout(()=>this.textContent=\'Use\',800)" style="background:none;border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent);cursor:pointer;font-size:9px;padding:2px 8px">Use</button>';
+      h+='<button onclick="S._taskTemplates.splice('+i+',1);save();this.closest(\'#task-tmpl-mgr-panel\')._render()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">x</button>';
+      h+='</div>';
+    });
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showWorkspaceMood(){
+  let panel=document.getElementById('ws-mood-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='ws-mood-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const now=new Date();
+  const todayStr=now.toISOString().substring(0,10);
+  // Calculate mood factors
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now).length;
+  const doneToday=tasks.filter(t=>t.completedAt&&t.completedAt.substring(0,10)===todayStr).length;
+  const totalActive=tasks.filter(t=>t.status!=='done').length;
+  const blocked=tasks.filter(t=>t.status==='blocked').length;
+  const inProgress=tasks.filter(t=>t.status==='in-progress').length;
+  // Score 0-100
+  let score=50;
+  score+=doneToday*8;
+  score-=overdue*5;
+  score-=blocked*8;
+  score+=inProgress>0?10:0;
+  score+=totalActive<20?10:-5;
+  score=Math.max(0,Math.min(100,score));
+  let mood,moodColor,moodIcon;
+  if(score>=80){mood='Thriving';moodColor='#4ade80';moodIcon='*';}
+  else if(score>=60){mood='Productive';moodColor='#22d3ee';moodIcon='+';}
+  else if(score>=40){mood='Steady';moodColor='#f59e0b';moodIcon='=';}
+  else if(score>=20){mood='Stressed';moodColor='#ef4444';moodIcon='-';}
+  else{mood='Critical';moodColor='#dc2626';moodIcon='!';}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:15px;color:var(--text)">Workspace Mood</span><button onclick="this.closest(\'#ws-mood-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  // Big mood display
+  h+='<div style="text-align:center;margin-bottom:16px">';
+  h+='<div style="width:80px;height:80px;border-radius:50%;background:'+moodColor+'22;border:3px solid '+moodColor+';display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:32px;color:'+moodColor+'">'+moodIcon+'</div>';
+  h+='<div style="font-size:20px;font-weight:700;color:'+moodColor+'">'+mood+'</div>';
+  h+='<div style="font-size:12px;color:var(--text-muted)">Score: '+score+'/100</div>';
+  h+='</div>';
+  // Factors
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">Factors</div>';
+  const factors=[
+    {label:'Tasks done today',val:doneToday,impact:doneToday>0?'+positive':'neutral',col:doneToday>0?'#4ade80':'#6b7280'},
+    {label:'Overdue tasks',val:overdue,impact:overdue>0?'-negative':'positive',col:overdue>0?'#ef4444':'#4ade80'},
+    {label:'Blocked tasks',val:blocked,impact:blocked>0?'-negative':'neutral',col:blocked>0?'#ef4444':'#6b7280'},
+    {label:'In progress',val:inProgress,impact:inProgress>0?'+positive':'neutral',col:inProgress>0?'#22d3ee':'#6b7280'},
+    {label:'Active tasks',val:totalActive,impact:totalActive<20?'manageable':'heavy',col:totalActive<20?'#4ade80':'#f59e0b'},
+  ];
+  factors.forEach(f=>{
+    h+='<div style="padding:4px 8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+    h+='<span style="flex:1;font-size:11px;color:var(--text)">'+f.label+'</span>';
+    h+='<span style="font-size:12px;font-weight:700;color:'+f.col+'">'+f.val+'</span>';
+    h+='<span style="font-size:9px;color:'+f.col+'">'+f.impact+'</span>';
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
