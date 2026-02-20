@@ -6107,6 +6107,12 @@ function cmdGetItems(q) {
       ['emoji picker','Browse and copy emojis to clipboard'],
       ['time estimates','Task time estimate breakdown and analysis'],
       ['decision matrix','Eisenhower-style 4-quadrant decision matrix'],
+      ['number formatter','Format numbers as currency, binary, hex, roman, and more'],
+      ['weekly report','Weekly task report with daily breakdown'],
+      ['cipher','Text encryption with Caesar, ROT13, Atbash ciphers'],
+      ['text analysis','Word frequency, letter frequency, and text statistics'],
+      ['task age','Task age distribution summary by time buckets'],
+      ['weather','Current weather from your location'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8597,6 +8603,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='decision matrix' || ql==='matrix' || ql==='eisenhower' || ql==='quadrant')){
     items.unshift({title:'Decision Matrix',desc:'4-quadrant decision matrix',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMatrix();}});
+  }
+  if(ql && (ql==='number formatter' || ql==='number format' || ql==='num format' || ql==='number convert')){
+    items.unshift({title:'Number Formatter',desc:'Format numbers in many formats',icon:'N',type:'action',action:()=>{closeCommandPalette();showNumberFormatter();}});
+  }
+  if(ql && (ql==='weekly report' || ql==='week report' || ql==='weekly summary' || ql==='week summary')){
+    items.unshift({title:'Weekly Report',desc:'Weekly task report with breakdown',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyReport();}});
+  }
+  if(ql && (ql==='cipher' || ql==='encrypt' || ql==='caesar' || ql==='rot13')){
+    items.unshift({title:'Text Cipher',desc:'Caesar, ROT13, Atbash encryption',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCipher();}});
+  }
+  if(ql && (ql==='text analysis' || ql==='text stats' || ql==='word frequency' || ql==='analyze text')){
+    items.unshift({title:'Text Analysis',desc:'Word/letter frequency and statistics',icon:'A',type:'action',action:()=>{closeCommandPalette();showTextStats();}});
+  }
+  if(ql && (ql==='task age' || ql==='age summary' || ql==='task age summary' || ql==='old tasks')){
+    items.unshift({title:'Task Age Summary',desc:'Task age distribution by time buckets',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAgeSummary();}});
+  }
+  if(ql && (ql==='weather' || ql==='forecast' || ql==='temperature' || ql==='current weather')){
+    items.unshift({title:'Weather',desc:'Current weather from your location',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWeather();}});
   }
   return items.slice(0, 20);
 }
@@ -19499,6 +19523,219 @@ function showQuickMatrix(){
     el.innerHTML=h2;
   };
   window._mxRender();
+}
+function showNumberFormatter(){
+  let panel=document.getElementById('numfmt-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='numfmt-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw';
+  window._numFmt=function(){
+    var val=document.getElementById('numfmt-input').value;var num=parseFloat(val);
+    var out=document.getElementById('numfmt-out');if(!out)return;
+    if(isNaN(num)){out.innerHTML='<div style="color:#ef4444;font-size:10px">Enter a valid number</div>';return;}
+    var formats=[
+      {label:'Number',value:num.toLocaleString('en-US')},
+      {label:'Scientific',value:num.toExponential(4)},
+      {label:'Fixed (2)',value:num.toFixed(2)},
+      {label:'Percentage',value:(num*100).toFixed(2)+'%'},
+      {label:'Binary',value:'0b'+(Number.isInteger(num)?num.toString(2):'N/A')},
+      {label:'Octal',value:'0o'+(Number.isInteger(num)?num.toString(8):'N/A')},
+      {label:'Hexadecimal',value:'0x'+(Number.isInteger(num)?num.toString(16).toUpperCase():'N/A')},
+      {label:'Currency (USD)',value:'$'+num.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})},
+      {label:'Currency (EUR)',value:num.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2})+' EUR'},
+      {label:'Ordinal',value:num+(num%10===1&&num%100!==11?'st':num%10===2&&num%100!==12?'nd':num%10===3&&num%100!==13?'rd':'th')},
+      {label:'Roman',value:Number.isInteger(num)&&num>0&&num<4000?(function(n){var r='';var vals=[[1000,'M'],[900,'CM'],[500,'D'],[400,'CD'],[100,'C'],[90,'XC'],[50,'L'],[40,'XL'],[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']];vals.forEach(function(v){while(n>=v[0]){r+=v[1];n-=v[0];}});return r;})(num):'N/A'},
+      {label:'Words (approx)',value:num>=1e9?((num/1e9).toFixed(1)+'B'):num>=1e6?((num/1e6).toFixed(1)+'M'):num>=1e3?((num/1e3).toFixed(1)+'K'):String(num)}
+    ];
+    out.innerHTML=formats.map(function(f){
+      return '<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border)"><span style="font-size:10px;color:var(--text-muted)">'+f.label+'</span><span style="font-size:10px;color:var(--accent);font-family:var(--mono);cursor:pointer" onclick="navigator.clipboard.writeText(\''+f.value.replace(/'/g,"\\'")+'\')" title="Click to copy">'+esc(f.value)+'</span></div>';
+    }).join('');
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Number Formatter</span><button onclick="document.getElementById(\'numfmt-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<input id="numfmt-input" type="text" placeholder="Enter a number..." oninput="window._numFmt()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:14px;color:var(--accent);font-family:var(--mono);outline:none;margin-bottom:10px;box-sizing:border-box;text-align:center">';
+  h+='<div id="numfmt-out"></div>';
+  h+='<div style="font-size:8px;color:var(--text-muted);text-align:center;margin-top:8px">Click any value to copy</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskWeeklyReport(){
+  let panel=document.getElementById('weekly-report-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='weekly-report-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  var today=new Date();var weekStart=new Date(today);weekStart.setDate(weekStart.getDate()-today.getDay()+1);
+  var weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+6);
+  var ws=weekStart.toISOString().split('T')[0];var we=weekEnd.toISOString().split('T')[0];
+  var created=S.tasks.filter(function(t){return t.created&&t.created>=ws&&t.created<=we+'T';});
+  var completed=S.tasks.filter(function(t){return t.completedAt&&t.completedAt>=ws&&t.completedAt<=we+'T';});
+  var dueThisWeek=S.tasks.filter(function(t){return t.due&&t.due>=ws&&t.due<=we;});
+  var overdue=S.tasks.filter(function(t){return t.due&&t.due<ws&&t.status!=='done';});
+  var byDay={};
+  for(var d=0;d<7;d++){
+    var dd=new Date(weekStart);dd.setDate(dd.getDate()+d);
+    var ds=dd.toISOString().split('T')[0];
+    var dayName=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][d];
+    byDay[dayName]={created:created.filter(function(t){return t.created&&t.created.startsWith(ds);}).length,completed:completed.filter(function(t){return t.completedAt&&t.completedAt.startsWith(ds);}).length};
+  }
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Weekly Report</span><div style="display:flex;gap:6px"><button onclick="navigator.clipboard.writeText(document.getElementById(\'weekly-report-panel\').innerText)" style="padding:3px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px">Copy</button><button onclick="document.getElementById(\'weekly-report-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">Week of '+ws+' to '+we+'</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:12px">';
+  [{label:'Created',value:created.length,color:'#3b82f6'},{label:'Completed',value:completed.length,color:'#4ade80'},{label:'Due',value:dueThisWeek.length,color:'#f59e0b'},{label:'Overdue',value:overdue.length,color:'#ef4444'}].forEach(function(m){
+    h+='<div style="background:var(--bg-surface);border-radius:var(--radius);padding:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:'+m.color+';font-family:var(--mono)">'+m.value+'</div><div style="font-size:8px;color:var(--text-muted)">'+m.label+'</div></div>';
+  });
+  h+='</div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:6px">Daily Breakdown:</div>';
+  Object.entries(byDay).forEach(function(e){
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><span style="font-size:10px;color:var(--text);width:30px;font-weight:600">'+e[0]+'</span><span style="font-size:9px;color:#3b82f6">+'+e[1].created+'</span><span style="font-size:9px;color:#4ade80">V'+e[1].completed+'</span></div>';
+  });
+  if(completed.length>0){
+    h+='<div style="font-size:10px;color:var(--text-muted);font-weight:600;margin:12px 0 6px">Completed This Week:</div>';
+    completed.forEach(function(t){
+      h+='<div style="font-size:10px;color:var(--text);padding:2px 0;border-bottom:1px solid var(--border)">V '+esc(t.title||'Untitled')+'</div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickCipher(){
+  let panel=document.getElementById('cipher-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='cipher-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw';
+  window._cipherRun=function(mode){
+    var text=document.getElementById('cipher-text').value||'';
+    var shift=parseInt(document.getElementById('cipher-shift').value)||3;
+    var method=document.getElementById('cipher-method').value;
+    var result='';
+    if(method==='caesar'){
+      for(var i=0;i<text.length;i++){
+        var c=text.charCodeAt(i);
+        var s=mode==='enc'?shift:-shift;
+        if(c>=65&&c<=90)result+=String.fromCharCode(((c-65+s+26)%26)+65);
+        else if(c>=97&&c<=122)result+=String.fromCharCode(((c-97+s+26)%26)+97);
+        else result+=text[i];
+      }
+    }else if(method==='rot13'){
+      for(var j=0;j<text.length;j++){
+        var cc=text.charCodeAt(j);
+        if(cc>=65&&cc<=90)result+=String.fromCharCode(((cc-65+13)%26)+65);
+        else if(cc>=97&&cc<=122)result+=String.fromCharCode(((cc-97+13)%26)+97);
+        else result+=text[j];
+      }
+    }else if(method==='reverse'){
+      result=text.split('').reverse().join('');
+    }else if(method==='atbash'){
+      for(var k=0;k<text.length;k++){
+        var ca=text.charCodeAt(k);
+        if(ca>=65&&ca<=90)result+=String.fromCharCode(90-(ca-65));
+        else if(ca>=97&&ca<=122)result+=String.fromCharCode(122-(ca-97));
+        else result+=text[k];
+      }
+    }
+    document.getElementById('cipher-out').value=result;
+  };
+  var selStyle='background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:5px;font-size:10px;color:var(--text);outline:none';
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Text Cipher</span><button onclick="document.getElementById(\'cipher-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:8px;align-items:center"><select id="cipher-method" style="'+selStyle+'"><option value="caesar">Caesar</option><option value="rot13">ROT13</option><option value="atbash">Atbash</option><option value="reverse">Reverse</option></select><label style="font-size:9px;color:var(--text-muted)">Shift:</label><input id="cipher-shift" type="number" value="3" min="1" max="25" style="width:40px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;font-size:10px;color:var(--text);outline:none;text-align:center;font-family:var(--mono)"></div>';
+  h+='<textarea id="cipher-text" placeholder="Enter text to encrypt..." style="width:100%;height:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--text);resize:none;outline:none;margin-bottom:6px;box-sizing:border-box"></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:8px"><button onclick="window._cipherRun(\'enc\')" style="flex:1;padding:6px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600">Encrypt</button><button onclick="window._cipherRun(\'dec\')" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Decrypt</button></div>';
+  h+='<textarea id="cipher-out" readonly style="width:100%;height:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--accent);font-family:var(--mono);resize:none;outline:none;box-sizing:border-box"></textarea>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'cipher-out\').value)" style="margin-top:6px;padding:4px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px">Copy Result</button>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTextStats(){
+  let panel=document.getElementById('text-stats-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='text-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._tsAnalyze=function(){
+    var text=document.getElementById('ts-input').value||'';
+    var out=document.getElementById('ts-out');if(!out)return;
+    if(!text.trim()){out.innerHTML='<div style="color:var(--text-muted);font-size:10px;text-align:center;padding:12px">Paste text above to analyze</div>';return;}
+    var words=text.trim().split(/\s+/);var wordCount=words.length;
+    var uniqueWords=new Set(words.map(function(w){return w.toLowerCase().replace(/[^a-z]/g,'');}));uniqueWords.delete('');
+    var freq={};words.forEach(function(w){var lw=w.toLowerCase().replace(/[^a-z]/g,'');if(lw)freq[lw]=(freq[lw]||0)+1;});
+    var topWords=Object.entries(freq).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+    var sentences=text.split(/[.!?]+/).filter(function(s){return s.trim();}).length;
+    var avgWordLen=words.reduce(function(s,w){return s+w.length;},0)/wordCount;
+    var avgSentLen=wordCount/Math.max(sentences,1);
+    var letterFreq={};text.toLowerCase().replace(/[^a-z]/g,'').split('').forEach(function(c){letterFreq[c]=(letterFreq[c]||0)+1;});
+    var topLetters=Object.entries(letterFreq).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+    var totalLetters=text.replace(/[^a-zA-Z]/g,'').length;
+    var h2='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">';
+    [{l:'Words',v:wordCount},{l:'Unique',v:uniqueWords.size},{l:'Sentences',v:sentences},{l:'Avg Word',v:avgWordLen.toFixed(1)+'c'},{l:'Avg Sentence',v:avgSentLen.toFixed(1)+'w'},{l:'Letters',v:totalLetters}].forEach(function(m){
+      h2+='<div style="background:var(--bg-surface);border-radius:var(--radius);padding:6px;text-align:center"><div style="font-size:14px;font-weight:700;color:var(--accent);font-family:var(--mono)">'+m.v+'</div><div style="font-size:8px;color:var(--text-muted)">'+m.l+'</div></div>';
+    });
+    h2+='</div>';
+    h2+='<div style="font-size:10px;color:var(--text-muted);font-weight:600;margin-bottom:4px">Top 10 Words:</div>';
+    topWords.forEach(function(w){
+      var pct=Math.round(w[1]/wordCount*100);
+      h2+='<div style="display:flex;align-items:center;gap:6px;padding:2px 0"><span style="font-size:10px;color:var(--text);width:80px;overflow:hidden;text-overflow:ellipsis">'+esc(w[0])+'</span><div style="flex:1;height:5px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);min-width:2px;border-radius:3px"></div></div><span style="font-size:9px;color:var(--text-muted);font-family:var(--mono);width:30px;text-align:right">'+w[1]+'</span></div>';
+    });
+    h2+='<div style="font-size:10px;color:var(--text-muted);font-weight:600;margin:10px 0 4px">Letter Frequency:</div>';
+    var maxLetterFreq=topLetters.length>0?topLetters[0][1]:1;
+    topLetters.forEach(function(l){
+      h2+='<div style="display:flex;align-items:center;gap:6px;padding:1px 0"><span style="font-size:10px;color:var(--text);width:20px;font-family:var(--mono);font-weight:600">'+l[0]+'</span><div style="flex:1;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+Math.round(l[1]/maxLetterFreq*100)+'%;background:#3b82f6;border-radius:2px"></div></div><span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)">'+l[1]+'</span></div>';
+    });
+    out.innerHTML=h2;
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Text Analysis</span><button onclick="document.getElementById(\'text-stats-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="ts-input" oninput="window._tsAnalyze()" placeholder="Paste text to analyze..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:11px;color:var(--text);resize:vertical;outline:none;margin-bottom:8px;box-sizing:border-box"></textarea>';
+  h+='<div id="ts-out"><div style="color:var(--text-muted);font-size:10px;text-align:center;padding:12px">Paste text above to analyze</div></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskAgeSummary(){
+  let panel=document.getElementById('task-age-sum-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-age-sum-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw';
+  var now=Date.now();
+  var active=S.tasks.filter(function(t){return t.status!=='done'&&t.created;});
+  var buckets=[
+    {label:'Today',min:0,max:1,color:'#4ade80'},
+    {label:'1-3 days',min:1,max:3,color:'#22d3ee'},
+    {label:'3-7 days',min:3,max:7,color:'#3b82f6'},
+    {label:'1-2 weeks',min:7,max:14,color:'#8b5cf6'},
+    {label:'2-4 weeks',min:14,max:28,color:'#f59e0b'},
+    {label:'1-3 months',min:28,max:90,color:'#ef4444'},
+    {label:'3+ months',min:90,max:9999,color:'#dc2626'}
+  ];
+  buckets.forEach(function(b){b.count=0;b.tasks=[];});
+  active.forEach(function(t){
+    var age=Math.floor((now-new Date(t.created).getTime())/86400000);
+    for(var i=0;i<buckets.length;i++){
+      if(age>=buckets[i].min&&age<buckets[i].max){buckets[i].count++;buckets[i].tasks.push(t);break;}
+    }
+  });
+  var maxCount=Math.max.apply(null,buckets.map(function(b){return b.count;}).concat([1]));
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Age Summary</span><button onclick="document.getElementById(\'task-age-sum-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:10px">'+active.length+' active tasks</div>';
+  buckets.forEach(function(b){
+    var pct=Math.round(b.count/maxCount*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0"><span style="font-size:10px;color:var(--text);width:80px">'+b.label+'</span><div style="flex:1;height:10px;background:var(--bg-surface);border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+b.color+';border-radius:5px;min-width:'+(b.count>0?'4px':'0')+'"></div></div><span style="font-size:10px;color:'+b.color+';font-family:var(--mono);font-weight:600;width:24px;text-align:right">'+b.count+'</span></div>';
+  });
+  var avgAge=active.length>0?Math.round(active.reduce(function(s,t){return s+Math.floor((now-new Date(t.created).getTime())/86400000);},0)/active.length):0;
+  h+='<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--accent);font-weight:600">Average Age: '+avgAge+' days</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickWeather(){
+  let panel=document.getElementById('weather-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='weather-widget';
+  panel.style.cssText='position:fixed;top:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  panel.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:11px;color:var(--text-muted)">Weather</span><button onclick="document.getElementById(\'weather-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div><div id="weather-content" style="font-size:10px;color:var(--text-muted)">Getting location...</div>';
+  document.body.appendChild(panel);
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var lat=pos.coords.latitude.toFixed(2);var lon=pos.coords.longitude.toFixed(2);
+      fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current_weather=true&hourly=temperature_2m,weathercode&timezone=auto&forecast_days=1').then(function(r){return r.json();}).then(function(d){
+        var el=document.getElementById('weather-content');if(!el)return;
+        var cw=d.current_weather||{};
+        var weatherNames={0:'Clear',1:'Mainly Clear',2:'Partly Cloudy',3:'Overcast',45:'Foggy',48:'Rime Fog',51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',61:'Light Rain',63:'Rain',65:'Heavy Rain',71:'Light Snow',73:'Snow',75:'Heavy Snow',80:'Light Showers',81:'Showers',82:'Heavy Showers',95:'Thunderstorm',96:'Thunderstorm + Hail'};
+        var name=weatherNames[cw.weathercode]||'Unknown';
+        var tempF=Math.round(cw.temperature*9/5+32);
+        el.innerHTML='<div style="font-size:24px;font-weight:700;color:var(--accent);margin-bottom:4px">'+Math.round(cw.temperature)+'C / '+tempF+'F</div><div style="font-size:11px;color:var(--text);margin-bottom:6px">'+name+'</div><div style="font-size:9px;color:var(--text-muted)">Wind: '+cw.windspeed+' km/h | Lat: '+lat+' | Lon: '+lon+'</div>';
+      }).catch(function(){
+        var el=document.getElementById('weather-content');if(el)el.textContent='Failed to fetch weather data';
+      });
+    },function(){
+      var el=document.getElementById('weather-content');if(el)el.textContent='Location access denied';
+    });
+  }else{
+    document.getElementById('weather-content').textContent='Geolocation not supported';
+  }
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
