@@ -6215,6 +6215,9 @@ function cmdGetItems(q) {
       ['readme','README.md generator with templates'],
       ['status timeline','Task status stacked area timeline'],
       ['mood','Daily mood tracker with 7-day trend'],
+      ['package.json','package.json generator'],
+      ['weekly goals','Weekly goals tracker with progress'],
+      ['sleep','Sleep hours tracker with 7-day chart'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9029,6 +9032,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='mood' || ql==='mood tracker' || ql==='mood log' || ql==='how am i feeling')){
     items.unshift({title:'Mood Tracker',desc:'Track daily mood with 7-day trend',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMoodTracker();}});
+  }
+  if(ql && (ql==='package.json' || ql==='package' || ql==='npm init' || ql==='pkg json')){
+    items.unshift({title:'package.json Generator',desc:'Build package.json with form fields',icon:'P',type:'action',action:()=>{closeCommandPalette();showPackageJsonGen();}});
+  }
+  if(ql && (ql==='weekly goals' || ql==='goals' || ql==='week goals' || ql==='weekly plan')){
+    items.unshift({title:'Weekly Goals',desc:'Set and track weekly goals',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyGoals();}});
+  }
+  if(ql && (ql==='sleep' || ql==='sleep log' || ql==='sleep tracker' || ql==='hours slept')){
+    items.unshift({title:'Sleep Log',desc:'Track sleep hours with weekly chart',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSleepLog();}});
   }
   return items.slice(0, 20);
 }
@@ -23984,6 +23996,122 @@ function showQuickMoodTracker(){
         save();rend();
       };
     });
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showPackageJsonGen(){
+  let p=document.getElementById('pkgjson-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='pkgjson-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let cfg=S._pkgCfg||{name:'my-project',version:'1.0.0',desc:'',main:'index.js',scripts:{start:'node index.js',dev:'nodemon index.js',test:'jest',build:'tsc'},license:'MIT',author:'',keywords:''};
+  function gen(){
+    let pkg={name:cfg.name,version:cfg.version,description:cfg.desc,main:cfg.main,scripts:cfg.scripts,keywords:cfg.keywords?cfg.keywords.split(',').map(s=>s.trim()).filter(Boolean):[],author:cfg.author,license:cfg.license};
+    return JSON.stringify(pkg,null,2);
+  }
+  function rend(){
+    let scriptRows=Object.entries(cfg.scripts).map(([k,v])=>'<div style="display:flex;gap:4px;margin-bottom:3px"><input data-sk="'+esc(k)+'" data-sf="key" value="'+esc(k)+'" style="width:80px;padding:3px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:#4ade80;font-size:10px;font-family:monospace"><input data-sk="'+esc(k)+'" data-sf="val" value="'+esc(v)+'" style="flex:1;padding:3px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:10px;font-family:monospace"></div>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">package.json Generator</span><button onclick="document.getElementById(\'pkgjson-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:grid;gap:6px;margin-bottom:8px">'
+      +'<div style="display:flex;gap:6px"><input id="pkg-name" value="'+esc(cfg.name)+'" placeholder="name" style="flex:1;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"><input id="pkg-ver" value="'+esc(cfg.version)+'" placeholder="version" style="width:80px;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"></div>'
+      +'<input id="pkg-desc" value="'+esc(cfg.desc)+'" placeholder="description" style="padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px">'
+      +'<div style="display:flex;gap:6px"><input id="pkg-main" value="'+esc(cfg.main)+'" placeholder="main" style="flex:1;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;font-family:monospace"><input id="pkg-author" value="'+esc(cfg.author)+'" placeholder="author" style="flex:1;padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"></div>'
+      +'<input id="pkg-kw" value="'+esc(cfg.keywords)+'" placeholder="keywords (comma-separated)" style="padding:5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px">'
+      +'</div>'
+      +'<div style="margin-bottom:8px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Scripts</div>'+scriptRows+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.4;max-height:180px;overflow-y:auto">'+esc(gen())+'</pre>'
+      +'<button id="pkg-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy package.json</button>';
+    let upd=function(){
+      cfg.name=document.getElementById('pkg-name').value;
+      cfg.version=document.getElementById('pkg-ver').value;
+      cfg.desc=document.getElementById('pkg-desc').value;
+      cfg.main=document.getElementById('pkg-main').value;
+      cfg.author=document.getElementById('pkg-author').value;
+      cfg.keywords=document.getElementById('pkg-kw').value;
+      S._pkgCfg=cfg;save();
+    };
+    ['pkg-name','pkg-ver','pkg-desc','pkg-main','pkg-author','pkg-kw'].forEach(id=>{document.getElementById(id).oninput=upd;});
+    p.querySelectorAll('[data-sk]').forEach(inp=>{inp.oninput=function(){
+      let oldKey=this.dataset.sk;
+      if(this.dataset.sf==='val'){cfg.scripts[oldKey]=this.value;}
+      S._pkgCfg=cfg;save();
+    };});
+    document.getElementById('pkg-copy').onclick=function(){navigator.clipboard.writeText(gen());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy package.json';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskWeeklyGoals(){
+  let p=document.getElementById('weekly-goals-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='weekly-goals-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  let now=new Date();
+  let weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-weekStart.getDay()+1);
+  let weekKey=weekStart.toISOString().slice(0,10);
+  if(!S._weeklyGoals)S._weeklyGoals={};
+  if(!S._weeklyGoals[weekKey])S._weeklyGoals[weekKey]=[];
+  let goals=S._weeklyGoals[weekKey];
+  let tasks=(S.tasks||[]);
+  let weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+7);
+  let doneThisWeek=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=weekStart&&new Date(t.completedAt)<weekEnd).length;
+  function rend(){
+    goals=S._weeklyGoals[weekKey]||[];
+    let list=goals.map((g,i)=>'<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:var(--radius);margin-bottom:4px"><input type="checkbox" data-gi="'+i+'" '+(g.done?'checked':'')+' style="cursor:pointer"><span style="flex:1;font-size:12px;color:var(--text-primary);'+(g.done?'text-decoration:line-through;opacity:0.5':'')+'">'+esc(g.text)+'</span><button data-gd="'+i+'" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:12px">x</button></div>').join('');
+    let completed=goals.filter(g=>g.done).length;
+    let pct=goals.length?Math.round(completed/goals.length*100):0;
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Weekly Goals</span><button onclick="document.getElementById(\'weekly-goals-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Week of '+weekKey+' | '+doneThisWeek+' tasks completed</div>'
+      +'<div style="height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="height:100%;width:'+pct+'%;background:#4ade80;transition:width 0.3s"></div></div>'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">'+completed+'/'+goals.length+' goals completed ('+pct+'%)</div>'
+      +(list||'<div style="text-align:center;color:var(--text-muted);padding:12px;font-size:11px">No goals set for this week</div>')
+      +'<div style="margin-top:8px;display:flex;gap:4px"><input id="wg-input" placeholder="Add a weekly goal..." style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"><button id="wg-add" style="padding:6px 12px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:11px">Add</button></div>';
+    p.querySelectorAll('[data-gi]').forEach(cb=>{cb.onchange=function(){
+      goals[parseInt(this.dataset.gi)].done=this.checked;S._weeklyGoals[weekKey]=goals;save();rend();
+    };});
+    p.querySelectorAll('[data-gd]').forEach(b=>{b.onclick=function(){
+      goals.splice(parseInt(this.dataset.gd),1);S._weeklyGoals[weekKey]=goals;save();rend();
+    };});
+    document.getElementById('wg-add').onclick=function(){
+      let v=document.getElementById('wg-input').value.trim();
+      if(!v)return;
+      goals.push({text:v,done:false});S._weeklyGoals[weekKey]=goals;save();rend();
+    };
+    document.getElementById('wg-input').onkeydown=function(e){if(e.key==='Enter')document.getElementById('wg-add').click();};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showQuickSleepLog(){
+  let p=document.getElementById('sleep-log-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='sleep-log-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  if(!S._sleepLog)S._sleepLog=[];
+  let today=new Date().toISOString().slice(0,10);
+  let todayEntry=S._sleepLog.find(s=>s.date===today);
+  function rend(){
+    todayEntry=S._sleepLog.find(s=>s.date===today);
+    let last7=S._sleepLog.slice(-7);
+    let avg=last7.length?Math.round(last7.reduce((s,e)=>s+e.hours,0)/last7.length*10)/10:0;
+    let barH=60;
+    let bars=last7.map(e=>{
+      let h=Math.min(e.hours/10,1)*barH;
+      let d=new Date(e.date);
+      let day=['S','M','T','W','T','F','S'][d.getDay()];
+      let color=e.hours>=7?'#4ade80':e.hours>=5?'#fbbf24':'#f87171';
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:2px"><div style="width:20px;height:'+barH+'px;background:var(--bg-surface);border-radius:3px;display:flex;align-items:flex-end;overflow:hidden"><div style="width:100%;height:'+h+'px;background:'+color+';border-radius:3px"></div></div><span style="font-size:8px;color:var(--text-muted)">'+day+'</span><span style="font-size:8px;color:'+color+'">'+e.hours+'</span></div>';
+    }).join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Sleep Log</span><button onclick="document.getElementById(\'sleep-log-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">'+bars+'</div>'
+      +'<div style="text-align:center;font-size:10px;color:var(--text-muted);margin-bottom:8px">7-day avg: <span style="font-weight:600;color:var(--text-primary)">'+avg+'h</span></div>'
+      +'<div style="display:flex;gap:4px;align-items:center"><label style="font-size:10px;color:var(--text-muted);min-width:50px">Today:</label><input id="sleep-hrs" type="number" min="0" max="14" step="0.5" value="'+(todayEntry?todayEntry.hours:7)+'" style="flex:1;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:12px;text-align:center"><span style="font-size:10px;color:var(--text-muted)">hrs</span></div>'
+      +'<button id="sleep-save" style="width:100%;margin-top:6px;padding:6px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:11px">'+(todayEntry?'Update':'Log Sleep')+'</button>';
+    document.getElementById('sleep-save').onclick=function(){
+      let hrs=parseFloat(document.getElementById('sleep-hrs').value)||0;
+      let existing=S._sleepLog.findIndex(s=>s.date===today);
+      if(existing>=0)S._sleepLog[existing]={date:today,hours:hrs};
+      else S._sleepLog.push({date:today,hours:hrs});
+      save();this.textContent='Saved!';setTimeout(()=>{rend();},800);
+    };
   }
   document.body.appendChild(p);
   rend();
