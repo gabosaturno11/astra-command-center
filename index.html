@@ -5802,6 +5802,9 @@ function cmdGetItems(q) {
       ['tag cloud','Visual tag cloud sized by frequency'],
       ['priority grid','Quick priority reassignment for active tasks'],
       ['content timeline','Chronological timeline of all content items'],
+      ['velocity','12-week task velocity line chart'],
+      ['quick note','Toggle floating quick-note capture button'],
+      ['bookmarklets','Generate bookmarklets for capturing to ASTRA'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7099,6 +7102,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='content timeline' || ql==='content history' || ql==='content feed' || ql==='creation history')){
     items.unshift({title:'Content Timeline',desc:'Chronological feed of all content items by date',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentTimeline();}});
   }
+  // Velocity chart prefix
+  if(ql && (ql==='velocity' || ql==='velocity chart' || ql==='task velocity' || ql==='completion rate')){
+    items.unshift({title:'Task Velocity Chart',desc:'12-week line chart: created vs completed tasks',icon:'V',type:'action',action:()=>{closeCommandPalette();showVelocityChart();}});
+  }
+  // Quick note prefix
+  if(ql && (ql==='quick note' || ql==='quick capture' || ql==='fab' || ql==='floating note')){
+    items.unshift({title:'Toggle Quick Note Button',desc:'Floating action button for instant note capture',icon:'+',type:'action',action:()=>{closeCommandPalette();toggleQuickNote();}});
+  }
+  // Bookmarklets prefix
+  if(ql && (ql==='bookmarklets' || ql==='bookmarklet' || ql==='browser capture' || ql==='capture bookmarks')){
+    items.unshift({title:'Bookmarklet Generator',desc:'Create browser bookmarklets to save links/text/tasks',icon:'B',type:'action',action:()=>{closeCommandPalette();showBookmarkletGenerator();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -8085,6 +8100,87 @@ function showContentTimeline(){
   });
   if(!items.length)h='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No content items yet</div>';
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Timeline (${items.length} items)</span><button onclick="document.getElementById('content-tl-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showVelocityChart(){
+  let panel=document.getElementById('velocity-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='velocity-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:75vh;overflow-y:auto';
+  const weeks=[];const now=new Date();
+  for(let w=11;w>=0;w--){
+    const weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-w*7-now.getDay());
+    const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+6);
+    const startStr=weekStart.toISOString().split('T')[0];
+    const endStr=weekEnd.toISOString().split('T')[0];
+    const completed=S.tasks.filter(t=>t.completedAt&&t.completedAt.split('T')[0]>=startStr&&t.completedAt.split('T')[0]<=endStr).length;
+    const created=S.tasks.filter(t=>t.createdAt&&t.createdAt.split('T')[0]>=startStr&&t.createdAt.split('T')[0]<=endStr).length;
+    weeks.push({label:weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'}),completed,created});
+  }
+  const maxVal=Math.max(...weeks.map(w=>Math.max(w.completed,w.created)),1);
+  const W=480;const H=180;const pad=30;const gw=W-pad*2;const gh=H-pad*2;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto">`;
+  for(let i=0;i<=4;i++){
+    const y=pad+gh-gh*(i/4);const val=Math.round(maxVal*(i/4));
+    svg+=`<line x1="${pad}" y1="${y}" x2="${W-pad}" y2="${y}" stroke="var(--border)" stroke-width="0.5"/>`;
+    svg+=`<text x="${pad-4}" y="${y+3}" font-size="8" fill="var(--text-muted)" text-anchor="end">${val}</text>`;
+  }
+  let completedPath='';let createdPath='';
+  weeks.forEach((w,i)=>{
+    const x=pad+i*(gw/(weeks.length-1));
+    const yC=pad+gh-gh*(w.completed/maxVal);
+    const yR=pad+gh-gh*(w.created/maxVal);
+    completedPath+=(i===0?'M':'L')+x+','+yC;
+    createdPath+=(i===0?'M':'L')+x+','+yR;
+    if(i%2===0)svg+=`<text x="${x}" y="${H-5}" font-size="7" fill="var(--text-muted)" text-anchor="middle">${w.label}</text>`;
+  });
+  svg+=`<path d="${createdPath}" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.7"/>`;
+  svg+=`<path d="${completedPath}" fill="none" stroke="#22c55e" stroke-width="2"/>`;
+  weeks.forEach((w,i)=>{
+    const x=pad+i*(gw/(weeks.length-1));
+    const yC=pad+gh-gh*(w.completed/maxVal);
+    const yR=pad+gh-gh*(w.created/maxVal);
+    svg+=`<circle cx="${x}" cy="${yC}" r="3" fill="#22c55e"/>`;
+    svg+=`<circle cx="${x}" cy="${yR}" r="3" fill="#3b82f6"/>`;
+  });
+  svg+='</svg>';
+  const totalCompleted=weeks.reduce((s,w)=>s+w.completed,0);
+  const totalCreated=weeks.reduce((s,w)=>s+w.created,0);
+  const avgVelocity=Math.round(totalCompleted/weeks.length*10)/10;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Task Velocity (12 Weeks)</span><button onclick="document.getElementById('velocity-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;gap:12px;margin-bottom:8px;font-size:10px"><span style="color:#22c55e">Completed: ${totalCompleted}</span><span style="color:#3b82f6">Created: ${totalCreated}</span><span style="color:var(--accent)">Avg: ${avgVelocity}/wk</span></div><div style="display:flex;gap:8px;margin-bottom:8px;font-size:8px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:#22c55e;border-radius:1px"></span>Completed</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:#3b82f6;border-radius:1px"></span>Created</span></div>${svg}`;
+  document.body.appendChild(panel);
+}
+function toggleQuickNote(){
+  let btn=document.getElementById('quick-note-fab');
+  if(btn){btn.remove();return;}
+  btn=document.createElement('div');btn.id='quick-note-fab';
+  btn.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1400;display:flex;flex-direction:column;align-items:flex-end;gap:8px';
+  btn.innerHTML=`<div id="quick-note-area" style="display:none;width:280px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:8px;padding:10px;box-shadow:0 8px 32px rgba(0,0,0,0.5)"><textarea id="quick-note-text" placeholder="Quick note..." style="width:100%;height:60px;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;resize:vertical;box-sizing:border-box;margin-bottom:6px"></textarea><div style="display:flex;gap:4px"><select id="quick-note-type" style="flex:1;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:10px"><option value="idea">Idea</option><option value="thought">Thought</option><option value="quote">Quote</option><option value="todo">Todo</option><option value="insight">Insight</option></select><button onclick="saveQuickNote()" style="padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;font-size:10px;font-weight:600;cursor:pointer">Save</button></div></div><button onclick="const a=document.getElementById('quick-note-area');a.style.display=a.style.display==='none'?'block':'none';if(a.style.display==='block')document.getElementById('quick-note-text').focus()" style="width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#000;font-size:18px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-weight:700">+</button>`;
+  document.body.appendChild(btn);
+}
+function saveQuickNote(){
+  const text=document.getElementById('quick-note-text');
+  const type=document.getElementById('quick-note-type');
+  if(!text||!text.value.trim()){toast('Enter some text');return;}
+  const id=Date.now();
+  S.content.unshift({id,body:text.value.trim(),type:type.value,theme:'quick-capture',tags:['quick-note'],createdAt:new Date().toISOString(),pinned:false});
+  save();text.value='';toast('Quick note saved!');
+  const area=document.getElementById('quick-note-area');if(area)area.style.display='none';
+}
+function showBookmarkletGenerator(){
+  let panel=document.getElementById('bookmarklet-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='bookmarklet-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto';
+  const bookmarklets=[
+    {name:'Save Page as Link',desc:'Save current page URL + title to ASTRA links',code:"javascript:void(function(){var t=document.title,u=window.location.href;var d=JSON.parse(localStorage.getItem('astra-state')||'{}');if(!d.links)d.links=[];d.links.unshift({id:Date.now(),title:t,url:u,category:'saved',createdAt:new Date().toISOString()});localStorage.setItem('astra-state',JSON.stringify(d));alert('Saved: '+t)}())"},
+    {name:'Capture Selection',desc:'Save highlighted text to ASTRA content',code:"javascript:void(function(){var s=window.getSelection().toString();if(!s){alert('Select some text first');return}var d=JSON.parse(localStorage.getItem('astra-state')||'{}');if(!d.content)d.content=[];d.content.unshift({id:Date.now(),body:s,type:'quote',theme:'web-capture',tags:['bookmarklet'],source:window.location.href,createdAt:new Date().toISOString()});localStorage.setItem('astra-state',JSON.stringify(d));alert('Captured '+s.length+' chars')}())"},
+    {name:'Quick Task',desc:'Create a task from current page',code:"javascript:void(function(){var t=prompt('Task title:',document.title);if(!t)return;var d=JSON.parse(localStorage.getItem('astra-state')||'{}');if(!d.tasks)d.tasks=[];d.tasks.unshift({id:Date.now(),title:t,status:'todo',priority:'p2',createdAt:new Date().toISOString()});localStorage.setItem('astra-state',JSON.stringify(d));alert('Task created: '+t)}())"},
+  ];
+  let h='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Drag these links to your bookmarks bar, or right-click and "Add to Bookmarks"</div>';
+  bookmarklets.forEach(b=>{
+    h+=`<div style="padding:10px;background:var(--bg-surface);border-radius:6px;margin-bottom:8px;border-left:2px solid var(--accent)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><a href="${b.code}" style="font-size:11px;font-weight:600;color:var(--accent);text-decoration:none;cursor:move" onclick="event.preventDefault();toast('Drag to bookmarks bar!')">${esc(b.name)}</a><button onclick="navigator.clipboard.writeText(\`${b.code.replace(/`/g,"'")}\`);toast('Bookmarklet code copied!')" style="padding:2px 8px;background:var(--accent);border:none;border-radius:3px;color:#000;font-size:8px;cursor:pointer">Copy</button></div><div style="font-size:9px;color:var(--text-muted)">${b.desc}</div></div>`;
+  });
+  h+='<div style="font-size:9px;color:var(--text-muted);margin-top:8px;font-style:italic">Note: Bookmarklets work on the same domain. For cross-domain, use the Nexus Capture extension.</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Bookmarklet Generator</span><button onclick="document.getElementById('bookmarklet-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
