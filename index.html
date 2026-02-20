@@ -6749,6 +6749,12 @@ function cmdGetItems(q) {
       ['redis','Redis commands reference'],
       ['streak','Daily task completion streak'],
       ['json formatter','JSON prettify minify tool'],
+      ['mongodb','MongoDB CRUD query aggregate ref'],
+      ['focus score','Focus score based on completions'],
+      ['url encoder','URL encode decode tool'],
+      ['grafana','Grafana PromQL reference'],
+      ['project health','Project health dashboard'],
+      ['hash','SHA-256 SHA-512 hash generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -11165,6 +11171,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='json formatter' || ql==='json' || ql==='prettify json' || ql==='minify json')){
     items.unshift({title:'JSON Formatter',desc:'Prettify and minify JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonFormatter();}});
+  }
+  if(ql && (ql==='mongodb' || ql==='mongo' || ql==='mongo ref' || ql==='mongodb ref')){
+    items.unshift({title:'MongoDB Reference',desc:'CRUD, query, aggregate, index',icon:'M',type:'action',action:()=>{closeCommandPalette();showMongoDBRef();}});
+  }
+  if(ql && (ql==='focus score' || ql==='focus' || ql==='score' || ql==='productivity score')){
+    items.unshift({title:'Focus Score',desc:'Productivity score based on completions',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFocusScore();}});
+  }
+  if(ql && (ql==='url encoder' || ql==='url encode' || ql==='url decode' || ql==='urlencode')){
+    items.unshift({title:'URL Encoder',desc:'Encode and decode URLs',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUrlEncoder();}});
+  }
+  if(ql && (ql==='grafana' || ql==='promql' || ql==='grafana ref' || ql==='prometheus query')){
+    items.unshift({title:'Grafana Reference',desc:'PromQL queries, variables, alerts',icon:'G',type:'action',action:()=>{closeCommandPalette();showGrafanaRef();}});
+  }
+  if(ql && (ql==='project health' || ql==='health dashboard' || ql==='project status' || ql==='health')){
+    items.unshift({title:'Project Health',desc:'Health scores for all projects',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskProjectHealth();}});
+  }
+  if(ql && (ql==='hash' || ql==='sha' || ql==='sha256' || ql==='hash generator')){
+    items.unshift({title:'Hash Generator',desc:'SHA-256, SHA-512, SHA-1 hashes',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHashGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -40553,6 +40577,148 @@ function showQuickJsonFormatter(){
   h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_jf-input\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Copy</button>';
   w.innerHTML=h;
   document.body.appendChild(w);
+}
+function showMongoDBRef(){
+  const cmds={
+    'CRUD':['db.col.insertOne({k:"v"})','db.col.insertMany([{a:1},{a:2}])','db.col.find({status:"active"})','db.col.findOne({_id:ObjectId("...")})','db.col.updateOne({_id:id},{$set:{k:"v"}})','db.col.updateMany({},{$inc:{count:1}})','db.col.deleteOne({_id:id})','db.col.deleteMany({status:"old"})'],
+    'Query':['db.col.find({age:{$gt:25}})','db.col.find({tags:{$in:["a","b"]}})','db.col.find({$or:[{a:1},{b:2}]})','db.col.find().sort({date:-1}).limit(10)','db.col.find({},{name:1,_id:0})','db.col.countDocuments({status:"active"})'],
+    'Aggregate':['db.col.aggregate([{$match:{}},{$group:{_id:"$field",total:{$sum:1}}}])','$lookup: {from:"other",localField:"id",foreignField:"ref",as:"joined"}','$project, $unwind, $sort, $limit, $skip'],
+    'Index':['db.col.createIndex({field:1})','db.col.createIndex({a:1,b:-1})','db.col.createIndex({field:"text"})','db.col.getIndexes()','db.col.dropIndex("name")'],
+    'Admin':['show dbs','use mydb','show collections','db.stats()','db.col.stats()','db.dropDatabase()']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">MongoDB Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{html+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.background=\'#4ade8022\';setTimeout(()=>this.style.background=\'\',400)" style="font-family:monospace;font-size:11px;color:var(--text-primary);padding:4px 8px;cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all">'+c+'</div>';});
+    html+='</div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showTaskFocusScore(){
+  const tasks=S.tasks||[];
+  const now=new Date();
+  const today=now.toISOString().split('T')[0];
+  const thisWeekStart=new Date(now);thisWeekStart.setDate(thisWeekStart.getDate()-thisWeekStart.getDay());
+  const todayDone=tasks.filter(t=>t.status==='done'&&(t.completedAt||t.updatedAt||'').startsWith(today)).length;
+  const weekDone=tasks.filter(t=>{if(t.status!=='done')return false;const d=new Date(t.completedAt||t.updatedAt||0);return d>=thisWeekStart;}).length;
+  const activeCount=tasks.filter(t=>t.status==='in-progress').length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now).length;
+  const p0Done=tasks.filter(t=>t.status==='done'&&t.priority==='p0').length;
+  const p0Total=tasks.filter(t=>t.priority==='p0').length;
+  let score=50;
+  score+=Math.min(todayDone*5,20);
+  score+=Math.min(weekDone*2,15);
+  score-=overdue*3;
+  score-=Math.max(activeCount-3,0)*2;
+  if(p0Total>0)score+=Math.round(p0Done/p0Total*15);
+  score=Math.max(0,Math.min(100,score));
+  const grade=score>=90?'A+':score>=80?'A':score>=70?'B':score>=60?'C':score>=50?'D':'F';
+  const gradeColor=score>=80?'#4ade80':score>=60?'#fbbf24':'#ef4444';
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Focus Score</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  html+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:56px;font-weight:700;color:'+gradeColor+'">'+score+'</div><div style="font-size:24px;font-weight:600;color:'+gradeColor+'">'+grade+'</div></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">';
+  html+='<div style="background:var(--bg-surface);padding:8px;border-radius:6px"><span style="color:var(--text-muted)">Today done:</span> <strong style="color:#4ade80">'+todayDone+'</strong></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px;border-radius:6px"><span style="color:var(--text-muted)">Week done:</span> <strong style="color:#4ade80">'+weekDone+'</strong></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px;border-radius:6px"><span style="color:var(--text-muted)">In progress:</span> <strong style="color:#06b6d4">'+activeCount+'</strong></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px;border-radius:6px"><span style="color:var(--text-muted)">Overdue:</span> <strong style="color:#ef4444">'+overdue+'</strong></div>';
+  html+='<div style="background:var(--bg-surface);padding:8px;border-radius:6px"><span style="color:var(--text-muted)">P0 done:</span> <strong style="color:var(--text-primary)">'+p0Done+'/'+p0Total+'</strong></div>';
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-top:12px;text-align:center">Score based on completions, overdue count, WIP, and P0 ratio</div>';
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showQuickUrlEncoder(){
+  let w=document.getElementById('url-enc-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='url-enc-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">URL Encode/Decode</h4><button onclick="document.getElementById(\'url-enc-widget\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  h+='<textarea id="_ue-input" rows="3" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:8px;font-size:12px;font-family:monospace;resize:vertical;margin-bottom:6px" placeholder="Enter text or URL..."></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+  h+='<button onclick="document.getElementById(\'_ue-output\').value=encodeURIComponent(document.getElementById(\'_ue-input\').value)" style="flex:1;background:#4ade80;border:none;color:#000;padding:6px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer">Encode</button>';
+  h+='<button onclick="try{document.getElementById(\'_ue-output\').value=decodeURIComponent(document.getElementById(\'_ue-input\').value)}catch(e){document.getElementById(\'_ue-output\').value=\'Error: \'+e.message}" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Decode</button>';
+  h+='<button onclick="try{document.getElementById(\'_ue-output\').value=encodeURI(document.getElementById(\'_ue-input\').value)}catch(e){document.getElementById(\'_ue-output\').value=\'Error: \'+e.message}" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">encodeURI</button>';
+  h+='</div>';
+  h+='<textarea id="_ue-output" rows="3" readonly style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:#4ade80;padding:8px;border-radius:8px;font-size:12px;font-family:monospace;resize:vertical;margin-bottom:6px" placeholder="Result..."></textarea>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_ue-output\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Copy</button>';
+  w.innerHTML=h;
+  document.body.appendChild(w);
+}
+function showGrafanaRef(){
+  const cmds={
+    'PromQL Basics':['metric_name','metric_name{label="value"}','rate(metric[5m])','increase(metric[1h])','sum(rate(http_requests_total[5m]))','avg by(instance)(cpu_usage)'],
+    'PromQL Functions':['histogram_quantile(0.99, rate(http_duration_bucket[5m]))','topk(10, http_requests_total)','bottomk(5, node_memory_free)','count(up == 1)','absent(metric)','changes(metric[5m])'],
+    'PromQL Aggregation':['sum by(label)(metric)','avg without(instance)(metric)','max(metric) by(job)','min(metric)','count(metric)','stddev(metric)'],
+    'Grafana Variables':['$__interval','$__rate_interval','$__timeFrom()','$__timeTo()','$__range','${var:csv}','${var:pipe}'],
+    'Alert Rules':['WHEN avg() OF query IS ABOVE threshold','FOR 5m','Labels: severity=critical','Annotations: summary, description']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Grafana / PromQL Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{html+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.background=\'#4ade8022\';setTimeout(()=>this.style.background=\'\',400)" style="font-family:monospace;font-size:11px;color:var(--text-primary);padding:4px 8px;cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all">'+c+'</div>';});
+    html+='</div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showTaskProjectHealth(){
+  const projects=S.projects||[];
+  const tasks=S.tasks||[];
+  const content=S.content||[];
+  const docs=S.writerDocs||[];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Project Health Dashboard</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">X</button></div>';
+  if(!projects.length){html+='<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No projects</div></div>';document.body.insertAdjacentHTML('beforeend',html);return;}
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.project===p.name||t.projectId===p.id);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const active=pTasks.filter(t=>t.status==='in-progress').length;
+    const overdue=pTasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length;
+    const total=pTasks.length;
+    const pct=total?Math.round(done/total*100):0;
+    const pContent=content.filter(c=>c.project===p.name).length;
+    const pDocs=docs.filter(d=>d.project===p.name).length;
+    const healthScore=Math.min(100,pct+(overdue>0?-15:10)+(active>0?5:0));
+    const healthColor=healthScore>=70?'#4ade80':healthScore>=40?'#fbbf24':'#ef4444';
+    html+='<div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">'+esc(p.name)+'</span><span style="font-size:20px;font-weight:700;color:'+healthColor+'">'+healthScore+'</span></div>';
+    html+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:'+healthColor+';border-radius:3px"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    html+='<span>Tasks: <strong style="color:var(--text-primary)">'+done+'/'+total+'</strong></span>';
+    html+='<span>Active: <strong style="color:#06b6d4">'+active+'</strong></span>';
+    if(overdue)html+='<span>Overdue: <strong style="color:#ef4444">'+overdue+'</strong></span>';
+    html+='<span>Content: <strong style="color:var(--text-primary)">'+pContent+'</strong></span>';
+    html+='<span>Docs: <strong style="color:var(--text-primary)">'+pDocs+'</strong></span>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function showQuickHashGenerator(){
+  let w=document.getElementById('hash-gen-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='hash-gen-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:340px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h4 style="margin:0;color:#4ade80;font-size:13px">Hash Generator</h4><button onclick="document.getElementById(\'hash-gen-widget\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  h+='<textarea id="_hg-input" rows="2" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:8px;font-size:12px;resize:vertical;margin-bottom:6px" placeholder="Enter text to hash..."></textarea>';
+  h+='<div style="display:flex;gap:4px;margin-bottom:8px">';
+  ['SHA-256','SHA-384','SHA-512','SHA-1'].forEach(alg=>{
+    h+='<button onclick="window._hgCalc(\''+alg+'\')" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:4px;border-radius:6px;font-size:10px;cursor:pointer">'+alg.replace('SHA-','')+'</button>';
+  });
+  h+='</div>';
+  h+='<div id="_hg-result" style="font-family:monospace;font-size:10px;color:#4ade80;word-break:break-all;background:var(--bg-surface);padding:8px;border-radius:6px;border:1px solid var(--border);min-height:30px;margin-bottom:6px"></div>';
+  h+='<button onclick="const t=document.getElementById(\'_hg-result\').textContent;if(t){navigator.clipboard.writeText(t);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Hash\',600)}" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:6px;font-size:11px;cursor:pointer">Copy Hash</button>';
+  w.innerHTML=h;
+  document.body.appendChild(w);
+  window._hgCalc=async function(alg){
+    const text=document.getElementById('_hg-input').value;
+    if(!text){document.getElementById('_hg-result').textContent='Enter text first';return;}
+    const buf=await crypto.subtle.digest(alg,new TextEncoder().encode(text));
+    const hex=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    document.getElementById('_hg-result').textContent=alg+': '+hex;
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
