@@ -6653,6 +6653,12 @@ function cmdGetItems(q) {
       ['vercel','Vercel CLI config serverless ref'],
       ['priority shift','Priority distribution by status'],
       ['ascii','ASCII character table reference'],
+      ['aws','AWS CLI S3 EC2 Lambda IAM reference'],
+      ['context switching','Active context switching analysis'],
+      ['percentage','Percentage calculator three modes'],
+      ['gcp','Google Cloud Platform CLI reference'],
+      ['focus time','Focus time tracking report'],
+      ['fibonacci','Fibonacci sequence generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10781,6 +10787,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='ascii' || ql==='ascii table' || ql==='ascii chart' || ql==='char codes')){
     items.unshift({title:'ASCII Table',desc:'Printable ASCII character table',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAsciiTable();}});
+  }
+  if(ql && (ql==='aws' || ql==='aws cli' || ql==='aws ref' || ql==='amazon')){
+    items.unshift({title:'AWS CLI Reference',desc:'S3, EC2, Lambda, IAM commands',icon:'A',type:'action',action:()=>{closeCommandPalette();showAWSCLIRef();}});
+  }
+  if(ql && (ql==='context switching' || ql==='context switch' || ql==='wip contexts' || ql==='active contexts')){
+    items.unshift({title:'Context Switching',desc:'Active project context analysis',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskContextSwitching();}});
+  }
+  if(ql && (ql==='percentage' || ql==='percent' || ql==='pct calc' || ql==='percentage calculator')){
+    items.unshift({title:'Percentage Calculator',desc:'X% of Y, % change, ratio',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPercentageCalc();}});
+  }
+  if(ql && (ql==='gcp' || ql==='google cloud' || ql==='gcloud' || ql==='gcp ref')){
+    items.unshift({title:'GCP CLI Reference',desc:'Compute, Cloud Run, Storage',icon:'G',type:'action',action:()=>{closeCommandPalette();showGCPRef();}});
+  }
+  if(ql && (ql==='focus time' || ql==='time report' || ql==='tracked time' || ql==='focus report')){
+    items.unshift({title:'Focus Time Report',desc:'Time tracked per task',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFocusTime();}});
+  }
+  if(ql && (ql==='fibonacci' || ql==='fib' || ql==='fibonacci sequence' || ql==='fibonacci numbers')){
+    items.unshift({title:'Fibonacci',desc:'Fibonacci sequence generator',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFibonacci();}});
   }
   return items.slice(0, 20);
 }
@@ -38014,6 +38038,125 @@ function showQuickAsciiTable(){
   }
   h+='</div>';
   d.innerHTML=h;document.body.appendChild(d);
+}
+function showAWSCLIRef(){
+  let d=document.getElementById('aws-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='aws-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'S3':['aws s3 ls','aws s3 cp file.txt s3://bucket/','aws s3 sync ./dist s3://bucket/ --delete','aws s3 mb s3://new-bucket','aws s3 rm s3://bucket/file.txt','aws s3 presign s3://bucket/file.txt --expires-in 3600'],
+    'EC2':['aws ec2 describe-instances','aws ec2 start-instances --instance-ids i-xxx','aws ec2 stop-instances --instance-ids i-xxx','aws ec2 run-instances --image-id ami-xxx --instance-type t2.micro','aws ec2 describe-security-groups'],
+    'Lambda':['aws lambda list-functions','aws lambda invoke --function-name myFunc output.json','aws lambda create-function --function-name myFunc --runtime nodejs20.x','aws lambda update-function-code --function-name myFunc --zip-file fileb://func.zip'],
+    'IAM':['aws iam list-users','aws iam create-user --user-name newuser','aws iam attach-user-policy --user-name user --policy-arn arn:aws:iam::policy/ReadOnly','aws sts get-caller-identity'],
+    'General':['aws configure','aws configure list','aws --region us-east-1','--output json | table | text','--profile prod','aws sts get-session-token']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">AWS CLI Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskContextSwitching(){
+  let d=document.getElementById('ctx-switch-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='ctx-switch-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const projects=(S.projects||[]);
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  const projectsWithWIP={};
+  inProgress.forEach(t=>{
+    const pid=t.projectId||'_none';
+    if(!projectsWithWIP[pid])projectsWithWIP[pid]=[];
+    projectsWithWIP[pid].push(t);
+  });
+  const switchCount=Object.keys(projectsWithWIP).length;
+  const color=switchCount<=2?'#4ade80':switchCount<=4?'#fbbf24':'#f87171';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Context Switching</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;font-weight:700;color:'+color+'">'+switchCount+'</div><div style="font-size:11px;color:var(--text-muted)">Active Contexts</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">'+inProgress.length+' tasks in progress</div></div>';
+  const advice=switchCount<=2?'Good focus! Minimal context switching.':switchCount<=4?'Moderate switching. Consider finishing some tasks.':'High context switching! Try to reduce WIP.';
+  h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center;font-size:12px;color:'+color+';margin-bottom:12px">'+advice+'</div>';
+  Object.entries(projectsWithWIP).forEach(([pid,items])=>{
+    const pName=projects.find(p=>p.id===pid);
+    h+='<div style="margin:6px 0;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px">'+(pName?esc(pName.name):'Unassigned')+' ('+items.length+')</div>';
+    items.forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0">'+esc(t.title)+'</div>';});
+    h+='</div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickPercentageCalc(){
+  let d=document.getElementById('pct-calc-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='pct-calc-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Percentage Calc</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">What is X% of Y?</div><div style="display:flex;gap:4px;align-items:center"><input id="pc-x" type="number" placeholder="X" style="width:60px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><span style="color:var(--text-muted);font-size:12px">% of</span><input id="pc-y" type="number" placeholder="Y" style="width:80px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><span style="color:var(--text-muted);font-size:12px">=</span><span id="pc-r1" style="color:var(--accent);font-weight:700;font-size:14px">?</span></div></div>';
+  h+='<div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">X is what % of Y?</div><div style="display:flex;gap:4px;align-items:center"><input id="pc-a" type="number" placeholder="X" style="width:60px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><span style="color:var(--text-muted);font-size:12px">of</span><input id="pc-b" type="number" placeholder="Y" style="width:80px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><span style="color:var(--text-muted);font-size:12px">=</span><span id="pc-r2" style="color:var(--accent);font-weight:700;font-size:14px">?%</span></div></div>';
+  h+='<div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">% change from X to Y</div><div style="display:flex;gap:4px;align-items:center"><input id="pc-from" type="number" placeholder="X" style="width:60px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><span style="color:var(--text-muted);font-size:12px">to</span><input id="pc-to" type="number" placeholder="Y" style="width:80px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><span style="color:var(--text-muted);font-size:12px">=</span><span id="pc-r3" style="color:var(--accent);font-weight:700;font-size:14px">?%</span></div></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  ['pc-x','pc-y'].forEach(id=>{document.getElementById(id).oninput=function(){const x=parseFloat(document.getElementById('pc-x').value);const y=parseFloat(document.getElementById('pc-y').value);document.getElementById('pc-r1').textContent=!isNaN(x)&&!isNaN(y)?((x/100)*y).toFixed(2):'?';};});
+  ['pc-a','pc-b'].forEach(id=>{document.getElementById(id).oninput=function(){const a=parseFloat(document.getElementById('pc-a').value);const b=parseFloat(document.getElementById('pc-b').value);document.getElementById('pc-r2').textContent=!isNaN(a)&&!isNaN(b)&&b!==0?((a/b)*100).toFixed(2)+'%':'?%';};});
+  ['pc-from','pc-to'].forEach(id=>{document.getElementById(id).oninput=function(){const f=parseFloat(document.getElementById('pc-from').value);const t=parseFloat(document.getElementById('pc-to').value);document.getElementById('pc-r3').textContent=!isNaN(f)&&!isNaN(t)&&f!==0?(((t-f)/f)*100).toFixed(2)+'%':'?%';};});
+}
+function showGCPRef(){
+  let d=document.getElementById('gcp-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='gcp-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Auth & Config':['gcloud auth login','gcloud auth application-default login','gcloud config set project PROJECT_ID','gcloud config list','gcloud projects list','gcloud auth list'],
+    'Compute':['gcloud compute instances list','gcloud compute instances create vm1 --machine-type e2-micro','gcloud compute instances start vm1','gcloud compute instances stop vm1','gcloud compute ssh vm1','gcloud compute firewall-rules create allow-http --allow tcp:80'],
+    'Cloud Run':['gcloud run deploy --source .','gcloud run services list','gcloud run services describe myservice','gcloud run services delete myservice','gcloud run deploy myservice --image gcr.io/project/image'],
+    'Storage':['gsutil ls','gsutil cp file.txt gs://bucket/','gsutil rsync -r ./dist gs://bucket/','gsutil mb gs://new-bucket','gsutil rm gs://bucket/file.txt'],
+    'Cloud Functions':['gcloud functions deploy myFunc --runtime nodejs20','gcloud functions call myFunc','gcloud functions logs read myFunc','gcloud functions list'],
+    'Other':['gcloud container clusters list','gcloud sql instances list','gcloud pubsub topics list','gcloud secrets create my-secret','gcloud secrets versions add my-secret --data-file=secret.txt']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">GCP CLI Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskFocusTime(){
+  let d=document.getElementById('focus-time-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='focus-time-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const tracked=tasks.filter(t=>t.timeTracked&&t.timeTracked>0).sort((a,b)=>b.timeTracked-a.timeTracked);
+  const totalSec=tracked.reduce((a,t)=>a+t.timeTracked,0);
+  const totalHrs=Math.floor(totalSec/3600);const totalMin=Math.floor((totalSec%3600)/60);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Focus Time Report</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:28px;font-weight:700;color:var(--accent)">'+totalHrs+'h '+totalMin+'m</div><div style="font-size:11px;color:var(--text-muted)">Total tracked time ('+tracked.length+' tasks)</div></div>';
+  if(tracked.length>0){
+    h+='<div style="font-size:11px;color:var(--accent);margin-bottom:6px;font-weight:600">Top tasks by time</div>';
+    const maxSec=tracked[0].timeTracked;
+    tracked.slice(0,10).forEach(t=>{
+      const mins=Math.round(t.timeTracked/60);
+      const hrs=Math.floor(mins/60);const rm=mins%60;
+      const pct=Math.round((t.timeTracked/maxSec)*100);
+      h+='<div style="margin:4px 0"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><span style="color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(t.title)+'</span><span style="color:var(--text-muted);margin-left:8px">'+(hrs>0?hrs+'h ':'')+rm+'m</span></div>';
+      h+='<div style="height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:2px"></div></div></div>';
+    });
+  }else{
+    h+='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px">No time tracked yet. Use the timer on tasks to start tracking.</div>';
+  }
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickFibonacci(){
+  let d=document.getElementById('fib-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='fib-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Fibonacci</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:8px"><input id="fib-n" type="number" value="10" min="1" max="50" style="width:60px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;text-align:center"><button onclick="window._fibCalc()" style="flex:1;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px">Generate</button></div>';
+  h+='<div id="fib-output" style="font-family:monospace;font-size:12px;padding:8px;background:var(--bg-surface);border-radius:4px;color:var(--text-secondary);max-height:200px;overflow-y:auto"></div>';
+  h+='<div style="margin-top:8px"><div style="font-size:10px;color:var(--text-muted)">Golden Ratio: <span style="color:var(--accent);font-weight:600">1.6180339887...</span></div></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._fibCalc=function(){
+    const n=parseInt(document.getElementById('fib-n').value)||10;
+    const out=document.getElementById('fib-output');if(!out)return;
+    const fib=[0,1];for(let i=2;i<n;i++)fib.push(fib[i-1]+fib[i-2]);
+    out.innerHTML=fib.map((v,i)=>'<span style="color:var(--accent)">F('+i+')</span> = '+v).join('<br>');
+  };
+  window._fibCalc();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
