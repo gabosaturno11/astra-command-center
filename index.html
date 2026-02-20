@@ -6380,6 +6380,9 @@ function cmdGetItems(q) {
       ['helm','Helm/Kubernetes chart reference'],
       ['health dashboard','System-wide health dashboard'],
       ['font pairing','Font pairing suggestions'],
+      ['kubectl','kubectl/Kubernetes command reference'],
+      ['net flow','Task creation vs completion net flow'],
+      ['border radius','CSS border-radius generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9689,6 +9692,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='font pairing' || ql==='fonts' || ql==='font pair' || ql==='typography')){
     items.unshift({title:'Font Pairings',desc:'Curated font pairing suggestions',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFontPairing();}});
+  }
+  if(ql && (ql==='kubectl' || ql==='kubernetes' || ql==='k8s' || ql==='kubectl ref')){
+    items.unshift({title:'kubectl Reference',desc:'kubectl commands cheatsheet',icon:'K',type:'action',action:()=>{closeCommandPalette();showKubectlRef();}});
+  }
+  if(ql && (ql==='net flow' || ql==='task flow' || ql==='inflow outflow chart' || ql==='backlog flow')){
+    items.unshift({title:'Net Flow',desc:'Weekly task creation vs completion flow',icon:'N',type:'action',action:()=>{closeCommandPalette();showTaskNetFlow();}});
+  }
+  if(ql && (ql==='border radius' || ql==='border' || ql==='rounded corners' || ql==='css radius')){
+    items.unshift({title:'Border Radius',desc:'CSS border-radius presets with preview',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBorderRadius();}});
   }
   return items.slice(0, 20);
 }
@@ -29137,6 +29149,81 @@ function showQuickFontPairing(){
     html+='<div style="font-size:10px;color:var(--text-muted)">'+p.desc+'</div></div>';
   });
   html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click pairing to copy heading font-family</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showKubectlRef(){
+  const d=document.createElement('div');d.id='kubectl-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Pods':['kubectl get pods','kubectl get pods -A','kubectl describe pod <name>','kubectl logs <pod>','kubectl exec -it <pod> -- /bin/sh','kubectl delete pod <name>'],
+    'Deploy':['kubectl get deployments','kubectl apply -f <file>','kubectl delete -f <file>','kubectl rollout status deploy/<name>','kubectl rollout undo deploy/<name>'],
+    'Service':['kubectl get services','kubectl get ingress','kubectl expose deploy <name> --port=80','kubectl port-forward <pod> 8080:80'],
+    'Config':['kubectl get configmaps','kubectl get secrets','kubectl create secret generic <name> --from-literal=key=val'],
+    'Cluster':['kubectl get nodes','kubectl get namespaces','kubectl cluster-info','kubectl top pods','kubectl top nodes'],
+    'Debug':['kubectl get events','kubectl describe node <name>','kubectl api-resources','kubectl config view','kubectl config use-context <ctx>']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">kubectl Reference</h3><button onclick="document.getElementById(\'kubectl-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskNetFlow(){
+  const d=document.createElement('div');d.id='net-flow-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const now=new Date();
+  const weeks=[];
+  for(let i=7;i>=0;i--){
+    const start=new Date(now.getTime()-i*7*86400000);const end=new Date(start.getTime()+7*86400000);
+    const created=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=start&&new Date(t.createdAt)<end).length;
+    const done=tasks.filter(t=>t.status==='done'&&t.updatedAt&&new Date(t.updatedAt)>=start&&new Date(t.updatedAt)<end).length;
+    weeks.push({label:i===0?'This Wk':'W-'+i,created,done,net:done-created});
+  }
+  const mx=Math.max(...weeks.map(w=>Math.max(Math.abs(w.net),w.created,w.done)),1);
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Net Flow (8 weeks)</h3><button onclick="document.getElementById(\'net-flow-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">Positive = clearing backlog. Negative = growing.</div>';
+  let svg='<svg width="460" height="200" viewBox="0 0 460 200">';
+  svg+='<rect width="460" height="200" fill="var(--bg-surface)" rx="8"/>';
+  svg+='<line x1="30" y1="100" x2="450" y2="100" stroke="var(--border)" stroke-width="1" stroke-dasharray="4"/>';
+  weeks.forEach((w,i)=>{
+    const x=50+i*52;const h=Math.abs(w.net)/mx*80;
+    const y=w.net>=0?100-h:100;
+    svg+='<rect x="'+x+'" y="'+y+'" width="35" height="'+h+'" fill="'+(w.net>=0?'#4ade80':'#ef4444')+'" rx="3" opacity="0.8"/>';
+    svg+='<text x="'+(x+17)+'" y="'+(w.net>=0?y-5:y+h+12)+'" text-anchor="middle" fill="var(--text-secondary)" font-size="10">'+(w.net>0?'+':'')+w.net+'</text>';
+    svg+='<text x="'+(x+17)+'" y="195" text-anchor="middle" fill="var(--text-muted)" font-size="8">'+w.label+'</text>';
+  });
+  svg+='</svg>';
+  html+=svg;
+  const totalNet=weeks.reduce((s,w)=>s+w.net,0);
+  html+='<div style="text-align:center;margin-top:10px;font-size:12px;color:var(--text-muted)">8-week net: <span style="color:'+(totalNet>=0?'#4ade80':'#ef4444')+';font-weight:600">'+(totalNet>0?'+':'')+totalNet+'</span></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickBorderRadius(){
+  const d=document.createElement('div');d.id='border-radius-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  const presets=[
+    {label:'None',val:'0px'},
+    {label:'Subtle',val:'4px'},
+    {label:'Small',val:'8px'},
+    {label:'Medium',val:'12px'},
+    {label:'Large',val:'16px'},
+    {label:'XL',val:'24px'},
+    {label:'Pill',val:'9999px'},
+    {label:'Circle',val:'50%'},
+    {label:'Custom',val:'12px 0 12px 0'},
+    {label:'Blob',val:'30% 70% 70% 30% / 30% 30% 70% 70%'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Border Radius</h3><button onclick="document.getElementById(\'border-radius-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div id="br-preview" style="width:120px;height:80px;background:#4ade80;border-radius:8px;margin:0 auto 10px;transition:border-radius 0.3s"></div>';
+  html+='<div id="br-css" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:10px;color:#4ade80;cursor:pointer;text-align:center;margin-bottom:10px">border-radius: 8px;</div>';
+  presets.forEach(p=>{
+    html+='<div onclick="document.getElementById(\'br-preview\').style.borderRadius=\''+p.val+'\';document.getElementById(\'br-css\').textContent=\'border-radius: '+p.val+';\';" style="display:flex;justify-content:space-between;padding:4px 8px;font-size:11px;cursor:pointer;border-radius:3px;margin-bottom:1px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'"><span style="color:var(--text-secondary)">'+p.label+'</span><span style="color:var(--text-muted);font-family:monospace;font-size:9px">'+p.val+'</span></div>';
+  });
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:6px;text-align:center">Click CSS to copy</div>';
   d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
