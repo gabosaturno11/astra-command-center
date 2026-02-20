@@ -899,6 +899,7 @@ textarea{resize:vertical;line-height:1.6}
           <div class="task-toolbar-search">
             <input type="text" id="task-search" placeholder="Search tasks..." oninput="renderTasks()" style="font-size:10px;padding:5px 8px">
           </div>
+          <button class="btn btn-sm" id="task-clear-filters" onclick="clearTaskFilters()" style="display:none;color:var(--red);font-size:8px" title="Clear all filters">Clear</button>
         </div>
       </div>
       <div class="content-area" id="task-content-area">
@@ -2521,6 +2522,7 @@ function contentInlineEdit(id,el,e){
 // === TASKS ===
 function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
 function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;['all','active','todo','progress','blocked','done'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',f===k);});renderTasks();}
+function clearTaskFilters(){taskFilter='all';taskProjectFilter=null;const ts=document.getElementById('task-search');if(ts)ts.value='';const tsort=document.getElementById('task-sort');if(tsort)tsort.value='manual';const tpf=document.getElementById('task-project-filter');if(tpf)tpf.value='';['all','active','todo','progress','blocked','done'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',k==='all');});renderTasks();toast('Filters cleared');}
 function filterTaskProject(p){taskProjectFilter=p;taskFilter='all';renderTasks();}
 function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');else if(taskFilter==='todo')items=items.filter(t=>t.status==='todo');else if(taskFilter==='progress')items=items.filter(t=>t.status==='progress');else if(taskFilter==='blocked')items=items.filter(t=>t.status==='blocked');else if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(sortVal==='completed')items.sort((a,b)=>new Date(b.completedAt||0)-new Date(a.completedAt||0));else if(sortVal==='project')items.sort((a,b)=>(a.project||'zzz').localeCompare(b.project||'zzz'));else if(sortVal==='time')items.sort((a,b)=>(b.timeSpent||0)-(a.timeSpent||0));return items;}
 
@@ -2546,6 +2548,7 @@ function renderTasks(){
   document.getElementById('tasks-count').textContent=activeTasks;
   document.getElementById('tasks-count').title=activeTasks+' active, '+doneTasks+' done ('+S.tasks.length+' total)';
   const taskCountInfo=document.getElementById('task-count-info');if(taskCountInfo){const filtered=items.length;const total=S.tasks.length;taskCountInfo.textContent=filtered!==total?'Showing '+filtered+' of '+total:'';}
+  const cfBtn=document.getElementById('task-clear-filters');if(cfBtn){const hasFilter=taskFilter!=='all'||taskProjectFilter||(document.getElementById('task-search')?.value)||((document.getElementById('task-sort')?.value||'manual')!=='manual');cfBtn.style.display=hasFilter?'inline-block':'none';}
   const acEl=document.getElementById('archived-count');if(acEl)acEl.textContent=(S.archivedTasks||[]).length||'';
   if(!document.getElementById('pdl')){const dl=document.createElement('datalist');dl.id='pdl';document.body.appendChild(dl);}
   document.getElementById('pdl').innerHTML=projects.map(p=>`<option value="${p}">`).join('');
