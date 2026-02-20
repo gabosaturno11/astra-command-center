@@ -6551,6 +6551,12 @@ function cmdGetItems(q) {
       ['firewall','Firewall iptables ufw pf reference'],
       ['project timeline','Visual project timeline with progress'],
       ['json path','JSON path tester and formatter'],
+      ['kubernetes','Kubernetes kubectl reference'],
+      ['focus analysis','Focus analysis with overdue and priority'],
+      ['flashcards','Flashcard study tool'],
+      ['terraform','Terraform infrastructure as code reference'],
+      ['done this week','Tasks completed this week summary'],
+      ['css gradient','CSS gradient generator with preview'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10373,6 +10379,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='json path' || ql==='jsonpath' || ql==='json tester' || ql==='json query')){
     items.unshift({title:'JSON Path Tester',desc:'Query and format JSON data',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonPathTester();}});
+  }
+  if(ql && (ql==='kubernetes' || ql==='kubectl' || ql==='k8s' || ql==='kubernetes ref')){
+    items.unshift({title:'Kubernetes Reference',desc:'kubectl commands for pods, deployments',icon:'K',type:'action',action:()=>{closeCommandPalette();showKubernetesRef();}});
+  }
+  if(ql && (ql==='focus analysis' || ql==='focus' || ql==='what to focus' || ql==='priority focus')){
+    items.unshift({title:'Focus Analysis',desc:'Overdue, today, week priorities',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFocusAnalysis();}});
+  }
+  if(ql && (ql==='flashcards' || ql==='flash cards' || ql==='study cards' || ql==='flashcard')){
+    items.unshift({title:'Flashcards',desc:'Create and study flashcards',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFlashcards();}});
+  }
+  if(ql && (ql==='terraform' || ql==='tf' || ql==='terraform ref' || ql==='infrastructure code')){
+    items.unshift({title:'Terraform Reference',desc:'Infrastructure as code commands',icon:'T',type:'action',action:()=>{closeCommandPalette();showTerraformRef();}});
+  }
+  if(ql && (ql==='done this week' || ql==='completed this week' || ql==='week done' || ql==='weekly done')){
+    items.unshift({title:'Done This Week',desc:'Tasks completed this week',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDoneThisWeek();}});
+  }
+  if(ql && (ql==='css gradient' || ql==='gradient' || ql==='gradient generator' || ql==='css background')){
+    items.unshift({title:'CSS Gradient',desc:'Gradient generator with color picker',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickCssGradient();}});
   }
   return items.slice(0, 20);
 }
@@ -34647,6 +34671,265 @@ function showQuickJsonPathTester(){
   window._jpFormat=()=>{const inp=document.getElementById('jsonpath-input');if(!inp)return;try{inp.value=JSON.stringify(JSON.parse(inp.value),null,2);}catch(e){alert('Invalid JSON');}};
   window._jpMinify=()=>{const inp=document.getElementById('jsonpath-input');if(!inp)return;try{inp.value=JSON.stringify(JSON.parse(inp.value));}catch(e){alert('Invalid JSON');}};
   window._jpValidate=()=>{const out=document.getElementById('jsonpath-output');const inp=document.getElementById('jsonpath-input');if(!inp||!out)return;try{JSON.parse(inp.value);out.textContent='Valid JSON';out.style.color='#4ade80';}catch(e){out.textContent='Invalid: '+e.message;out.style.color='#ef4444';}};
+  document.body.appendChild(d);
+}
+function showKubernetesRef(){
+  const cmds={
+    'Pods':{
+      'kubectl get pods':'List all pods',
+      'kubectl get pods -A':'All namespaces',
+      'kubectl describe pod name':'Pod details',
+      'kubectl logs pod-name':'View pod logs',
+      'kubectl logs -f pod-name':'Follow logs',
+      'kubectl exec -it pod -- sh':'Shell into pod',
+      'kubectl delete pod name':'Delete pod',
+      'kubectl top pods':'Pod resource usage'
+    },
+    'Deployments':{
+      'kubectl get deployments':'List deployments',
+      'kubectl apply -f deploy.yaml':'Apply manifest',
+      'kubectl rollout status deploy/name':'Rollout status',
+      'kubectl rollout undo deploy/name':'Rollback',
+      'kubectl scale deploy/name --replicas=3':'Scale replicas',
+      'kubectl set image deploy/name c=img:v2':'Update image',
+      'kubectl rollout history deploy/name':'Rollout history',
+      'kubectl rollout restart deploy/name':'Rolling restart'
+    },
+    'Services & Config':{
+      'kubectl get svc':'List services',
+      'kubectl get configmaps':'List configmaps',
+      'kubectl get secrets':'List secrets',
+      'kubectl get ingress':'List ingresses',
+      'kubectl create secret generic name --from-literal=k=v':'Create secret',
+      'kubectl get pvc':'List persistent volume claims',
+      'kubectl get nodes':'List nodes',
+      'kubectl cluster-info':'Cluster information'
+    },
+    'Debugging':{
+      'kubectl get events --sort-by=.metadata.creationTimestamp':'Recent events',
+      'kubectl describe node name':'Node details',
+      'kubectl get pods -o wide':'Show pod IPs and nodes',
+      'kubectl port-forward pod 8080:80':'Port forward',
+      'kubectl cp pod:/path ./local':'Copy from pod',
+      'kubectl run debug --image=busybox -it --rm -- sh':'Debug pod',
+      'kubectl api-resources':'List all resource types',
+      'kubectl explain pod.spec':'Resource documentation'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Kubernetes Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskFocusAnalysis(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const now=new Date();
+  const today=now.toISOString().split('T')[0];
+  const thisWeekStart=new Date(now);thisWeekStart.setDate(thisWeekStart.getDate()-thisWeekStart.getDay());
+  const todayTasks=tasks.filter(t=>t.due&&t.due===today&&t.status!=='done');
+  const weekTasks=tasks.filter(t=>{if(t.status==='done')return false;if(!t.due)return false;const d2=new Date(t.due);return d2>=thisWeekStart&&d2<=new Date(thisWeekStart.getTime()+7*24*60*60*1000);});
+  const overdue=tasks.filter(t=>t.due&&new Date(t.due)<now&&t.status!=='done');
+  const p0Tasks=tasks.filter(t=>t.priority==='p0'&&t.status!=='done');
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Focus Analysis</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center;border-left:3px solid #ef4444"><div style="font-size:10px;color:var(--text-muted)">Overdue</div><div style="font-size:24px;font-weight:700;color:#ef4444">'+overdue.length+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center;border-left:3px solid #f59e0b"><div style="font-size:10px;color:var(--text-muted)">Due Today</div><div style="font-size:24px;font-weight:700;color:#f59e0b">'+todayTasks.length+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center;border-left:3px solid #3b82f6"><div style="font-size:10px;color:var(--text-muted)">This Week</div><div style="font-size:24px;font-weight:700;color:#3b82f6">'+weekTasks.length+'</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center;border-left:3px solid #ef4444"><div style="font-size:10px;color:var(--text-muted)">P0 Active</div><div style="font-size:24px;font-weight:700;color:#ef4444">'+p0Tasks.length+'</div></div>';
+  html+='</div>';
+  if(overdue.length||todayTasks.length||p0Tasks.length){
+    html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;font-weight:600">Priority Focus List:</div>';
+    const focusList=[...overdue.slice(0,3),...p0Tasks.slice(0,3),...todayTasks.slice(0,3)];
+    const seen=new Set();
+    focusList.forEach(t=>{
+      if(seen.has(t.id||t.title))return;seen.add(t.id||t.title);
+      const isOverdue=t.due&&new Date(t.due)<now&&t.status!=='done';
+      html+='<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:var(--bg-surface);border-radius:4px;margin-bottom:3px">';
+      html+='<span style="font-size:10px;font-weight:600;color:'+(isOverdue?'#ef4444':t.priority==='p0'?'#ef4444':'#f59e0b')+'">'+(isOverdue?'LATE':t.priority?.toUpperCase()||'P3')+'</span>';
+      html+='<span style="flex:1;font-size:11px;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</span>';
+      if(t.due)html+='<span style="font-size:9px;color:var(--text-muted)">'+new Date(t.due).toLocaleDateString()+'</span>';
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickFlashcards(){
+  if(!S._flashcards)S._flashcards=[];
+  let idx=0;let showAnswer=false;
+  function render(){
+    let ex=document.getElementById('flashcard-float');if(ex)ex.remove();
+    const d=document.createElement('div');d.id='flashcard-float';
+    d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">Flashcards</span><button onclick="document.getElementById(\'flashcard-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    if(S._flashcards.length){
+      const card=S._flashcards[idx%S._flashcards.length];
+      html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">'+(idx%S._flashcards.length+1)+'/'+S._flashcards.length+'</div>';
+      html+='<div onclick="window._fcFlip()" style="background:var(--bg-base);border-radius:8px;padding:16px;min-height:80px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;margin-bottom:10px">';
+      html+='<span style="font-size:14px;color:'+(showAnswer?'#4ade80':'#e2e8f0')+'">'+esc(showAnswer?card.a:card.q)+'</span></div>';
+      html+='<div style="display:flex;gap:6px;margin-bottom:10px">';
+      html+='<button onclick="window._fcPrev()" style="flex:1;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px;border-radius:4px;cursor:pointer;font-size:12px">Prev</button>';
+      html+='<button onclick="window._fcFlip()" style="flex:1;background:#4ade8033;color:#4ade80;border:1px solid #4ade80;padding:6px;border-radius:4px;cursor:pointer;font-size:12px">Flip</button>';
+      html+='<button onclick="window._fcNext()" style="flex:1;background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px;border-radius:4px;cursor:pointer;font-size:12px">Next</button>';
+      html+='</div>';
+    }
+    html+='<div style="border-top:1px solid var(--border);padding-top:8px">';
+    html+='<input id="fc-q" placeholder="Question" style="width:100%;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px;margin-bottom:4px">';
+    html+='<input id="fc-a" placeholder="Answer" style="width:100%;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:11px;margin-bottom:6px">';
+    html+='<button onclick="window._fcAdd()" style="width:100%;background:#4ade80;color:#000;border:none;padding:5px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Add Card</button>';
+    html+='</div>';
+    d.innerHTML=html;
+    document.body.appendChild(d);
+  }
+  window._fcFlip=()=>{showAnswer=!showAnswer;render();};
+  window._fcPrev=()=>{idx=Math.max(0,idx-1);showAnswer=false;render();};
+  window._fcNext=()=>{idx++;showAnswer=false;render();};
+  window._fcAdd=()=>{
+    const q=document.getElementById('fc-q')?.value.trim();
+    const a=document.getElementById('fc-a')?.value.trim();
+    if(!q||!a)return;
+    S._flashcards.push({q,a});save();render();
+  };
+  render();
+}
+function showTerraformRef(){
+  const cmds={
+    'Core Commands':{
+      'terraform init':'Initialize working directory',
+      'terraform plan':'Preview changes',
+      'terraform apply':'Apply changes',
+      'terraform destroy':'Destroy infrastructure',
+      'terraform validate':'Validate configuration',
+      'terraform fmt':'Format config files',
+      'terraform show':'Show current state',
+      'terraform output':'Show output values'
+    },
+    'State Management':{
+      'terraform state list':'List resources in state',
+      'terraform state show resource':'Show resource details',
+      'terraform state mv old new':'Move resource in state',
+      'terraform state rm resource':'Remove from state',
+      'terraform state pull':'Pull remote state',
+      'terraform state push':'Push to remote state',
+      'terraform import resource id':'Import existing resource',
+      'terraform taint resource':'Mark resource for recreation'
+    },
+    'Workspace':{
+      'terraform workspace list':'List workspaces',
+      'terraform workspace new name':'Create workspace',
+      'terraform workspace select name':'Switch workspace',
+      'terraform workspace delete name':'Delete workspace',
+      'terraform workspace show':'Show current workspace',
+      'terraform plan -target=resource':'Plan specific resource',
+      'terraform apply -auto-approve':'Apply without prompt',
+      'terraform plan -out=plan.tfplan':'Save plan to file'
+    },
+    'HCL Syntax':{
+      'variable "name" {}':'Declare variable',
+      'output "name" { value = ... }':'Declare output',
+      'resource "type" "name" {}':'Declare resource',
+      'data "type" "name" {}':'Data source',
+      'module "name" { source = ... }':'Use module',
+      'locals { key = value }':'Local values',
+      'terraform { backend "s3" {} }':'Backend config',
+      'count = 3':'Create multiple resources'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Terraform Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskDoneThisWeek(){
+  const tasks=S.tasks||[];
+  const now=new Date();
+  const weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-weekStart.getDay());weekStart.setHours(0,0,0,0);
+  const done=tasks.filter(t=>t.status==='done').filter(t=>{const d2=new Date(t.completedAt||t.updated||t.id);return d2>=weekStart;});
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Done This Week</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:48px;font-weight:700;color:#4ade80">'+done.length+'</div><div style="font-size:12px;color:var(--text-muted)">tasks completed this week</div></div>';
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const byday=days.map((_,i)=>{
+    const dayDate=new Date(weekStart);dayDate.setDate(dayDate.getDate()+i);
+    return done.filter(t=>{const d2=new Date(t.completedAt||t.updated||t.id);return d2.toDateString()===dayDate.toDateString();}).length;
+  });
+  const maxD=Math.max(...byday,1);
+  html+='<div style="display:flex;gap:4px;align-items:flex-end;height:80px;margin-bottom:8px">';
+  days.forEach((day,i)=>{
+    const h=Math.max((byday[i]/maxD)*60,2);
+    const isToday=i===now.getDay();
+    html+='<div style="flex:1;text-align:center"><div style="height:'+h+'px;background:'+(isToday?'#4ade80':'#4ade8066')+';border-radius:3px 3px 0 0;margin:0 auto;width:80%"></div>';
+    html+='<div style="font-size:9px;color:'+(isToday?'#4ade80':'var(--text-muted)')+';margin-top:4px">'+day+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">'+byday[i]+'</div></div>';
+  });
+  html+='</div>';
+  if(done.length){
+    html+='<div style="border-top:1px solid var(--border);padding-top:10px;max-height:200px;overflow-y:auto">';
+    done.sort((a,b)=>new Date(b.completedAt||b.updated||b.id)-new Date(a.completedAt||a.updated||a.id)).forEach(t=>{
+      html+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px"><span style="color:#4ade80">&#10003;</span><span style="color:#e2e8f0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</span>';
+      html+='<span style="color:var(--text-muted);font-size:9px">'+new Date(t.completedAt||t.updated||t.id).toLocaleDateString()+'</span></div>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickCssGradient(){
+  let ex=document.getElementById('gradient-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='gradient-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+  let c1='#4ade80',c2='#3b82f6',angle=135,type='linear';
+  function getCSS(){return type==='linear'?'linear-gradient('+angle+'deg, '+c1+', '+c2+')':'radial-gradient(circle, '+c1+', '+c2+')';}
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">CSS Gradient</span><button onclick="document.getElementById(\'gradient-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="height:80px;border-radius:8px;margin-bottom:10px;background:'+getCSS()+'"></div>';
+    html+='<div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">';
+    html+='<label style="font-size:10px;color:var(--text-muted)">Color 1</label>';
+    html+='<input type="color" value="'+c1+'" onchange="window._grC1(this.value)" style="width:32px;height:24px;border:none;cursor:pointer">';
+    html+='<label style="font-size:10px;color:var(--text-muted)">Color 2</label>';
+    html+='<input type="color" value="'+c2+'" onchange="window._grC2(this.value)" style="width:32px;height:24px;border:none;cursor:pointer">';
+    html+='<button onclick="window._grSwap()" style="background:var(--bg-surface);color:var(--text-muted);border:1px solid var(--border);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">Swap</button>';
+    html+='</div>';
+    html+='<div style="display:flex;gap:6px;margin-bottom:8px;align-items:center">';
+    html+='<button onclick="window._grType(\'linear\')" style="background:'+(type==='linear'?'#4ade8033':'var(--bg-surface)')+';color:'+(type==='linear'?'#4ade80':'var(--text-muted)')+';border:1px solid '+(type==='linear'?'#4ade80':'var(--border)')+';padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">Linear</button>';
+    html+='<button onclick="window._grType(\'radial\')" style="background:'+(type==='radial'?'#4ade8033':'var(--bg-surface)')+';color:'+(type==='radial'?'#4ade80':'var(--text-muted)')+';border:1px solid '+(type==='radial'?'#4ade80':'var(--border)')+';padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">Radial</button>';
+    if(type==='linear'){
+      html+='<label style="font-size:10px;color:var(--text-muted)">Angle</label>';
+      html+='<input type="range" min="0" max="360" value="'+angle+'" oninput="window._grAngle(this.value)" style="flex:1">';
+      html+='<span style="font-size:10px;color:var(--text-muted);min-width:30px">'+angle+'</span>';
+    }
+    html+='</div>';
+    html+='<div id="gr-css-out" style="background:var(--bg-base);padding:8px;border-radius:6px;font-size:11px;color:#e2e8f0;font-family:monospace;margin-bottom:8px;word-break:break-all">background: '+getCSS()+';</div>';
+    html+='<button onclick="window._grCopy()" style="width:100%;background:#4ade80;color:#000;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Copy CSS</button>';
+    d.innerHTML=html;
+  }
+  window._grC1=(v)=>{c1=v;render();};
+  window._grC2=(v)=>{c2=v;render();};
+  window._grSwap=()=>{const tmp=c1;c1=c2;c2=tmp;render();};
+  window._grType=(t)=>{type=t;render();};
+  window._grAngle=(v)=>{angle=parseInt(v);render();};
+  window._grCopy=()=>{const el=document.getElementById('gr-css-out');if(el)navigator.clipboard.writeText(el.textContent);const btn=d.querySelector('button:last-child');if(btn){btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy CSS',500);}};
+  render();
   document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
