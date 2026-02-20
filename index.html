@@ -6313,6 +6313,32 @@ function cmdGetItems(q) {
     filtered.slice(0,15).forEach(e=>{items.unshift({title:e.text,desc:timeAgo(e.time)+' | '+e.type,icon:e.icon,type:'info'});});
     if(!filtered.length)items.unshift({title:'No activity found',desc:'System activity log is empty',icon:'!',type:'info'});
   }
+  // Writer stats prefix
+  if(ql && (ql==='writerstats' || ql==='ws' || ql.startsWith('writerstats:'))){
+    const totalWords=S.docs.reduce((a,d)=>a+countW(d.body),0);
+    const totalDocs=S.docs.length;
+    const avgWords=totalDocs?Math.round(totalWords/totalDocs):0;
+    const longestDoc=S.docs.reduce((best,d)=>countW(d.body)>countW(best.body)?d:best,S.docs[0]||{body:''});
+    const versionsTotal=S.docs.reduce((a,d)=>a+(d.versions||[]).length,0);
+    const today=new Date().toISOString().split('T')[0];
+    const todayEdited=S.docs.filter(d=>d.updated&&d.updated.startsWith(today)).length;
+    const last7Docs=(()=>{const d=new Date();let c=0;for(let i=0;i<7;i++){const ds=d.toISOString().split('T')[0];c+=S.docs.filter(doc=>doc.updated&&doc.updated.startsWith(ds)).length;d.setDate(d.getDate()-1);}return c;})();
+    const readTime=Math.max(1,Math.ceil(totalWords/238));
+    items.unshift({title:'Today: '+todayEdited+' docs edited | This week: '+last7Docs+' updates',desc:'Versions saved: '+versionsTotal,icon:'W',type:'info'});
+    items.unshift({title:'Average: '+avgWords+' words/doc | Read time: ~'+readTime+'min',desc:'Longest: '+(longestDoc.title||'Untitled')+' ('+countW(longestDoc.body)+'w)',icon:'W',type:'info'});
+    items.unshift({title:'Writer Stats: '+totalDocs+' docs / '+totalWords.toLocaleString()+' words',desc:'Comprehensive writing statistics',icon:'W',type:'info'});
+  }
+  // Whiteboard search prefix
+  if(ql && ql.startsWith('wb:')){
+    const wbq=q.substring(3).trim().toLowerCase();
+    if(wbq && S.wbNodes){
+      const matches=S.wbNodes.filter(n=>(n.t||'').toLowerCase().includes(wbq)||(n.b||'').toLowerCase().includes(wbq));
+      matches.slice(0,10).forEach(n=>{
+        items.unshift({title:'WB: '+(n.t||'Node'),desc:(n.b||'').substring(0,80),icon:'W',type:'action',action:()=>{closeCommandPalette();switchSection('whiteboard',null);setTimeout(()=>{const el=document.querySelector('[data-wb-id="'+n.id+'"]');if(el){el.style.outline='3px solid var(--accent)';el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{el.style.outline='';},3000);}},300);}});
+      });
+      if(!matches.length)items.unshift({title:'No whiteboard nodes match "'+wbq+'"',desc:'Try a different search term',icon:'!',type:'info'});
+    }else{items.unshift({title:'Type wb:searchterm to find whiteboard nodes',desc:'Searches node titles and body text',icon:'W',type:'info'});}
+  }
   // Count prefix
   if(ql && ql.startsWith('count:')){
     const active=S.tasks.filter(t=>t.status!=='done').length;const done=S.tasks.filter(t=>t.status==='done').length;
