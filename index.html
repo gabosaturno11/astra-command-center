@@ -5869,6 +5869,9 @@ function cmdGetItems(q) {
       ['daily digest','Generate comprehensive daily summary'],
       ['content archive','Archive and restore old content'],
       ['changelog','View workspace change log for this session'],
+      ['focus config','Configure focus mode: duration, breaks, blocked sections'],
+      ['action items','Extract TODO/ACTION items from content as tasks'],
+      ['weekly planner','Week-at-a-glance task planner'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7443,6 +7446,18 @@ function cmdGetItems(q) {
   // Changelog prefix
   if(ql && (ql==='changelog' || ql==='change log' || ql==='changes' || ql==='activity log')){
     items.unshift({title:'Workspace Changelog',desc:'View session change log',icon:'L',type:'action',action:()=>{closeCommandPalette();showChangelog();}});
+  }
+  // Focus config prefix
+  if(ql && (ql==='focus config' || ql==='focus settings' || ql==='focus mode config' || ql==='pomodoro config')){
+    items.unshift({title:'Focus Mode Config',desc:'Set duration, breaks, blocked sections',icon:'F',type:'action',action:()=>{closeCommandPalette();showFocusModeConfig();}});
+  }
+  // Action items prefix
+  if(ql && (ql==='action items' || ql==='extract actions' || ql==='extract todos' || ql==='note to task')){
+    items.unshift({title:'Extract Action Items',desc:'Find TODO/ACTION items in content and create tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();extractActionItems();}});
+  }
+  // Weekly planner prefix
+  if(ql && (ql==='weekly planner' || ql==='week planner' || ql==='plan week' || ql==='week view planner')){
+    items.unshift({title:'Weekly Planner',desc:'Week-at-a-glance with tasks in day slots',icon:'W',type:'action',action:()=>{closeCommandPalette();showWeeklyPlanner();}});
   }
   return items.slice(0, 20);
 }
@@ -10589,6 +10604,143 @@ function showChangelog(){
       h+=`</div>`;
     });
     h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showFocusModeConfig(){
+  if(!S._focusConfig)S._focusConfig={blockedSections:[],duration:25,breakDuration:5};
+  const fc=S._focusConfig;
+  const allSections=['tasks','calendar','writer','livingDocs','content','links','whiteboard','repos','pipeline'];
+  const panel=document.createElement('div');panel.id='focus-config-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Focus Mode Config</span><button onclick="document.getElementById('focus-config-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Focus Duration (minutes)</div>`;
+  h+=`<div style="display:flex;gap:8px">`;
+  [15,25,45,60].forEach(m=>{
+    const selected=fc.duration===m;
+    h+=`<button onclick="S._focusConfig.duration=${m};save();document.getElementById('focus-config-panel').remove();showFocusModeConfig()" style="padding:6px 14px;border-radius:6px;border:1px solid ${selected?'var(--accent)':'var(--border)'};background:${selected?'var(--accent)':'var(--bg-surface)'};color:${selected?'#000':'var(--text-secondary)'};cursor:pointer;font-size:11px;font-weight:${selected?'700':'400'}">${m}m</button>`;
+  });
+  h+=`</div></div>`;
+  h+=`<div style="margin-bottom:16px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Break Duration (minutes)</div>`;
+  h+=`<div style="display:flex;gap:8px">`;
+  [3,5,10,15].forEach(m=>{
+    const selected=fc.breakDuration===m;
+    h+=`<button onclick="S._focusConfig.breakDuration=${m};save();document.getElementById('focus-config-panel').remove();showFocusModeConfig()" style="padding:6px 14px;border-radius:6px;border:1px solid ${selected?'var(--accent)':'var(--border)'};background:${selected?'var(--accent)':'var(--bg-surface)'};color:${selected?'#000':'var(--text-secondary)'};cursor:pointer;font-size:11px;font-weight:${selected?'700':'400'}">${m}m</button>`;
+  });
+  h+=`</div></div>`;
+  h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Block sections during focus (click to toggle)</div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">`;
+  allSections.forEach(sec=>{
+    const blocked=(fc.blockedSections||[]).includes(sec);
+    h+=`<button onclick="toggleFocusBlock('${sec}')" style="padding:6px;border-radius:6px;border:1px solid ${blocked?'#ef4444':'var(--border)'};background:${blocked?'rgba(239,68,68,0.1)':'var(--bg-surface)'};color:${blocked?'#ef4444':'var(--text-secondary)'};cursor:pointer;font-size:10px">${blocked?'X ':''}${sec}</button>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function toggleFocusBlock(sec){
+  if(!S._focusConfig)S._focusConfig={blockedSections:[],duration:25,breakDuration:5};
+  if(!S._focusConfig.blockedSections)S._focusConfig.blockedSections=[];
+  const idx=S._focusConfig.blockedSections.indexOf(sec);
+  if(idx>=0)S._focusConfig.blockedSections.splice(idx,1);
+  else S._focusConfig.blockedSections.push(sec);
+  save();const p=document.getElementById('focus-config-panel');if(p)p.remove();showFocusModeConfig();
+}
+function extractActionItems(){
+  const content=S.content||[];
+  const actionPatterns=[/^[-*]\s*\[[ x]\]\s*(.+)$/gm,/^TODO:\s*(.+)$/gim,/^ACTION:\s*(.+)$/gim,/^[-*]\s*(.+)$/gm];
+  const found=[];
+  content.forEach(c=>{
+    const text=c.body||'';
+    const lines=text.split('\n');
+    lines.forEach(line=>{
+      const trimmed=line.trim();
+      if(trimmed.match(/^[-*]\s*\[[ ]\]\s*.+/)){
+        const title=trimmed.replace(/^[-*]\s*\[[ ]\]\s*/,'');
+        found.push({title,source:c.id,preview:(c.body||'').substring(0,40)});
+      } else if(trimmed.match(/^(TODO|ACTION):\s*.+/i)){
+        const title=trimmed.replace(/^(TODO|ACTION):\s*/i,'');
+        found.push({title,source:c.id,preview:(c.body||'').substring(0,40)});
+      }
+    });
+  });
+  const panel=document.createElement('div');panel.id='action-items-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Action Items Found (${found.length})</span><button onclick="document.getElementById('action-items-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Scans content for TODO:, ACTION:, and unchecked [ ] items</div>`;
+  if(!found.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No action items found in content. Use "- [ ] task", "TODO: task", or "ACTION: task" format.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    found.slice(0,20).forEach((item,i)=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px">`;
+      h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary)">${esc(item.title)}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">From: ${esc(item.preview)}...</div></div>`;
+      h+=`<button onclick="createTaskFromAction('${esc(item.title.replace(/'/g,"\\'"))}')" style="font-size:9px;padding:3px 8px;background:var(--accent);border:none;border-radius:4px;color:#000;cursor:pointer;font-weight:600">Create Task</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+    if(found.length>1){
+      h+=`<button onclick="createAllActionTasks()" style="width:100%;margin-top:12px;padding:10px;background:var(--bg-surface);border:1px solid var(--accent);border-radius:6px;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600">Create All ${found.length} Tasks</button>`;
+    }
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+  window._extractedActions=found;
+}
+function createTaskFromAction(title){
+  if(!S.tasks)S.tasks=[];
+  S.tasks.unshift({id:'t_'+Date.now(),title,status:'todo',priority:'p2',project:'',due:'',created:new Date().toISOString(),description:'Extracted from content',subtasks:[]});
+  save();showToast('Task created: '+title.substring(0,40));
+}
+function createAllActionTasks(){
+  const actions=window._extractedActions||[];
+  if(!actions.length)return;
+  if(!confirm('Create '+actions.length+' tasks?'))return;
+  actions.forEach((item,i)=>{
+    setTimeout(()=>{
+      if(!S.tasks)S.tasks=[];
+      S.tasks.unshift({id:'t_'+(Date.now()+i),title:item.title,status:'todo',priority:'p2',project:'',due:'',created:new Date().toISOString(),description:'Extracted from content',subtasks:[]});
+    },i*10);
+  });
+  setTimeout(()=>{save();showToast('Created '+actions.length+' tasks');const p=document.getElementById('action-items-panel');if(p)p.remove();},actions.length*10+100);
+}
+function showWeeklyPlanner(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();const dayOfWeek=now.getDay();
+  const monday=new Date(now);monday.setDate(monday.getDate()-(dayOfWeek===0?6:dayOfWeek-1));
+  const days=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monday);d.setDate(d.getDate()+i);
+    const dateStr=d.toISOString().split('T')[0];
+    const dayTasks=tasks.filter(t=>t.due===dateStr);
+    days.push({date:d,dateStr,name:d.toLocaleDateString('en-US',{weekday:'short'}),dayNum:d.getDate(),tasks:dayTasks,isToday:dateStr===now.toISOString().split('T')[0]});
+  }
+  const unscheduled=tasks.filter(t=>!t.due).slice(0,10);
+  const panel=document.createElement('div');panel.id='weekly-planner-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Weekly Planner</span><button onclick="document.getElementById('weekly-planner-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px">`;
+  days.forEach(day=>{
+    h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:8px;min-height:120px;border:${day.isToday?'1px solid var(--accent)':'1px solid transparent'}">`;
+    h+=`<div style="font-size:10px;font-weight:600;color:${day.isToday?'var(--accent)':'var(--text-primary)'};margin-bottom:6px">${day.name} ${day.dayNum}</div>`;
+    if(!day.tasks.length){
+      h+=`<div style="font-size:9px;color:var(--text-muted);opacity:0.5">No tasks</div>`;
+    } else {
+      day.tasks.slice(0,4).forEach(t=>{
+        const pColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f59e0b':t.priority==='p2'?'#3b82f6':'#6b7280';
+        h+=`<div style="font-size:9px;color:var(--text-secondary);padding:2px 4px;margin-bottom:2px;background:var(--bg-base);border-radius:3px;border-left:2px solid ${pColor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title)}</div>`;
+      });
+      if(day.tasks.length>4)h+=`<div style="font-size:8px;color:var(--text-muted)">+${day.tasks.length-4} more</div>`;
+    }
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  if(unscheduled.length){
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Unscheduled (${unscheduled.length})</div>`;
+    h+=`<div style="display:flex;flex-wrap:wrap;gap:4px">`;
+    unscheduled.forEach(t=>{
+      h+=`<span style="font-size:9px;padding:2px 8px;background:var(--bg-base);border:1px solid var(--border);border-radius:10px;color:var(--text-secondary)">${esc(t.title.substring(0,30))}</span>`;
+    });
+    h+=`</div></div>`;
   }
   panel.innerHTML=h;document.body.appendChild(panel);
 }
