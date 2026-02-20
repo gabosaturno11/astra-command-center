@@ -6059,6 +6059,9 @@ function cmdGetItems(q) {
       ['regex','Live regex pattern tester with matches'],
       ['ics export','Export tasks as ICS calendar file'],
       ['dice','Random number generator and decision maker'],
+      ['date calculator','Add/subtract days and find date differences'],
+      ['gantt','Simple Gantt chart showing task durations'],
+      ['memo','Floating persistent memo pad'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8393,6 +8396,18 @@ function cmdGetItems(q) {
   // Dice prefix
   if(ql && (ql==='dice' || ql==='random' || ql==='coin flip' || ql==='decide')){
     items.unshift({title:'Random / Dice',desc:'Random number and decision maker',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDice();}});
+  }
+  // Date calculator prefix
+  if(ql && (ql==='date calculator' || ql==='date calc' || ql==='date math' || ql==='days between')){
+    items.unshift({title:'Date Calculator',desc:'Add days, find date differences',icon:'D',type:'action',action:()=>{closeCommandPalette();showDateCalculator();}});
+  }
+  // Gantt prefix
+  if(ql && (ql==='gantt' || ql==='gantt chart' || ql==='task gantt' || ql==='task timeline')){
+    items.unshift({title:'Task Gantt',desc:'Simple task duration chart',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskGantt();}});
+  }
+  // Memo prefix
+  if(ql && (ql==='memo' || ql==='memo pad' || ql==='notepad' || ql==='scratch pad')){
+    items.unshift({title:'Quick Memo',desc:'Floating persistent memo pad',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMemo();}});
   }
   return items.slice(0, 20);
 }
@@ -17672,6 +17687,94 @@ function showQuickDice(){
     panel.innerHTML=h;panel._render=render;
   }
   render();document.body.appendChild(panel);
+}
+function showDateCalculator(){
+  let panel=document.getElementById('date-calc-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='date-calc-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:80vh;overflow-y:auto';
+  const today=new Date().toISOString().substring(0,10);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Date Calculator</span><button onclick="this.closest(\'#date-calc-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  // Add/subtract days
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">Add/Subtract Days</div>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:10px;align-items:center">';
+  h+='<input id="dc-base" type="date" value="'+today+'" style="flex:1;padding:5px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px">';
+  h+='<span style="color:var(--text-muted);font-size:12px">+</span>';
+  h+='<input id="dc-days" type="number" value="7" style="width:60px;padding:5px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;text-align:center">';
+  h+='<span style="color:var(--text-muted);font-size:10px">days</span>';
+  h+='<button onclick="const b=document.getElementById(\'dc-base\').value;const d=+document.getElementById(\'dc-days\').value;const r=new Date(b);r.setDate(r.getDate()+d);document.getElementById(\'dc-result1\').textContent=r.toISOString().substring(0,10)+\' (\'+r.toLocaleDateString(\'en\',{weekday:\'long\'})+\')\';" style="padding:5px 10px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:10px;font-weight:600">=</button>';
+  h+='</div>';
+  h+='<div id="dc-result1" style="font-size:14px;font-weight:700;color:#4ade80;margin-bottom:16px;min-height:20px"></div>';
+  // Date difference
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">Days Between Dates</div>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:10px;align-items:center">';
+  h+='<input id="dc-from" type="date" value="'+today+'" style="flex:1;padding:5px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px">';
+  h+='<span style="color:var(--text-muted);font-size:12px">to</span>';
+  h+='<input id="dc-to" type="date" style="flex:1;padding:5px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px">';
+  h+='<button onclick="const f=new Date(document.getElementById(\'dc-from\').value);const t=new Date(document.getElementById(\'dc-to\').value);const diff=Math.round((t-f)/86400000);document.getElementById(\'dc-result2\').textContent=diff+\' days (\'+Math.round(diff/7*10)/10+\' weeks)\';" style="padding:5px 10px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:10px;font-weight:600">=</button>';
+  h+='</div>';
+  h+='<div id="dc-result2" style="font-size:14px;font-weight:700;color:#4ade80;margin-bottom:16px;min-height:20px"></div>';
+  // Quick references
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px">Quick Reference</div>';
+  const refs=[7,14,30,60,90];
+  h+='<div style="display:flex;gap:4px;flex-wrap:wrap">';
+  refs.forEach(d=>{
+    const r=new Date();r.setDate(r.getDate()+d);
+    h+='<span style="font-size:9px;padding:3px 6px;background:var(--bg-surface);border-radius:var(--radius);color:var(--text-muted)">+'+d+'d = '+r.toISOString().substring(0,10)+'</span>';
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskGantt(){
+  let panel=document.getElementById('task-gantt-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-gantt-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:95vw;max-height:85vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.due&&t.created).sort((a,b)=>(a.due||'').localeCompare(b.due||''));
+  const now=new Date();
+  // Find date range
+  let minDate=new Date(),maxDate=new Date();
+  tasks.forEach(t=>{
+    const c=new Date(t.created),d=new Date(t.due);
+    if(c<minDate)minDate=c;
+    if(d>maxDate)maxDate=d;
+  });
+  const rangeMs=maxDate-minDate||86400000;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Gantt Chart</span><button onclick="this.closest(\'#task-gantt-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">'+tasks.length+' tasks with dates | '+minDate.toISOString().substring(0,10)+' to '+maxDate.toISOString().substring(0,10)+'</div>';
+  if(!tasks.length){
+    h+='<div style="text-align:center;color:var(--text-muted);padding:30px;font-size:12px">No tasks with both created and due dates.</div>';
+  }
+  tasks.slice(0,25).forEach(t=>{
+    const created=new Date(t.created);
+    const due=new Date(t.due);
+    const startPct=Math.max(0,Math.round((created-minDate)/rangeMs*100));
+    const endPct=Math.max(startPct+2,Math.round((due-minDate)/rangeMs*100));
+    const widthPct=endPct-startPct;
+    const pCol=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f59e0b':t.priority==='p2'?'#3b82f6':'#6b7280';
+    const barCol=t.status==='done'?'#4ade80':due<now&&t.status!=='done'?'#ef4444':pCol;
+    h+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:3px">';
+    h+='<span style="font-size:10px;color:var(--text);width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</span>';
+    h+='<div style="flex:1;height:14px;background:var(--bg-surface);border-radius:2px;position:relative">';
+    h+='<div style="position:absolute;left:'+startPct+'%;width:'+widthPct+'%;height:100%;background:'+barCol+(t.status==='done'?'':'88')+';border-radius:2px"></div>';
+    h+='</div>';
+    h+='<span style="font-size:9px;color:var(--text-muted);width:55px;flex-shrink:0;text-align:right">'+t.due.substring(5,10)+'</span>';
+    h+='</div>';
+  });
+  if(tasks.length>25)h+='<div style="font-size:10px;color:var(--text-muted);margin-top:6px">+'+(tasks.length-25)+' more tasks</div>';
+  // Today marker
+  const todayPct=Math.round((now-minDate)/rangeMs*100);
+  h+='<div style="font-size:10px;color:#4ade80;margin-top:8px">Today is at '+todayPct+'% of the range</div>';
+  h+='<div style="display:flex;gap:12px;font-size:9px;margin-top:6px"><span style="color:#4ade80">Done</span><span style="color:#ef4444">Overdue</span><span style="color:#3b82f6">Active</span></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickMemo(){
+  let panel=document.getElementById('quick-memo-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-memo-widget';
+  panel.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  if(!S._memo)S._memo='';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:12px;color:var(--text)">Quick Memo</span><div style="display:flex;gap:4px"><button onclick="S._memo=document.getElementById(\'qm-text\').value;save();this.textContent=\'Saved!\';setTimeout(()=>this.textContent=\'Save\',800)" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px;padding:2px 8px">Save</button><button onclick="this.closest(\'#quick-memo-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div></div>';
+  h+='<textarea id="qm-text" style="width:100%;height:150px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5" placeholder="Write anything here... Auto-saved on close.">'+esc(S._memo)+'</textarea>';
+  h+='<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:9px;color:var(--text-muted)">'+S._memo.split(/\s+/).filter(Boolean).length+' words</span><button onclick="navigator.clipboard.writeText(document.getElementById(\'qm-text\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">Copy</button></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
