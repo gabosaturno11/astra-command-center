@@ -6461,6 +6461,12 @@ function cmdGetItems(q) {
       ['npm','npm package manager scripts reference'],
       ['tag breakdown','Task distribution by tags'],
       ['base64','Base64 encode decode and URL encode tool'],
+      ['git hooks','Git hooks and lint-staged reference'],
+      ['due forecast','When are open tasks due breakdown'],
+      ['hash','SHA-256 SHA-384 SHA-512 hash generator'],
+      ['yarn','Yarn package manager reference'],
+      ['estimate accuracy','How accurate are task time estimates'],
+      ['csv','CSV viewer and parser tool'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10013,6 +10019,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='base64' || ql==='encode' || ql==='decode' || ql==='url encode')){
     items.unshift({title:'Base64 Tool',desc:'Encode, decode, URL encode/decode',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBase64Tool();}});
+  }
+  if(ql && (ql==='git hooks' || ql==='hooks' || ql==='husky' || ql==='lint staged')){
+    items.unshift({title:'Git Hooks Reference',desc:'Hooks, Husky, lint-staged, commitlint',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitHooksRef();}});
+  }
+  if(ql && (ql==='due forecast' || ql==='due date' || ql==='deadline forecast' || ql==='due breakdown')){
+    items.unshift({title:'Due Date Forecast',desc:'When are open tasks due',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDueDateForecast();}});
+  }
+  if(ql && (ql==='hash' || ql==='hash generator' || ql==='sha256' || ql==='sha512')){
+    items.unshift({title:'Hash Generator',desc:'SHA-256/384/512 hash generation',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHashGenerator();}});
+  }
+  if(ql && (ql==='yarn' || ql==='yarn ref' || ql==='yarn add' || ql==='yarn workspace')){
+    items.unshift({title:'Yarn Reference',desc:'Yarn package manager cheatsheet',icon:'Y',type:'action',action:()=>{closeCommandPalette();showYarnRef();}});
+  }
+  if(ql && (ql==='estimate' || ql==='estimate accuracy' || ql==='estimation' || ql==='time accuracy')){
+    items.unshift({title:'Estimate Accuracy',desc:'How accurate are task estimates',icon:'E',type:'action',action:()=>{closeCommandPalette();showTaskEstimateAccuracy();}});
+  }
+  if(ql && (ql==='csv' || ql==='csv viewer' || ql==='csv parser' || ql==='spreadsheet')){
+    items.unshift({title:'CSV Viewer',desc:'Parse and view CSV data as table',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCsvViewer();}});
   }
   return items.slice(0, 20);
 }
@@ -31495,6 +31519,166 @@ function showQuickBase64Tool(){
     const inp=document.getElementById('b64-input').value;const out=document.getElementById('b64-output');const st=document.getElementById('b64-status');
     try{const result=decodeURIComponent(inp.trim());out.textContent=result;st.style.color='#4ade80';st.textContent='URL Decoded ('+result.length+' chars)';}
     catch(e){st.style.color='#ef4444';st.textContent='Error: '+e.message;out.textContent='';}
+  };
+}
+function showGitHooksRef(){
+  const cmds={
+    'Common Hooks':{'pre-commit':'Runs before commit, exit 1 to abort','commit-msg':'Validate/modify commit message','pre-push':'Runs before push, exit 1 to abort','post-commit':'Runs after commit (notifications)','post-merge':'Runs after merge (install deps)'},
+    'Setup':{'Create hook':'touch .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit','Husky install':'npx husky install','Husky add hook':'npx husky add .husky/pre-commit "npm test"','Skip hooks':'git commit --no-verify','List hooks':'ls -la .git/hooks/'},
+    'Lint-Staged':{'Install':'npm i -D lint-staged','Config (.lintstagedrc)':'{"*.js": ["eslint --fix", "git add"]}','With Husky':'npx husky add .husky/pre-commit "npx lint-staged"','Run manually':'npx lint-staged','Verbose':'npx lint-staged --verbose'},
+    'Commit Linting':{'Install commitlint':'npm i -D @commitlint/cli @commitlint/config-conventional','Config':'echo "module.exports = {extends: [\'@commitlint/config-conventional\']}" > commitlint.config.js','Hook':'npx husky add .husky/commit-msg "npx --no -- commitlint --edit $1"','Test':'echo "feat: test" | npx commitlint','Format':'type(scope): description'},
+    'Custom Scripts':{'Pre-commit lint':'#!/bin/sh\\nnpm run lint','Pre-push test':'#!/bin/sh\\nnpm test','Check branch':'#!/bin/sh\\nbranch=$(git branch --show-current)\\nif [ "$branch" = "main" ]; then echo "Direct push to main!"; exit 1; fi','File size check':'find . -name "*.js" -size +1M','Secret scan':'git diff --cached | grep -i "password\\|secret\\|api_key"'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Git Hooks Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskDueDateForecast(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();const buckets={overdue:0,today:0,thisWeek:0,nextWeek:0,thisMonth:0,later:0,noDue:0};
+  tasks.forEach(t=>{
+    if(!t.due){buckets.noDue++;return;}
+    const due=new Date(t.due);const diff=Math.floor((due-now)/(1000*60*60*24));
+    if(diff<0)buckets.overdue++;
+    else if(diff===0)buckets.today++;
+    else if(diff<=7)buckets.thisWeek++;
+    else if(diff<=14)buckets.nextWeek++;
+    else if(diff<=30)buckets.thisMonth++;
+    else buckets.later++;
+  });
+  const total=tasks.length||1;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Due Date Forecast</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const items=[
+    {label:'Overdue',count:buckets.overdue,color:'#ef4444'},
+    {label:'Today',count:buckets.today,color:'#f59e0b'},
+    {label:'This Week',count:buckets.thisWeek,color:'#06b6d4'},
+    {label:'Next Week',count:buckets.nextWeek,color:'#8b5cf6'},
+    {label:'This Month',count:buckets.thisMonth,color:'#4ade80'},
+    {label:'Later',count:buckets.later,color:'#64748b'},
+    {label:'No Due Date',count:buckets.noDue,color:'#374151'}
+  ];
+  items.forEach(it=>{
+    const pct=Math.round(it.count/total*100);
+    html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="width:80px;font-size:11px;color:var(--text-secondary)">'+it.label+'</span>';
+    html+='<div style="flex:1;height:20px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+it.color+';border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:600;min-width:'+(it.count>0?'20px':'0')+'">'+it.count+'</div></div>';
+    html+='<span style="width:30px;text-align:right;font-size:10px;color:var(--text-muted)">'+pct+'%</span></div>';
+  });
+  html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">'+tasks.length+' open tasks | '+(buckets.overdue>0?'<span style="color:#ef4444;font-weight:600">'+buckets.overdue+' overdue!</span>':'No overdue tasks')+'</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickHashGenerator(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">Hash Generator</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<textarea id="hash-input" placeholder="Enter text to hash..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box"></textarea>';
+  html+='<button onclick="window._generateHashes()" style="background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin:10px 0">Generate Hashes</button>';
+  html+='<div id="hash-results" style="background:var(--bg-surface);border:1px solid var(--border);padding:10px;border-radius:6px;min-height:60px"></div>';
+  html+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted)">Uses Web Crypto API (SHA-256, SHA-384, SHA-512)</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._generateHashes=async function(){
+    const inp=document.getElementById('hash-input').value;const out=document.getElementById('hash-results');
+    if(!inp){out.innerHTML='<span style="color:var(--text-muted);font-size:11px">Enter text first</span>';return;}
+    out.innerHTML='<span style="color:var(--text-muted);font-size:11px">Computing...</span>';
+    const enc=new TextEncoder();const data=enc.encode(inp);
+    const algos=['SHA-256','SHA-384','SHA-512'];
+    let r='';
+    for(const algo of algos){
+      const hash=await crypto.subtle.digest(algo,data);
+      const arr=Array.from(new Uint8Array(hash));
+      const hex=arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+      r+='<div style="margin-bottom:8px"><div style="color:var(--text-secondary);font-size:10px;font-weight:600;margin-bottom:2px">'+algo+'</div>';
+      r+='<div style="display:flex;gap:6px;align-items:center"><code style="flex:1;font-size:10px;color:var(--text-primary);word-break:break-all;background:var(--bg-elevated);padding:4px 8px;border-radius:3px">'+hex+'</code>';
+      r+='<button onclick="navigator.clipboard.writeText(\''+hex+'\');this.textContent=\'ok\';setTimeout(()=>this.textContent=\'cp\',600)" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);padding:2px 8px;border-radius:3px;cursor:pointer;font-size:9px;flex-shrink:0">cp</button></div></div>';
+    }
+    const md5Like=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',data))).slice(0,16).map(b=>b.toString(16).padStart(2,'0')).join('');
+    r+='<div style="margin-bottom:8px"><div style="color:var(--text-secondary);font-size:10px;font-weight:600;margin-bottom:2px">Short Hash (first 32 chars of SHA-256)</div>';
+    r+='<div style="display:flex;gap:6px;align-items:center"><code style="flex:1;font-size:10px;color:#4ade80;background:var(--bg-elevated);padding:4px 8px;border-radius:3px">'+md5Like+'</code>';
+    r+='<button onclick="navigator.clipboard.writeText(\''+md5Like+'\');this.textContent=\'ok\';setTimeout(()=>this.textContent=\'cp\',600)" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);padding:2px 8px;border-radius:3px;cursor:pointer;font-size:9px;flex-shrink:0">cp</button></div></div>';
+    out.innerHTML=r;
+  };
+}
+function showYarnRef(){
+  const cmds={
+    'Package Management':{'Install all':'yarn install','Add package':'yarn add package-name','Add dev dep':'yarn add -D package-name','Remove package':'yarn remove package-name','Upgrade all':'yarn upgrade'},
+    'Running Scripts':{'Run script':'yarn run script-name','Start':'yarn start','Test':'yarn test','Build':'yarn build','Dev server':'yarn dev'},
+    'Workspaces':{'List workspaces':'yarn workspaces list','Run in workspace':'yarn workspace @scope/pkg run build','Add to workspace':'yarn workspace @scope/pkg add lodash','Run all':'yarn workspaces foreach run test','Info':'yarn workspaces info'},
+    'Info & Cache':{'Why installed':'yarn why package-name','List packages':'yarn list --depth=0','Outdated':'yarn outdated','Cache clean':'yarn cache clean','Info package':'yarn info package-name'},
+    'Config':{'Init project':'yarn init -y','Set registry':'yarn config set registry URL','Global add':'yarn global add package-name','Audit':'yarn audit','Licenses':'yarn licenses list'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Yarn Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskEstimateAccuracy(){
+  const tasks=(S.tasks||[]).filter(t=>t.estimate&&t.status==='done');
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Estimate Accuracy</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(tasks.length===0){
+    html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No completed tasks with estimates found.<br>Add estimates to tasks (e.g. "30m", "2h") and complete them to see accuracy data.</div>';
+  } else {
+    const parseEst=e=>{const m=e.match(/(\d+)\s*(m|h|d)/i);if(!m)return 0;const v=parseInt(m[1]);if(m[2]==='h')return v*60;if(m[2]==='d')return v*480;return v;};
+    let totalEst=0,totalActual=0,accurate=0,under=0,over=0;
+    tasks.forEach(t=>{
+      const estMin=parseEst(t.estimate);if(estMin===0)return;
+      const actualMin=t.timeTracked?Math.round(t.timeTracked/60):estMin;
+      totalEst+=estMin;totalActual+=actualMin;
+      const ratio=actualMin/estMin;
+      if(ratio>=0.8&&ratio<=1.2)accurate++;
+      else if(ratio<0.8)over++;
+      else under++;
+    });
+    const avgAccuracy=totalEst>0?Math.round(totalActual/totalEst*100):100;
+    html+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;font-weight:700;color:'+(avgAccuracy>=80&&avgAccuracy<=120?'#4ade80':'#f59e0b')+'">'+avgAccuracy+'%</div><div style="color:var(--text-muted);font-size:11px">Overall estimation accuracy</div></div>';
+    html+='<div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px">';
+    html+='<div style="text-align:center;padding:10px 16px;background:var(--bg-surface);border-radius:6px"><div style="color:#4ade80;font-size:20px;font-weight:600">'+accurate+'</div><div style="color:var(--text-muted);font-size:10px">On Target</div></div>';
+    html+='<div style="text-align:center;padding:10px 16px;background:var(--bg-surface);border-radius:6px"><div style="color:#ef4444;font-size:20px;font-weight:600">'+under+'</div><div style="color:var(--text-muted);font-size:10px">Underestimated</div></div>';
+    html+='<div style="text-align:center;padding:10px 16px;background:var(--bg-surface);border-radius:6px"><div style="color:#06b6d4;font-size:20px;font-weight:600">'+over+'</div><div style="color:var(--text-muted);font-size:10px">Overestimated</div></div></div>';
+    html+='<div style="padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">Total estimated: '+totalEst+'min | Total actual: '+totalActual+'min | '+tasks.length+' tasks analyzed</div>';
+  }
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickCsvViewer(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">CSV Viewer</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<textarea id="csv-input" placeholder="Paste CSV data here (comma, tab, or semicolon separated)..." style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box"></textarea>';
+  html+='<div style="display:flex;gap:6px;margin:10px 0"><button onclick="window._parseCsv(\',\')" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Comma</button>';
+  html+='<button onclick="window._parseCsv(\'\\t\')" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Tab</button>';
+  html+='<button onclick="window._parseCsv(\';\')" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px">Semicolon</button></div>';
+  html+='<div id="csv-output" style="overflow-x:auto"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._parseCsv=function(delim){
+    const inp=document.getElementById('csv-input').value.trim();const out=document.getElementById('csv-output');
+    if(!inp){out.innerHTML='<span style="color:var(--text-muted);font-size:11px">Paste CSV data first</span>';return;}
+    const lines=inp.split('\n').map(l=>l.split(delim));
+    const maxCols=Math.max(...lines.map(l=>l.length));
+    let t='<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px">';
+    lines.forEach((row,ri)=>{
+      t+='<tr>';
+      for(let c=0;c<maxCols;c++){
+        const cell=(row[c]||'').trim();
+        const tag=ri===0?'th':'td';
+        const style=ri===0?'background:var(--bg-surface);color:#4ade80;font-weight:600;':'color:var(--text-secondary);';
+        t+='<'+tag+' style="'+style+'padding:6px 10px;border:1px solid var(--border);text-align:left;white-space:nowrap">'+esc(cell)+'</'+tag+'>';
+      }
+      t+='</tr>';
+    });
+    t+='</table>';
+    t+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">'+lines.length+' rows x '+maxCols+' columns</div>';
+    out.innerHTML=t;
   };
 }
 function showProjectRoadmap(filterProject){
