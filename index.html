@@ -6659,6 +6659,12 @@ function cmdGetItems(q) {
       ['gcp','Google Cloud Platform CLI reference'],
       ['focus time','Focus time tracking report'],
       ['fibonacci','Fibonacci sequence generator'],
+      ['heroku','Heroku CLI deploy addons reference'],
+      ['burndown','Task burndown chart 28 days'],
+      ['lorem','Lorem ipsum text generator'],
+      ['kubernetes','Kubectl pods deploy services ref'],
+      ['velocity','Task velocity chart 8 weeks'],
+      ['countdown','Countdown timer with pause reset'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10805,6 +10811,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='fibonacci' || ql==='fib' || ql==='fibonacci sequence' || ql==='fibonacci numbers')){
     items.unshift({title:'Fibonacci',desc:'Fibonacci sequence generator',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFibonacci();}});
+  }
+  if(ql && (ql==='heroku' || ql==='heroku cli' || ql==='heroku ref' || ql==='heroku deploy')){
+    items.unshift({title:'Heroku CLI Reference',desc:'Deploy, addons, config, scaling',icon:'H',type:'action',action:()=>{closeCommandPalette();showHerokuRef();}});
+  }
+  if(ql && (ql==='burndown' || ql==='burndown chart' || ql==='task burndown' || ql==='burn down')){
+    items.unshift({title:'Burndown Chart',desc:'28-day task burndown visualization',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBurndownChart();}});
+  }
+  if(ql && (ql==='lorem' || ql==='lorem ipsum' || ql==='placeholder text' || ql==='dummy text')){
+    items.unshift({title:'Lorem Ipsum',desc:'Generate placeholder text',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLoremIpsum();}});
+  }
+  if(ql && (ql==='kubernetes' || ql==='kubectl' || ql==='k8s' || ql==='kube')){
+    items.unshift({title:'Kubernetes Reference',desc:'kubectl pods, deploy, services',icon:'K',type:'action',action:()=>{closeCommandPalette();showKubernetesRef();}});
+  }
+  if(ql && (ql==='velocity' || ql==='velocity chart' || ql==='task velocity' || ql==='throughput')){
+    items.unshift({title:'Velocity Chart',desc:'8-week task velocity trend',icon:'V',type:'action',action:()=>{closeCommandPalette();showTaskVelocityChart();}});
+  }
+  if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='timer countdown' || ql==='count down')){
+    items.unshift({title:'Countdown Timer',desc:'Timer with start/pause/reset',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
   }
   return items.slice(0, 20);
 }
@@ -38157,6 +38181,122 @@ function showQuickFibonacci(){
     out.innerHTML=fib.map((v,i)=>'<span style="color:var(--accent)">F('+i+')</span> = '+v).join('<br>');
   };
   window._fibCalc();
+}
+function showHerokuRef(){
+  let p=document.getElementById('heroku-ref-panel');if(p)p.remove();
+  const cmds={'App Management':['heroku create myapp','heroku apps','heroku apps:info myapp','heroku apps:rename newname','heroku apps:destroy myapp --confirm myapp','heroku open','heroku logs --tail','heroku logs -n 200','heroku ps','heroku ps:scale web=2','heroku ps:restart','heroku maintenance:on','heroku maintenance:off'],'Deploy & Git':['git push heroku main','heroku builds','heroku builds:cancel','heroku releases','heroku rollback v42','heroku container:push web','heroku container:release web','heroku pipeline:create mypipe','heroku pipeline:add mypipe -a myapp','heroku pipeline:promote'],'Config & Env':['heroku config','heroku config:set KEY=value','heroku config:unset KEY','heroku config:get KEY','heroku domains','heroku domains:add example.com','heroku certs:auto','heroku features','heroku features:enable runtime-dyno-metadata'],'Addons & Data':['heroku addons','heroku addons:create heroku-postgresql','heroku addons:create heroku-redis','heroku pg:info','heroku pg:psql','heroku pg:backups:capture','heroku pg:backups:download','heroku redis:info','heroku run bash','heroku run rails console'],'Auth & Team':['heroku login','heroku auth:whoami','heroku auth:token','heroku access','heroku access:add user@email.com','heroku teams','heroku members','heroku spaces']};
+  p=document.createElement('div');p.id='heroku-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Heroku CLI Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskBurndownChart(){
+  let p=document.getElementById('burndown-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const now=new Date();const fourWeeksAgo=new Date(now);fourWeeksAgo.setDate(fourWeeksAgo.getDate()-28);
+  const days=[];for(let i=0;i<28;i++){const d=new Date(fourWeeksAgo);d.setDate(d.getDate()+i);days.push(d);}
+  const totalAtStart=tasks.filter(t=>{const c=new Date(t.created||t.id);return c<=fourWeeksAgo;}).length+tasks.filter(t=>{const c=new Date(t.created||t.id);return c>fourWeeksAgo;}).length;
+  let remaining=totalAtStart;const data=[];
+  days.forEach(d=>{
+    const ds=d.toISOString().split('T')[0];
+    const created=tasks.filter(t=>(t.created||'').split('T')[0]===ds).length;
+    const done=tasks.filter(t=>t.status==='done'&&(t.completedAt||'').split('T')[0]===ds).length;
+    remaining=remaining+created-done;
+    data.push({date:ds,remaining,label:d.toLocaleDateString('en',{month:'short',day:'numeric'})});
+  });
+  const maxR=Math.max(...data.map(d=>d.remaining),1);
+  const w=560,ht=200;
+  let svg='<svg width="'+w+'" height="'+(ht+30)+'" viewBox="0 0 '+w+' '+(ht+30)+'">';
+  svg+='<line x1="0" y1="'+ht+'" x2="'+w+'" y2="'+ht+'" stroke="var(--border)" stroke-width="1"/>';
+  const ideal=totalAtStart;const idealEnd=0;
+  svg+='<line x1="0" y1="'+(ht-((ideal/maxR)*ht))+'" x2="'+w+'" y2="'+ht+'" stroke="var(--text-muted)" stroke-width="1" stroke-dasharray="4"/>';
+  let path='M';
+  data.forEach((d,i)=>{const x=(i/(data.length-1))*w;const y=ht-((d.remaining/maxR)*ht);path+=(i===0?'':' L')+x.toFixed(1)+' '+y.toFixed(1);});
+  svg+='<path d="'+path+'" fill="none" stroke="#4ade80" stroke-width="2"/>';
+  data.filter((_,i)=>i%7===0).forEach((d,i)=>{const x=(data.indexOf(d)/(data.length-1))*w;svg+='<text x="'+x+'" y="'+(ht+18)+'" font-size="9" fill="var(--text-muted)" text-anchor="middle">'+d.label+'</text>';});
+  svg+='</svg>';
+  p=document.createElement('div');p.id='burndown-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:640px;width:90vw;max-height:80vh;overflow-y:auto';
+  const activeTasks=tasks.filter(t=>t.status!=='done').length;const doneTasks=tasks.filter(t=>t.status==='done').length;
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Burndown Chart (28 days)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div><div style="display:flex;gap:16px;margin-bottom:12px"><div style="font-size:12px;color:var(--text-muted)">Active: <span style="color:#f87171">'+activeTasks+'</span></div><div style="font-size:12px;color:var(--text-muted)">Done: <span style="color:#4ade80">'+doneTasks+'</span></div><div style="font-size:12px;color:var(--text-muted)">Total: '+tasks.length+'</div></div>'+svg+'<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Green line = remaining tasks over time. Dashed = ideal burndown.</div>';
+  document.body.appendChild(p);
+}
+function showQuickLoremIpsum(){
+  let w=document.getElementById('lorem-widget');if(w)w.remove();
+  const paras=['Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.','Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris.','Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus.','Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.'];
+  w=document.createElement('div');w.id='lorem-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:340px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Lorem Ipsum</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted)">Paragraphs</label><input type="number" id="lorem-count" value="3" min="1" max="10" style="width:60px;margin-left:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px"></div><div style="display:flex;gap:6px;margin-bottom:8px"><button onclick="window._genLorem(\'paras\')" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Paragraphs</button><button onclick="window._genLorem(\'words\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Words</button><button onclick="window._genLorem(\'sentences\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Sentences</button></div><div id="lorem-output" style="background:var(--bg-surface);border-radius:4px;padding:8px;font-size:11px;color:var(--text-secondary);max-height:180px;overflow-y:auto;line-height:1.5;white-space:pre-wrap"></div><button onclick="navigator.clipboard.writeText(document.getElementById(\'lorem-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="margin-top:6px;width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Copy</button>';
+  document.body.appendChild(w);
+  window._loremParas=paras;
+  window._genLorem=function(mode){
+    const n=parseInt(document.getElementById('lorem-count').value)||3;
+    let result='';
+    if(mode==='paras'){for(let i=0;i<n;i++)result+=(i>0?'\n\n':'')+paras[i%paras.length];}
+    else if(mode==='words'){const allWords=paras.join(' ').split(' ');result=allWords.slice(0,n*10).join(' ')+'.';}
+    else{const allSentences=paras.join(' ').split('. ').map(s=>s.trim()+'.').filter(s=>s.length>2);result=allSentences.slice(0,n).join(' ');}
+    document.getElementById('lorem-output').textContent=result;
+  };
+  window._genLorem('paras');
+}
+function showKubernetesRef(){
+  let p=document.getElementById('k8s-ref-panel');if(p)p.remove();
+  const cmds={'Cluster & Context':['kubectl cluster-info','kubectl config get-contexts','kubectl config use-context myctx','kubectl config current-context','kubectl get nodes','kubectl describe node mynode','kubectl top nodes','kubectl api-resources','kubectl version'],'Pods':['kubectl get pods','kubectl get pods -A','kubectl get pods -o wide','kubectl describe pod mypod','kubectl logs mypod','kubectl logs mypod -f --tail=100','kubectl exec -it mypod -- bash','kubectl port-forward mypod 8080:80','kubectl delete pod mypod','kubectl top pods'],'Deployments & Services':['kubectl get deployments','kubectl create deployment myapp --image=nginx','kubectl scale deploy myapp --replicas=3','kubectl rollout status deploy/myapp','kubectl rollout undo deploy/myapp','kubectl get services','kubectl expose deploy myapp --port=80 --type=LoadBalancer','kubectl get ingress','kubectl get endpoints'],'Config & Secrets':['kubectl get configmaps','kubectl create configmap myconf --from-file=app.conf','kubectl get secrets','kubectl create secret generic mysec --from-literal=key=val','kubectl get pvc','kubectl get pv','kubectl apply -f manifest.yaml','kubectl delete -f manifest.yaml'],'Namespaces & RBAC':['kubectl get namespaces','kubectl create namespace myns','kubectl get pods -n myns','kubectl get serviceaccounts','kubectl get roles','kubectl get clusterroles','kubectl auth can-i create pods','kubectl get networkpolicies']};
+  p=document.createElement('div');p.id='k8s-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Kubernetes (kubectl) Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskVelocityChart(){
+  let p=document.getElementById('velocity-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const now=new Date();const weeks=[];
+  for(let i=7;i>=0;i--){const wStart=new Date(now);wStart.setDate(wStart.getDate()-(i*7));const wEnd=new Date(wStart);wEnd.setDate(wEnd.getDate()+7);weeks.push({start:wStart,end:wEnd,label:'W'+(8-i)});}
+  const data=weeks.map(w=>{
+    const done=tasks.filter(t=>{if(t.status!=='done')return false;const d=new Date(t.completedAt||t.created||'');return d>=w.start&&d<w.end;}).length;
+    const created=tasks.filter(t=>{const c=new Date(t.created||'');return c>=w.start&&c<w.end;}).length;
+    return{...w,done,created};
+  });
+  const maxV=Math.max(...data.map(d=>Math.max(d.done,d.created)),1);
+  const w2=520,ht=180;const bw=w2/data.length*0.35;
+  let svg='<svg width="'+w2+'" height="'+(ht+30)+'" viewBox="0 0 '+w2+' '+(ht+30)+'">';
+  svg+='<line x1="0" y1="'+ht+'" x2="'+w2+'" y2="'+ht+'" stroke="var(--border)" stroke-width="1"/>';
+  data.forEach((d,i)=>{
+    const x=(i/(data.length))*w2+(w2/data.length*0.15);
+    const dH=(d.done/maxV)*ht;const cH=(d.created/maxV)*ht;
+    svg+='<rect x="'+x+'" y="'+(ht-dH)+'" width="'+bw+'" height="'+dH+'" fill="#4ade80" rx="2"/>';
+    svg+='<rect x="'+(x+bw+2)+'" y="'+(ht-cH)+'" width="'+bw+'" height="'+cH+'" fill="#60a5fa" rx="2"/>';
+    svg+='<text x="'+(x+bw)+'" y="'+(ht+16)+'" font-size="9" fill="var(--text-muted)" text-anchor="middle">'+d.label+'</text>';
+  });
+  svg+='</svg>';
+  const avgVelocity=(data.reduce((s,d)=>s+d.done,0)/data.length).toFixed(1);
+  p=document.createElement('div');p.id='velocity-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Velocity Chart (8 weeks)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div><div style="display:flex;gap:16px;margin-bottom:12px"><div style="font-size:12px;color:var(--text-muted)">Avg Velocity: <span style="color:#4ade80">'+avgVelocity+' tasks/week</span></div><div style="font-size:11px"><span style="color:#4ade80">Green</span>=Done <span style="color:#60a5fa">Blue</span>=Created</div></div>'+svg;
+  document.body.appendChild(p);
+}
+function showQuickCountdownTimer(){
+  let w=document.getElementById('countdown-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='countdown-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Countdown Timer</div><button onclick="if(window._cdInterval)clearInterval(window._cdInterval);this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="display:flex;gap:6px;margin-bottom:10px"><input type="number" id="cd-min" value="5" min="0" max="999" placeholder="min" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px;text-align:center"><span style="color:var(--text-muted);line-height:28px">:</span><input type="number" id="cd-sec" value="0" min="0" max="59" placeholder="sec" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px;text-align:center"></div><div id="cd-display" style="font-size:36px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:10px;font-family:monospace">05:00</div><div style="display:flex;gap:6px"><button onclick="window._cdStart()" id="cd-start-btn" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Start</button><button onclick="window._cdPause()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Pause</button><button onclick="window._cdReset()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Reset</button></div>';
+  document.body.appendChild(w);
+  window._cdTotal=300;window._cdRemaining=300;window._cdRunning=false;window._cdInterval=null;
+  window._cdUpdateDisplay=function(){const m=Math.floor(window._cdRemaining/60);const s=window._cdRemaining%60;document.getElementById('cd-display').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');if(window._cdRemaining<=10&&window._cdRunning)document.getElementById('cd-display').style.color='#f87171';else document.getElementById('cd-display').style.color='var(--text-primary)';};
+  window._cdStart=function(){if(window._cdRunning)return;const m=parseInt(document.getElementById('cd-min').value)||0;const s=parseInt(document.getElementById('cd-sec').value)||0;if(!window._cdRunning&&window._cdRemaining===window._cdTotal){window._cdTotal=m*60+s;window._cdRemaining=window._cdTotal;}window._cdRunning=true;window._cdInterval=setInterval(()=>{window._cdRemaining--;window._cdUpdateDisplay();if(window._cdRemaining<=0){clearInterval(window._cdInterval);window._cdRunning=false;document.getElementById('cd-display').textContent='DONE!';document.getElementById('cd-display').style.color='#4ade80';}},1000);};
+  window._cdPause=function(){if(window._cdInterval)clearInterval(window._cdInterval);window._cdRunning=false;};
+  window._cdReset=function(){if(window._cdInterval)clearInterval(window._cdInterval);window._cdRunning=false;const m=parseInt(document.getElementById('cd-min').value)||0;const s=parseInt(document.getElementById('cd-sec').value)||0;window._cdTotal=m*60+s;window._cdRemaining=window._cdTotal;window._cdUpdateDisplay();};
+  window._cdUpdateDisplay();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
