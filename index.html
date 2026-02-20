@@ -5836,6 +5836,12 @@ function cmdGetItems(q) {
       ['status email','Generate weekly status email (copies to clipboard)'],
       ['morning','Morning briefing panel with daily overview'],
       ['shortcuts','Visual keyboard shortcut cheatsheet'],
+      ['streak','Daily usage streak tracker'],
+      ['content templates','Pre-built templates for notes, meetings, journals'],
+      ['link checker','Check if saved links are still reachable'],
+      ['reading progress','Track read/unread status of content items'],
+      ['project timeline','Visual timeline of project milestones'],
+      ['math','Quick calculator - type math: expression'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7272,6 +7278,33 @@ function cmdGetItems(q) {
   // Shortcut cheatsheet prefix
   if(ql && (ql==='shortcuts' || ql==='shortcut cheatsheet' || ql==='keyboard' || ql==='keys' || ql==='hotkeys')){
     items.unshift({title:'Shortcut Cheatsheet',desc:'Visual keyboard shortcut reference',icon:'K',type:'action',action:()=>{closeCommandPalette();showShortcutCheatsheet();}});
+  }
+  // Streak tracker prefix
+  if(ql && (ql==='streak' || ql==='streak tracker' || ql==='daily streak' || ql==='usage streak')){
+    items.unshift({title:'Streak Tracker',desc:'Track daily usage streaks and active days',icon:'S',type:'action',action:()=>{closeCommandPalette();showStreakTracker();}});
+  }
+  // Content templates prefix
+  if(ql && (ql==='content templates' || ql==='templates' || ql==='template' || ql==='new template')){
+    items.unshift({title:'Content Templates',desc:'Meeting notes, project brief, journal, research, decision log',icon:'T',type:'action',action:()=>{closeCommandPalette();showContentTemplates();}});
+  }
+  // Link checker prefix
+  if(ql && (ql==='link checker' || ql==='check links' || ql==='broken links' || ql==='link health')){
+    items.unshift({title:'Link Health Checker',desc:'Check if saved links are still reachable',icon:'L',type:'action',action:()=>{closeCommandPalette();showBulkLinkChecker();}});
+  }
+  // Reading progress prefix
+  if(ql && (ql==='reading' || ql==='reading progress' || ql==='read status' || ql==='unread')){
+    items.unshift({title:'Reading Progress',desc:'Track read/unread/reading status of content items',icon:'R',type:'action',action:()=>{closeCommandPalette();showReadingProgress();}});
+  }
+  // Project timeline prefix
+  if(ql && (ql==='project timeline' || ql==='timeline' || ql==='gantt' || ql==='milestones')){
+    items.unshift({title:'Project Timeline',desc:'Visual timeline of project milestones and task dates',icon:'T',type:'action',action:()=>{closeCommandPalette();showProjectTimeline();}});
+  }
+  // Quick math
+  if(ql && ql.startsWith('math:')){
+    const expr=ql.substring(5).trim();const result=quickMath(expr);
+    if(result!==null){
+      items.unshift({title:'= '+result,desc:'Math: '+expr,icon:'#',type:'action',action:()=>{navigator.clipboard.writeText(String(result));showToast('Copied: '+result);closeCommandPalette();}});
+    }
   }
   return items.slice(0, 20);
 }
@@ -9240,6 +9273,194 @@ function showShortcutCheatsheet(){
   });
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Keyboard Shortcuts</span><button onclick="document.getElementById('shortcut-cheat-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
+}
+function showStreakTracker(){
+  const now=new Date();const today=now.toISOString().split('T')[0];
+  if(!S._streakData)S._streakData={lastActive:'',currentStreak:0,longestStreak:0,history:[]};
+  const sd=S._streakData;
+  if(sd.lastActive!==today){
+    const yesterday=new Date(now);yesterday.setDate(yesterday.getDate()-1);
+    const yStr=yesterday.toISOString().split('T')[0];
+    if(sd.lastActive===yStr){sd.currentStreak++;} else if(sd.lastActive&&sd.lastActive!==today){sd.currentStreak=1;} else if(!sd.lastActive){sd.currentStreak=1;}
+    sd.lastActive=today;if(sd.currentStreak>sd.longestStreak)sd.longestStreak=sd.currentStreak;
+    if(!sd.history.includes(today))sd.history.push(today);
+    if(sd.history.length>365)sd.history=sd.history.slice(-365);
+    save();
+  }
+  const tasks=S.tasks||[];const content=S.content||[];
+  const todayTasks=tasks.filter(t=>t.created&&t.created.startsWith(today)).length;
+  const todayContent=content.filter(c=>c.created&&c.created.startsWith(today)).length;
+  const totalDays=sd.history.length;
+  const panel=document.createElement('div');panel.id='streak-tracker-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Streak Tracker</span><button onclick="document.getElementById('streak-tracker-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:28px;font-weight:700;color:var(--accent)">${sd.currentStreak}</div><div style="font-size:10px;color:var(--text-muted)">Current Streak</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:28px;font-weight:700;color:#f59e0b">${sd.longestStreak}</div><div style="font-size:10px;color:var(--text-muted)">Longest Streak</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:28px;font-weight:700;color:#8b5cf6">${totalDays}</div><div style="font-size:10px;color:var(--text-muted)">Total Active Days</div></div>`;
+  h+=`</div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Today's Activity</div>`;
+  h+=`<div style="display:flex;gap:16px"><span style="font-size:12px;color:var(--text-secondary)">Tasks created: <span style="color:var(--accent)">${todayTasks}</span></span>`;
+  h+=`<span style="font-size:12px;color:var(--text-secondary)">Content added: <span style="color:var(--accent)">${todayContent}</span></span></div></div>`;
+  const last30=[];for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);last30.push(d.toISOString().split('T')[0]);}
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Last 30 Days</div>`;
+  h+=`<div style="display:flex;flex-wrap:wrap;gap:3px">`;
+  last30.forEach(day=>{
+    const active=sd.history.includes(day);
+    h+=`<div title="${day}" style="width:14px;height:14px;border-radius:2px;background:${active?'var(--accent)':'var(--bg-base)'};opacity:${active?1:0.3}"></div>`;
+  });
+  h+=`</div></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentTemplates(){
+  const templates=[
+    {name:'Meeting Notes',body:'## Meeting: [Topic]\\n\\n**Date:** '+new Date().toLocaleDateString()+'\\n**Attendees:** \\n\\n### Agenda\\n1. \\n\\n### Discussion\\n\\n### Action Items\\n- [ ] \\n\\n### Next Steps\\n',theme:'meeting'},
+    {name:'Project Brief',body:'## Project: [Name]\\n\\n**Objective:** \\n**Timeline:** \\n**Owner:** \\n\\n### Background\\n\\n### Requirements\\n1. \\n\\n### Success Criteria\\n- \\n\\n### Risks\\n- ',theme:'project'},
+    {name:'Weekly Review',body:'## Week of '+new Date().toLocaleDateString()+'\\n\\n### Completed\\n- \\n\\n### In Progress\\n- \\n\\n### Blockers\\n- \\n\\n### Next Week Goals\\n1. \\n\\n### Reflection\\n',theme:'review'},
+    {name:'Research Note',body:'## Research: [Topic]\\n\\n**Source:** \\n**Date:** '+new Date().toLocaleDateString()+'\\n\\n### Key Findings\\n1. \\n\\n### Quotes\\n> \\n\\n### My Analysis\\n\\n### Follow-up Questions\\n- ',theme:'research'},
+    {name:'Decision Log',body:'## Decision: [Title]\\n\\n**Date:** '+new Date().toLocaleDateString()+'\\n**Status:** Decided / Pending\\n\\n### Context\\n\\n### Options Considered\\n1. **Option A:** \\n2. **Option B:** \\n\\n### Decision\\n\\n### Rationale\\n\\n### Impact\\n',theme:'decision'},
+    {name:'Daily Journal',body:'## '+new Date().toLocaleDateString()+'\\n\\n### Gratitude\\n- \\n\\n### Top 3 Priorities\\n1. \\n2. \\n3. \\n\\n### Notes\\n\\n### End of Day Review\\n- What went well: \\n- What to improve: ',theme:'journal'},
+  ];
+  const panel=document.createElement('div');panel.id='content-templates-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Templates</span><button onclick="document.getElementById('content-templates-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;gap:8px">`;
+  templates.forEach((t,i)=>{
+    h+=`<div onclick="applyContentTemplate(${i})" style="background:var(--bg-surface);padding:12px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'">`;
+    h+=`<div style="font-size:12px;font-weight:600;color:var(--text-primary)">${t.name}</div>`;
+    h+=`<div style="font-size:10px;color:var(--text-muted);margin-top:4px">${t.body.replace(/\\n/g,' ').substring(0,80)}...</div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+  window._contentTemplates=templates;
+}
+function applyContentTemplate(idx){
+  const templates=window._contentTemplates;if(!templates||!templates[idx])return;
+  const t=templates[idx];
+  const id='c_'+Date.now();
+  const item={id,body:t.body.replace(/\\n/g,'\n'),theme:t.theme,tags:[t.theme,'template'],created:new Date().toISOString(),pinned:false,starred:false};
+  if(!S.content)S.content=[];S.content.unshift(item);save();
+  const p=document.getElementById('content-templates-panel');if(p)p.remove();
+  switchSection('content');renderContent();
+  showToast('Created from template: '+t.name);
+}
+function showBulkLinkChecker(){
+  const links=S.links||[];
+  if(!links.length){showToast('No links to check');return;}
+  const panel=document.createElement('div');panel.id='link-checker-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Link Health Checker</span><button onclick="document.getElementById('link-checker-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Checking ${links.length} links... (CORS may affect results)</div>`;
+  h+=`<div id="link-check-results" style="display:grid;gap:6px">`;
+  links.forEach(l=>{
+    h+=`<div id="lc-${l.id}" style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px">`;
+    h+=`<div style="width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0" id="lc-dot-${l.id}"></div>`;
+    h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.title||l.url)}</div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.url)}</div></div>`;
+    h+=`<span style="font-size:9px;color:var(--text-muted)" id="lc-status-${l.id}">checking...</span>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+  let ok=0,fail=0,unknown=0;
+  links.forEach((l,i)=>{
+    setTimeout(()=>{
+      fetch(l.url,{method:'HEAD',mode:'no-cors',signal:AbortSignal.timeout(5000)}).then(()=>{
+        const dot=document.getElementById('lc-dot-'+l.id);const st=document.getElementById('lc-status-'+l.id);
+        if(dot)dot.style.background='#4ade80';if(st){st.textContent='reachable';st.style.color='#4ade80';}
+        ok++;
+      }).catch(()=>{
+        const dot=document.getElementById('lc-dot-'+l.id);const st=document.getElementById('lc-status-'+l.id);
+        if(dot)dot.style.background='#888';if(st){st.textContent='unknown';st.style.color='#888';}
+        unknown++;
+      });
+    },i*200);
+  });
+}
+function showReadingProgress(){
+  const content=S.content||[];
+  const statuses={unread:0,reading:0,done:0};
+  content.forEach(c=>{const s=c._readStatus||'unread';statuses[s]=(statuses[s]||0)+1;});
+  const total=content.length||1;
+  const panel=document.createElement('div');panel.id='reading-progress-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Reading Progress</span><button onclick="document.getElementById('reading-progress-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#f59e0b">${statuses.unread}</div><div style="font-size:10px;color:var(--text-muted)">Unread</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#3b82f6">${statuses.reading}</div><div style="font-size:10px;color:var(--text-muted)">Reading</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--accent)">${statuses.done}</div><div style="font-size:10px;color:var(--text-muted)">Done</div></div>`;
+  h+=`</div>`;
+  const pctDone=Math.round((statuses.done/total)*100);
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;margin-bottom:12px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">${pctDone}% completed</div>`;
+  h+=`<div style="height:8px;background:var(--bg-base);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pctDone}%;background:var(--accent);border-radius:4px;transition:width 0.3s"></div></div></div>`;
+  const unread=content.filter(c=>!c._readStatus||c._readStatus==='unread').slice(0,10);
+  if(unread.length){
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Unread Items (${statuses.unread})</div>`;
+    h+=`<div style="display:grid;gap:4px">`;
+    unread.forEach(c=>{
+      const preview=(c.body||'').substring(0,60);
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px">`;
+      h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(preview||'(empty)')}</div></div>`;
+      h+=`<button onclick="setReadStatus('${c.id}','reading')" style="font-size:9px;padding:2px 6px;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;color:#3b82f6;cursor:pointer">Reading</button>`;
+      h+=`<button onclick="setReadStatus('${c.id}','done')" style="font-size:9px;padding:2px 6px;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;color:var(--accent);cursor:pointer">Done</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function setReadStatus(id,status){
+  const c=(S.content||[]).find(x=>x.id===id);if(!c)return;
+  c._readStatus=status;save();
+  const p=document.getElementById('reading-progress-panel');if(p)p.remove();
+  showReadingProgress();
+}
+function showProjectTimeline(){
+  const projects=S.projects||[];const tasks=S.tasks||[];
+  const panel=document.createElement('div');panel.id='project-timeline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Project Timeline</span><button onclick="document.getElementById('project-timeline-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+  projects.forEach((p,pi)=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    if(!pTasks.length)return;
+    const dates=pTasks.filter(t=>t.due).map(t=>new Date(t.due).getTime()).filter(d=>!isNaN(d));
+    const created=pTasks.filter(t=>t.created).map(t=>new Date(t.created).getTime()).filter(d=>!isNaN(d));
+    const allDates=[...dates,...created].filter(d=>d>0);
+    if(!allDates.length)return;
+    const minD=Math.min(...allDates);const maxD=Math.max(...allDates);
+    const rangeD=maxD-minD||86400000;
+    const color=colors[pi%colors.length];
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const pct=Math.round((done/pTasks.length)*100);
+    h+=`<div style="margin-bottom:16px;background:var(--bg-surface);padding:12px;border-radius:8px;border-left:3px solid ${color}">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">`;
+    h+=`<span style="font-size:12px;font-weight:600;color:${color}">${esc(p.name)}</span>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${done}/${pTasks.length} done (${pct}%)</span></div>`;
+    h+=`<div style="position:relative;height:20px;background:var(--bg-base);border-radius:4px;overflow:hidden;margin-bottom:6px">`;
+    pTasks.forEach(t=>{
+      const d=t.due?new Date(t.due).getTime():(t.created?new Date(t.created).getTime():0);
+      if(!d)return;
+      const pos=Math.round(((d-minD)/rangeD)*100);
+      const isDone=t.status==='done';
+      h+=`<div title="${esc(t.title)}" style="position:absolute;left:${pos}%;top:3px;width:14px;height:14px;border-radius:50%;background:${isDone?color:'transparent'};border:2px solid ${color};transform:translateX(-50%);cursor:pointer;opacity:${isDone?1:0.6}"></div>`;
+    });
+    h+=`</div>`;
+    h+=`<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted)"><span>${new Date(minD).toLocaleDateString()}</span><span>${new Date(maxD).toLocaleDateString()}</span></div>`;
+    h+=`</div>`;
+  });
+  if(!h.includes('border-left'))h+=`<div style="font-size:12px;color:var(--text-muted);text-align:center;padding:20px">No projects with dated tasks found</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function quickMath(expr){
+  try{
+    const sanitized=expr.replace(/[^0-9+\-*/.()% ]/g,'');
+    if(!sanitized.trim())return null;
+    const result=new Function('return '+sanitized)();
+    if(typeof result==='number'&&isFinite(result))return result;
+    return null;
+  }catch(e){return null;}
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
