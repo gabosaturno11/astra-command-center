@@ -5954,6 +5954,12 @@ function cmdGetItems(q) {
       ['focus score history','30-day focus score trend line chart'],
       ['convert','Convert between types: content>task, task>content, etc.'],
       ['workspace stats','Comprehensive 12-metric workspace statistics'],
+      ['habits','Daily habit tracker with 7-day grid and streaks'],
+      ['suggestions','Smart workspace suggestions based on data analysis'],
+      ['project archive','Archive completed projects to reduce clutter'],
+      ['sprint','Sprint planner for weekly task planning'],
+      ['content templates','Pre-built templates for blog posts, notes, reviews'],
+      ['workspace timeline','Chronological timeline of all workspace activity'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7868,6 +7874,30 @@ function cmdGetItems(q) {
   // Workspace stats prefix
   if(ql && (ql==='workspace stats' || ql==='all stats' || ql==='statistics' || ql==='numbers')){
     items.unshift({title:'Workspace Statistics',desc:'12-metric comprehensive stats overview',icon:'S',type:'action',action:()=>{closeCommandPalette();showWorkspaceStats();}});
+  }
+  // Habits prefix
+  if(ql && (ql==='habits' || ql==='habit tracker' || ql==='daily habits' || ql==='streaks')){
+    items.unshift({title:'Habit Tracker',desc:'Track daily habits with 7-day grid and streaks',icon:'H',type:'action',action:()=>{closeCommandPalette();showHabitTracker();}});
+  }
+  // Suggestions prefix
+  if(ql && (ql==='suggestions' || ql==='smart suggestions' || ql==='tips' || ql==='advice')){
+    items.unshift({title:'Smart Suggestions',desc:'AI-powered workspace improvement suggestions',icon:'?',type:'action',action:()=>{closeCommandPalette();showSmartSuggestions();}});
+  }
+  // Project archive prefix
+  if(ql && (ql==='project archive' || ql==='archive projects' || ql==='archived' || ql==='hide projects')){
+    items.unshift({title:'Project Archive',desc:'Archive and restore completed projects',icon:'A',type:'action',action:()=>{closeCommandPalette();showProjectArchive();}});
+  }
+  // Sprint prefix
+  if(ql && (ql==='sprint' || ql==='sprint planner' || ql==='weekly sprint' || ql==='plan week')){
+    items.unshift({title:'Sprint Planner',desc:'Plan weekly sprints with task assignment',icon:'S',type:'action',action:()=>{closeCommandPalette();showSprintPlanner();}});
+  }
+  // Content templates prefix
+  if(ql && (ql==='content templates' || ql==='templates' || ql==='template' || ql==='blog template')){
+    items.unshift({title:'Content Templates',desc:'Pre-built templates for various content types',icon:'T',type:'action',action:()=>{closeCommandPalette();showContentTemplates();}});
+  }
+  // Workspace timeline prefix
+  if(ql && (ql==='workspace timeline' || ql==='timeline' || ql==='activity timeline' || ql==='history')){
+    items.unshift({title:'Workspace Timeline',desc:'Chronological timeline of all activity',icon:'T',type:'action',action:()=>{closeCommandPalette();showWorkspaceTimeline();}});
   }
   return items.slice(0, 20);
 }
@@ -13821,6 +13851,190 @@ function showWorkspaceStats(){
     h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:${s.color}">${s.value}</div><div style="font-size:9px;color:var(--text-muted)">${s.label}</div></div>`;
   });
   h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showHabitTracker(){
+  let panel=document.getElementById('habit-tracker-panel');if(panel)panel.remove();
+  if(!S._habits)S._habits=[];
+  panel=document.createElement('div');panel.id='habit-tracker-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const days7=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days7.push(d.toISOString().split('T')[0]);}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Habit Tracker</h3><div><button onclick="(function(){const n=prompt(\'Habit name:\');if(!n)return;S._habits.push({id:Date.now(),name:n,log:{}});save();showHabitTracker();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;margin-right:8px;font-size:11px">+ Habit</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  if(S._habits.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No habits yet. Add one to start tracking daily.</div>';}
+  else{
+    h+='<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:6px;font-size:11px;color:var(--text-muted);border-bottom:1px solid var(--border)">Habit</th>';
+    days7.forEach(d=>{h+='<th style="padding:6px;font-size:10px;color:var(--text-muted);text-align:center;border-bottom:1px solid var(--border)">'+d.slice(5)+'</th>';});
+    h+='<th style="padding:6px;font-size:10px;color:var(--text-muted);text-align:center;border-bottom:1px solid var(--border)">Streak</th><th style="padding:6px;font-size:10px;border-bottom:1px solid var(--border)"></th></tr></thead><tbody>';
+    S._habits.forEach(hab=>{
+      h+='<tr><td style="padding:6px;font-size:12px">'+esc(hab.name)+'</td>';
+      let streak=0;const sorted=Object.keys(hab.log||{}).filter(k=>hab.log[k]).sort().reverse();
+      if(sorted.length>0){const t=new Date();for(let i=0;i<365;i++){const dd=new Date(t);dd.setDate(dd.getDate()-i);const dk=dd.toISOString().split('T')[0];if(hab.log&&hab.log[dk])streak++;else break;}}
+      days7.forEach(d=>{
+        const done=hab.log&&hab.log[d];
+        h+='<td style="text-align:center;padding:6px"><button onclick="(function(){const h=S._habits.find(x=>x.id==='+hab.id+');if(!h)return;if(!h.log)h.log={};h.log[\''+d+'\']=!h.log[\''+d+'\'];save();showHabitTracker();})()" style="width:24px;height:24px;border-radius:4px;border:1px solid '+(done?'var(--accent)':'var(--border)')+';background:'+(done?'var(--accent)':'transparent')+';color:'+(done?'#000':'var(--text-muted)')+';cursor:pointer;font-size:10px">'+(done?'V':'')+'</button></td>';
+      });
+      h+='<td style="text-align:center;padding:6px;font-size:12px;color:var(--accent)">'+streak+'d</td>';
+      h+='<td style="padding:6px"><button onclick="(function(){if(!confirm(\'Delete habit?\'))return;S._habits=S._habits.filter(x=>x.id!=='+hab.id+');save();showHabitTracker();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">X</button></td></tr>';
+    });
+    h+='</tbody></table>';
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showSmartSuggestions(){
+  let panel=document.getElementById('smart-suggestions-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='smart-suggestions-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const suggestions=[];
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];const docs=(S.writerDocs||[]);
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date());
+  if(overdue.length>0)suggestions.push({icon:'!',text:'You have '+overdue.length+' overdue task'+(overdue.length>1?'s':'')+'. Consider rescheduling or completing them.',action:'tasks'});
+  const noDesc=tasks.filter(t=>t.status!=='done'&&(!t.description||t.description.trim()===''));
+  if(noDesc.length>3)suggestions.push({icon:'D',text:noDesc.length+' active tasks have no description. Adding context helps future you.',action:'tasks'});
+  const noDue=tasks.filter(t=>t.status!=='done'&&!t.due);
+  if(noDue.length>5)suggestions.push({icon:'C',text:noDue.length+' tasks have no due date. Schedule them for better planning.',action:'tasks'});
+  const uncat=links.filter(l=>!l.category||l.category==='uncategorized');
+  if(uncat.length>3)suggestions.push({icon:'L',text:uncat.length+' links are uncategorized. Organize for easier retrieval.',action:'links'});
+  const shortContent=content.filter(c=>(c.body||'').split(/\s+/).length<20);
+  if(shortContent.length>3)suggestions.push({icon:'W',text:shortContent.length+' content items are very short (<20 words). Consider expanding.',action:'content'});
+  const emptyDocs=docs.filter(d=>!d.content||d.content.trim().length<50);
+  if(emptyDocs.length>0)suggestions.push({icon:'E',text:emptyDocs.length+' writer doc'+(emptyDocs.length>1?'s are':' is')+' nearly empty. Start writing!',action:'writer'});
+  const highPri=tasks.filter(t=>t.status!=='done'&&(t.priority==='p0'||t.priority==='p1'));
+  if(highPri.length>5)suggestions.push({icon:'P',text:'You have '+highPri.length+' high-priority tasks. Focus on reducing this number.',action:'tasks'});
+  const stale=tasks.filter(t=>{if(t.status==='done')return false;const age=(Date.now()-new Date(t.created||t.id).getTime())/(1000*60*60*24);return age>30;});
+  if(stale.length>0)suggestions.push({icon:'S',text:stale.length+' tasks are older than 30 days. Review and archive if no longer relevant.',action:'tasks'});
+  if(suggestions.length===0)suggestions.push({icon:'V',text:'Everything looks good! Your workspace is well-organized.',action:null});
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Smart Suggestions</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  suggestions.forEach(s=>{
+    h+='<div style="display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;cursor:'+(s.action?'pointer':'default')+'" '+(s.action?'onclick="this.parentElement.remove();switchSection(\''+s.action+'\')"':'')+'>';
+    h+='<div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;flex-shrink:0">'+s.icon+'</div>';
+    h+='<div style="font-size:12px;line-height:1.5;color:var(--text-primary)">'+esc(s.text)+'</div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectArchive(){
+  let panel=document.getElementById('project-archive-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='project-archive-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._archivedProjects)S._archivedProjects=[];
+  const projects=S.projects||[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Project Archive</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Archive completed projects to reduce clutter. Archived projects are hidden from main views but data is preserved.</div>';
+  h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Active Projects</h4>';
+  if(projects.length===0){h+='<div style="color:var(--text-muted);font-size:11px;padding:8px 0">No active projects.</div>';}
+  else{projects.forEach(p=>{
+    const taskCount=(S.tasks||[]).filter(t=>t.projectId===p.id).length;
+    const doneCount=(S.tasks||[]).filter(t=>t.projectId===p.id&&t.status==='done').length;
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px">';
+    h+='<div><div style="font-size:12px;font-weight:600">'+esc(p.name)+'</div><div style="font-size:10px;color:var(--text-muted)">'+taskCount+' tasks ('+doneCount+' done)</div></div>';
+    h+='<button onclick="(function(){if(!confirm(\'Archive project: '+esc(p.name).replace(/'/g,"\\'")+'?\'))return;if(!S._archivedProjects)S._archivedProjects=[];S._archivedProjects.push(S.projects.find(x=>x.id===\''+p.id+'\'));S.projects=S.projects.filter(x=>x.id!==\''+p.id+'\');save();showProjectArchive();})()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:10px">Archive</button>';
+    h+='</div>';
+  });}
+  h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Archived Projects ('+S._archivedProjects.length+')</h4>';
+  if(S._archivedProjects.length===0){h+='<div style="color:var(--text-muted);font-size:11px;padding:8px 0">No archived projects.</div>';}
+  else{S._archivedProjects.forEach(p=>{
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;opacity:0.6">';
+    h+='<div style="font-size:12px">'+esc(p.name)+'</div>';
+    h+='<button onclick="(function(){S.projects.push(S._archivedProjects.find(x=>x.id===\''+p.id+'\'));S._archivedProjects=S._archivedProjects.filter(x=>x.id!==\''+p.id+'\');save();showProjectArchive();})()" style="background:none;border:1px solid var(--accent);color:var(--accent);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:10px">Restore</button>';
+    h+='</div>';
+  });}
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showSprintPlanner(){
+  let panel=document.getElementById('sprint-planner-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='sprint-planner-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._sprints)S._sprints=[];
+  const tasks=S.tasks||[];
+  const today=new Date();const weekEnd=new Date(today);weekEnd.setDate(today.getDate()+(7-today.getDay()));
+  const activeSprint=S._sprints.find(s=>s.active);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Sprint Planner</h3><div>';
+  if(!activeSprint)h+='<button onclick="(function(){const name=prompt(\'Sprint name:\',\'Sprint \'+(S._sprints.length+1));if(!name)return;S._sprints.push({id:Date.now(),name:name,active:true,taskIds:[],startDate:new Date().toISOString(),endDate:new Date(Date.now()+7*24*60*60*1000).toISOString()});save();showSprintPlanner();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">New Sprint</button>';
+  h+='<button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  if(activeSprint){
+    const sprintTasks=tasks.filter(t=>activeSprint.taskIds.includes(t.id));
+    const done=sprintTasks.filter(t=>t.status==='done').length;
+    const pct=sprintTasks.length>0?Math.round(done/sprintTasks.length*100):0;
+    h+='<div style="padding:12px;border:1px solid var(--accent);border-radius:8px;margin-bottom:16px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:8px"><strong style="font-size:13px">'+esc(activeSprint.name)+'</strong><span style="font-size:11px;color:var(--text-muted)">'+done+'/'+sprintTasks.length+' done ('+pct+'%)</span></div>';
+    h+='<div style="height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="height:100%;background:var(--accent);width:'+pct+'%;border-radius:3px"></div></div>';
+    sprintTasks.forEach(t=>{
+      const color=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':t.priority==='p2'?'#3b82f6':'#6b7280';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px">';
+      h+='<span style="'+(t.status==='done'?'text-decoration:line-through;color:var(--text-muted)':'')+'"><span style="color:'+color+';margin-right:6px">'+esc(t.priority||'p3').toUpperCase()+'</span>'+esc(t.title)+'</span>';
+      h+='<button onclick="(function(){activeSprint.taskIds=activeSprint.taskIds.filter(id=>id!==\''+t.id+'\');save();showSprintPlanner();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">remove</button></div>';
+    });
+    h+='<div style="margin-top:8px"><button onclick="(function(){const s=S._sprints.find(x=>x.active);if(s){s.active=false;}save();showSprintPlanner();})()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:10px">End Sprint</button></div></div>';
+    h+='<h4 style="margin:12px 0 8px;font-size:12px;color:var(--text-muted)">Add Tasks to Sprint</h4>';
+    const available=tasks.filter(t=>t.status!=='done'&&!activeSprint.taskIds.includes(t.id)).slice(0,20);
+    available.forEach(t=>{
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px">';
+      h+='<span>'+esc(t.title)+'</span>';
+      h+='<button onclick="(function(){const s=S._sprints.find(x=>x.active);if(s)s.taskIds.push(\''+t.id+'\');save();showSprintPlanner();})()" style="background:var(--accent);color:#000;border:none;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:10px">Add</button></div>';
+    });
+  }else{
+    if(S._sprints.length>0){
+      h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Past Sprints</h4>';
+      S._sprints.slice().reverse().forEach(s=>{
+        const st=tasks.filter(t=>s.taskIds.includes(t.id));
+        const d=st.filter(t=>t.status==='done').length;
+        h+='<div style="padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;opacity:0.7"><div style="font-size:12px;font-weight:600">'+esc(s.name)+'</div><div style="font-size:10px;color:var(--text-muted)">'+d+'/'+st.length+' completed</div></div>';
+      });
+    }else{
+      h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No sprints yet. Create one to plan your week.</div>';
+    }
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentTemplates(){
+  let panel=document.getElementById('content-templates-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-templates-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._contentTemplates)S._contentTemplates=[
+    {id:1,name:'Blog Post',body:'# Title\n\n## Introduction\n\n## Main Points\n\n### Point 1\n\n### Point 2\n\n### Point 3\n\n## Conclusion\n\n## Call to Action'},
+    {id:2,name:'Meeting Notes',body:'## Meeting: [Topic]\n**Date:** [date]\n**Attendees:** \n\n## Agenda\n1. \n2. \n3. \n\n## Notes\n\n## Action Items\n- [ ] \n- [ ] \n\n## Next Steps'},
+    {id:3,name:'Project Brief',body:'# Project: [Name]\n\n## Objective\n\n## Scope\n\n## Timeline\n- Start: \n- End: \n\n## Key Deliverables\n1. \n2. \n3. \n\n## Success Criteria\n\n## Risks'},
+    {id:4,name:'Weekly Review',body:'# Week of [date]\n\n## Wins\n- \n\n## Challenges\n- \n\n## Lessons Learned\n- \n\n## Next Week Focus\n1. \n2. \n3. '},
+    {id:5,name:'Quick Note',body:'## Note\n\n'},
+  ];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Templates</h3><div><button onclick="(function(){const n=prompt(\'Template name:\');if(!n)return;const b=prompt(\'Template body (markdown):\');if(!b)return;S._contentTemplates.push({id:Date.now(),name:n,body:b});save();showContentTemplates();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">+ Template</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  S._contentTemplates.forEach(tmpl=>{
+    h+='<div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:13px">'+esc(tmpl.name)+'</strong><div>';
+    h+='<button onclick="(function(){const body=S._contentTemplates.find(t=>t.id==='+tmpl.id+').body;const title=prompt(\'Content title:\',\''+esc(tmpl.name).replace(/'/g,"\\'")+'\');if(!title)return;if(!S.content)S.content=[];S.content.unshift({id:\'c_\'+Date.now(),title:title,body:body,tags:[],theme:\'general\',created:new Date().toISOString()});save();showContentTemplates();showNotification(\'Content created from template\');})()" style="background:var(--accent);color:#000;border:none;padding:3px 8px;border-radius:3px;cursor:pointer;font-size:10px;margin-right:4px">Use</button>';
+    h+='<button onclick="(function(){if(!confirm(\'Delete template?\'))return;S._contentTemplates=S._contentTemplates.filter(t=>t.id!=='+tmpl.id+');save();showContentTemplates();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">X</button></div></div>';
+    h+='<pre style="font-size:10px;color:var(--text-muted);margin:0;white-space:pre-wrap;max-height:80px;overflow:hidden">'+esc(tmpl.body)+'</pre></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWorkspaceTimeline(){
+  let panel=document.getElementById('workspace-timeline-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='workspace-timeline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const events=[];
+  (S.tasks||[]).forEach(t=>{events.push({date:t.created||new Date(parseInt(t.id.replace(/\D/g,''))||Date.now()).toISOString(),type:'task',title:'Task: '+t.title,status:t.status});});
+  (S.content||[]).forEach(c=>{events.push({date:c.created||new Date().toISOString(),type:'content',title:'Content: '+c.title,status:'created'});});
+  (S.links||[]).forEach(l=>{events.push({date:l.created||new Date().toISOString(),type:'link',title:'Link: '+(l.title||l.url),status:'saved'});});
+  (S.writerDocs||[]).forEach(d=>{events.push({date:d.modified||d.created||new Date().toISOString(),type:'doc',title:'Doc: '+d.title,status:'written'});});
+  events.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const typeColors={task:'#4ade80',content:'#22d3ee',link:'#f97316',doc:'#a78bfa'};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Workspace Timeline</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px;display:flex;gap:12px">';
+  Object.entries(typeColors).forEach(([t,c])=>{h+='<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+c+';margin-right:4px"></span>'+t+'</span>';});
+  h+='</div>';
+  const shown=events.slice(0,50);
+  let lastDate='';
+  shown.forEach(ev=>{
+    const d=ev.date?ev.date.split('T')[0]:'unknown';
+    if(d!==lastDate){lastDate=d;h+='<div style="font-size:10px;color:var(--text-muted);padding:8px 0 4px;border-top:1px solid var(--border);margin-top:8px">'+d+'</div>';}
+    const col=typeColors[ev.type]||'var(--text-muted)';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px">';
+    h+='<div style="width:8px;height:8px;border-radius:50%;background:'+col+';flex-shrink:0"></div>';
+    h+='<span style="color:var(--text-primary)">'+esc(ev.title)+'</span>';
+    h+='<span style="color:var(--text-muted);font-size:9px;margin-left:auto">'+esc(ev.status)+'</span></div>';
+  });
+  if(events.length>50)h+='<div style="color:var(--text-muted);font-size:10px;text-align:center;padding:12px 0">Showing 50 of '+events.length+' events</div>';
+  if(events.length===0)h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No events yet. Start creating tasks, content, and docs.</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
