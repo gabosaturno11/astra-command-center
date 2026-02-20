@@ -6284,6 +6284,9 @@ function cmdGetItems(q) {
       ['mongoose','Mongoose schema generator'],
       ['status pie','Task status pie chart'],
       ['password strength','Password strength checker'],
+      ['kubernetes','Kubernetes YAML generator'],
+      ['creation heatmap','Task creation heatmap'],
+      ['world clock','World clock widget'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9305,6 +9308,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='password strength' || ql==='password' || ql==='password check' || ql==='pwd strength')){
     items.unshift({title:'Password Strength',desc:'Check password strength with criteria',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordStrength();}});
+  }
+  if(ql && (ql==='kubernetes' || ql==='k8s' || ql==='kube yaml' || ql==='k8s config')){
+    items.unshift({title:'Kubernetes YAML',desc:'Generate K8s Deployment, Service, Ingress, Config',icon:'K',type:'action',action:()=>{closeCommandPalette();showKubernetesYamlGen();}});
+  }
+  if(ql && (ql==='creation heatmap' || ql==='heatmap' || ql==='task heatmap' || ql==='activity heatmap')){
+    items.unshift({title:'Creation Heatmap',desc:'GitHub-style task creation heatmap',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskCreationHeatmap();}});
+  }
+  if(ql && (ql==='world clock' || ql==='time zones' || ql==='timezone' || ql==='clocks')){
+    items.unshift({title:'World Clock',desc:'Live clocks for 8 time zones',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWorldClock();}});
   }
   return items.slice(0, 20);
 }
@@ -26287,6 +26299,93 @@ function showQuickPasswordStrength(){
   };
   window._checkPwd=(v)=>rend(v);
   document.body.appendChild(d);rend();
+}
+function showKubernetesYamlGen(){
+  let ex=document.getElementById('k8s-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'Deployment':`apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: my-app\n  labels:\n    app: my-app\nspec:\n  replicas: 3\n  selector:\n    matchLabels:\n      app: my-app\n  template:\n    metadata:\n      labels:\n        app: my-app\n    spec:\n      containers:\n      - name: my-app\n        image: my-app:latest\n        ports:\n        - containerPort: 8080\n        env:\n        - name: NODE_ENV\n          value: "production"\n        resources:\n          requests:\n            memory: "128Mi"\n            cpu: "250m"\n          limits:\n            memory: "256Mi"\n            cpu: "500m"\n        livenessProbe:\n          httpGet:\n            path: /health\n            port: 8080\n          initialDelaySeconds: 15\n          periodSeconds: 10`,
+    'Service':`apiVersion: v1\nkind: Service\nmetadata:\n  name: my-app-service\nspec:\n  type: ClusterIP\n  selector:\n    app: my-app\n  ports:\n  - port: 80\n    targetPort: 8080\n    protocol: TCP\n---\napiVersion: v1\nkind: Service\nmetadata:\n  name: my-app-lb\nspec:\n  type: LoadBalancer\n  selector:\n    app: my-app\n  ports:\n  - port: 80\n    targetPort: 8080`,
+    'Ingress':`apiVersion: networking.k8s.io/v1\nkind: Ingress\nmetadata:\n  name: my-app-ingress\n  annotations:\n    nginx.ingress.kubernetes.io/rewrite-target: /\n    cert-manager.io/cluster-issuer: letsencrypt-prod\nspec:\n  ingressClassName: nginx\n  tls:\n  - hosts:\n    - app.example.com\n    secretName: app-tls\n  rules:\n  - host: app.example.com\n    http:\n      paths:\n      - path: /\n        pathType: Prefix\n        backend:\n          service:\n            name: my-app-service\n            port:\n              number: 80`,
+    'ConfigMap + Secret':`apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: my-app-config\ndata:\n  APP_ENV: production\n  LOG_LEVEL: info\n  DB_HOST: postgres-service\n  DB_PORT: "5432"\n---\napiVersion: v1\nkind: Secret\nmetadata:\n  name: my-app-secrets\ntype: Opaque\nstringData:\n  DB_PASSWORD: change-me\n  JWT_SECRET: change-me\n  API_KEY: change-me`
+  };
+  let sel='Deployment';
+  const d=document.createElement('div');d.id='k8s-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-k8pre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-k8pre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Kubernetes YAML Generator</span><span onclick="document.getElementById('k8s-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#k8s-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy YAML',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy YAML</button>
+    </div>`;
+    d.querySelectorAll('[data-k8pre]').forEach(b=>b.onclick=()=>{sel=b.dataset.k8pre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskCreationHeatmap(){
+  let ex=document.getElementById('creation-heat-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const weeks=12;const now=new Date();
+  const grid={};
+  for(let i=weeks*7-1;i>=0;i--){
+    const dt=new Date(now);dt.setDate(dt.getDate()-i);
+    const ds=dt.toISOString().split('T')[0];
+    grid[ds]=0;
+  }
+  tasks.forEach(t=>{if(t.createdAt){const ds=t.createdAt.split('T')[0];if(grid[ds]!==undefined)grid[ds]++;}});
+  const days=Object.entries(grid);
+  const mx=Math.max(...Object.values(grid),1);
+  const cellSize=10;const gap=2;
+  const cols=Math.ceil(days.length/7);
+  const cells=days.map((d,i)=>{
+    const col=Math.floor(i/7);const row=i%7;
+    const intensity=d[1]/mx;
+    const color=d[1]===0?'var(--bg-surface)':`rgba(74,222,128,${0.2+intensity*0.8})`;
+    return `<rect x="${col*(cellSize+gap)}" y="${row*(cellSize+gap)}" width="${cellSize}" height="${cellSize}" rx="2" fill="${color}" title="${d[0]}: ${d[1]} tasks"><title>${d[0]}: ${d[1]}</title></rect>`;
+  }).join('');
+  const svgW=cols*(cellSize+gap);const svgH=7*(cellSize+gap);
+  const dayLabels=['M','','W','','F','','S'];
+  const yLabels=dayLabels.map((l,i)=>`<text x="-4" y="${i*(cellSize+gap)+9}" text-anchor="end" fill="var(--text-muted)" font-size="8">${l}</text>`).join('');
+  const d=document.createElement('div');d.id='creation-heat-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Creation Heatmap</span><span onclick="document.getElementById('creation-heat-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="overflow-x:auto"><svg width="${svgW+20}" height="${svgH+4}" viewBox="-14 0 ${svgW+34} ${svgH+4}">${yLabels}${cells}</svg></div>
+    <div style="display:flex;align-items:center;gap:4px;margin-top:8px;font-size:9px;color:var(--text-muted)"><span>Less</span>${[0,0.25,0.5,0.75,1].map(i=>`<div style="width:10px;height:10px;border-radius:2px;background:${i===0?'var(--bg-surface)':`rgba(74,222,128,${0.2+i*0.8})`}"></div>`).join('')}<span>More</span><span style="margin-left:auto">${weeks} weeks | ${tasks.length} total tasks</span></div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickWorldClock(){
+  let ex=document.getElementById('world-clock-float');if(ex){ex.remove();return;}
+  const zones=[
+    {name:'Local',tz:Intl.DateTimeFormat().resolvedOptions().timeZone},
+    {name:'New York',tz:'America/New_York'},
+    {name:'London',tz:'Europe/London'},
+    {name:'Tokyo',tz:'Asia/Tokyo'},
+    {name:'Sydney',tz:'Australia/Sydney'},
+    {name:'Dubai',tz:'Asia/Dubai'},
+    {name:'LA',tz:'America/Los_Angeles'},
+    {name:'Berlin',tz:'Europe/Berlin'}
+  ];
+  const d=document.createElement('div');d.id='world-clock-float';
+  const rend=()=>{
+    const now=new Date();
+    const clocks=zones.map(z=>{
+      const time=now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'2-digit',minute:'2-digit',hour12:true});
+      const date=now.toLocaleDateString('en-US',{timeZone:z.tz,weekday:'short',month:'short',day:'numeric'});
+      const hr=parseInt(now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'numeric',hour12:false}));
+      const isNight=hr<6||hr>=20;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+        <div><div style="font-size:11px;color:var(--text-primary);font-weight:600">${z.name}</div><div style="font-size:9px;color:var(--text-muted)">${date}</div></div>
+        <div style="font-size:16px;font-weight:300;color:${isNight?'#6b7280':'var(--accent)'};font-family:monospace">${time}</div>
+      </div>`;
+    }).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:250px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">World Clock</span><span onclick="clearInterval(window._wcInt);document.getElementById('world-clock-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      ${clocks}
+    </div>`;
+  };
+  document.body.appendChild(d);rend();
+  window._wcInt=setInterval(rend,30000);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
