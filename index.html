@@ -5767,6 +5767,9 @@ function cmdGetItems(q) {
       ['restore','Import JSON backup to restore data'],
       ['export docs','Export all writer docs as single markdown'],
       ['roadmap','Project roadmap timeline view'],
+      ['journal','Open/create today\'s journal entry'],
+      ['writing','Writing stats and daily word streak'],
+      ['cleanup','Find orphans, dupes, and empty items'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6902,6 +6905,21 @@ function cmdGetItems(q) {
     items.unshift({title:'Full Project Roadmap',desc:'Timeline view of all projects with task milestones',icon:'R',type:'action',action:()=>{closeCommandPalette();showProjectRoadmap();}});
     projects.slice(0,3).forEach(p=>{items.unshift({title:'Roadmap: '+p,desc:'Timeline for '+p+' tasks',icon:'R',type:'action',action:()=>{closeCommandPalette();showProjectRoadmap(p);}});});
   }
+  // Journal prefix
+  if(ql && (ql==='journal' || ql==='daily journal' || ql==='diary' || ql==='today journal')){
+    const today=new Date().toISOString().split('T')[0];
+    const existing=S.docs.find(d=>d.title&&d.title.startsWith('Journal '+today));
+    items.unshift({title:existing?'Open Journal: '+today:'Create Journal: '+today,desc:existing?'Open existing journal entry':'Create new journal entry for today',icon:'J',type:'action',action:()=>{closeCommandPalette();openDailyJournal();}});
+    items.unshift({title:'Journal Archive',desc:'View all journal entries',icon:'J',type:'action',action:()=>{closeCommandPalette();showJournalArchive();}});
+  }
+  // Writing stats prefix
+  if(ql && (ql==='writing' || ql==='writing stats' || ql==='word streak' || ql==='writing streak')){
+    items.unshift({title:'Writing Stats Dashboard',desc:'Word counts, streaks, daily output',icon:'W',type:'action',action:()=>{closeCommandPalette();showWritingStats();}});
+  }
+  // Cleanup prefix
+  if(ql && (ql==='cleanup' || ql==='clean' || ql==='prune' || ql==='data cleanup')){
+    items.unshift({title:'Data Cleanup Report',desc:'Find empty items, duplicates, orphaned data',icon:'X',type:'action',action:()=>{closeCommandPalette();showDataCleanup();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7013,6 +7031,79 @@ function exportAllDocsIndividual(){
     setTimeout(()=>{a.click();},i*200);
   });
   toast('Downloading '+S.docs.length+' files...');
+}
+function openDailyJournal(){
+  const today=new Date().toISOString().split('T')[0];
+  const label=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  let doc=S.docs.find(d=>d.title&&d.title.startsWith('Journal '+today));
+  if(!doc){
+    doc={id:Date.now(),title:'Journal '+today,body:'<h2>'+label+'</h2><p></p><h3>Priorities</h3><p></p><h3>Notes</h3><p></p><h3>Reflections</h3><p></p>',created:new Date().toISOString(),updated:new Date().toISOString(),tags:['journal']};
+    S.docs.unshift(doc);save();
+  }
+  switchSection('writer',null);
+  setTimeout(()=>{const sel=document.getElementById('writer-doc-select');if(sel){sel.value=doc.id;loadDoc(doc.id);}},100);
+  toast('Journal: '+today);
+}
+function showJournalArchive(){
+  const entries=S.docs.filter(d=>d.title&&d.title.startsWith('Journal ')).sort((a,b)=>(b.title||'').localeCompare(a.title||''));
+  let panel=document.getElementById('journal-archive-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='journal-archive-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw;max-height:60vh;overflow-y:auto';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Journal Archive (${entries.length})</span><button onclick="document.getElementById('journal-archive-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`+
+    (entries.length?entries.map(d=>{const wc=(d.body||'').replace(/<[^>]+>/g,' ').trim().split(/\s+/).filter(x=>x.length).length;return`<div onclick="document.getElementById('journal-archive-panel').remove();switchSection('writer',null);setTimeout(()=>{const sel=document.getElementById('writer-doc-select');if(sel){sel.value=${d.id};loadDoc(${d.id});}},100)" style="padding:6px 8px;cursor:pointer;border-left:3px solid var(--accent);margin-bottom:4px;border-radius:0 4px 4px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><div style="font-size:11px;color:var(--text-primary)">${esc(d.title)}</div><div style="font-size:9px;color:var(--text-muted)">${wc} words</div></div>`;}).join(''):'<div style="padding:20px;text-align:center;color:var(--text-muted)">No journal entries yet. Type "journal" in Cmd+K to start.</div>');
+  document.body.appendChild(panel);
+}
+function showWritingStats(){
+  let panel=document.getElementById('writing-stats-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='writing-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const totalWords=S.docs.reduce((sum,d)=>{const text=(d.body||'').replace(/<[^>]+>/g,' ');return sum+text.trim().split(/\s+/).filter(x=>x.length).length;},0);
+  const totalContent=S.content.reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);
+  const docsByDate={};
+  S.docs.forEach(d=>{const ds=(d.updated||d.created||'').split('T')[0];if(ds){if(!docsByDate[ds])docsByDate[ds]=0;docsByDate[ds]++;}});
+  // writing streak
+  let streak=0;let checkDate=new Date();
+  for(let i=0;i<365;i++){const ds=checkDate.toISOString().split('T')[0];if(docsByDate[ds]||S.content.some(c=>c.created&&c.created.startsWith(ds))){streak++;}else if(i>0)break;checkDate.setDate(checkDate.getDate()-1);}
+  // daily word chart (last 7 days)
+  const dailyWords=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];const wc=S.docs.filter(doc=>(doc.updated||doc.created||'').startsWith(ds)).reduce((sum,doc)=>{const text=(doc.body||'').replace(/<[^>]+>/g,' ');return sum+text.trim().split(/\s+/).filter(x=>x.length).length;},0)+S.content.filter(c=>c.created&&c.created.startsWith(ds)).reduce((sum,c)=>sum+(c.body||'').trim().split(/\s+/).filter(x=>x.length).length,0);dailyWords.push({date:ds,words:wc});}
+  const maxW=Math.max(1,...dailyWords.map(d=>d.words));
+  const bars=dailyWords.map(d=>`<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1"><div style="width:100%;height:60px;display:flex;align-items:flex-end"><div style="width:100%;height:${Math.max(2,d.words/maxW*60)}px;background:var(--accent);border-radius:2px 2px 0 0"></div></div><span style="font-size:7px;color:var(--text-muted)">${d.date.substring(8)}</span><span style="font-size:7px;color:var(--accent-cyan)">${d.words>0?d.words:''}</span></div>`).join('');
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Writing Stats</span><button onclick="document.getElementById('writing-stats-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px"><div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:18px;font-weight:700;color:var(--accent)">${totalWords.toLocaleString()}</div><div style="font-size:9px;color:var(--text-muted)">Doc Words</div></div><div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:18px;font-weight:700;color:var(--accent-cyan)">${totalContent.toLocaleString()}</div><div style="font-size:9px;color:var(--text-muted)">Content Words</div></div><div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:18px;font-weight:700;color:var(--green)">${streak}</div><div style="font-size:9px;color:var(--text-muted)">Day Streak</div></div></div><div style="margin-bottom:12px"><div style="font-size:10px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Last 7 Days</div><div style="display:flex;gap:4px">${bars}</div></div><div style="font-size:10px;color:var(--text-muted)">${S.docs.length} documents | ${S.content.length} content items | ${(totalWords+totalContent).toLocaleString()} total words</div>`;
+  document.body.appendChild(panel);
+}
+function showDataCleanup(){
+  let panel=document.getElementById('cleanup-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='cleanup-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto';
+  const issues=[];
+  // Empty tasks
+  const emptyTasks=S.tasks.filter(t=>!t.title||!t.title.trim());
+  if(emptyTasks.length)issues.push({type:'warning',msg:emptyTasks.length+' tasks with empty titles',action:'Remove empty tasks',fn:()=>{S.tasks=S.tasks.filter(t=>t.title&&t.title.trim());save();renderTasks();showDataCleanup();toast('Removed '+emptyTasks.length+' empty tasks');}});
+  // Empty content
+  const emptyContent=S.content.filter(c=>!c.body||!c.body.trim());
+  if(emptyContent.length)issues.push({type:'warning',msg:emptyContent.length+' content items with empty body',action:'Remove empty content',fn:()=>{S.content=S.content.filter(c=>c.body&&c.body.trim());save();renderContent();showDataCleanup();toast('Removed '+emptyContent.length+' empty content');}});
+  // Duplicate content
+  const seenBodies=new Set();const dupeContent=[];
+  S.content.forEach(c=>{const key=(c.body||'').trim().substring(0,100);if(seenBodies.has(key))dupeContent.push(c);else seenBodies.add(key);});
+  if(dupeContent.length)issues.push({type:'info',msg:dupeContent.length+' potential duplicate content items',action:'Remove duplicates (keep first)',fn:()=>{const seen=new Set();S.content=S.content.filter(c=>{const key=(c.body||'').trim().substring(0,100);if(seen.has(key))return false;seen.add(key);return true;});save();renderContent();showDataCleanup();toast('Removed '+dupeContent.length+' duplicates');}});
+  // Duplicate links
+  const seenUrls=new Set();const dupeLinks=[];
+  S.links.forEach(l=>{if(seenUrls.has(l.url))dupeLinks.push(l);else seenUrls.add(l.url);});
+  if(dupeLinks.length)issues.push({type:'info',msg:dupeLinks.length+' duplicate links (same URL)',action:'Remove duplicate links',fn:()=>{const seen=new Set();S.links=S.links.filter(l=>{if(seen.has(l.url))return false;seen.add(l.url);return true;});save();renderLinks();showDataCleanup();toast('Removed '+dupeLinks.length+' duplicate links');}});
+  // Tasks without project
+  const noProject=S.tasks.filter(t=>!t.project&&t.status!=='done');
+  if(noProject.length>5)issues.push({type:'info',msg:noProject.length+' active tasks without a project'});
+  // Old done tasks
+  const oldDone=S.tasks.filter(t=>{if(t.status!=='done'||!t.completedAt)return false;return(Date.now()-new Date(t.completedAt).getTime())>30*86400000;});
+  if(oldDone.length>10)issues.push({type:'info',msg:oldDone.length+' completed tasks older than 30 days',action:'Archive old completed tasks',fn:()=>{archiveCompletedTasks();}});
+  // localStorage size
+  const storageSize=JSON.stringify(S).length;
+  issues.push({type:storageSize>4000000?'warning':'info',msg:'Storage: '+(storageSize/1024).toFixed(0)+'KB / 5MB ('+Math.round(storageSize/5000000*100)+'% used)'});
+  const clr={warning:'var(--orange)',info:'var(--text-muted)',error:'var(--red)'};
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Data Cleanup</span><button onclick="document.getElementById('cleanup-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`+(issues.length?issues.map(i=>`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:4px;margin-bottom:4px;border-left:3px solid ${clr[i.type]}"><div style="flex:1;font-size:10px;color:var(--text-primary)">${esc(i.msg)}</div>${i.action?`<button onclick="document.getElementById('cleanup-panel').remove();(${i.fn.toString()})()" class="btn btn-sm btn-ghost" style="font-size:8px;white-space:nowrap">${i.action}</button>`:''}</div>`).join('')+'<div style="margin-top:12px;text-align:center;font-size:9px;color:var(--text-muted)">'+issues.length+' issues found</div>':'<div style="padding:20px;text-align:center;color:var(--accent)">No issues found. Data is clean.</div>');
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
