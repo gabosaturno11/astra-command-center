@@ -5823,6 +5823,8 @@ function cmdGetItems(q) {
       ['wip limits','Configure WIP limits per board column'],
       ['duplicates','Find duplicate content with similarity scoring'],
       ['export csv','Export all tasks as CSV spreadsheet'],
+      ['inbox','View unsorted/uncategorized items across all sections'],
+      ['session','Show current ASTRA session time'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7203,6 +7205,15 @@ function cmdGetItems(q) {
   // Export CSV prefix
   if(ql && (ql==='export csv' || ql==='csv export' || ql==='tasks csv' || ql==='spreadsheet export')){
     items.unshift({title:'Export Tasks as CSV',desc:'Download all tasks as comma-separated spreadsheet',icon:'E',type:'action',action:()=>{closeCommandPalette();exportTasksCSV();}});
+  }
+  // Inbox prefix
+  if(ql && (ql==='inbox' || ql==='unsorted' || ql==='uncategorized' || ql==='no project')){
+    items.unshift({title:'Inbox (Unsorted Items)',desc:'View tasks, content, links without a project/theme',icon:'I',type:'action',action:()=>{closeCommandPalette();showInbox();}});
+  }
+  // Session timer prefix
+  if(ql && (ql==='session' || ql==='session timer' || ql==='uptime' || ql==='session time')){
+    const elapsed=Date.now()-_sessionStart;const mins=Math.floor(elapsed/60000);
+    items.unshift({title:'Session Time: '+Math.floor(mins/60)+'h '+mins%60+'m',desc:'Time since ASTRA was opened this session',icon:'T',type:'action',action:()=>{closeCommandPalette();showSessionTimer();}});
   }
   return items.slice(0, 20);
 }
@@ -8837,6 +8848,53 @@ function exportTasksCSV(){
   a.download='astra-tasks-'+new Date().toISOString().split('T')[0]+'.csv';
   a.click();
   toast('Exported '+S.tasks.length+' tasks as CSV');
+}
+function showInbox(){
+  let panel=document.getElementById('inbox-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='inbox-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const unsortedTasks=S.tasks.filter(t=>!t.project&&t.status!=='done');
+  const unsortedContent=S.content.filter(c=>!c.theme&&!c.project);
+  const unsortedLinks=(S.links||[]).filter(l=>!l.category||l.category==='Uncategorized');
+  const unsortedDocs=(S.docs||[]).filter(d=>!d.project);
+  const total=unsortedTasks.length+unsortedContent.length+unsortedLinks.length+unsortedDocs.length;
+  let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#06b6d4">${unsortedTasks.length}</div><div style="font-size:7px;color:var(--text-muted)">Tasks</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#f59e0b">${unsortedContent.length}</div><div style="font-size:7px;color:var(--text-muted)">Content</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#8b5cf6">${unsortedLinks.length}</div><div style="font-size:7px;color:var(--text-muted)">Links</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:var(--accent)">${unsortedDocs.length}</div><div style="font-size:7px;color:var(--text-muted)">Docs</div></div>`;
+  h+='</div>';
+  if(unsortedTasks.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#06b6d4;margin-bottom:4px">Unsorted Tasks</div>';
+    unsortedTasks.slice(0,10).forEach(t=>{
+      h+=`<div onclick="document.getElementById('inbox-panel').remove();openTaskDetail(${t.id})" style="padding:3px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;border-left:2px solid #06b6d4;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(t.title||'Untitled')}</div>`;
+    });
+    h+='<div style="height:8px"></div>';
+  }
+  if(unsortedContent.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#f59e0b;margin-bottom:4px">Unsorted Content</div>';
+    unsortedContent.slice(0,10).forEach(c=>{
+      h+=`<div onclick="document.getElementById('inbox-panel').remove();openContentModal(${c.id})" style="padding:3px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;border-left:2px solid #f59e0b;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc((c.body||'').substring(0,60))}</div>`;
+    });
+    h+='<div style="height:8px"></div>';
+  }
+  if(unsortedLinks.length){
+    h+='<div style="font-size:10px;font-weight:600;color:#8b5cf6;margin-bottom:4px">Uncategorized Links</div>';
+    unsortedLinks.slice(0,10).forEach(l=>{
+      h+=`<div onclick="window.open('${(l.url||'').replace(/'/g,"\\'")}','_blank')" style="padding:3px 8px;font-size:10px;color:var(--text-primary);cursor:pointer;border-left:2px solid #8b5cf6;margin:2px 0" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'">${esc(l.title||l.url||'Untitled')}</div>`;
+    });
+  }
+  if(!total)h='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">Inbox empty! Everything is categorized.</div>';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Inbox (${total} unsorted)</span><button onclick="document.getElementById('inbox-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+var _sessionStart=Date.now();
+function showSessionTimer(){
+  const elapsed=Date.now()-_sessionStart;
+  const mins=Math.floor(elapsed/60000);
+  const hrs=Math.floor(mins/60);
+  const m=mins%60;
+  toast('Session time: '+(hrs?hrs+'h ':'')+(m)+'m');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
