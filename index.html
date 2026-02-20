@@ -6272,6 +6272,12 @@ function cmdGetItems(q) {
       ['rollup','Rollup config generator'],
       ['estimate accuracy','Task estimate vs actual'],
       ['countdown','Countdown timer widget'],
+      ['swc','SWC compiler config generator'],
+      ['dependencies','Task dependency list'],
+      ['dice','Dice roller widget'],
+      ['sql schema','SQL schema generator'],
+      ['project timeline','Project progress timeline'],
+      ['coin flip','Coin flip randomizer'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9257,6 +9263,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='countdown' || ql==='countdown timer' || ql==='count down' || ql==='timer countdown')){
     items.unshift({title:'Countdown Timer',desc:'Countdown timer with preset durations',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCountdownTimer();}});
+  }
+  if(ql && (ql==='swc' || ql==='swc config' || ql==='swcrc' || ql==='swc compiler')){
+    items.unshift({title:'SWC Config',desc:'Generate .swcrc for React, TS, Next, Node',icon:'S',type:'action',action:()=>{closeCommandPalette();showSwcConfigGen();}});
+  }
+  if(ql && (ql==='dependencies' || ql==='dependency list' || ql==='blocked by' || ql==='task deps')){
+    items.unshift({title:'Task Dependencies',desc:'View blocked tasks and their blockers',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDependencyList();}});
+  }
+  if(ql && (ql==='dice' || ql==='dice roller' || ql==='roll dice' || ql==='d20')){
+    items.unshift({title:'Dice Roller',desc:'Roll d4, d6, d8, d10, d12, d20, d100',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDiceRoller();}});
+  }
+  if(ql && (ql==='sql schema' || ql==='sql' || ql==='create table' || ql==='database schema')){
+    items.unshift({title:'SQL Schema',desc:'Generate SQL CREATE TABLE statements',icon:'S',type:'action',action:()=>{closeCommandPalette();showSqlSchemaGen();}});
+  }
+  if(ql && (ql==='project timeline' || ql==='timeline' || ql==='project progress' || ql==='project status')){
+    items.unshift({title:'Project Timeline',desc:'Progress bars for all projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectTimeline();}});
+  }
+  if(ql && (ql==='coin flip' || ql==='coin' || ql==='flip coin' || ql==='heads tails')){
+    items.unshift({title:'Coin Flip',desc:'Random coin flip with history',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCoinFlip();}});
   }
   return items.slice(0, 20);
 }
@@ -25937,6 +25961,147 @@ function showQuickCountdownTimer(){
     rend();
   };
   window._cdReset=()=>{clearInterval(window._cdInt);running=false;remaining=totalSec;rend();};
+  document.body.appendChild(d);rend();
+}
+function showSwcConfigGen(){
+  let ex=document.getElementById('swc-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'React (JSX)':`{\n  "jsc": {\n    "parser": {\n      "syntax": "ecmascript",\n      "jsx": true,\n      "dynamicImport": true\n    },\n    "transform": {\n      "react": {\n        "runtime": "automatic"\n      }\n    },\n    "target": "es2022"\n  },\n  "module": {\n    "type": "es6"\n  },\n  "minify": true\n}`,
+    'TypeScript':`{\n  "jsc": {\n    "parser": {\n      "syntax": "typescript",\n      "tsx": true,\n      "decorators": true\n    },\n    "transform": {\n      "legacyDecorator": true,\n      "decoratorMetadata": true\n    },\n    "target": "es2022"\n  },\n  "module": {\n    "type": "commonjs"\n  }\n}`,
+    'Next.js':`{\n  "jsc": {\n    "parser": {\n      "syntax": "typescript",\n      "tsx": true\n    },\n    "transform": {\n      "react": {\n        "runtime": "automatic"\n      }\n    },\n    "paths": {\n      "@/*": ["./src/*"]\n    },\n    "target": "es2022"\n  }\n}`,
+    'Node.js':`{\n  "jsc": {\n    "parser": {\n      "syntax": "ecmascript",\n      "dynamicImport": true\n    },\n    "target": "es2022"\n  },\n  "module": {\n    "type": "commonjs"\n  },\n  "minify": false\n}`
+  };
+  let sel='React (JSX)';
+  const d=document.createElement('div');d.id='swc-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-swcpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-swcpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">SWC Config Generator</span><span onclick="document.getElementById('swc-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#swc-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy .swcrc',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy .swcrc</button>
+    </div>`;
+    d.querySelectorAll('[data-swcpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.swcpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskDependencyList(){
+  let ex=document.getElementById('dep-list-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const blocked=tasks.filter(t=>t.blockedBy&&t.status!=='done');
+  const blocking=tasks.filter(t=>{
+    return blocked.some(b=>b.blockedBy===t.id||b.blockedBy===t.title);
+  });
+  const rows=blocked.map(t=>{
+    const blocker=tasks.find(bt=>bt.id===t.blockedBy||bt.title===t.blockedBy);
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-size:11px;color:var(--text-primary)">${esc(t.title)}</div>
+        <div style="font-size:9px;color:var(--text-muted);margin-top:2px">Status: ${t.status} | Priority: ${t.priority||'p3'}</div>
+      </div>
+      <div style="font-size:10px;color:#f87171;text-align:right">
+        <div>Blocked by:</div>
+        <div style="color:var(--text-secondary);font-size:10px">${blocker?esc(blocker.title):esc(t.blockedBy||'Unknown')}</div>
+      </div>
+    </div>`;
+  }).join('');
+  const d=document.createElement('div');d.id='dep-list-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Dependencies</span><span onclick="document.getElementById('dep-list-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    ${blocked.length?rows:'<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No blocked tasks found</div>'}
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">${blocked.length} blocked tasks | ${blocking.length} blocking tasks</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickDiceRoller(){
+  let ex=document.getElementById('dice-roller-float');if(ex){ex.remove();return;}
+  let results=[],lastDie=6;
+  const d=document.createElement('div');d.id='dice-roller-float';
+  const roll=(sides)=>{lastDie=sides;const val=Math.floor(Math.random()*sides)+1;results.unshift({sides,val,time:new Date().toLocaleTimeString()});if(results.length>10)results.length=10;rend();};
+  const rend=()=>{
+    const dice=[4,6,8,10,12,20,100];
+    const btns=dice.map(s=>`<button onclick="window._rollDie(${s})" style="background:${s===lastDie?'var(--accent)':'var(--bg-surface)'};color:${s===lastDie?'#000':'var(--text-secondary)'};border:1px solid var(--border);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">d${s}</button>`).join('');
+    const hist=results.map(r=>`<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);padding:2px 0"><span>d${r.sides}</span><span style="color:var(--accent);font-weight:600">${r.val}</span><span>${r.time}</span></div>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:220px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Dice Roller</span><span onclick="document.getElementById('dice-roller-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      ${results.length?`<div style="font-size:42px;font-weight:200;color:var(--accent);margin:8px 0">${results[0].val}</div>`:'<div style="font-size:14px;color:var(--text-muted);margin:16px 0">Pick a die</div>'}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-bottom:10px">${btns}</div>
+      ${results.length>1?`<div style="border-top:1px solid var(--border);padding-top:6px;max-height:80px;overflow-y:auto">${hist}</div>`:''}
+    </div>`;
+  };
+  window._rollDie=roll;
+  document.body.appendChild(d);rend();
+}
+function showSqlSchemaGen(){
+  let ex=document.getElementById('sql-schema-float');if(ex){ex.remove();return;}
+  const presets={
+    'Users Table':`CREATE TABLE users (\n  id SERIAL PRIMARY KEY,\n  email VARCHAR(255) UNIQUE NOT NULL,\n  password_hash VARCHAR(255) NOT NULL,\n  username VARCHAR(100) UNIQUE,\n  full_name VARCHAR(200),\n  avatar_url TEXT,\n  role VARCHAR(20) DEFAULT 'user',\n  is_active BOOLEAN DEFAULT true,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX idx_users_email ON users(email);\nCREATE INDEX idx_users_username ON users(username);`,
+    'Posts + Comments':`CREATE TABLE posts (\n  id SERIAL PRIMARY KEY,\n  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\n  title VARCHAR(300) NOT NULL,\n  slug VARCHAR(300) UNIQUE NOT NULL,\n  body TEXT,\n  status VARCHAR(20) DEFAULT 'draft',\n  published_at TIMESTAMP,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE comments (\n  id SERIAL PRIMARY KEY,\n  post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,\n  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,\n  body TEXT NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX idx_posts_user ON posts(user_id);\nCREATE INDEX idx_comments_post ON comments(post_id);`,
+    'E-commerce':`CREATE TABLE products (\n  id SERIAL PRIMARY KEY,\n  name VARCHAR(255) NOT NULL,\n  description TEXT,\n  price DECIMAL(10,2) NOT NULL,\n  sku VARCHAR(100) UNIQUE,\n  stock INTEGER DEFAULT 0,\n  category_id INTEGER,\n  is_active BOOLEAN DEFAULT true,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE orders (\n  id SERIAL PRIMARY KEY,\n  user_id INTEGER REFERENCES users(id),\n  status VARCHAR(30) DEFAULT 'pending',\n  total DECIMAL(10,2) NOT NULL,\n  shipping_address TEXT,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE order_items (\n  id SERIAL PRIMARY KEY,\n  order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,\n  product_id INTEGER REFERENCES products(id),\n  quantity INTEGER NOT NULL,\n  price DECIMAL(10,2) NOT NULL\n);`,
+    'Auth + Sessions':`CREATE TABLE sessions (\n  id VARCHAR(128) PRIMARY KEY,\n  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\n  ip_address VARCHAR(45),\n  user_agent TEXT,\n  expires_at TIMESTAMP NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE TABLE password_resets (\n  id SERIAL PRIMARY KEY,\n  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,\n  token VARCHAR(255) UNIQUE NOT NULL,\n  used BOOLEAN DEFAULT false,\n  expires_at TIMESTAMP NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n);\n\nCREATE INDEX idx_sessions_user ON sessions(user_id);\nCREATE INDEX idx_sessions_expires ON sessions(expires_at);`
+  };
+  let sel='Users Table';
+  const d=document.createElement('div');d.id='sql-schema-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-sqlpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-sqlpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">SQL Schema Generator</span><span onclick="document.getElementById('sql-schema-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#sql-schema-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy SQL',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy SQL</button>
+    </div>`;
+    d.querySelectorAll('[data-sqlpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.sqlpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskProjectTimeline(){
+  let ex=document.getElementById('proj-timeline-float');if(ex){ex.remove();return;}
+  const projects=S.projects||[];
+  const tasks=S.tasks||[];
+  const now=new Date();
+  const rows=projects.map(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const total=pTasks.length;
+    const pct=total?Math.round((done/total)*100):0;
+    const earliest=pTasks.reduce((min,t)=>t.createdAt&&t.createdAt<min?t.createdAt:min,now.toISOString());
+    const latest=pTasks.reduce((max,t)=>{const d=t.completedAt||t.createdAt||'';return d>max?d:max;},'');
+    const days=Math.max(1,Math.floor((new Date(latest||now)-new Date(earliest))/(86400000)));
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <div style="width:100px;font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(p.name)}">${esc(p.name)}</div>
+      <div style="flex:1;background:var(--bg-surface);height:14px;border-radius:4px;overflow:hidden;position:relative">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#4ade80,#22d3ee);border-radius:4px"></div>
+        <span style="position:absolute;right:4px;top:1px;font-size:9px;color:var(--text-primary)">${pct}%</span>
+      </div>
+      <div style="width:60px;text-align:right;font-size:10px;color:var(--text-muted)">${done}/${total}</div>
+      <div style="width:40px;text-align:right;font-size:9px;color:var(--text-muted)">${days}d</div>
+    </div>`;
+  }).join('');
+  const d=document.createElement('div');d.id='proj-timeline-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Project Timeline</span><span onclick="document.getElementById('proj-timeline-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    ${rows||'<div style="color:var(--text-muted);font-size:12px;text-align:center;padding:20px">No projects</div>'}
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickCoinFlip(){
+  let ex=document.getElementById('coin-flip-float');if(ex){ex.remove();return;}
+  let history=[],flipping=false;
+  const d=document.createElement('div');d.id='coin-flip-float';
+  const rend=()=>{
+    const heads=history.filter(h=>h==='H').length;
+    const tails=history.filter(h=>h==='T').length;
+    const hist=history.slice(0,20).map(h=>`<span style="display:inline-block;width:18px;height:18px;border-radius:50%;line-height:18px;text-align:center;font-size:9px;font-weight:600;${h==='H'?'background:#4ade80;color:#000':'background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border)'}">${h}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:200px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Coin Flip</span><span onclick="document.getElementById('coin-flip-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="font-size:48px;margin:12px 0;${flipping?'animation:spin 0.3s linear infinite':''}">${history.length?history[0]==='H'?'H':'T':'?'}</div>
+      <button onclick="window._flipCoin()" style="background:var(--accent);color:#000;border:none;padding:8px 24px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:10px">Flip</button>
+      ${history.length?`<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-bottom:6px">${hist}</div><div style="font-size:10px;color:var(--text-muted)">H: ${heads} | T: ${tails} | Total: ${history.length}</div>`:''}</div>`;
+  };
+  window._flipCoin=()=>{
+    if(flipping)return;flipping=true;rend();
+    let count=0;const anim=setInterval(()=>{count++;if(count>8){clearInterval(anim);flipping=false;const result=Math.random()<0.5?'H':'T';history.unshift(result);rend();}},80);
+  };
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
