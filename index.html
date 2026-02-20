@@ -951,6 +951,7 @@ textarea{resize:vertical;line-height:1.6}
             <div class="cal-view-toggle">
               <button class="cal-view-btn active" id="cal-view-month" onclick="setCalView('month')">Month</button>
               <button class="cal-view-btn" id="cal-view-week" onclick="setCalView('week')">Week</button>
+              <button class="cal-view-btn" id="cal-view-year" onclick="setCalView('year')">Year</button>
             </div>
             <div style="margin-left:auto;display:flex;gap:6px">
               <button class="btn btn-sm" onclick="window.open('https://calendar.google.com','_blank')">Google Cal</button>
@@ -1196,6 +1197,8 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Convert to bullet point list'" style="font-size:8px;padding:2px 6px">Bullets</button>
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Generate headline and title suggestions'" style="font-size:8px;padding:2px 6px">Headlines</button>
             <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Show detailed word count and text statistics'" style="font-size:8px;padding:2px 6px">Stats</button>
+            <button class="btn btn-sm btn-ghost" onclick="document.getElementById('pl-prompt').value='Generate questions from this text'" style="font-size:8px;padding:2px 6px">Questions</button>
+            <button class="btn btn-sm btn-ghost" onclick="plWordCloud()" style="font-size:8px;padding:2px 6px;color:var(--accent)">Word Cloud</button>
             <span style="width:1px;height:12px;background:var(--border);margin:0 2px"></span>
             <button class="btn btn-sm btn-ghost" onclick="plSaveTemplate()" style="font-size:8px;padding:2px 6px;color:var(--accent)">+ Save</button>
           </div>
@@ -3019,8 +3022,12 @@ function setCalView(v) {
   calView = v;
   document.getElementById('cal-view-month').classList.toggle('active', v==='month');
   document.getElementById('cal-view-week').classList.toggle('active', v==='week');
+  const yearBtn=document.getElementById('cal-view-year');if(yearBtn)yearBtn.classList.toggle('active', v==='year');
   document.getElementById('cal-grid').style.display = v==='month' ? 'grid' : 'none';
   document.getElementById('cal-week-grid').style.display = v==='week' ? 'grid' : 'none';
+  let yearGrid=document.getElementById('cal-year-grid');
+  if(!yearGrid){yearGrid=document.createElement('div');yearGrid.id='cal-year-grid';document.getElementById('cal-week-grid').parentElement.appendChild(yearGrid);}
+  yearGrid.style.display=v==='year'?'block':'none';
   if(v==='week' && !calWeekStart) {
     const now = new Date();
     const day = now.getDay();
@@ -3060,6 +3067,10 @@ function renderCalendar(){
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   if(calView === 'week') {
     renderWeekView();
+    return;
+  }
+  if(calView === 'year') {
+    renderYearHeatmap();
     return;
   }
   const monthTaskCount=S.tasks.filter(t=>{if(!t.due)return false;const d=new Date(t.due+'T12:00:00');return d.getMonth()===calMonth&&d.getFullYear()===calYear;}).length;
@@ -3143,6 +3154,34 @@ function calDayPopup(dateStr,tasks){
 function calAddTaskOnDay(dateStr){
   S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p2',project:'',due:dateStr,created:new Date().toISOString()});
   save();renderCalendar();renderTasks();toast('New task on '+dateStr);
+}
+function renderYearHeatmap(){
+  const year=calYear;const today=new Date().toISOString().split('T')[0];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('cal-month-label').innerHTML=year+' <span style="font-size:9px;color:var(--accent);font-family:var(--mono)">Activity Heatmap</span>';
+  const tasksByDay={};S.tasks.forEach(t=>{if(t.due){tasksByDay[t.due]=(tasksByDay[t.due]||0)+1;}if(t.created){const cd=t.created.split('T')[0];tasksByDay[cd]=(tasksByDay[cd]||0)+0.5;}if(t.completedAt){const cd=t.completedAt.split('T')[0];tasksByDay[cd]=(tasksByDay[cd]||0)+1;}});
+  S.content.forEach(c=>{if(c.created){const cd=c.created.split('T')[0];tasksByDay[cd]=(tasksByDay[cd]||0)+0.5;}});
+  const maxActivity=Math.max(1,...Object.values(tasksByDay));
+  const cellSize=11;const cellGap=2;const startDay=new Date(year,0,1).getDay();
+  const weeksInYear=53;const svgW=weeksInYear*(cellSize+cellGap)+40;const svgH=7*(cellSize+cellGap)+30;
+  let svg=`<svg width="${svgW}" height="${svgH}" style="display:block;margin:8px auto">`;
+  ['S','M','T','W','T','F','S'].forEach((d,i)=>{svg+=`<text x="0" y="${i*(cellSize+cellGap)+cellSize+20}" font-size="8" fill="var(--text-muted)" font-family="var(--mono)">${d}</text>`;});
+  let currentMonth=-1;
+  for(let w=0;w<weeksInYear;w++){
+    for(let d=0;d<7;d++){
+      const dayNum=w*7+d-startDay;const date=new Date(year,0,1+dayNum);
+      if(date.getFullYear()!==year)continue;
+      const ds=date.toISOString().split('T')[0];const activity=tasksByDay[ds]||0;
+      const intensity=activity?Math.min(1,activity/maxActivity):0;
+      const fill=activity===0?'rgba(255,255,255,0.03)':intensity<0.25?'rgba(74,222,128,0.2)':intensity<0.5?'rgba(74,222,128,0.4)':intensity<0.75?'rgba(74,222,128,0.6)':'rgba(74,222,128,0.9)';
+      const x=30+w*(cellSize+cellGap);const y=20+d*(cellSize+cellGap);
+      svg+=`<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${fill}" stroke="${ds===today?'var(--accent)':'none'}" stroke-width="${ds===today?'1':'0'}"><title>${ds}: ${Math.round(activity)} activity</title></rect>`;
+      if(date.getMonth()!==currentMonth){currentMonth=date.getMonth();svg+=`<text x="${x}" y="12" font-size="8" fill="var(--text-muted)" font-family="var(--mono)">${months[currentMonth]}</text>`;}
+    }
+  }
+  svg+='</svg>';
+  const yearGrid=document.getElementById('cal-year-grid');
+  if(yearGrid){yearGrid.innerHTML=svg+'<div style="display:flex;gap:4px;justify-content:center;align-items:center;margin-top:4px;font-size:8px;color:var(--text-muted)"><span>Less</span><span style="width:10px;height:10px;background:rgba(255,255,255,0.03);border-radius:2px;display:inline-block"></span><span style="width:10px;height:10px;background:rgba(74,222,128,0.2);border-radius:2px;display:inline-block"></span><span style="width:10px;height:10px;background:rgba(74,222,128,0.4);border-radius:2px;display:inline-block"></span><span style="width:10px;height:10px;background:rgba(74,222,128,0.6);border-radius:2px;display:inline-block"></span><span style="width:10px;height:10px;background:rgba(74,222,128,0.9);border-radius:2px;display:inline-block"></span><span>More</span></div>';}
 }
 function calDragStart(e,id){calDragId=id;e.dataTransfer.effectAllowed='move';}
 function calDrop(e,dateStr){e.preventDefault();if(calDragId){const t=S.tasks.find(x=>x.id===calDragId);if(t){t.due=dateStr;save();renderCalendar();renderTasks();toast('Moved to '+dateStr);}calDragId=null;}}
@@ -6798,6 +6837,35 @@ function plLocalProcess(text,prompt){
   if(pl.includes('question')||pl.includes('faq')){const qs=sentences.filter(s=>/\?|who|what|when|where|why|how|which|can|could|should|would|is|are|do|does/i.test(s));return'Questions Found (local):\n\n'+(qs.length?qs.map(q=>'Q: '+q+(q.endsWith('?')?'':'?')).join('\n\n'):'No explicit questions found in the text.');}
   if(pl.includes('headline')||pl.includes('title')){const caps=sentences.slice(0,5).map(s=>{const w=s.split(/\s+/).slice(0,8).join(' ');return w.split(' ').map(x=>x.charAt(0).toUpperCase()+x.slice(1).toLowerCase()).join(' ');});return'Headline Suggestions (local):\n\n'+caps.map((h,i)=>(i+1)+'. '+h).join('\n');}
   return'Processed text (local - API unavailable):\n\nInput: '+words.length+' words, '+sentences.length+' sentences.\n\nKey sentences:\n'+sentences.slice(0,5).map(s=>'- '+s+'.').join('\n')+'\n\nNote: For advanced processing (AI summarization, translation, etc.), configure OPENAI_API_KEY in Vercel environment variables.';
+}
+function plWordCloud(){
+  const text=(document.getElementById('pl-text')?.value||'').trim();
+  if(!text){toast('Paste or enter text first');return;}
+  const stopWords=new Set(['the','a','an','is','are','was','were','be','been','have','has','had','do','does','did','will','would','shall','should','may','might','must','can','could','and','but','or','nor','for','yet','so','in','on','at','to','of','by','with','from','as','into','through','during','before','after','above','below','up','down','out','off','over','under','again','then','once','here','there','when','where','why','how','all','each','every','both','few','more','most','other','some','such','no','not','only','own','same','than','too','very','just','also','about','its','it','this','that','these','those','i','me','my','we','us','our','you','your','he','him','his','she','her','they','them','their','what','which','who','been','being','because']);
+  const words=text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>2&&!stopWords.has(w));
+  const freq={};words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,40);
+  if(!sorted.length){toast('Not enough words');return;}
+  const maxF=sorted[0][1];const svgW=500;const svgH=300;
+  const colors=['#4ade80','#22d3ee','#a855f7','#f472b6','#fbbf24','#f87171','#34d399','#60a5fa','#c084fc','#fb923c'];
+  let cloudSvg='<svg xmlns="http://www.w3.org/2000/svg" width="'+svgW+'" height="'+svgH+'" style="background:#0a0a0e;border-radius:8px">';
+  const placed=[];
+  sorted.forEach(([w,c],i)=>{
+    const size=Math.max(10,Math.round((c/maxF)*36));
+    const color=colors[i%colors.length];
+    for(let attempt=0;attempt<50;attempt++){
+      const x=20+Math.random()*(svgW-40);const y=20+Math.random()*(svgH-40);
+      const overlap=placed.some(p=>Math.abs(p.x-x)<(p.w+w.length*size*0.5)/2&&Math.abs(p.y-y)<size);
+      if(!overlap){
+        cloudSvg+=`<text x="${x}" y="${y}" font-size="${size}" fill="${color}" font-family="system-ui" opacity="${0.6+0.4*(c/maxF)}">${w}</text>`;
+        placed.push({x,y,w:w.length*size*0.6});break;
+      }
+    }
+  });
+  cloudSvg+='</svg>';
+  const resultDiv=document.getElementById('pl-result');resultDiv.style.display='block';
+  document.getElementById('pl-synthesis-text').innerHTML=cloudSvg+'<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Top words: '+sorted.slice(0,10).map(([w,c])=>w+'('+c+')').join(', ')+'</div>';
+  toast('Word cloud generated');
 }
 function plSaveTemplate(){
   const prompt=document.getElementById('pl-prompt').value.trim();
