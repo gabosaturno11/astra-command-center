@@ -1145,6 +1145,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="openFilteredLinks()" title="Open all visible links">Open All</button>
           <button class="btn btn-sm" onclick="copyAllLinkURLs()" title="Copy all filtered URLs to clipboard">Copy URLs</button>
           <button class="btn btn-sm" onclick="batchImportLinks()" title="Paste multiple URLs to import">Import</button>
+          <button class="btn btn-sm" onclick="checkAllLinks()" title="Check all links for broken URLs" id="link-check-btn">Check</button>
           <button class="btn btn-primary btn-sm" onclick="openLinkModal()">+ Add</button>
         </div>
       </div>
@@ -1747,6 +1748,7 @@ textarea{resize:vertical;line-height:1.6}
       <div class="td-subtasks" id="td-subtasks"></div>
       <div class="td-add-subtask" onclick="addSubtaskInModal()">+ Add subtask</div>
     </div>
+    <div class="td-field"><label>Notes <span id="td-notes-count" style="font-size:8px;color:var(--text-muted);font-weight:400"></span></label><textarea id="td-notes" placeholder="Quick notes, decisions, updates..." style="min-height:40px;font-size:10px;resize:vertical"></textarea></div>
     <div class="td-created" id="td-created"></div>
     <div id="td-log" style="margin-top:8px"></div>
     <div class="td-footer">
@@ -2811,6 +2813,8 @@ function openTaskDetail(id) {
   document.getElementById('td-recur').value = t.recurrence || '';
   document.getElementById('td-blocked-by').value = t.blockedBy || '';
   document.getElementById('td-estimate').value = t.estimate || '';
+  document.getElementById('td-notes').value = t.notes || '';
+  const nc=document.getElementById('td-notes-count');if(nc)nc.textContent=(t.notes||'').trim()?'('+countW(t.notes)+' words)':'';
   document.getElementById('td-recur-info').textContent = t.recurrence ? 'Repeats ' + t.recurrence + (t.lastRecurred ? ' (last: ' + t.lastRecurred + ')' : '') : '';
   let timeText=t.created ? 'Created: ' + new Date(t.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' ('+timeAgo(t.created)+')' : '';
   if(t.completedAt)timeText+=' | Done: '+new Date(t.completedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' ('+timeAgo(t.completedAt)+')';
@@ -2881,6 +2885,7 @@ function saveTaskDetail() {
   t.recurrence = document.getElementById('td-recur').value || '';
   t.blockedBy = document.getElementById('td-blocked-by').value.trim() || '';
   t.estimate = document.getElementById('td-estimate').value.trim() || '';
+  t.notes = document.getElementById('td-notes').value.trim() || '';
   // Link to project ID if name matches
   if(t.project) { const p = (S.projects||[]).find(pr => pr.name === t.project); if(p) t.projectId = p.id; }
   save(); closeTaskDetail(); renderTasks();
@@ -3639,7 +3644,7 @@ function renderLinks(){
   else if(ls==='tag')items.sort((a,b)=>((a.tags&&a.tags[0])||'zzz').localeCompare((b.tags&&b.tags[0])||'zzz'));
   items.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
   const g=document.getElementById('links-grid');
-  const renderLinkCard=l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')" ${l.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${l.pinned?'<div style="font-size:7px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Pinned</div>':''}<div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div></div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue" style="cursor:pointer" onclick="event.stopPropagation();setLinkCat('${escA(l.category)}',null)">${esc(l.category)}</span>`:''}${l.projectId?(()=>{const p=(S.projects||[]).find(x=>x.id===l.projectId);return p?`<span class="badge badge-muted" style="font-size:7px">${esc(p.name)}</span>`:''})():''}${(l.tags&&l.tags.length)?l.tags.map(tag=>`<span style="font-size:7px;padding:0 3px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:2px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}</span>`).join(''):''}${l.created?`<span style="font-size:8px;color:var(--text-muted)" title="${new Date(l.created).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}">${timeAgo(l.created)}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();pinLink(${l.id})" style="${l.pinned?'color:var(--accent)':''}">${l.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('[${escA(l.title)}](${escA(l.url)})');toast('Markdown link copied')">MD</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;};
+  const renderLinkCard=l=>{let domain='';try{domain=new URL(l.url).hostname;}catch(e){}return`<div class="link-card" draggable="true" ondragstart="event.dataTransfer.setData('text/plain',JSON.stringify({type:'links',id:${l.id}}))" onclick="window.open('${escA(l.url)}','_blank')" ${l.pinned?'style="border-color:rgba(74,222,128,0.2)"':''}>${l.pinned?'<div style="font-size:7px;color:var(--accent);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px">Pinned</div>':''}<div style="display:flex;align-items:center;gap:8px">${domain?`<img src="https://www.google.com/s2/favicons?domain=${domain}&sz=32" width="16" height="16" style="border-radius:2px;flex-shrink:0" onerror="this.style.display='none'">`:''}<div class="link-card-title" style="margin:0">${esc(l.title)}</div>${l._status?`<span style="width:6px;height:6px;border-radius:50%;background:${l._status==='ok'?'var(--accent)':'var(--red)'};flex-shrink:0" title="${l._status==='ok'?'Link OK':'Link may be broken'}"></span>`:''}</div><div class="link-card-url">${esc(l.url)}</div>${l.desc?`<div class="link-card-desc">${parseWikiLinks(esc(l.desc))}</div>`:''}<div class="link-card-footer">${l.category?`<span class="badge badge-blue" style="cursor:pointer" onclick="event.stopPropagation();setLinkCat('${escA(l.category)}',null)">${esc(l.category)}</span>`:''}${l.projectId?(()=>{const p=(S.projects||[]).find(x=>x.id===l.projectId);return p?`<span class="badge badge-muted" style="font-size:7px">${esc(p.name)}</span>`:''})():''}${(l.tags&&l.tags.length)?l.tags.map(tag=>`<span style="font-size:7px;padding:0 3px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:2px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}</span>`).join(''):''}${l.created?`<span style="font-size:8px;color:var(--text-muted)" title="${new Date(l.created).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'})}">${timeAgo(l.created)}</span>`:''}<div class="link-card-actions"><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();pinLink(${l.id})" style="${l.pinned?'color:var(--accent)':''}">${l.pinned?'Unpin':'Pin'}</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('${escA(l.url)}')">Copy</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();cpText('[${escA(l.title)}](${escA(l.url)})');toast('Markdown link copied')">MD</button><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openLinkModal(${l.id})">Edit</button><button class="btn btn-sm btn-ghost btn-danger" onclick="event.stopPropagation();delLink(${l.id})">Del</button></div></div></div>`;};
   // Make link category clickable in renderLinkCard — already handled via setLinkCat
   const linkDateGrp=d=>{if(!d)return'Unknown';const diff=Math.floor((new Date()-new Date(d))/86400000);if(diff<1)return'Today';if(diff<7)return'This Week';if(diff<30)return'This Month';return'Older';};
   let linksHtml='';if(ls==='domain'||ls==='category'||ls==='newest'||ls==='oldest'||ls==='alpha'||ls==='tag'){let lastGrp=null;items.forEach(l=>{let grp;if(ls==='domain'){try{grp=new URL(l.url).hostname;}catch(e){grp='unknown';}}else if(ls==='category'){grp=l.category||'Uncategorized';}else if(ls==='tag'){grp=(l.tags&&l.tags[0])||'Untagged';}else if(ls==='alpha'){grp=(l.title||'Untitled')[0].toUpperCase();}else{grp=linkDateGrp(l.created);}if(grp!==lastGrp){const cnt=items.filter(x=>{if(ls==='domain'){try{return new URL(x.url).hostname===grp;}catch(e){return false;}}if(ls==='category')return(x.category||'Uncategorized')===grp;if(ls==='tag')return((x.tags&&x.tags[0])||'Untagged')===grp;if(ls==='alpha')return(x.title||'Untitled')[0].toUpperCase()===grp;return linkDateGrp(x.created)===grp;}).length;const clr=ls==='tag'?'#f59e0b':(ls==='newest'||ls==='oldest')?'var(--yellow)':ls==='alpha'?'var(--accent)':'var(--accent-cyan)';linksHtml+=`<div style="grid-column:1/-1;padding:8px 4px 4px;font-size:11px;font-weight:600;color:${clr};border-bottom:1px solid var(--border);margin-bottom:2px;letter-spacing:0.03em">${esc(grp)} <span style="font-size:9px;color:var(--text-muted);font-weight:400">${cnt}</span></div>`;lastGrp=grp;}linksHtml+=renderLinkCard(l);});}else{linksHtml=items.map(renderLinkCard).join('');}
@@ -3712,6 +3717,21 @@ function copyAllLinkURLs(){
   if(!items.length){toast('No links to copy');return;}
   const urls=items.map(l=>l.url).join('\n');
   navigator.clipboard.writeText(urls).then(()=>toast('Copied '+items.length+' URLs'));
+}
+
+async function checkAllLinks(){
+  const btn=document.getElementById('link-check-btn');if(btn)btn.textContent='Checking...';
+  let ok=0,fail=0,skip=0;
+  for(const l of S.links){
+    try{
+      const r=await fetch(l.url,{method:'HEAD',mode:'no-cors',signal:AbortSignal.timeout(5000)});
+      l._status='ok';ok++;
+    }catch(e){
+      if(l.url.startsWith('http')){l._status='error';fail++;}else{l._status='skip';skip++;}
+    }
+  }
+  if(btn)btn.textContent='Check';
+  renderLinks();toast(ok+' OK, '+fail+' broken'+(skip?', '+skip+' skipped':''));
 }
 
 // === PROJECTS ===
@@ -5961,6 +5981,28 @@ function cmdGetItems(q) {
       items.unshift({title:p+' ('+pct+'%)',desc:active+' active, '+done+' done | '+specs+' specs'+(tm?' | '+formatTimeSpent(tm)+' tracked':''),icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p;renderTasks();}});
     });
     if(!filtered.length)items.unshift({title:'No projects found',desc:'Tasks have no project assignments',icon:'!',type:'info'});
+  }
+  // Habit tracker prefix
+  if(ql && (ql.startsWith('habit:') || ql==='habit' || ql==='habits')){
+    if(!S.habits)S.habits=[];
+    const today=new Date().toISOString().split('T')[0];
+    const hq=ql.startsWith('habit:')?q.substring(6).trim():'';
+    if(hq && hq.startsWith('+')){
+      const name=hq.substring(1).trim();
+      if(name){items.unshift({title:'Create habit: '+name,desc:'Add new daily habit',icon:'+',type:'action',action:()=>{S.habits.push({id:Date.now(),name,log:[]});save();toast('Habit created: '+name);closeCommandPalette();}});}
+    }else{
+      S.habits.forEach(h=>{
+        const checkedToday=(h.log||[]).includes(today);
+        const streak=(()=>{let s=0;const d=new Date();for(let i=0;i<30;i++){const ds=d.toISOString().split('T')[0];if((h.log||[]).includes(ds))s++;else if(i>0)break;d.setDate(d.getDate()-1);}return s;})();
+        const last7=(()=>{const d=new Date();let c=0;for(let i=0;i<7;i++){const ds=d.toISOString().split('T')[0];if((h.log||[]).includes(ds))c++;d.setDate(d.getDate()-1);}return c;})();
+        items.unshift({title:(checkedToday?'[x] ':'[ ] ')+h.name,desc:streak+' day streak | '+last7+'/7 this week'+(hq&&hq.startsWith('-')?' | click to delete':''),icon:'H',type:'action',action:()=>{
+          if(hq&&hq.startsWith('-')){S.habits=S.habits.filter(x=>x.id!==h.id);save();toast('Deleted: '+h.name);}
+          else{if(checkedToday){h.log=h.log.filter(d=>d!==today);}else{if(!h.log)h.log=[];h.log.push(today);}save();toast(checkedToday?'Unchecked: '+h.name:'Checked: '+h.name);}
+          closeCommandPalette();
+        }});
+      });
+      if(!S.habits.length)items.unshift({title:'No habits yet',desc:'Type habit:+name to create one (e.g. habit:+exercise)',icon:'!',type:'info'});
+    }
   }
   // Activity log prefix
   if(ql && (ql.startsWith('log:') || ql==='log' || ql==='activity')){
