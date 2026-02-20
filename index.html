@@ -5701,6 +5701,7 @@ function cmdGetItems(q) {
       ['pomodoro','Focus session stats + start timer'],['collections','Auto-detect content groups'],
       ['scratch','Persistent floating scratchpad'],['review','Weekly review + copy markdown'],
       ['workspace','Full workspace stats overview'],
+      ['chart','SVG charts: status pie, priority bars, themes, weekly'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6773,7 +6774,63 @@ function cmdGetItems(q) {
     const lastSave=S._lastSaveTime||null;
     items.unshift({title:'Last saved: '+(lastSave?timeAgo(lastSave):'unknown'),desc:'Accent: '+(S._accentColor||'#4ade80 (default)'),icon:'i',type:'info'});
   }
+  // Chart prefix — visual distributions
+  if(ql && (ql==='chart' || ql.startsWith('chart:') || ql==='charts' || ql==='graph')){
+    items.unshift({title:'Task Status Distribution',desc:'SVG pie chart of task statuses',icon:'P',type:'action',action:()=>{closeCommandPalette();showChart('status');}});
+    items.unshift({title:'Task Priority Distribution',desc:'SVG bar chart of priorities',icon:'B',type:'action',action:()=>{closeCommandPalette();showChart('priority');}});
+    items.unshift({title:'Content by Theme',desc:'SVG chart of content themes',icon:'T',type:'action',action:()=>{closeCommandPalette();showChart('theme');}});
+    items.unshift({title:'Weekly Activity',desc:'SVG chart of 7-day activity',icon:'W',type:'action',action:()=>{closeCommandPalette();showChart('weekly');}});
+  }
   return items.slice(0, 20);
+}
+function showChart(type){
+  let panel=document.getElementById('chart-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='chart-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw';
+  let svg='';const w=400,h=250;
+  if(type==='status'){
+    const counts={todo:0,progress:0,done:0,blocked:0};S.tasks.forEach(t=>counts[t.status]=(counts[t.status]||0)+1);
+    const total=Object.values(counts).reduce((a,v)=>a+v,0);if(!total){panel.innerHTML='<div style="text-align:center;color:var(--text-muted);padding:20px">No tasks yet</div><button onclick="this.parentElement.remove()" style="display:block;margin:0 auto;background:none;border:none;color:var(--text-muted);cursor:pointer">Close</button>';document.body.appendChild(panel);return;}
+    const colors={todo:'#3b82f6',progress:'#f59e0b',done:'#4ade80',blocked:'#ef4444'};
+    let startAngle=-Math.PI/2;const cx=120,cy=120,r=100;
+    svg=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+    Object.entries(counts).filter(([,v])=>v>0).forEach(([status,count])=>{
+      const angle=(count/total)*Math.PI*2;const endAngle=startAngle+angle;
+      const x1=cx+r*Math.cos(startAngle),y1=cy+r*Math.sin(startAngle);
+      const x2=cx+r*Math.cos(endAngle),y2=cy+r*Math.sin(endAngle);
+      const large=angle>Math.PI?1:0;
+      svg+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${colors[status]}" opacity="0.85"><title>${status}: ${count} (${Math.round(count/total*100)}%)</title></path>`;
+      startAngle=endAngle;
+    });
+    let ly=20;Object.entries(counts).filter(([,v])=>v>0).forEach(([s,c])=>{svg+=`<rect x="260" y="${ly}" width="12" height="12" fill="${colors[s]}" rx="2"/><text x="278" y="${ly+10}" fill="#ccc" font-size="11">${s}: ${c} (${Math.round(c/total*100)}%)</text>`;ly+=20;});
+    svg+='</svg>';
+  }else if(type==='priority'){
+    const counts={p0:0,p1:0,p2:0,p3:0};S.tasks.filter(t=>t.status!=='done').forEach(t=>counts[t.priority||'p2']++);
+    const max=Math.max(...Object.values(counts),1);const colors={p0:'#ef4444',p1:'#f59e0b',p2:'#3b82f6',p3:'#666'};
+    svg=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+    Object.entries(counts).forEach(([p,c],i)=>{const bw=60,bh=Math.round(c/max*150),x=40+i*90,y=180-bh;
+      svg+=`<rect x="${x}" y="${y}" width="${bw}" height="${bh}" fill="${colors[p]}" rx="4" opacity="0.85"/><text x="${x+bw/2}" y="200" fill="#888" font-size="11" text-anchor="middle">${p.toUpperCase()}</text><text x="${x+bw/2}" y="${y-5}" fill="#ccc" font-size="12" text-anchor="middle">${c}</text>`;
+    });svg+='</svg>';
+  }else if(type==='theme'){
+    const themes={};S.content.forEach(c=>{const t=c.theme||'unthemed';themes[t]=(themes[t]||0)+1;});
+    const sorted=Object.entries(themes).sort((a,b)=>b[1]-a[1]).slice(0,8);const max=sorted.length?sorted[0][1]:1;
+    const cl=['#4ade80','#22d3ee','#a855f7','#f59e0b','#3b82f6','#ec4899','#ef4444','#eab308'];
+    svg=`<svg width="${w}" height="${sorted.length*28+10}" viewBox="0 0 ${w} ${sorted.length*28+10}">`;
+    sorted.forEach(([t,c],i)=>{const bw=Math.round(c/max*(w-140)),y=5+i*28;
+      svg+=`<rect x="0" y="${y}" width="${bw}" height="20" fill="${cl[i%cl.length]}" rx="3" opacity="0.85"/><text x="${bw+6}" y="${y+14}" fill="#ccc" font-size="10">${esc(t)} (${c})</text>`;
+    });svg+='</svg>';
+  }else if(type==='weekly'){
+    const days=[];const today=new Date();
+    for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];days.push({label:['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()],created:S.tasks.filter(t=>t.created&&t.created.startsWith(ds)).length,completed:S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(ds)).length,content:S.content.filter(c=>c.created&&c.created.startsWith(ds)).length});}
+    const max=Math.max(...days.map(d=>d.created+d.completed+d.content),1);
+    svg=`<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">`;
+    days.forEach((d,i)=>{const x=30+i*52,bw=14;
+      svg+=`<rect x="${x}" y="${180-Math.round(d.created/max*150)}" width="${bw}" height="${Math.round(d.created/max*150)}" fill="#3b82f6" rx="2" opacity="0.85"/><rect x="${x+16}" y="${180-Math.round(d.completed/max*150)}" width="${bw}" height="${Math.round(d.completed/max*150)}" fill="#4ade80" rx="2" opacity="0.85"/><rect x="${x+32}" y="${180-Math.round(d.content/max*150)}" width="${bw}" height="${Math.round(d.content/max*150)}" fill="#a855f7" rx="2" opacity="0.85"/><text x="${x+22}" y="198" fill="#888" font-size="10" text-anchor="middle">${d.label}</text>`;
+    });
+    svg+=`<rect x="${w-110}" y="10" width="10" height="10" fill="#3b82f6" rx="2"/><text x="${w-95}" y="19" fill="#888" font-size="9">Created</text><rect x="${w-110}" y="25" width="10" height="10" fill="#4ade80" rx="2"/><text x="${w-95}" y="34" fill="#888" font-size="9">Done</text><rect x="${w-110}" y="40" width="10" height="10" fill="#a855f7" rx="2"/><text x="${w-95}" y="49" fill="#888" font-size="9">Content</text></svg>`;
+  }
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">${{status:'Task Status',priority:'Task Priority (Active)',theme:'Content Themes',weekly:'Weekly Activity'}[type]}</span><button onclick="document.getElementById('chart-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;justify-content:center">${svg}</div>`;
+  document.body.appendChild(panel);
 }
 function toggleScratchpad(){
   let panel=document.getElementById('scratchpad-panel');
