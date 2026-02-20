@@ -6545,6 +6545,12 @@ function cmdGetItems(q) {
       ['systemd','systemd service management reference'],
       ['habit tracker','Daily habit tracker with streaks'],
       ['text transform','Text case and format transformer'],
+      ['rsync','rsync file sync reference'],
+      ['weekly velocity','Weekly task velocity chart'],
+      ['world clock','World clock with 8 timezones'],
+      ['firewall','Firewall iptables ufw pf reference'],
+      ['project timeline','Visual project timeline with progress'],
+      ['json path','JSON path tester and formatter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10349,6 +10355,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='text transform' || ql==='text case' || ql==='case convert' || ql==='transform text')){
     items.unshift({title:'Text Transform',desc:'Convert text case and format',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTextTransform();}});
+  }
+  if(ql && (ql==='rsync' || ql==='rsync ref' || ql==='file sync' || ql==='rsync commands')){
+    items.unshift({title:'rsync Reference',desc:'File synchronization commands',icon:'R',type:'action',action:()=>{closeCommandPalette();showRsyncRef();}});
+  }
+  if(ql && (ql==='weekly velocity' || ql==='velocity' || ql==='task velocity' || ql==='throughput')){
+    items.unshift({title:'Weekly Velocity',desc:'12-week task velocity chart',icon:'V',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyVelocity();}});
+  }
+  if(ql && (ql==='world clock' || ql==='time zones' || ql==='timezones' || ql==='global time')){
+    items.unshift({title:'World Clock',desc:'8 timezone clock display',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWorldClock();}});
+  }
+  if(ql && (ql==='firewall' || ql==='iptables' || ql==='ufw' || ql==='firewall ref')){
+    items.unshift({title:'Firewall Reference',desc:'iptables, ufw, firewalld, pf commands',icon:'F',type:'action',action:()=>{closeCommandPalette();showFirewallRef();}});
+  }
+  if(ql && (ql==='project timeline' || ql==='timeline' || ql==='gantt' || ql==='project gantt')){
+    items.unshift({title:'Project Timeline',desc:'Visual project timeline with progress',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskProjectTimeline2();}});
+  }
+  if(ql && (ql==='json path' || ql==='jsonpath' || ql==='json tester' || ql==='json query')){
+    items.unshift({title:'JSON Path Tester',desc:'Query and format JSON data',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonPathTester();}});
   }
   return items.slice(0, 20);
 }
@@ -34370,6 +34394,259 @@ function showQuickTextTransform(){
     try{const result=window._ttFns[idx](inp.value);out.textContent=result;}catch(e){out.textContent='Error: '+e.message;}
   };
   render();
+  document.body.appendChild(d);
+}
+function showRsyncRef(){
+  const cmds={
+    'Basic Sync':{
+      'rsync -av src/ dest/':'Archive mode, verbose',
+      'rsync -avz src/ dest/':'Compress during transfer',
+      'rsync -avn src/ dest/':'Dry run (show what would transfer)',
+      'rsync -av --delete src/ dest/':'Delete extraneous files from dest',
+      'rsync -av --progress src/ dest/':'Show transfer progress',
+      'rsync -av --exclude="*.log" src/ dest/':'Exclude pattern',
+      'rsync -av --include="*.js" --exclude="*" src/ dest/':'Include only .js',
+      'rsync -avP src/ dest/':'Progress + partial (resume)'
+    },
+    'Remote Sync':{
+      'rsync -avz src/ user@host:dest/':'Push to remote',
+      'rsync -avz user@host:src/ dest/':'Pull from remote',
+      'rsync -avz -e "ssh -p 2222" src/ host:dest/':'Custom SSH port',
+      'rsync -avz -e "ssh -i key" src/ host:dest/':'SSH with key file',
+      'rsync --rsync-path="sudo rsync" src/ host:dest/':'Remote sudo',
+      'rsync -avz --bwlimit=1000 src/ host:dest/':'Bandwidth limit (KB/s)',
+      'rsync -avz --timeout=30 src/ host:dest/':'Set timeout',
+      'rsync -avz --compress-level=9 src/ host:dest/':'Max compression'
+    },
+    'Filtering':{
+      '--exclude-from=file':'Exclude patterns from file',
+      '--include-from=file':'Include patterns from file',
+      '--filter="- *.tmp"':'Filter rules',
+      '--max-size=100m':'Skip files larger than 100MB',
+      '--min-size=1k':'Skip files smaller than 1KB',
+      '--existing':'Only update existing files',
+      '--ignore-existing':'Skip files that exist on dest',
+      '--update':'Skip files newer on dest'
+    },
+    'Advanced':{
+      '--checksum':'Use checksum, not mod-time',
+      '--backup --backup-dir=bak/':'Keep backups of changed files',
+      '--link-dest=ref/':'Hard-link unchanged files',
+      '--partial-dir=.rsync-partial':'Store partial transfers',
+      '--log-file=sync.log':'Log to file',
+      '--stats':'Show transfer statistics',
+      '--itemize-changes':'Show changes itemized',
+      '--chmod=Du=rwx,Dg=rx,Do=rx':'Set permissions'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">rsync Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskWeeklyVelocity(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const now=new Date();
+  const weeks=[];
+  for(let i=11;i>=0;i--){
+    const start=new Date(now);start.setDate(start.getDate()-(i*7));
+    const end=new Date(start);end.setDate(end.getDate()+7);
+    const created=tasks.filter(t=>{const c=new Date(t.created||t.id);return c>=start&&c<end;}).length;
+    const done=tasks.filter(t=>{if(t.status!=='done')return false;const c=new Date(t.completedAt||t.updated||t.id);return c>=start&&c<end;}).length;
+    weeks.push({label:'W'+(12-i),created,done});
+  }
+  const maxV=Math.max(...weeks.map(w=>Math.max(w.created,w.done)),1);
+  const chartH=180;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Weekly Velocity (12 Weeks)</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:3px;align-items:flex-end;height:'+chartH+'px;margin-bottom:12px">';
+  weeks.forEach(w=>{
+    const ch=Math.max((w.created/maxV)*(chartH-30),2);
+    const dh=Math.max((w.done/maxV)*(chartH-30),2);
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:1px">';
+    html+='<div style="width:100%;display:flex;gap:1px;align-items:flex-end;justify-content:center">';
+    html+='<div style="width:45%;height:'+ch+'px;background:#f97316;border-radius:2px 2px 0 0" title="Created: '+w.created+'"></div>';
+    html+='<div style="width:45%;height:'+dh+'px;background:#4ade80;border-radius:2px 2px 0 0" title="Done: '+w.done+'"></div>';
+    html+='</div>';
+    html+='<div style="font-size:9px;color:var(--text-muted)">'+w.label+'</div></div>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:16px;justify-content:center;font-size:11px">';
+  html+='<span><span style="display:inline-block;width:10px;height:10px;background:#f97316;border-radius:2px;margin-right:4px"></span>Created</span>';
+  html+='<span><span style="display:inline-block;width:10px;height:10px;background:#4ade80;border-radius:2px;margin-right:4px"></span>Completed</span>';
+  html+='</div>';
+  const avgVelocity=Math.round(weeks.reduce((s,w)=>s+w.done,0)/weeks.length*10)/10;
+  html+='<div style="color:var(--text-muted);font-size:11px;text-align:center;margin-top:8px">Avg velocity: '+avgVelocity+' tasks/week</div>';
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickWorldClock(){
+  let ex=document.getElementById('worldclock-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='worldclock-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  const zones=[
+    {label:'Local',tz:Intl.DateTimeFormat().resolvedOptions().timeZone},
+    {label:'UTC',tz:'UTC'},
+    {label:'New York',tz:'America/New_York'},
+    {label:'London',tz:'Europe/London'},
+    {label:'Tokyo',tz:'Asia/Tokyo'},
+    {label:'Sydney',tz:'Australia/Sydney'},
+    {label:'Dubai',tz:'Asia/Dubai'},
+    {label:'Sao Paulo',tz:'America/Sao_Paulo'}
+  ];
+  function render(){
+    const now=new Date();
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">World Clock</span><button onclick="clearInterval(window._wcInterval);document.getElementById(\'worldclock-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    zones.forEach(z=>{
+      const time=now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+      const date=now.toLocaleDateString('en-US',{timeZone:z.tz,weekday:'short',month:'short',day:'numeric'});
+      const hour=parseInt(now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'numeric',hour12:false}));
+      const isDay=hour>=6&&hour<18;
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">';
+      html+='<div><span style="font-size:12px;color:#e2e8f0">'+z.label+'</span><div style="font-size:10px;color:var(--text-muted)">'+date+'</div></div>';
+      html+='<div style="text-align:right"><span style="font-family:monospace;font-size:16px;color:'+(isDay?'#4ade80':'#8b5cf6')+'">'+time+'</span></div>';
+      html+='</div>';
+    });
+    d.innerHTML=html;
+  }
+  render();
+  window._wcInterval=setInterval(render,1000);
+  document.body.appendChild(d);
+}
+function showFirewallRef(){
+  const cmds={
+    'iptables':{
+      'iptables -L':'List all rules',
+      'iptables -L -n -v':'Verbose with numbers',
+      'iptables -A INPUT -p tcp --dport 80 -j ACCEPT':'Allow HTTP',
+      'iptables -A INPUT -p tcp --dport 443 -j ACCEPT':'Allow HTTPS',
+      'iptables -A INPUT -p tcp --dport 22 -j ACCEPT':'Allow SSH',
+      'iptables -A INPUT -j DROP':'Drop all other input',
+      'iptables -D INPUT 3':'Delete rule 3',
+      'iptables-save > rules.v4':'Save rules'
+    },
+    'ufw (Ubuntu)':{
+      'ufw enable':'Enable firewall',
+      'ufw disable':'Disable firewall',
+      'ufw status verbose':'Show status and rules',
+      'ufw allow 80/tcp':'Allow HTTP',
+      'ufw allow from 10.0.0.0/8':'Allow subnet',
+      'ufw deny 23':'Deny telnet',
+      'ufw delete allow 80':'Remove rule',
+      'ufw reset':'Reset to defaults'
+    },
+    'firewalld (RHEL)':{
+      'firewall-cmd --state':'Check if running',
+      'firewall-cmd --list-all':'List all rules',
+      'firewall-cmd --add-service=http --permanent':'Allow HTTP',
+      'firewall-cmd --add-port=8080/tcp --permanent':'Allow port',
+      'firewall-cmd --remove-service=ftp --permanent':'Remove service',
+      'firewall-cmd --reload':'Apply changes',
+      'firewall-cmd --list-services':'List allowed services',
+      'firewall-cmd --zone=public --list-all':'Zone info'
+    },
+    'macOS pf':{
+      'pfctl -e':'Enable packet filter',
+      'pfctl -d':'Disable packet filter',
+      'pfctl -f /etc/pf.conf':'Load rules file',
+      'pfctl -sr':'Show current rules',
+      'pfctl -ss':'Show state table',
+      'pfctl -si':'Show statistics',
+      'pfctl -t bruteforce -T show':'Show table entries',
+      'pfctl -t bruteforce -T add IP':'Add IP to table'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Firewall Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskProjectTimeline2(){
+  const projects=S.projects||[];const tasks=S.tasks||[];
+  if(!projects.length){alert('No projects');return;}
+  const now=new Date();
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Project Timeline</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const colors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#f97316'];
+  projects.forEach((p,pi)=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const earliest=pTasks.reduce((min,t)=>{const d2=new Date(t.created||t.id);return d2<min?d2:min;},now);
+    const latest=pTasks.reduce((max,t)=>{const d2=new Date(t.due||t.updated||t.created||t.id);return d2>max?d2:max;},earliest);
+    const span=(latest-earliest)/(1000*60*60*24);
+    const elapsed=(now-earliest)/(1000*60*60*24);
+    const pct=span>0?Math.min(Math.round((elapsed/span)*100),100):100;
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const total=pTasks.length;
+    const color=colors[pi%colors.length];
+    html+='<div style="margin-bottom:12px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px">';
+    html+='<span style="font-size:12px;color:'+color+';font-weight:600">'+esc(p.name)+'</span>';
+    html+='<span style="font-size:10px;color:var(--text-muted)">'+done+'/'+total+' tasks done</span></div>';
+    html+='<div style="height:20px;background:var(--bg-base);border-radius:4px;position:relative;overflow:hidden">';
+    html+='<div style="height:100%;width:'+pct+'%;background:'+color+'33;border-radius:4px"></div>';
+    const donePct=total?Math.round((done/total)*100):0;
+    html+='<div style="position:absolute;top:0;left:0;height:100%;width:'+donePct+'%;background:'+color+';border-radius:4px;opacity:0.7"></div>';
+    html+='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;color:#e2e8f0;font-weight:600">'+donePct+'%</div>';
+    html+='</div>';
+    html+='<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-top:2px"><span>'+earliest.toLocaleDateString()+'</span><span>'+latest.toLocaleDateString()+'</span></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickJsonPathTester(){
+  let ex=document.getElementById('jsonpath-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='jsonpath-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:380px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">JSON Path Tester</span><button onclick="document.getElementById(\'jsonpath-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<textarea id="jsonpath-input" style="width:100%;height:100px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;font-family:monospace;resize:none;margin-bottom:6px" placeholder=\'{"name":"test","items":[1,2,3]}\'></textarea>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+  html+='<input id="jsonpath-path" placeholder="Path: e.g. items.1 or name" style="flex:1;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;font-family:monospace">';
+  html+='<button onclick="window._evalJsonPath()" style="background:#4ade80;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Query</button>';
+  html+='</div>';
+  html+='<div id="jsonpath-output" style="background:var(--bg-base);padding:8px;border-radius:6px;font-size:11px;color:#4ade80;font-family:monospace;min-height:40px;max-height:100px;overflow-y:auto;white-space:pre-wrap"></div>';
+  html+='<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">';
+  html+='<button onclick="window._jpFormat()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">Format</button>';
+  html+='<button onclick="window._jpMinify()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">Minify</button>';
+  html+='<button onclick="window._jpValidate()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px">Validate</button>';
+  html+='</div>';
+  d.innerHTML=html;
+  window._evalJsonPath=()=>{
+    const inp=document.getElementById('jsonpath-input');
+    const path=document.getElementById('jsonpath-path');
+    const out=document.getElementById('jsonpath-output');
+    if(!inp||!path||!out)return;
+    try{
+      const obj=JSON.parse(inp.value);
+      const parts=path.value.split('.');
+      let result=obj;
+      for(const p of parts){if(p&&result!==undefined)result=result[isNaN(p)?p:parseInt(p)];}
+      out.textContent=typeof result==='object'?JSON.stringify(result,null,2):String(result);
+      out.style.color='#4ade80';
+    }catch(e){out.textContent='Error: '+e.message;out.style.color='#ef4444';}
+  };
+  window._jpFormat=()=>{const inp=document.getElementById('jsonpath-input');if(!inp)return;try{inp.value=JSON.stringify(JSON.parse(inp.value),null,2);}catch(e){alert('Invalid JSON');}};
+  window._jpMinify=()=>{const inp=document.getElementById('jsonpath-input');if(!inp)return;try{inp.value=JSON.stringify(JSON.parse(inp.value));}catch(e){alert('Invalid JSON');}};
+  window._jpValidate=()=>{const out=document.getElementById('jsonpath-output');const inp=document.getElementById('jsonpath-input');if(!inp||!out)return;try{JSON.parse(inp.value);out.textContent='Valid JSON';out.style.color='#4ade80';}catch(e){out.textContent='Invalid: '+e.message;out.style.color='#ef4444';}};
   document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
