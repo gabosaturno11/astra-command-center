@@ -5687,6 +5687,7 @@ function cmdGetItems(q) {
       ['digest','Daily briefing + overdue + progress'],['goals:','Track daily + weekly goals'],
       ['streak','Activity streak + weekly heatmap'],['heatmap','90-day activity heatmap popup'],
       ['deps','Task dependency chain visualization'],['accent','Change accent color (8 presets)'],
+      ['pomodoro','Focus session stats + start timer'],['collections','Auto-detect content groups'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6690,6 +6691,37 @@ function cmdGetItems(q) {
       items.unshift({title:a.name,desc:'Set accent color to '+a.color,icon:'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+a.color+'"></span>',type:'action',action:()=>{document.documentElement.style.setProperty('--accent',a.color);S._accentColor=a.color;save();toast('Accent: '+a.name);closeCommandPalette();}});
     });
   }
+  // Pomodoro stats prefix
+  if(ql && (ql==='pomodoro' || ql.startsWith('pomodoro:') || ql==='pomo' || ql==='focus stats')){
+    if(!S.focusSessions)S.focusSessions=[];
+    const today=new Date().toISOString().split('T')[0];
+    const todaySessions=S.focusSessions.filter(s=>s.date===today);
+    const todayMins=todaySessions.reduce((a,s)=>a+s.minutes,0);
+    const weekStart=new Date();weekStart.setDate(weekStart.getDate()-7);const ws=weekStart.toISOString().split('T')[0];
+    const weekSessions=S.focusSessions.filter(s=>s.date>=ws);
+    const weekMins=weekSessions.reduce((a,s)=>a+s.minutes,0);
+    items.unshift({title:'Today: '+todaySessions.length+' sessions ('+todayMins+'min)',desc:'This week: '+weekSessions.length+' sessions ('+weekMins+'min)',icon:'P',type:'info'});
+    items.unshift({title:'Start 25-min focus session',desc:'Classic pomodoro',icon:'+',type:'action',action:()=>{closeCommandPalette();startFocusTimer(null,25);}});
+    items.unshift({title:'Start 50-min deep work',desc:'Extended focus block',icon:'+',type:'action',action:()=>{closeCommandPalette();startFocusTimer(null,50);}});
+    items.unshift({title:'Start 10-min sprint',desc:'Quick burst session',icon:'+',type:'action',action:()=>{closeCommandPalette();startFocusTimer(null,10);}});
+    todaySessions.slice(0,5).forEach(s=>{items.unshift({title:s.minutes+'min '+(s.task?'on: '+esc(s.task):'(no task)'),desc:s.date+' at '+(s.startedAt||'?'),icon:'*',type:'info'});});
+  }
+  // Collections prefix — auto-detect content groupings
+  if(ql && (ql==='collections' || ql.startsWith('collections:') || ql==='groups')){
+    const keywords={};
+    S.content.forEach(c=>{
+      const words=(c.body||'').toLowerCase().split(/\s+/).filter(w=>w.length>4);
+      const counts={};words.forEach(w=>{const clean=w.replace(/[^a-z]/g,'');if(clean.length>4)counts[clean]=(counts[clean]||0)+1;});
+      Object.entries(counts).filter(([,n])=>n>=2).forEach(([w])=>{if(!keywords[w])keywords[w]=[];keywords[w].push(c.id);});
+    });
+    const collections=Object.entries(keywords).filter(([,ids])=>ids.length>=3).sort((a,b)=>b[1].length-a[1].length).slice(0,10);
+    if(collections.length){
+      items.unshift({title:'Auto-detected '+collections.length+' content collections',desc:'Based on recurring keywords across items',icon:'C',type:'info'});
+      collections.forEach(([kw,ids])=>{
+        items.unshift({title:kw+' ('+ids.length+' items)',desc:'Recurring keyword across content items',icon:'#',type:'action',action:()=>{closeCommandPalette();document.getElementById('content-search').value=kw;renderContent();toast('Filtered: '+kw);}});
+      });
+    }else{items.unshift({title:'No collections detected yet',desc:'Add more content with recurring themes',icon:'!',type:'info'});}
+  }
   return items.slice(0, 20);
 }
 function showActivityHeatmap(){
@@ -7609,11 +7641,11 @@ async function reposHealthCheck(){
 }
 
 // === FOCUS TIMER ===
-let focusTimerInterval=null;let focusTimerEnd=0;let focusTimerTaskId=null;
+let focusTimerInterval=null;let focusTimerEnd=0;let focusTimerTaskId=null;let focusTimerStartedAt=null;let focusTimerMinutes=0;
 function startFocusTimer(taskId,minutes){
   minutes=minutes||25;
   if(focusTimerInterval){clearInterval(focusTimerInterval);const fp=document.getElementById('focus-timer-float');if(fp)fp.remove();}
-  focusTimerTaskId=taskId||null;focusTimerEnd=Date.now()+minutes*60*1000;
+  focusTimerTaskId=taskId||null;focusTimerEnd=Date.now()+minutes*60*1000;focusTimerStartedAt=new Date().toISOString();focusTimerMinutes=minutes;
   const t=taskId?S.tasks.find(x=>x.id===taskId):null;
   const panel=document.createElement('div');panel.id='focus-timer-float';
   panel.style.cssText='position:fixed;bottom:20px;right:20px;background:var(--bg-surface);border:1px solid var(--accent);border-radius:12px;padding:12px 16px;z-index:9999;min-width:200px;box-shadow:0 8px 32px rgba(0,0,0,0.4)';
@@ -7631,8 +7663,10 @@ function startFocusTimer(taskId,minutes){
 function stopFocusTimer(){
   if(focusTimerInterval){clearInterval(focusTimerInterval);focusTimerInterval=null;}
   const fp=document.getElementById('focus-timer-float');if(fp)fp.remove();
-  if(focusTimerTaskId){const elapsed=Math.max(0,Math.round(((focusTimerEnd>Date.now()?focusTimerEnd-(focusTimerEnd-Date.now()):focusTimerEnd)-Date.now()+focusTimerEnd-Date.now())/60000));const t=S.tasks.find(x=>x.id===focusTimerTaskId);if(t){const mins=Math.max(1,Math.round((Date.now()-(focusTimerEnd-25*60000))/60000));t.timeSpent=(t.timeSpent||0)+mins;save();renderTasks();}}
-  focusTimerTaskId=null;
+  const elapsed=focusTimerStartedAt?Math.max(1,Math.round((Date.now()-new Date(focusTimerStartedAt).getTime())/60000)):0;
+  if(focusTimerTaskId){const t=S.tasks.find(x=>x.id===focusTimerTaskId);if(t){t.timeSpent=(t.timeSpent||0)+elapsed;save();renderTasks();}}
+  if(elapsed>0&&focusTimerStartedAt){if(!S.focusSessions)S.focusSessions=[];const t=focusTimerTaskId?S.tasks.find(x=>x.id===focusTimerTaskId):null;S.focusSessions.unshift({date:new Date().toISOString().split('T')[0],minutes:elapsed,task:t?t.title:'',startedAt:new Date(focusTimerStartedAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}),planned:focusTimerMinutes});if(S.focusSessions.length>200)S.focusSessions.length=200;save();}
+  focusTimerTaskId=null;focusTimerStartedAt=null;focusTimerMinutes=0;
 }
 function extendFocusTimer(mins){focusTimerEnd+=mins*60*1000;toast('+'+mins+' minutes added');}
 
