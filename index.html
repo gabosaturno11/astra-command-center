@@ -6296,6 +6296,9 @@ function cmdGetItems(q) {
       ['graphql','GraphQL schema generator'],
       ['throughput','Weekly task throughput chart'],
       ['text diff','Side-by-side text comparison'],
+      ['socket.io','Socket.IO boilerplate code'],
+      ['project radar','Multi-project radar chart'],
+      ['markdown preview','Live markdown preview'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9353,6 +9356,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='text diff' || ql==='diff' || ql==='compare text' || ql==='text compare')){
     items.unshift({title:'Text Diff',desc:'Compare two texts side by side',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickTextDiff();}});
+  }
+  if(ql && (ql==='socket.io' || ql==='socketio' || ql==='websocket' || ql==='realtime')){
+    items.unshift({title:'Socket.IO Boilerplate',desc:'Server, React client, chat room templates',icon:'S',type:'action',action:()=>{closeCommandPalette();showSocketIoBoilerplate();}});
+  }
+  if(ql && (ql==='project radar' || ql==='radar chart' || ql==='radar' || ql==='project metrics')){
+    items.unshift({title:'Project Radar',desc:'Multi-project radar comparison chart',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskProjectRadar();}});
+  }
+  if(ql && (ql==='markdown preview' || ql==='md preview' || ql==='markdown' || ql==='preview markdown')){
+    items.unshift({title:'Markdown Preview',desc:'Live side-by-side markdown renderer',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownPreview();}});
   }
   return items.slice(0, 20);
 }
@@ -26657,6 +26669,93 @@ function showQuickTextDiff(){
     const t1=document.getElementById('diff-t1').value;
     const t2=document.getElementById('diff-t2').value;
     rend(t1,t2);
+  };
+  document.body.appendChild(d);rend();
+}
+function showSocketIoBoilerplate(){
+  let ex=document.getElementById('socketio-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'Server':`const { Server } = require('socket.io');\nconst http = require('http');\nconst express = require('express');\n\nconst app = express();\nconst server = http.createServer(app);\nconst io = new Server(server, {\n  cors: { origin: '*' }\n});\n\nio.on('connection', (socket) => {\n  console.log('User connected:', socket.id);\n\n  socket.on('join-room', (room) => {\n    socket.join(room);\n    socket.to(room).emit('user-joined', socket.id);\n  });\n\n  socket.on('message', (data) => {\n    io.to(data.room).emit('message', {\n      user: socket.id,\n      text: data.text,\n      timestamp: new Date().toISOString()\n    });\n  });\n\n  socket.on('disconnect', () => {\n    console.log('User disconnected:', socket.id);\n  });\n});\n\nserver.listen(3001, () => {\n  console.log('Socket.IO server on port 3001');\n});`,
+    'React Client':`import { useEffect, useState } from 'react';\nimport { io } from 'socket.io-client';\n\nconst socket = io('http://localhost:3001');\n\nexport function useSocket() {\n  const [connected, setConnected] = useState(false);\n  const [messages, setMessages] = useState([]);\n\n  useEffect(() => {\n    socket.on('connect', () => setConnected(true));\n    socket.on('disconnect', () => setConnected(false));\n\n    socket.on('message', (msg) => {\n      setMessages((prev) => [...prev, msg]);\n    });\n\n    return () => {\n      socket.off('connect');\n      socket.off('disconnect');\n      socket.off('message');\n    };\n  }, []);\n\n  const sendMessage = (room, text) => {\n    socket.emit('message', { room, text });\n  };\n\n  const joinRoom = (room) => {\n    socket.emit('join-room', room);\n  };\n\n  return { connected, messages, sendMessage, joinRoom };\n}`,
+    'Chat Room':`// Server: chat room with typing indicators\nio.on('connection', (socket) => {\n  let username = '';\n\n  socket.on('set-username', (name) => {\n    username = name;\n    io.emit('user-list', getUsers());\n  });\n\n  socket.on('typing', (room) => {\n    socket.to(room).emit('typing', { user: username });\n  });\n\n  socket.on('stop-typing', (room) => {\n    socket.to(room).emit('stop-typing', { user: username });\n  });\n\n  socket.on('chat-message', ({ room, message }) => {\n    io.to(room).emit('chat-message', {\n      user: username,\n      message,\n      timestamp: Date.now()\n    });\n  });\n});`
+  };
+  let sel='Server';
+  const d=document.createElement('div');d.id='socketio-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-siopre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-siopre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Socket.IO Boilerplate</span><span onclick="document.getElementById('socketio-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#socketio-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Code',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Code</button>
+    </div>`;
+    d.querySelectorAll('[data-siopre]').forEach(b=>b.onclick=()=>{sel=b.dataset.siopre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskProjectRadar(){
+  let ex=document.getElementById('project-radar-float');if(ex){ex.remove();return;}
+  const projects=S.projects||[];
+  const tasks=S.tasks||[];
+  const metrics=projects.map(p=>{
+    const pt=tasks.filter(t=>t.projectId===p.id);
+    const total=pt.length||1;
+    const done=pt.filter(t=>t.status==='done').length;
+    const active=pt.filter(t=>t.status==='in-progress').length;
+    const overdue=pt.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length;
+    return{name:p.name,completion:done/total,activity:active/Math.max(total,1),health:1-(overdue/Math.max(total,1)),volume:Math.min(total/10,1)};
+  }).slice(0,6);
+  const cx=120,cy=120,r=90;
+  const dims=['Completion','Activity','Health','Volume'];
+  const angles=dims.map((_,i)=>(i*2*Math.PI/dims.length)-Math.PI/2);
+  const axes=dims.map((d,i)=>{
+    const x=cx+r*Math.cos(angles[i]);const y=cy+r*Math.sin(angles[i]);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--border)" stroke-width="1"/><text x="${cx+(r+14)*Math.cos(angles[i])}" y="${cy+(r+14)*Math.sin(angles[i])}" text-anchor="middle" fill="var(--text-muted)" font-size="8">${d}</text>`;
+  }).join('');
+  const colors=['#4ade80','#22d3ee','#a78bfa','#fb923c','#f87171','#facc15'];
+  const polys=metrics.map((m,mi)=>{
+    const vals=[m.completion,m.activity,m.health,m.volume];
+    const pts=vals.map((v,i)=>`${cx+v*r*0.8*Math.cos(angles[i])},${cy+v*r*0.8*Math.sin(angles[i])}`).join(' ');
+    return `<polygon points="${pts}" fill="${colors[mi%colors.length]}" fill-opacity="0.15" stroke="${colors[mi%colors.length]}" stroke-width="1.5"/>`;
+  }).join('');
+  const legend=metrics.map((m,i)=>`<span style="font-size:9px;color:${colors[i%colors.length]};display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:${colors[i%colors.length]}"></span>${esc(m.name)}</span>`).join('');
+  const d=document.createElement('div');d.id='project-radar-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:340px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;color:var(--text-primary)">Project Radar</span><span onclick="document.getElementById('project-radar-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="text-align:center"><svg width="240" height="240" viewBox="0 0 240 240">${axes}${polys}</svg></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">${legend}</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickMarkdownPreview(){
+  let ex=document.getElementById('md-preview-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='md-preview-float';
+  const renderMd=(text)=>{
+    return text
+      .replace(/^### (.+)$/gm,'<h3 style="font-size:14px;color:var(--text-primary);margin:8px 0 4px">$1</h3>')
+      .replace(/^## (.+)$/gm,'<h2 style="font-size:16px;color:var(--text-primary);margin:10px 0 4px">$1</h2>')
+      .replace(/^# (.+)$/gm,'<h1 style="font-size:18px;color:var(--text-primary);margin:12px 0 6px">$1</h1>')
+      .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g,'<em>$1</em>')
+      .replace(/`(.+?)`/g,'<code style="background:var(--bg-surface);padding:1px 4px;border-radius:3px;font-size:11px">$1</code>')
+      .replace(/^- (.+)$/gm,'<li style="margin-left:16px;font-size:12px">$1</li>')
+      .replace(/^(\d+)\. (.+)$/gm,'<li style="margin-left:16px;font-size:12px">$2</li>')
+      .replace(/\n/g,'<br>');
+  };
+  const rend=(md)=>{
+    md=md||'# Hello World\n\n## Subtitle\n\nThis is **bold** and *italic* text with `inline code`.\n\n- Item one\n- Item two\n- Item three\n\n1. First\n2. Second\n3. Third';
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Markdown Preview</span><span onclick="document.getElementById('md-preview-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label style="font-size:10px;color:var(--text-muted)">Markdown</label><textarea id="md-input" rows="12" oninput="window._mdPreview()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-top:4px">${esc(md)}</textarea></div>
+        <div><label style="font-size:10px;color:var(--text-muted)">Preview</label><div id="md-output" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-secondary);font-size:12px;line-height:1.6;margin-top:4px;min-height:200px;overflow-y:auto">${renderMd(md)}</div></div>
+      </div>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('md-input').value);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Markdown',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-top:10px">Copy Markdown</button>
+    </div>`;
+  };
+  window._mdPreview=()=>{
+    const txt=document.getElementById('md-input').value;
+    document.getElementById('md-output').innerHTML=renderMd(txt);
   };
   document.body.appendChild(d);rend();
 }
