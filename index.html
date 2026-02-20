@@ -5878,6 +5878,8 @@ function cmdGetItems(q) {
       ['multi project','Dashboard across all projects'],
       ['export themes','Export content grouped by theme to clipboard'],
       ['global search','Dedicated search panel across all sections'],
+      ['notifications','Overdue, WIP, streak, and storage alerts'],
+      ['stats history','Daily stats tracked over time (90 days)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7488,6 +7490,14 @@ function cmdGetItems(q) {
   // Global search prefix
   if(ql && (ql==='global search' || ql==='search all' || ql==='deep search' || ql==='find everything')){
     items.unshift({title:'Global Search',desc:'Dedicated search panel across all data',icon:'S',type:'action',action:()=>{closeCommandPalette();showGlobalSearch();}});
+  }
+  // Notification center prefix
+  if(ql && (ql==='notifications' || ql==='alerts' || ql==='notification center' || ql==='warnings')){
+    items.unshift({title:'Notification Center',desc:'Overdue, WIP warnings, streak, storage alerts',icon:'N',type:'action',action:()=>{closeCommandPalette();showNotificationCenter();}});
+  }
+  // Stats history prefix
+  if(ql && (ql==='stats history' || ql==='daily stats' || ql==='growth' || ql==='workspace growth')){
+    items.unshift({title:'Stats History',desc:'Daily stats tracked over 90 days with bar chart',icon:'S',type:'action',action:()=>{closeCommandPalette();showStatsHistory();}});
   }
   return items.slice(0, 20);
 }
@@ -10960,6 +10970,91 @@ function runGlobalSearch(query){
     });
   }
   results.innerHTML=html;
+}
+function showNotificationCenter(){
+  const notifications=[];const tasks=S.tasks||[];const now=new Date();const today=now.toISOString().split('T')[0];
+  const overdue=tasks.filter(t=>t.due&&t.due<today&&t.status!=='done');
+  overdue.forEach(t=>{notifications.push({type:'overdue',icon:'!',color:'#ef4444',title:'Overdue: '+t.title,detail:'Due '+t.due});});
+  const dueToday=tasks.filter(t=>t.due===today&&t.status!=='done');
+  dueToday.forEach(t=>{notifications.push({type:'today',icon:'T',color:'#f59e0b',title:'Due today: '+t.title,detail:t.priority||''});});
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  if(inProgress.length>5)notifications.push({type:'wip',icon:'W',color:'#3b82f6',title:'WIP Warning',detail:inProgress.length+' tasks in progress (recommend <5)'});
+  const sd=S._streakData||{};
+  if(sd.currentStreak>=7)notifications.push({type:'streak',icon:'S',color:'#4ade80',title:'Streak: '+sd.currentStreak+' days!',detail:'Keep it going!'});
+  const storageSize=new Blob([JSON.stringify(S)]).size;
+  if(storageSize>4*1024*1024)notifications.push({type:'storage',icon:'D',color:'#f97316',title:'Storage Warning',detail:Math.round(storageSize/1024)+'KB used (approaching 5MB limit)'});
+  const panel=document.createElement('div');panel.id='notification-center-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Notifications (${notifications.length})</span><button onclick="document.getElementById('notification-center-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  if(!notifications.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">All clear! No notifications.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    notifications.forEach(n=>{
+      h+=`<div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-surface);border-radius:8px;border-left:3px solid ${n.color}">`;
+      h+=`<div style="width:28px;height:28px;border-radius:50%;background:${n.color}20;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span style="font-size:12px;font-weight:700;color:${n.color}">${n.icon}</span></div>`;
+      h+=`<div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text-primary)">${esc(n.title)}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">${esc(n.detail)}</div></div>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function trackDailyStats(){
+  if(!S._dailyStats)S._dailyStats=[];
+  const today=new Date().toISOString().split('T')[0];
+  const existing=S._dailyStats.find(d=>d.date===today);
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];
+  const stats={
+    date:today,
+    tasks:tasks.length,
+    done:tasks.filter(t=>t.status==='done').length,
+    content:content.length,
+    links:links.length,
+    words:content.reduce((a,c)=>a+((c.body||'').split(/\s+/).filter(w=>w).length),0),
+    storage:Math.round(new Blob([JSON.stringify(S)]).size/1024)
+  };
+  if(existing){Object.assign(existing,stats);}
+  else{S._dailyStats.push(stats);if(S._dailyStats.length>90)S._dailyStats=S._dailyStats.slice(-90);}
+  save();
+}
+function showStatsHistory(){
+  trackDailyStats();
+  const stats=S._dailyStats||[];
+  const panel=document.createElement('div');panel.id='stats-history-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Stats History (${stats.length} days)</span><button onclick="document.getElementById('stats-history-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  if(stats.length<2){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">Not enough history yet. Check back tomorrow!</div>`;
+  } else {
+    const recent=stats.slice(-14);
+    const maxTasks=Math.max(...recent.map(s=>s.tasks),1);
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Task Growth (last ${recent.length} days)</div>`;
+    h+=`<div style="display:flex;align-items:end;gap:4px;height:100px;margin-bottom:16px;padding:4px;background:var(--bg-surface);border-radius:8px">`;
+    recent.forEach(s=>{
+      const height=Math.round((s.tasks/maxTasks)*80);
+      const doneHeight=Math.round((s.done/maxTasks)*80);
+      h+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end" title="${s.date}: ${s.tasks} tasks, ${s.done} done">`;
+      h+=`<div style="width:100%;height:${height}px;background:var(--accent);border-radius:2px 2px 0 0;position:relative">`;
+      h+=`<div style="position:absolute;bottom:0;width:100%;height:${doneHeight}px;background:#1a4731;border-radius:0 0 2px 2px"></div>`;
+      h+=`</div></div>`;
+    });
+    h+=`</div>`;
+    h+=`<div style="display:grid;gap:4px">`;
+    stats.slice(-7).reverse().forEach(s=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:4px;font-size:10px">`;
+      h+=`<span style="color:var(--text-muted);width:65px;flex-shrink:0">${s.date.substring(5)}</span>`;
+      h+=`<span style="color:var(--accent)">Tasks: ${s.tasks}</span>`;
+      h+=`<span style="color:#4ade80">Done: ${s.done}</span>`;
+      h+=`<span style="color:#3b82f6">Content: ${s.content}</span>`;
+      h+=`<span style="color:#f59e0b">Links: ${s.links}</span>`;
+      h+=`<span style="color:var(--text-muted)">${s.storage}KB</span>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
