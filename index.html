@@ -845,6 +845,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm" onclick="contentBulkExport()">Export Selected</button>
             <button class="btn btn-sm" onclick="toggleContentBulk()">Cancel</button>
           </div>
+          <button class="btn btn-sm" onclick="tagAllVisibleContent()" title="Add a tag to all currently visible items">Tag All</button>
           <button class="btn btn-primary btn-sm" onclick="openContentModal()">+ Add</button>
         </div>
       </div>
@@ -1722,6 +1723,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm" onclick="taskToContent()" title="Save task details as content">To Content</button>
       <button class="btn btn-sm" id="td-timer-btn" onclick="toggleTaskTimer()" title="Start/stop time tracking"></button>
       <button class="btn btn-sm" onclick="ftStartForTask(taskDetailId)" title="Start 25min focus timer for this task" style="color:var(--accent)">Focus</button>
+      <button class="btn btn-sm" id="td-unblock-btn" onclick="unblockTask()" title="Clear blocked-by and set to todo" style="display:none;color:var(--orange)">Unblock</button>
       <button class="btn btn-sm" onclick="copyTaskAsMarkdown()" title="Copy task as markdown">Copy MD</button>
       <button class="btn btn-sm" onclick="snoozeTask(1)" title="Push due date +1 day" style="color:var(--yellow)">+1d</button>
       <button class="btn btn-sm" onclick="snoozeTask(7)" title="Push due date +1 week" style="color:var(--yellow)">+1w</button>
@@ -2466,6 +2468,19 @@ function contentBulkTag(){
   S.content.forEach(c=>{if(contentSelected.has(c.id)){if(!c.tags)c.tags=[];if(!c.tags.includes(t))c.tags.push(t);}});
   save();contentSelected.clear();renderContent();toast('Tagged');
 }
+function tagAllVisibleContent(){
+  let items=S.content;
+  if(contentType!=='all')items=items.filter(c=>c.type===contentType);
+  if(contentTheme!=='all')items=items.filter(c=>c.theme===contentTheme);
+  if(contentTagFilter)items=items.filter(c=>(c.tags||[]).includes(contentTagFilter));
+  const q=(document.getElementById('content-search')?.value||'').toLowerCase();
+  if(q)items=items.filter(c=>(c.body+' '+c.theme+' '+(c.tags||[]).join(' ')).toLowerCase().includes(q));
+  if(!items.length){toast('No visible items');return;}
+  const tag=prompt('Tag to add to '+items.length+' visible items:');
+  if(!tag)return;const t=tag.trim().toLowerCase();
+  items.forEach(c=>{if(!c.tags)c.tags=[];if(!c.tags.includes(t))c.tags.push(t);});
+  save();renderContent();toast('Tagged '+items.length+' items with "'+t+'"');
+}
 function contentBulkExport(){
   if(!contentSelected.size){toast('Select items first');return;}
   const items=[...contentSelected].map(id=>S.content.find(c=>c.id===id)).filter(Boolean);
@@ -2672,9 +2687,11 @@ function openTaskDetail(id) {
   if(logEl&&t.log&&t.log.length){logEl.innerHTML='<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Activity</div>'+t.log.slice(-5).reverse().map(e=>`<div style="font-size:8px;color:var(--text-muted);padding:1px 0;font-family:var(--mono)">${e.from} -> ${e.to} <span style="opacity:0.5">${timeAgo(e.at)}</span></div>`).join('');}else if(logEl){logEl.innerHTML='';}
   renderSubtasksInModal(t.subtasks || []);
   updateTimerBtn(t);
+  const ubBtn=document.getElementById('td-unblock-btn');if(ubBtn)ubBtn.style.display=(t.status==='blocked'||t.blockedBy)?'inline-block':'none';
   document.getElementById('task-detail-modal').classList.add('open');
   setTimeout(()=>document.getElementById('td-title').focus(),100);
 }
+function unblockTask(){const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;t.blockedBy='';if(t.status==='blocked')t.status='todo';document.getElementById('td-blocked-by').value='';document.getElementById('td-status').value=t.status;document.getElementById('td-unblock-btn').style.display='none';save();renderTasks();toast('Unblocked');}
 function formatTimeSpent(mins){if(mins<60)return mins+'m';const h=Math.floor(mins/60);const m=mins%60;return h+'h'+(m?' '+m+'m':'');}
 function tdSetDue(days){const d=new Date();d.setDate(d.getDate()+days);document.getElementById('td-due').value=d.toISOString().split('T')[0];}
 function closeTaskDetail() {
