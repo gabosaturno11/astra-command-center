@@ -6647,6 +6647,12 @@ function cmdGetItems(q) {
       ['bun','Bun runtime reference'],
       ['work diary','7-day work diary log'],
       ['flexbox','CSS flexbox cheat sheet'],
+      ['cloudflare','Cloudflare Workers KV D1 R2 ref'],
+      ['blocker','Blocked task dependency report'],
+      ['css grid','CSS grid layout reference'],
+      ['vercel','Vercel CLI config serverless ref'],
+      ['priority shift','Priority distribution by status'],
+      ['ascii','ASCII character table reference'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10757,6 +10763,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='flexbox' || ql==='flex' || ql==='css flex' || ql==='flexbox ref')){
     items.unshift({title:'Flexbox Reference',desc:'CSS flexbox cheat sheet',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFlexboxRef();}});
+  }
+  if(ql && (ql==='cloudflare' || ql==='cf workers' || ql==='cloudflare ref' || ql==='wrangler')){
+    items.unshift({title:'Cloudflare Reference',desc:'Workers, KV, D1, R2, Pages',icon:'C',type:'action',action:()=>{closeCommandPalette();showCloudflareRef();}});
+  }
+  if(ql && (ql==='blocker' || ql==='blocker report' || ql==='blocked tasks' || ql==='blockers')){
+    items.unshift({title:'Blocker Report',desc:'Task dependency blockers',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBlockerReport();}});
+  }
+  if(ql && (ql==='css grid' || ql==='grid' || ql==='grid layout' || ql==='css grid ref')){
+    items.unshift({title:'CSS Grid Reference',desc:'Grid layout cheat sheet',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickCSSGridRef();}});
+  }
+  if(ql && (ql==='vercel' || ql==='vercel ref' || ql==='vercel cli' || ql==='vercel reference')){
+    items.unshift({title:'Vercel Reference',desc:'CLI, config, serverless, storage',icon:'V',type:'action',action:()=>{closeCommandPalette();showVercelRef();}});
+  }
+  if(ql && (ql==='priority shift' || ql==='priority distribution' || ql==='priority by status' || ql==='priority breakdown')){
+    items.unshift({title:'Priority Shift',desc:'Priority distribution by status',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityShift();}});
+  }
+  if(ql && (ql==='ascii' || ql==='ascii table' || ql==='ascii chart' || ql==='char codes')){
+    items.unshift({title:'ASCII Table',desc:'Printable ASCII character table',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAsciiTable();}});
   }
   return items.slice(0, 20);
 }
@@ -37850,6 +37874,145 @@ function showQuickFlexboxRef(){
       h+='<div style="font-size:11px;padding:3px 6px;margin:2px 0;background:var(--bg-surface);border-radius:3px;font-family:monospace;color:var(--text-secondary);cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+p+'</div>';
     });
   });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showCloudflareRef(){
+  let d=document.getElementById('cf-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='cf-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Workers':['export default { async fetch(request, env, ctx) { return new Response("Hello") } }','addEventListener("fetch", event => { event.respondWith(handleRequest(event.request)) })','wrangler dev','wrangler deploy','wrangler tail','wrangler secret put SECRET_NAME'],
+    'KV':['await env.MY_KV.get("key")','await env.MY_KV.put("key", "value")','await env.MY_KV.delete("key")','await env.MY_KV.list({ prefix: "user:" })','wrangler kv:namespace create "MY_KV"'],
+    'D1 (SQLite)':['const result = await env.DB.prepare("SELECT * FROM users").all()','await env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind("Alice").run()','wrangler d1 create my-database','wrangler d1 execute my-database --command "CREATE TABLE..."'],
+    'R2 (Storage)':['await env.MY_BUCKET.put("file.txt", data)','const obj = await env.MY_BUCKET.get("file.txt")','await env.MY_BUCKET.delete("file.txt")','await env.MY_BUCKET.list()'],
+    'Pages':['wrangler pages deploy ./dist','wrangler pages project create my-project','export function onRequestGet(context) { ... }','export function onRequestPost(context) { ... }'],
+    'Config (wrangler.toml)':['name = "my-worker"','main = "src/index.ts"','compatibility_date = "2024-01-01"','[vars]','API_KEY = "..."','[[kv_namespaces]]','binding = "MY_KV"']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Cloudflare Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskBlockerReport(){
+  let d=document.getElementById('blocker-report-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='blocker-report-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const blocked=tasks.filter(t=>t.blockedBy&&t.blockedBy.length>0);
+  const blockers={};
+  blocked.forEach(t=>{
+    (t.blockedBy||[]).forEach(bid=>{
+      if(!blockers[bid])blockers[bid]={blocker:null,blocking:[]};
+      blockers[bid].blocking.push(t);
+    });
+  });
+  Object.keys(blockers).forEach(bid=>{
+    blockers[bid].blocker=tasks.find(t=>t.id===bid)||(S.tasks||[]).find(t=>t.id===bid);
+  });
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Blocker Report</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:12px;color:'+(blocked.length>0?'#f87171':'#4ade80')+';margin-bottom:12px;font-weight:600">'+blocked.length+' blocked task'+(blocked.length!==1?'s':'')+'</div>';
+  if(Object.keys(blockers).length>0){
+    Object.entries(blockers).forEach(([bid,data])=>{
+      const bName=data.blocker?data.blocker.title:'Unknown ('+bid+')';
+      const bStatus=data.blocker?data.blocker.status:'unknown';
+      h+='<div style="margin:8px 0;padding:10px;background:var(--bg-surface);border-radius:6px;border-left:3px solid #f87171">';
+      h+='<div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:4px">Blocker: '+esc(bName)+' <span style="font-size:10px;color:var(--text-muted);text-transform:capitalize">('+bStatus+')</span></div>';
+      h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Blocking '+data.blocking.length+' task(s):</div>';
+      data.blocking.forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0;padding-left:12px">'+esc(t.title)+'</div>';});
+      h+='</div>';
+    });
+  }else{
+    h+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No blocked tasks. All clear!</div>';
+  }
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickCSSGridRef(){
+  let d=document.getElementById('grid-ref-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='grid-ref-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  const props={
+    'Container':['display: grid','grid-template-columns: repeat(3, 1fr)','grid-template-columns: 200px auto 1fr','grid-template-rows: 100px auto','grid-template-areas: "header header" "sidebar main" "footer footer"','gap: 16px','row-gap: 8px','column-gap: 16px','justify-items: start | center | end | stretch','align-items: start | center | end | stretch','place-items: center','grid-auto-flow: row | column | dense'],
+    'Items':['grid-column: 1 / 3','grid-row: 1 / -1','grid-area: header','justify-self: center','align-self: end','place-self: center'],
+    'Functions':['repeat(3, 1fr)','minmax(200px, 1fr)','auto-fill','auto-fit','fit-content(300px)','min(200px, 50%)','max(100px, 10vw)']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">CSS Grid Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  Object.entries(props).forEach(([cat,arr])=>{
+    h+='<div style="font-size:10px;color:var(--accent);margin:10px 0 4px;font-weight:600">'+cat+'</div>';
+    arr.forEach(p=>{
+      h+='<div style="font-size:11px;padding:3px 6px;margin:2px 0;background:var(--bg-surface);border-radius:3px;font-family:monospace;color:var(--text-secondary);cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+p+'</div>';
+    });
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showVercelRef(){
+  let d=document.getElementById('vercel-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='vercel-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['vercel','vercel --prod','vercel dev','vercel env pull .env.local','vercel env add SECRET','vercel logs','vercel domains add domain.com','vercel domains ls','vercel inspect deployment-url'],
+    'Config (vercel.json)':['{ "rewrites": [{ "source": "/api/(.*)", "destination": "/api/$1" }] }','{ "redirects": [{ "source": "/old", "destination": "/new", "permanent": true }] }','{ "headers": [{ "source": "/(.*)", "headers": [{ "key": "X-Frame-Options", "value": "DENY" }] }] }','{ "regions": ["iad1"], "functions": { "api/*.js": { "memory": 1024 } } }'],
+    'Serverless Functions':['export default function handler(req, res) { res.json({ ok: true }) }','export const config = { runtime: "edge" }','export function GET(request) { return Response.json({ ok: true }) }','import { put } from "@vercel/blob"','import { kv } from "@vercel/kv"'],
+    'Environment':['VERCEL_URL','VERCEL_ENV (production | preview | development)','VERCEL_GIT_COMMIT_SHA','VERCEL_GIT_COMMIT_MESSAGE','process.env.MY_SECRET'],
+    'Storage':['@vercel/blob (file storage)','@vercel/kv (Redis-compatible KV)','@vercel/postgres (PostgreSQL)','@vercel/edge-config (edge config)']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Vercel Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskPriorityShift(){
+  let d=document.getElementById('priority-shift-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='priority-shift-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const priorities=['p0','p1','p2','p3'];
+  const pColors={p0:'#f87171',p1:'#fb923c',p2:'#38bdf8',p3:'#94a3b8'};
+  const byStatus={};
+  ['backlog','todo','in-progress','review','done'].forEach(s=>{byStatus[s]={p0:0,p1:0,p2:0,p3:0};});
+  tasks.forEach(t=>{
+    const s=t.status||'todo';const p=t.priority||'p3';
+    if(byStatus[s]&&byStatus[s][p]!==undefined)byStatus[s][p]++;
+  });
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Priority Shift</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:auto repeat(4,1fr);gap:2px;font-size:11px">';
+  h+='<div></div>';priorities.forEach(p=>{h+='<div style="text-align:center;color:'+pColors[p]+';font-weight:600;padding:4px">'+p.toUpperCase()+'</div>';});
+  Object.entries(byStatus).forEach(([status,counts])=>{
+    const total=Object.values(counts).reduce((a,b)=>a+b,0);if(total===0)return;
+    h+='<div style="color:var(--text-secondary);padding:4px 8px;text-transform:capitalize">'+status+'</div>';
+    priorities.forEach(p=>{
+      const count=counts[p];
+      const bg=count>0?pColors[p]+'22':'transparent';
+      h+='<div style="text-align:center;padding:4px;background:'+bg+';border-radius:3px;color:'+(count>0?pColors[p]:'var(--text-muted)')+'">'+count+'</div>';
+    });
+  });
+  h+='</div>';
+  const totalByP={};priorities.forEach(p=>{totalByP[p]=tasks.filter(t=>(t.priority||'p3')===p).length;});
+  h+='<div style="margin-top:16px;display:flex;gap:8px;justify-content:center">';
+  priorities.forEach(p=>{
+    h+='<div style="text-align:center;padding:8px 12px;background:var(--bg-surface);border-radius:6px"><div style="font-size:18px;font-weight:700;color:'+pColors[p]+'">'+totalByP[p]+'</div><div style="font-size:9px;color:var(--text-muted)">'+p.toUpperCase()+'</div></div>';
+  });
+  h+='</div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickAsciiTable(){
+  let d=document.getElementById('ascii-table-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='ascii-table-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">ASCII Table</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;font-family:monospace;font-size:10px">';
+  h+='<div style="padding:3px;color:var(--accent);font-weight:600">Dec</div><div style="padding:3px;color:var(--accent);font-weight:600">Hex</div><div style="padding:3px;color:var(--accent);font-weight:600">Char</div><div style="padding:3px;color:var(--accent);font-weight:600">Name</div>';
+  const specials={0:'NUL',7:'BEL',8:'BS',9:'TAB',10:'LF',13:'CR',27:'ESC',32:'SPC',127:'DEL'};
+  for(let i=32;i<127;i++){
+    h+='<div style="padding:2px 3px;color:var(--text-muted)">'+i+'</div>';
+    h+='<div style="padding:2px 3px;color:var(--text-muted)">0x'+i.toString(16).toUpperCase()+'</div>';
+    h+='<div style="padding:2px 3px;color:var(--text-primary);cursor:pointer" onclick="navigator.clipboard.writeText(\''+String.fromCharCode(i).replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-primary)\',600)">'+esc(String.fromCharCode(i))+'</div>';
+    h+='<div style="padding:2px 3px;color:var(--text-muted);font-size:8px">'+(specials[i]||'')+'</div>';
+  }
+  h+='</div>';
   d.innerHTML=h;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
