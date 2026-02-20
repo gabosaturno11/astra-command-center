@@ -5805,6 +5805,9 @@ function cmdGetItems(q) {
       ['velocity','12-week task velocity line chart'],
       ['quick note','Toggle floating quick-note capture button'],
       ['bookmarklets','Generate bookmarklets for capturing to ASTRA'],
+      ['workspace search','Deep search across all sections with results'],
+      ['batch edit','Edit multiple tasks at once (priority, status, project)'],
+      ['content stats','Content analytics: types, themes, tags, word counts'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7114,6 +7117,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='bookmarklets' || ql==='bookmarklet' || ql==='browser capture' || ql==='capture bookmarks')){
     items.unshift({title:'Bookmarklet Generator',desc:'Create browser bookmarklets to save links/text/tasks',icon:'B',type:'action',action:()=>{closeCommandPalette();showBookmarkletGenerator();}});
   }
+  // Workspace search prefix
+  if(ql && (ql==='workspace search' || ql==='deep search' || ql==='search all' || ql==='global search')){
+    items.unshift({title:'Workspace Search',desc:'Deep search across tasks, content, docs, and links',icon:'S',type:'action',action:()=>{closeCommandPalette();showWorkspaceSearch();}});
+  }
+  // Batch edit prefix
+  if(ql && (ql==='batch edit' || ql==='batch tasks' || ql==='bulk edit' || ql==='mass edit')){
+    items.unshift({title:'Batch Task Editor',desc:'Select and edit multiple tasks at once',icon:'B',type:'action',action:()=>{closeCommandPalette();showBatchTaskEditor();}});
+  }
+  // Content stats prefix
+  if(ql && (ql==='content stats' || ql==='content analytics' || ql==='content dashboard' || ql==='content report')){
+    items.unshift({title:'Content Stats Dashboard',desc:'Types, themes, tags, word counts, trends',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentStats();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -8181,6 +8196,125 @@ function showBookmarkletGenerator(){
   });
   h+='<div style="font-size:9px;color:var(--text-muted);margin-top:8px;font-style:italic">Note: Bookmarklets work on the same domain. For cross-domain, use the Nexus Capture extension.</div>';
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Bookmarklet Generator</span><button onclick="document.getElementById('bookmarklet-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showWorkspaceSearch(initialQuery){
+  let panel=document.getElementById('ws-search-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='ws-search-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:85vh;overflow-y:auto';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Workspace Search</span><button onclick="document.getElementById('ws-search-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><input id="ws-search-input" placeholder="Search everything..." value="${initialQuery||''}" style="width:100%;padding:8px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;margin-bottom:10px;box-sizing:border-box" autofocus><div id="ws-search-results" style="font-size:10px"></div>`;
+  document.body.appendChild(panel);
+  const input=document.getElementById('ws-search-input');
+  input.addEventListener('input',()=>runWorkspaceSearch(input.value));
+  if(initialQuery)runWorkspaceSearch(initialQuery);
+  input.focus();
+}
+function runWorkspaceSearch(q){
+  const results=document.getElementById('ws-search-results');if(!results)return;
+  if(!q||q.length<2){results.innerHTML='<div style="color:var(--text-muted);padding:12px;text-align:center">Type at least 2 characters...</div>';return;}
+  const ql=q.toLowerCase();const matches=[];
+  S.tasks.forEach(t=>{
+    const score=((t.title||'').toLowerCase().includes(ql)?3:0)+((t.description||'').toLowerCase().includes(ql)?2:0)+((t.project||'').toLowerCase().includes(ql)?1:0);
+    if(score>0)matches.push({section:'Tasks',title:t.title||'Untitled',preview:(t.description||'').substring(0,80),score,action:`openTaskDetail(${t.id})`,color:'#06b6d4',status:t.status,pri:t.priority});
+  });
+  S.content.forEach(c=>{
+    const score=((c.body||'').toLowerCase().includes(ql)?3:0)+((c.tags||[]).join(' ').toLowerCase().includes(ql)?2:0)+((c.theme||'').toLowerCase().includes(ql)?1:0);
+    if(score>0)matches.push({section:'Content',title:(c.body||'').substring(0,60),preview:c.type+' | '+(c.theme||''),score,action:`openContentModal(${c.id})`,color:'#f59e0b'});
+  });
+  (S.docs||[]).forEach(d=>{
+    const score=((d.title||'').toLowerCase().includes(ql)?3:0)+((d.body||'').toLowerCase().includes(ql)?2:0);
+    if(score>0)matches.push({section:'Writer',title:d.title||'Untitled',preview:(d.body||'').substring(0,80),score,action:`switchSection('writer');setTimeout(()=>{const i=S.docs.findIndex(x=>x.id===${d.id});if(i>=0){writerDocIdx=i;renderWriterDoc();}},100)`,color:'var(--accent)'});
+  });
+  (S.links||[]).forEach(l=>{
+    const score=((l.title||'').toLowerCase().includes(ql)?3:0)+((l.url||'').toLowerCase().includes(ql)?2:0)+((l.category||'').toLowerCase().includes(ql)?1:0);
+    if(score>0)matches.push({section:'Links',title:l.title||l.url,preview:l.url,score,action:`window.open('${(l.url||'').replace(/'/g,"\\'")}','_blank')`,color:'#8b5cf6'});
+  });
+  matches.sort((a,b)=>b.score-a.score);
+  let h=`<div style="color:var(--text-muted);padding:4px 0;margin-bottom:6px">${matches.length} results for "${esc(q)}"</div>`;
+  const sections={};matches.slice(0,30).forEach(m=>{if(!sections[m.section])sections[m.section]=[];sections[m.section].push(m);});
+  Object.entries(sections).forEach(([sec,items])=>{
+    h+=`<div style="font-size:10px;font-weight:600;color:var(--text-secondary);padding:6px 0 4px;border-bottom:1px solid var(--border)">${sec} (${items.length})</div>`;
+    items.forEach(m=>{
+      h+=`<div onclick="document.getElementById('ws-search-panel').remove();${m.action}" style="padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid ${m.color}" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><div style="flex:1"><div style="font-size:10px;color:var(--text-primary)">${esc(m.title)}</div>${m.preview?`<div style="font-size:8px;color:var(--text-muted)">${esc(m.preview)}</div>`:''}</div>${m.status?`<span style="font-size:7px;color:var(--text-muted)">${m.status}</span>`:''}</div>`;
+    });
+  });
+  if(!matches.length)h='<div style="color:var(--text-muted);padding:20px;text-align:center">No results found</div>';
+  results.innerHTML=h;
+}
+function showBatchTaskEditor(){
+  let panel=document.getElementById('batch-edit-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='batch-edit-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const active=S.tasks.filter(t=>t.status!=='done');
+  let h='<div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap"><label style="font-size:10px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><input type="checkbox" id="batch-select-all" onchange="document.querySelectorAll(\'.batch-task-cb\').forEach(cb=>cb.checked=this.checked)"> Select All</label><select id="batch-action" style="padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:10px"><option value="">Action...</option><option value="priority">Set Priority</option><option value="status">Set Status</option><option value="project">Set Project</option><option value="due">Set Due Date</option></select><select id="batch-value" style="padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:10px"><option value="">Value...</option><option value="p0">P0 Critical</option><option value="p1">P1 High</option><option value="p2">P2 Medium</option><option value="p3">P3 Low</option><option value="todo">Status: Todo</option><option value="in-progress">Status: In Progress</option><option value="done">Status: Done</option></select><button onclick="applyBatchEdit()" style="padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;font-size:10px;font-weight:600;cursor:pointer">Apply</button></div>';
+  active.forEach(t=>{
+    const priColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':t.priority==='p2'?'#3b82f6':'#6b7280';
+    h+=`<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:10px;border-left:2px solid ${priColor}" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><input type="checkbox" class="batch-task-cb" value="${t.id}"><span style="flex:1;color:var(--text-primary)">${esc(t.title||'Untitled')}</span><span style="font-size:8px;color:${priColor}">${(t.priority||'p2').toUpperCase()}</span><span style="font-size:8px;color:var(--text-muted)">${t.status}</span></div>`;
+  });
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Batch Task Editor (${active.length} active)</span><button onclick="document.getElementById('batch-edit-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
+}
+function applyBatchEdit(){
+  const action=document.getElementById('batch-action');
+  const value=document.getElementById('batch-value');
+  if(!action||!value||!action.value||!value.value){toast('Select action and value');return;}
+  const checked=document.querySelectorAll('.batch-task-cb:checked');
+  if(!checked.length){toast('Select tasks first');return;}
+  let count=0;
+  checked.forEach(cb=>{
+    const t=S.tasks.find(x=>x.id===parseInt(cb.value));
+    if(!t)return;
+    if(action.value==='priority')t.priority=value.value;
+    else if(action.value==='status'){t.status=value.value;if(value.value==='done')t.completedAt=new Date().toISOString();}
+    else if(action.value==='project')t.project=value.value;
+    count++;
+  });
+  save();toast('Updated '+count+' tasks');showBatchTaskEditor();
+}
+function showContentStats(){
+  let panel=document.getElementById('content-stats-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-stats-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const items=S.content||[];
+  const totalWords=items.reduce((s,c)=>s+((c.body||'').split(/\s+/).length),0);
+  const totalChars=items.reduce((s,c)=>s+(c.body||'').length,0);
+  const types={};items.forEach(c=>{const t=c.type||'note';types[t]=(types[t]||0)+1;});
+  const themes={};items.forEach(c=>{if(c.theme)themes[c.theme]=(themes[c.theme]||0)+1;});
+  const tags={};items.forEach(c=>{(c.tags||[]).forEach(t=>{tags[t]=(tags[t]||0)+1;});});
+  const pinned=items.filter(c=>c.pinned).length;
+  const starred=items.filter(c=>c.starred).length;
+  const avgWords=items.length?Math.round(totalWords/items.length):0;
+  const thisWeek=new Date();thisWeek.setDate(thisWeek.getDate()-7);const weekStr=thisWeek.toISOString().split('T')[0];
+  const recentCount=items.filter(c=>c.createdAt&&c.createdAt.split('T')[0]>=weekStr).length;
+  const topTypes=Object.entries(types).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const topThemes=Object.entries(themes).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const topTags=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const typeColors={idea:'#f59e0b',quote:'#8b5cf6',code:'#06b6d4',insight:'#3b82f6',todo:'#ef4444',book:'#ec4899',research:'#22c55e',thought:'#14b8a6',note:'#6b7280'};
+  let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:var(--accent)">${items.length}</div><div style="font-size:7px;color:var(--text-muted)">Items</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#3b82f6">${(totalWords/1000).toFixed(1)}k</div><div style="font-size:7px;color:var(--text-muted)">Words</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#f59e0b">${avgWords}</div><div style="font-size:7px;color:var(--text-muted)">Avg Words</div></div>`;
+  h+=`<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:16px;font-weight:700;color:#22c55e">${recentCount}</div><div style="font-size:7px;color:var(--text-muted)">This Week</div></div>`;
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+  h+='<div><div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">By Type</div>';
+  topTypes.forEach(([t,n])=>{
+    const pct=Math.round(n/items.length*100);const color=typeColors[t]||'var(--text-muted)';
+    h+=`<div style="display:flex;align-items:center;gap:4px;padding:2px 0;font-size:9px"><span style="width:6px;height:6px;border-radius:50%;background:${color}"></span><span style="flex:1;color:var(--text-primary)">${esc(t)}</span><span style="color:var(--text-muted)">${n} (${pct}%)</span></div>`;
+  });
+  h+='</div>';
+  h+='<div><div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">By Theme</div>';
+  topThemes.forEach(([t,n])=>{h+=`<div style="font-size:9px;color:var(--text-primary);padding:2px 0">${esc(t)} <span style="color:var(--text-muted)">(${n})</span></div>`;});
+  if(!topThemes.length)h+='<div style="font-size:9px;color:var(--text-muted)">No themes</div>';
+  h+='</div></div>';
+  if(topTags.length){
+    h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">Top Tags</div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+    topTags.forEach(([t,n])=>{h+=`<span style="font-size:8px;color:var(--accent);padding:2px 6px;background:var(--accent)15;border-radius:8px">${esc(t)} (${n})</span>`;});
+    h+='</div>';
+  }
+  h+=`<div style="font-size:9px;color:var(--text-muted)">Pinned: ${pinned} | Starred: ${starred} | ${(totalChars/1024).toFixed(1)}KB total</div>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Stats Dashboard</span><button onclick="document.getElementById('content-stats-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
   document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
