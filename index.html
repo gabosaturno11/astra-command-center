@@ -6281,6 +6281,9 @@ function cmdGetItems(q) {
       ['prisma','Prisma schema generator'],
       ['weekly review','Weekly task review summary'],
       ['random number','Random number generator'],
+      ['mongoose','Mongoose schema generator'],
+      ['status pie','Task status pie chart'],
+      ['password strength','Password strength checker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9293,6 +9296,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='random number' || ql==='random' || ql==='rng' || ql==='number generator')){
     items.unshift({title:'Random Number',desc:'Random number in custom range',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRandomNumber();}});
+  }
+  if(ql && (ql==='mongoose' || ql==='mongo schema' || ql==='mongodb' || ql==='mongoose model')){
+    items.unshift({title:'Mongoose Schema',desc:'Generate Mongoose models for User, Blog, Product',icon:'M',type:'action',action:()=>{closeCommandPalette();showMongoSchemaGen();}});
+  }
+  if(ql && (ql==='status pie' || ql==='pie chart' || ql==='task pie' || ql==='status chart')){
+    items.unshift({title:'Status Pie Chart',desc:'Pie chart of task statuses',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskStatusPie();}});
+  }
+  if(ql && (ql==='password strength' || ql==='password' || ql==='password check' || ql==='pwd strength')){
+    items.unshift({title:'Password Strength',desc:'Check password strength with criteria',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordStrength();}});
   }
   return items.slice(0, 20);
 }
@@ -26192,6 +26204,88 @@ function showQuickRandomNumber(){
     history.unshift(result);if(history.length>20)history.length=20;
     rend();
   };
+  document.body.appendChild(d);rend();
+}
+function showMongoSchemaGen(){
+  let ex=document.getElementById('mongo-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'User Model':`const mongoose = require('mongoose');\nconst bcrypt = require('bcryptjs');\n\nconst userSchema = new mongoose.Schema({\n  email: { type: String, required: true, unique: true, lowercase: true, trim: true },\n  password: { type: String, required: true, minlength: 8 },\n  name: { type: String, required: true, trim: true },\n  role: { type: String, enum: ['user', 'admin'], default: 'user' },\n  avatar: String,\n  isActive: { type: Boolean, default: true },\n  lastLogin: Date\n}, { timestamps: true });\n\nuserSchema.pre('save', async function(next) {\n  if (!this.isModified('password')) return next();\n  this.password = await bcrypt.hash(this.password, 12);\n  next();\n});\n\nuserSchema.methods.comparePassword = async function(candidate) {\n  return bcrypt.compare(candidate, this.password);\n};\n\nmodule.exports = mongoose.model('User', userSchema);`,
+    'Blog Post':`const mongoose = require('mongoose');\n\nconst postSchema = new mongoose.Schema({\n  title: { type: String, required: true, trim: true },\n  slug: { type: String, required: true, unique: true },\n  content: { type: String, required: true },\n  excerpt: { type: String, maxlength: 300 },\n  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },\n  tags: [{ type: String, lowercase: true }],\n  category: { type: String, required: true },\n  status: { type: String, enum: ['draft', 'published', 'archived'], default: 'draft' },\n  featuredImage: String,\n  views: { type: Number, default: 0 },\n  publishedAt: Date\n}, { timestamps: true });\n\npostSchema.index({ title: 'text', content: 'text' });\npostSchema.index({ slug: 1 });\npostSchema.index({ tags: 1 });\n\nmodule.exports = mongoose.model('Post', postSchema);`,
+    'Product':`const mongoose = require('mongoose');\n\nconst productSchema = new mongoose.Schema({\n  name: { type: String, required: true, trim: true },\n  description: String,\n  price: { type: Number, required: true, min: 0 },\n  comparePrice: { type: Number, min: 0 },\n  sku: { type: String, unique: true },\n  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },\n  images: [String],\n  stock: { type: Number, default: 0, min: 0 },\n  variants: [{\n    name: String,\n    options: [String],\n    priceModifier: { type: Number, default: 0 }\n  }],\n  isActive: { type: Boolean, default: true },\n  ratings: { average: { type: Number, default: 0 }, count: { type: Number, default: 0 } }\n}, { timestamps: true });\n\nproductSchema.index({ name: 'text', description: 'text' });\n\nmodule.exports = mongoose.model('Product', productSchema);`
+  };
+  let sel='User Model';
+  const d=document.createElement('div');d.id='mongo-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-mgpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-mgpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Mongoose Schema Generator</span><span onclick="document.getElementById('mongo-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#mongo-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Schema',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Schema</button>
+    </div>`;
+    d.querySelectorAll('[data-mgpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.mgpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskStatusPie(){
+  let ex=document.getElementById('status-pie-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const statuses={todo:0,'in-progress':0,done:0,blocked:0};
+  tasks.forEach(t=>{const s=t.status||'todo';if(statuses[s]!==undefined)statuses[s]++;});
+  const total=tasks.length||1;
+  const colors={todo:'#6b7280','in-progress':'#22d3ee',done:'#4ade80',blocked:'#f87171'};
+  const labels={todo:'To Do','in-progress':'In Progress',done:'Done',blocked:'Blocked'};
+  const r=65;const cx=80;const cy=80;
+  let angle=0;
+  const slices=Object.entries(statuses).filter(([,v])=>v>0).map(([k,v])=>{
+    const pct=v/total;const a=pct*Math.PI*2;
+    const x1=cx+r*Math.cos(angle);const y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(angle+a);const y2=cy+r*Math.sin(angle+a);
+    const large=a>Math.PI?1:0;
+    const path=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} Z" fill="${colors[k]}" opacity="0.85"/>`;
+    angle+=a;return path;
+  }).join('');
+  const legend=Object.entries(statuses).map(([k,v])=>`<div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:${colors[k]}"></div><span style="font-size:11px;color:var(--text-secondary)">${labels[k]}: ${v} (${Math.round((v/total)*100)}%)</span></div>`).join('');
+  const d=document.createElement('div');d.id='status-pie-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:320px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Status Pie</span><span onclick="document.getElementById('status-pie-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="text-align:center"><svg width="160" height="160" viewBox="0 0 160 160">${slices}<text x="${cx}" y="${cy+4}" text-anchor="middle" fill="var(--text-primary)" font-size="16" font-weight="700">${tasks.length}</text></svg></div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-top:8px">${legend}</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickPasswordStrength(){
+  let ex=document.getElementById('pwd-strength-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='pwd-strength-float';
+  const check=(pwd)=>{
+    let score=0;const checks=[];
+    if(pwd.length>=8){score+=1;checks.push({pass:true,label:'8+ characters'});}else checks.push({pass:false,label:'8+ characters'});
+    if(pwd.length>=12){score+=1;checks.push({pass:true,label:'12+ characters'});}else checks.push({pass:false,label:'12+ characters'});
+    if(/[a-z]/.test(pwd)){score+=1;checks.push({pass:true,label:'Lowercase letter'});}else checks.push({pass:false,label:'Lowercase letter'});
+    if(/[A-Z]/.test(pwd)){score+=1;checks.push({pass:true,label:'Uppercase letter'});}else checks.push({pass:false,label:'Uppercase letter'});
+    if(/[0-9]/.test(pwd)){score+=1;checks.push({pass:true,label:'Number'});}else checks.push({pass:false,label:'Number'});
+    if(/[^a-zA-Z0-9]/.test(pwd)){score+=1;checks.push({pass:true,label:'Special character'});}else checks.push({pass:false,label:'Special character'});
+    if(!/(.)\1{2,}/.test(pwd)){score+=1;checks.push({pass:true,label:'No repeated chars'});}else checks.push({pass:false,label:'No repeated chars'});
+    const labels=['Very Weak','Weak','Fair','Good','Strong','Very Strong','Excellent'];
+    const colors=['#dc2626','#f87171','#fb923c','#facc15','#4ade80','#22d3ee','#a78bfa'];
+    const idx=Math.min(score,labels.length-1);
+    return{score,max:7,label:labels[idx],color:colors[idx],checks};
+  };
+  const rend=(pwd='')=>{
+    const r=pwd?check(pwd):{score:0,max:7,label:'Enter password',color:'var(--text-muted)',checks:[]};
+    const pct=Math.round((r.score/r.max)*100);
+    const checkList=r.checks.map(c=>`<div style="font-size:10px;color:${c.pass?'#4ade80':'var(--text-muted)'}"><span>${c.pass?'v':'x'}</span> ${c.label}</div>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:250px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Password Strength</span><span onclick="document.getElementById('pwd-strength-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <input type="text" placeholder="Type password to check..." value="${esc(pwd)}" oninput="window._checkPwd(this.value)" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:12px;font-family:monospace;box-sizing:border-box;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="flex:1;background:var(--bg-surface);border-radius:6px;height:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${r.color};border-radius:6px;transition:all 0.3s"></div></div>
+        <span style="font-size:11px;color:${r.color};font-weight:600;white-space:nowrap">${r.label}</span>
+      </div>
+      ${checkList}
+    </div>`;
+  };
+  window._checkPwd=(v)=>rend(v);
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
