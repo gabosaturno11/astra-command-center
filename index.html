@@ -6230,6 +6230,9 @@ function cmdGetItems(q) {
       ['vercel.json','Vercel config preset generator'],
       ['quarterly review','Quarterly task performance review'],
       ['binaural','Binaural focus tones generator'],
+      ['nginx','nginx config preset generator'],
+      ['velocity trend','Task velocity trend over 10 weeks'],
+      ['abc','ABC priority categorization tool'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9089,6 +9092,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='binaural' || ql==='focus music' || ql==='binaural beats' || ql==='focus tones')){
     items.unshift({title:'Binaural Focus',desc:'Binaural beat focus tones',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickFocusMusic();}});
+  }
+  if(ql && (ql==='nginx' || ql==='nginx config' || ql==='reverse proxy' || ql==='server config')){
+    items.unshift({title:'nginx Config',desc:'nginx server configuration presets',icon:'N',type:'action',action:()=>{closeCommandPalette();showNginxConfigGen();}});
+  }
+  if(ql && (ql==='velocity trend' || ql==='velocity' || ql==='speed trend' || ql==='completion velocity')){
+    items.unshift({title:'Velocity Trend',desc:'Task completion velocity over 10 weeks',icon:'V',type:'action',action:()=>{closeCommandPalette();showTaskVelocityTrend();}});
+  }
+  if(ql && (ql==='abc' || ql==='abc priority' || ql==='abc method' || ql==='priority list')){
+    items.unshift({title:'ABC Prioritizer',desc:'Categorize items by A/B/C priority',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAbcPrioritizer();}});
   }
   return items.slice(0, 20);
 }
@@ -24543,6 +24555,90 @@ function showQuickFocusMusic(){
     document.getElementById('fm-toggle').onclick=function(){if(playing)stop();else start();rend();};
   }
   window._fmStop=stop;
+  document.body.appendChild(p);
+  rend();
+}
+function showNginxConfigGen(){
+  let p=document.getElementById('nginx-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='nginx-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:540px;width:90vw;max-height:80vh;overflow-y:auto';
+  let presets=[
+    {name:'Static Site',code:'server {\n    listen 80;\n    server_name example.com;\n    root /var/www/html;\n    index index.html;\n\n    location / {\n        try_files $uri $uri/ =404;\n    }\n\n    # Cache static assets\n    location ~* \\.(css|js|png|jpg|jpeg|gif|ico|svg)$ {\n        expires 30d;\n        add_header Cache-Control "public, immutable";\n    }\n}'},
+    {name:'Reverse Proxy',code:'server {\n    listen 80;\n    server_name example.com;\n\n    location / {\n        proxy_pass http://localhost:3000;\n        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection \'upgrade\';\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto $scheme;\n        proxy_cache_bypass $http_upgrade;\n    }\n}'},
+    {name:'SSL + Redirect',code:'server {\n    listen 80;\n    server_name example.com;\n    return 301 https://$server_name$request_uri;\n}\n\nserver {\n    listen 443 ssl http2;\n    server_name example.com;\n\n    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;\n    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;\n\n    ssl_protocols TLSv1.2 TLSv1.3;\n    ssl_prefer_server_ciphers on;\n\n    location / {\n        proxy_pass http://localhost:3000;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n    }\n}'},
+    {name:'SPA (React/Vue)',code:'server {\n    listen 80;\n    server_name example.com;\n    root /var/www/app/build;\n    index index.html;\n\n    location / {\n        try_files $uri $uri/ /index.html;\n    }\n\n    location /api {\n        proxy_pass http://localhost:3001;\n        proxy_set_header Host $host;\n        proxy_set_header X-Real-IP $remote_addr;\n    }\n\n    location ~* \\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {\n        expires 1y;\n        add_header Cache-Control "public, immutable";\n    }\n\n    gzip on;\n    gzip_types text/css application/javascript application/json image/svg+xml;\n}'}
+  ];
+  let selected=0;
+  function rend(){
+    let tabs=presets.map((pr,i)=>'<button data-ni="'+i+'" style="padding:4px 8px;border-radius:var(--radius);border:1px solid '+(i===selected?'#4ade80':'var(--border)')+';background:'+(i===selected?'rgba(74,222,128,0.15)':'var(--bg-surface)')+';color:'+(i===selected?'#4ade80':'var(--text-muted)')+';cursor:pointer;font-size:10px">'+pr.name+'</button>').join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">nginx Config Generator</span><button onclick="document.getElementById(\'nginx-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">'+tabs+'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.4;max-height:300px;overflow-y:auto">'+esc(presets[selected].code)+'</pre>'
+      +'<button id="ngx-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy Config</button>';
+    p.querySelectorAll('[data-ni]').forEach(b=>{b.onclick=function(){selected=parseInt(this.dataset.ni);rend();};});
+    document.getElementById('ngx-copy').onclick=function(){navigator.clipboard.writeText(presets[selected].code);this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy Config';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskVelocityTrend(){
+  let p=document.getElementById('vel-trend-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='vel-trend-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let weeks=10;let now=new Date();
+  let data=[];
+  for(let w=weeks-1;w>=0;w--){
+    let wEnd=new Date(now);wEnd.setDate(wEnd.getDate()-w*7);
+    let wStart=new Date(wEnd);wStart.setDate(wStart.getDate()-7);
+    let label=(wEnd.getMonth()+1)+'/'+wEnd.getDate();
+    let completed=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=wStart&&new Date(t.completedAt)<wEnd).length;
+    data.push({label,completed});
+  }
+  let maxV=Math.max(...data.map(d=>d.completed),1);
+  let avg=Math.round(data.reduce((s,d)=>s+d.completed,0)/data.length*10)/10;
+  let svgW=460,svgH=180,pad=30;
+  let gap=(svgW-pad*2)/data.length;
+  let pts=data.map((d,i)=>{let x=pad+i*gap+gap/2;let y=svgH-pad-((d.completed/maxV)*(svgH-pad*2));return {x,y,v:d.completed,label:d.label};});
+  let lineD='M'+pts.map(pt=>pt.x+','+pt.y).join(' L');
+  let areaD=lineD+' L'+pts[pts.length-1].x+','+(svgH-pad)+' L'+pts[0].x+','+(svgH-pad)+' Z';
+  let dots=pts.map(pt=>'<circle cx="'+pt.x+'" cy="'+pt.y+'" r="3" fill="#4ade80"/><text x="'+pt.x+'" y="'+(pt.y-8)+'" text-anchor="middle" fill="#4ade80" font-size="9">'+pt.v+'</text>').join('');
+  let labels=pts.map((pt,i)=>i%2===0?'<text x="'+pt.x+'" y="'+(svgH-pad+14)+'" text-anchor="middle" fill="#888" font-size="8">'+pt.label+'</text>':'').join('');
+  let avgY=svgH-pad-((avg/maxV)*(svgH-pad*2));
+  let avgLine='<line x1="'+pad+'" y1="'+avgY+'" x2="'+(svgW-pad)+'" y2="'+avgY+'" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,3"/><text x="'+(svgW-pad+4)+'" y="'+(avgY+4)+'" fill="#fbbf24" font-size="8">avg '+avg+'</text>';
+  let svg='<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%"><rect width="'+svgW+'" height="'+svgH+'" fill="transparent"/><path d="'+areaD+'" fill="rgba(74,222,128,0.1)"/><path d="'+lineD+'" fill="none" stroke="#4ade80" stroke-width="2"/>'+dots+labels+avgLine+'</svg>';
+  let trend=data.length>=2?(data[data.length-1].completed>=data[data.length-2].completed?'Trending up':'Trending down'):'Not enough data';
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Velocity Trend (10 Weeks)</span><button onclick="document.getElementById(\'vel-trend-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:12px;margin-bottom:10px"><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:18px;font-weight:700;color:#4ade80">'+avg+'</div><div style="font-size:9px;color:var(--text-muted)">Avg/Week</div></div><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:var(--radius);text-align:center"><div style="font-size:14px;font-weight:600;color:var(--text-primary)">'+trend+'</div><div style="font-size:9px;color:var(--text-muted)">Direction</div></div></div>'
+    +svg;
+  document.body.appendChild(p);
+}
+function showQuickAbcPrioritizer(){
+  let p=document.getElementById('abc-prio-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='abc-prio-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._abcItems)S._abcItems=[];
+  function rend(){
+    let grouped={A:[],B:[],C:[]};
+    S._abcItems.forEach(item=>{if(grouped[item.cat])grouped[item.cat].push(item);});
+    let sections=['A','B','C'].map(cat=>{
+      let label=cat==='A'?'Must Do':cat==='B'?'Should Do':'Nice to Do';
+      let color=cat==='A'?'#f87171':cat==='B'?'#fbbf24':'#60a5fa';
+      let items=grouped[cat].map((item,i)=>'<div style="display:flex;align-items:center;gap:6px;padding:4px;background:var(--bg-base);border-radius:3px;margin-bottom:3px"><span style="font-weight:600;color:'+color+';font-size:11px;min-width:16px">'+cat+(i+1)+'</span><span style="flex:1;font-size:11px;color:var(--text-primary)">'+esc(item.text)+'</span><button data-ad="'+item.id+'" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:11px">x</button></div>').join('');
+      return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;padding-bottom:4px;border-bottom:2px solid '+color+'"><span style="font-size:12px;font-weight:600;color:'+color+'">'+cat+' - '+label+'</span><span style="font-size:10px;color:var(--text-muted)">'+grouped[cat].length+'</span></div>'+(items||'<div style="font-size:10px;color:var(--text-muted);padding:4px;text-align:center">Empty</div>')+'</div>';
+    }).join('');
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">ABC Prioritizer</span><button onclick="document.getElementById(\'abc-prio-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +sections
+      +'<div style="display:flex;gap:4px;margin-top:4px"><input id="abc-input" placeholder="Add item..." style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"><select id="abc-cat" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px"><option>A</option><option>B</option><option selected>C</option></select><button id="abc-add" style="padding:6px 10px;background:#4ade80;color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600;font-size:11px">+</button></div>';
+    p.querySelectorAll('[data-ad]').forEach(b=>{b.onclick=function(){S._abcItems=S._abcItems.filter(i=>i.id!==parseInt(this.dataset.ad));save();rend();};});
+    document.getElementById('abc-add').onclick=function(){
+      let text=document.getElementById('abc-input').value.trim();
+      let cat=document.getElementById('abc-cat').value;
+      if(!text)return;
+      S._abcItems.push({id:Date.now(),text,cat});save();rend();
+    };
+    document.getElementById('abc-input').onkeydown=function(e){if(e.key==='Enter')document.getElementById('abc-add').click();};
+  }
   document.body.appendChild(p);
   rend();
 }
