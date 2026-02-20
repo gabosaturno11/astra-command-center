@@ -6497,6 +6497,12 @@ function cmdGetItems(q) {
       ['heroku','Heroku CLI reference'],
       ['monthly overview','Six month task creation and completion'],
       ['number base','Decimal binary octal hex converter'],
+      ['fly','Fly.io CLI deploy and management reference'],
+      ['subtask progress','All tasks with subtask completion bars'],
+      ['snippets','Code snippet manager with copy'],
+      ['railway','Railway.app CLI reference'],
+      ['eisenhower','Eisenhower urgency importance matrix'],
+      ['jwt','JWT token decoder and inspector'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10157,6 +10163,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='number base' || ql==='binary' || ql==='hex convert' || ql==='base converter')){
     items.unshift({title:'Number Base Converter',desc:'Decimal, binary, octal, hex',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNumberBaseConverter();}});
+  }
+  if(ql && (ql==='fly' || ql==='fly.io' || ql==='flyctl' || ql==='fly deploy')){
+    items.unshift({title:'Fly.io CLI Reference',desc:'Deploy, scale, secrets, volumes',icon:'F',type:'action',action:()=>{closeCommandPalette();showFlyIoRef();}});
+  }
+  if(ql && (ql==='subtask' || ql==='subtask progress' || ql==='checklist progress' || ql==='subtask completion')){
+    items.unshift({title:'Subtask Progress',desc:'All tasks with subtask completion bars',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSubtaskProgress();}});
+  }
+  if(ql && (ql==='snippets' || ql==='snippet manager' || ql==='code snippet' || ql==='save snippet')){
+    items.unshift({title:'Snippet Manager',desc:'Save and copy code snippets',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSnippetManager();}});
+  }
+  if(ql && (ql==='railway' || ql==='railway cli' || ql==='railway deploy' || ql==='railway up')){
+    items.unshift({title:'Railway CLI Reference',desc:'Deploy, env, services, domains',icon:'R',type:'action',action:()=>{closeCommandPalette();showRailwayRef();}});
+  }
+  if(ql && (ql==='eisenhower' || ql==='urgency matrix' || ql==='importance matrix' || ql==='priority matrix')){
+    items.unshift({title:'Eisenhower Matrix',desc:'Urgent/important task classification',icon:'E',type:'action',action:()=>{closeCommandPalette();showTaskEisenhowerMatrix();}});
+  }
+  if(ql && (ql==='jwt' || ql==='jwt decoder' || ql==='decode token' || ql==='token inspect')){
+    items.unshift({title:'JWT Decoder',desc:'Decode and inspect JWT tokens',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJwtDecoder();}});
   }
   return items.slice(0, 20);
 }
@@ -32492,6 +32516,154 @@ function showQuickNumberBaseConverter(){
       });
       out.innerHTML=r;
     }catch(e){out.innerHTML='<span style="color:#ef4444;font-size:11px">Error: '+e.message+'</span>';}
+  };
+}
+function showFlyIoRef(){
+  const cmds={
+    'App Management':{'Launch app':'fly launch','Deploy':'fly deploy','List apps':'fly apps list','App status':'fly status','App info':'fly info'},
+    'Scaling':{'Scale count':'fly scale count 2','Scale VM':'fly scale vm shared-cpu-1x','Show scale':'fly scale show','Autoscale':'fly autoscale set min=1 max=5','Regions list':'fly regions list'},
+    'Secrets':{'Set secret':'fly secrets set KEY=value','List secrets':'fly secrets list','Unset secret':'fly secrets unset KEY','Import secrets':'fly secrets import < .env','Deploy after':'fly deploy (auto after secret set)'},
+    'Logs & SSH':{'View logs':'fly logs','Tail logs':'fly logs --app myapp','SSH console':'fly ssh console','SSH establish':'fly ssh establish','Proxy port':'fly proxy 5432 -a myapp'},
+    'Volumes & DB':{'Create volume':'fly volumes create data --size 10','List volumes':'fly volumes list','Create Postgres':'fly postgres create','Connect Postgres':'fly postgres connect -a mydb','Attach DB':'fly postgres attach mydb -a myapp'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Fly.io CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskSubtaskProgress(){
+  const tasks=(S.tasks||[]).filter(t=>t.subtasks&&t.subtasks.length>0);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Subtask Progress</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(tasks.length===0){
+    html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No tasks with subtasks found.<br>Add subtasks in task detail to track progress.</div>';
+  } else {
+    let totalSubs=0,totalDone=0;
+    tasks.forEach(t=>{
+      const total=t.subtasks.length;const done=t.subtasks.filter(s=>s.done).length;const pct=Math.round(done/total*100);
+      totalSubs+=total;totalDone+=done;
+      html+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--bg-surface);border-radius:6px">';
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="color:var(--text-primary);font-size:12px">'+esc(t.title)+'</span><span style="color:'+(pct===100?'#4ade80':'var(--text-muted)')+';font-size:11px;font-weight:600">'+done+'/'+total+' ('+pct+'%)</span></div>';
+      html+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+(pct===100?'#4ade80':'#06b6d4')+';border-radius:3px;transition:width 0.3s"></div></div>';
+      if(total<=8){
+        html+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">';
+        t.subtasks.forEach(s=>{html+='<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+(s.done?'#4ade8022':'var(--bg-elevated)')+';color:'+(s.done?'#4ade80':'var(--text-muted)')+'">'+(s.done?'done':'todo')+'</span>';});
+        html+='</div>';
+      }
+      html+='</div>';
+    });
+    const overallPct=totalSubs>0?Math.round(totalDone/totalSubs*100):0;
+    html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">'+tasks.length+' tasks with subtasks | '+totalDone+'/'+totalSubs+' subtasks done (<span style="color:#4ade80">'+overallPct+'%</span>)</div>';
+  }
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickSnippetManager(){
+  if(!S._snippets)S._snippets=[];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">Snippet Manager</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:10px"><input id="snip-name" placeholder="Snippet name" style="width:120px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 8px;border-radius:4px;font-size:11px"/>';
+  html+='<input id="snip-lang" placeholder="lang" style="width:60px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px 8px;border-radius:4px;font-size:11px"/>';
+  html+='<button onclick="window._addSnippet()" style="background:#4ade80;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Save</button></div>';
+  html+='<textarea id="snip-code" placeholder="Paste code snippet here..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:6px;font-family:monospace;font-size:11px;resize:vertical;box-sizing:border-box;margin-bottom:10px"></textarea>';
+  if(S._snippets.length===0){
+    html+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:11px">No snippets saved yet</div>';
+  } else {
+    S._snippets.forEach((s,i)=>{
+      html+='<div style="margin-bottom:8px;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><span style="color:var(--text-primary);font-size:12px;font-weight:600">'+esc(s.name)+'</span>';
+      if(s.lang)html+='<span style="color:#06b6d4;font-size:9px;margin-left:8px;padding:1px 6px;background:#06b6d422;border-radius:3px">'+esc(s.lang)+'</span>';
+      html+='</div><div style="display:flex;gap:4px"><button onclick="navigator.clipboard.writeText(S._snippets['+i+'].code);this.textContent=\'ok\';setTimeout(()=>this.textContent=\'cp\',600)" style="background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);padding:2px 8px;border-radius:3px;cursor:pointer;font-size:9px">cp</button>';
+      html+='<button onclick="S._snippets.splice('+i+',1);save();this.closest(\'div[style*=fixed]\').remove();showQuickSnippetManager()" style="background:var(--bg-elevated);border:1px solid var(--border);color:#ef4444;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:9px">x</button></div></div>';
+      html+='<pre style="color:var(--text-muted);font-size:10px;font-family:monospace;margin:0;max-height:80px;overflow:auto;white-space:pre-wrap">'+esc(s.code.substring(0,300))+(s.code.length>300?'...':'')+'</pre></div>';
+    });
+  }
+  html+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">'+S._snippets.length+' snippets saved</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._addSnippet=function(){
+    const name=document.getElementById('snip-name').value.trim();const code=document.getElementById('snip-code').value;const lang=document.getElementById('snip-lang').value.trim();
+    if(!name||!code){return;}
+    S._snippets.unshift({name,code,lang,created:new Date().toISOString()});
+    if(S._snippets.length>100)S._snippets.length=100;
+    save();document.querySelector('div[style*="fixed"][style*="translate"]').remove();showQuickSnippetManager();
+  };
+}
+function showRailwayRef(){
+  const cmds={
+    'Project Management':{'Login':'railway login','Init project':'railway init','Link project':'railway link','Status':'railway status','List projects':'railway list'},
+    'Deploy':{'Deploy':'railway up','Deploy with Docker':'railway up --dockerfile Dockerfile','Deploy from GitHub':'railway link (auto-deploy on push)','Redeploy':'railway up --force','Open app':'railway open'},
+    'Environment':{'Set variable':'railway variables set KEY=value','List variables':'railway variables','Unset variable':'railway variables delete KEY','Add from file':'railway variables set < .env','Environment switch':'railway environment'},
+    'Services':{'List services':'railway service list','Create service':'railway service','Add database':'railway add','Connect to DB':'railway connect postgres','Run command':'railway run bash'},
+    'Logs & Domains':{'View logs':'railway logs','Tail logs':'railway logs --follow','Add domain':'railway domain','Custom domain':'railway domain add example.com','Volume':'railway volume'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Railway CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskEisenhowerMatrix(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const urgent=t=>t.priority==='p0'||t.priority==='p1'||(t.due&&(new Date(t.due)-new Date())/(1000*60*60*24)<=3);
+  const important=t=>t.priority==='p0'||t.priority==='p1';
+  const q1=tasks.filter(t=>urgent(t)&&important(t));
+  const q2=tasks.filter(t=>!urgent(t)&&important(t));
+  const q3=tasks.filter(t=>urgent(t)&&!important(t));
+  const q4=tasks.filter(t=>!urgent(t)&&!important(t));
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Eisenhower Matrix</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
+  const quads=[
+    {title:'DO FIRST',sub:'Urgent + Important',tasks:q1,color:'#ef4444',bg:'#ef444415'},
+    {title:'SCHEDULE',sub:'Not Urgent + Important',tasks:q2,color:'#06b6d4',bg:'#06b6d415'},
+    {title:'DELEGATE',sub:'Urgent + Not Important',tasks:q3,color:'#f59e0b',bg:'#f59e0b15'},
+    {title:'ELIMINATE',sub:'Not Urgent + Not Important',tasks:q4,color:'#64748b',bg:'#64748b15'}
+  ];
+  quads.forEach(q=>{
+    html+='<div style="padding:12px;background:'+q.bg+';border:1px solid '+q.color+'33;border-radius:6px;min-height:100px">';
+    html+='<div style="color:'+q.color+';font-size:11px;font-weight:700;margin-bottom:2px">'+q.title+' ('+q.tasks.length+')</div>';
+    html+='<div style="color:var(--text-muted);font-size:9px;margin-bottom:8px">'+q.sub+'</div>';
+    q.tasks.slice(0,5).forEach(t=>{
+      html+='<div style="padding:4px 6px;margin-bottom:2px;background:var(--bg-elevated);border-radius:3px;font-size:10px;color:var(--text-primary)">'+esc(t.title.substring(0,40))+(t.title.length>40?'...':'')+'</div>';
+    });
+    if(q.tasks.length>5)html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px">+'+(q.tasks.length-5)+' more</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">'+tasks.length+' open tasks classified | Priority: urgent=P0/P1 or due within 3 days</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickJwtDecoder(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:85vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0">JWT Decoder</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<textarea id="jwt-input" placeholder="Paste JWT token here (eyJhbG...)" style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:10px;border-radius:6px;font-family:monospace;font-size:10px;resize:vertical;box-sizing:border-box"></textarea>';
+  html+='<button onclick="window._decodeJwt()" style="background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin:10px 0">Decode</button>';
+  html+='<div id="jwt-output" style="background:var(--bg-surface);border:1px solid var(--border);padding:10px;border-radius:6px;min-height:60px"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._decodeJwt=function(){
+    const inp=document.getElementById('jwt-input').value.trim();const out=document.getElementById('jwt-output');
+    if(!inp){out.innerHTML='<span style="color:var(--text-muted);font-size:11px">Paste a JWT token</span>';return;}
+    try{
+      const parts=inp.split('.');
+      if(parts.length!==3){out.innerHTML='<span style="color:#ef4444;font-size:11px">Invalid JWT: expected 3 parts, got '+parts.length+'</span>';return;}
+      const b64url=s=>decodeURIComponent(atob(s.replace(/-/g,'+').replace(/_/g,'/')).split('').map(c=>'%'+c.charCodeAt(0).toString(16).padStart(2,'0')).join(''));
+      const header=JSON.parse(b64url(parts[0]));const payload=JSON.parse(b64url(parts[1]));
+      let r='<div style="margin-bottom:12px"><div style="color:#06b6d4;font-size:11px;font-weight:600;margin-bottom:4px">HEADER</div><pre style="color:var(--text-primary);font-size:10px;font-family:monospace;margin:0;background:var(--bg-elevated);padding:8px;border-radius:4px">'+esc(JSON.stringify(header,null,2))+'</pre></div>';
+      r+='<div style="margin-bottom:12px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:4px">PAYLOAD</div><pre style="color:var(--text-primary);font-size:10px;font-family:monospace;margin:0;background:var(--bg-elevated);padding:8px;border-radius:4px">'+esc(JSON.stringify(payload,null,2))+'</pre></div>';
+      if(payload.exp){const exp=new Date(payload.exp*1000);const expired=exp<new Date();r+='<div style="font-size:10px;color:'+(expired?'#ef4444':'#4ade80')+'">Expires: '+exp.toISOString()+(expired?' (EXPIRED)':' (valid)')+'</div>';}
+      if(payload.iat){r+='<div style="font-size:10px;color:var(--text-muted)">Issued: '+new Date(payload.iat*1000).toISOString()+'</div>';}
+      r+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Signature: '+parts[2].substring(0,30)+'... (not verified client-side)</div>';
+      out.innerHTML=r;
+    }catch(e){out.innerHTML='<span style="color:#ef4444;font-size:11px">Error: '+esc(e.message)+'</span>';}
   };
 }
 function showProjectRoadmap(filterProject){
