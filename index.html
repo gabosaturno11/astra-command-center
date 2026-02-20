@@ -6713,6 +6713,12 @@ function cmdGetItems(q) {
       ['chmod','Linux permissions chmod chown ref'],
       ['win log','Accomplishments and wins tracker'],
       ['brain dump','Quick thought capture to task or content'],
+      ['sed','sed awk text processing reference'],
+      ['project summary','Project summary report all stats'],
+      ['table','Markdown HTML table generator'],
+      ['tmux','tmux sessions windows panes ref'],
+      ['idle tasks','Idle task detector 7 plus days'],
+      ['random','Random picker from list'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -11021,6 +11027,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='brain dump' || ql==='braindump' || ql==='thought capture' || ql==='dump thoughts')){
     items.unshift({title:'Brain Dump',desc:'Quick capture to thought/task/content',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBrainDump();}});
+  }
+  if(ql && (ql==='sed' || ql==='awk' || ql==='sed awk' || ql==='text processing ref')){
+    items.unshift({title:'sed/awk Reference',desc:'Text processing, substitution, patterns',icon:'S',type:'action',action:()=>{closeCommandPalette();showSedAwkRef();}});
+  }
+  if(ql && (ql==='project summary' || ql==='project report' || ql==='all projects' || ql==='summary report')){
+    items.unshift({title:'Project Summary',desc:'All projects progress report',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectSummary();}});
+  }
+  if(ql && (ql==='table' || ql==='table generator' || ql==='markdown table' || ql==='html table')){
+    items.unshift({title:'Table Generator',desc:'Markdown or HTML table builder',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTableGen();}});
+  }
+  if(ql && (ql==='tmux' || ql==='tmux ref' || ql==='terminal multiplexer' || ql==='tmux commands')){
+    items.unshift({title:'tmux Reference',desc:'Sessions, windows, panes, copy mode',icon:'T',type:'action',action:()=>{closeCommandPalette();showTmuxRef();}});
+  }
+  if(ql && (ql==='idle tasks' || ql==='idle' || ql==='stale tasks' || ql==='forgotten tasks')){
+    items.unshift({title:'Idle Task Detector',desc:'Tasks sitting idle 7+ days',icon:'I',type:'action',action:()=>{closeCommandPalette();showTaskIdleDetector();}});
+  }
+  if(ql && (ql==='random' || ql==='random picker' || ql==='pick random' || ql==='random choice')){
+    items.unshift({title:'Random Picker',desc:'Pick random item from list',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRandomPicker();}});
   }
   return items.slice(0, 20);
 }
@@ -39527,6 +39551,133 @@ function showQuickBrainDump(){
   window._saveBrainDumpAsTask=function(){const text=document.getElementById('bd-input').value.trim();if(!text)return;if(!S.tasks)S.tasks=[];S.tasks.push({id:'t_'+Date.now(),title:text,status:'todo',priority:'p2',created:new Date().toISOString()});S._brainDumps.push({text,date:new Date().toISOString(),type:'task'});save();document.getElementById('bd-input').value='';window._renderBDRecent();};
   window._saveBrainDumpAsContent=function(){const text=document.getElementById('bd-input').value.trim();if(!text)return;if(!S.content)S.content=[];S.content.push({id:'c_'+Date.now(),text,tags:['brain-dump'],created:new Date().toISOString()});S._brainDumps.push({text,date:new Date().toISOString(),type:'content'});save();document.getElementById('bd-input').value='';window._renderBDRecent();};
   window._renderBDRecent();
+}
+function showSedAwkRef(){
+  let p=document.getElementById('sedawk-ref-panel');if(p)p.remove();
+  const cmds={'sed Basics':['sed "s/old/new/" file','sed "s/old/new/g" file','sed -i "s/old/new/g" file (in-place)','sed -n "5p" file (print line 5)','sed -n "5,10p" file (lines 5-10)','sed "3d" file (delete line 3)','sed "/pattern/d" file (delete matching)','sed "1i\\header" file (insert before line 1)','sed "$a\\footer" file (append after last)','sed -n "/start/,/end/p" file (range)'],'sed Advanced':['sed "s/[0-9]\\+/NUM/g" file','sed -E "s/(word1|word2)/REPLACED/g" file','sed "/^$/d" file (remove blank lines)','sed "s/^/  /" file (indent)','sed "s/\\t/  /g" file (tabs to spaces)','sed "N;s/\\n/ /" file (join pairs)','sed -e "s/a/A/" -e "s/b/B/" file','sed "y/abc/ABC/" file (transliterate)'],'awk Basics':['awk "{print}" file','awk "{print $1}" file (first field)','awk "{print $1, $3}" file','awk -F "," "{print $2}" file.csv','awk "{print NR, $0}" file (line numbers)','awk "/pattern/ {print}" file','awk "NR==5" file (line 5)','awk "NR>=5 && NR<=10" file'],'awk Processing':['awk "{sum+=$1} END {print sum}" file','awk "{sum+=$1; n++} END {print sum/n}" file','awk "{print length, $0}" file | sort -n','awk "!seen[$0]++" file (unique lines)','awk "{count[$1]++} END {for(k in count) print k, count[k]}" file','awk "BEGIN {OFS=","} {print $1,$2,$3}" file','awk "{gsub(/old/,"new"); print}" file','awk -v var="value" "{print var, $0}" file'],'Common Recipes':['awk -F: "{print $1}" /etc/passwd','ps aux | awk "{print $2, $11}"','df -h | awk "NR>1 {print $5, $6}"','cat access.log | awk "{print $1}" | sort | uniq -c | sort -rn','sed "s/\\r$//" file (dos2unix)','awk "{print $NF}" file (last field)','awk "length > 80" file (long lines)']};
+  p=document.createElement('div');p.id='sedawk-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">sed / awk Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskProjectSummary(){
+  let p=document.getElementById('projsummary-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);const content=(S.content||[]);const docs=(S.writerDocs||[]);const links=(S.links||[]);
+  p=document.createElement('div');p.id='projsummary-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Project Summary Report</div><div style="display:flex;gap:6px;align-items:center"><button onclick="window._copyProjSummary()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div></div>';
+  let summaryMd='# Project Summary Report\n\n';
+  projects.forEach(proj=>{
+    const projTasks=tasks.filter(t=>(t.project||t.projectId)===proj.id);
+    const done=projTasks.filter(t=>t.status==='done').length;
+    const active=projTasks.filter(t=>t.status!=='done').length;
+    const overdue=projTasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length;
+    const projContent=content.filter(c=>(c.project||c.projectId)===proj.id).length;
+    const projDocs=docs.filter(d=>(d.project||d.projectId)===proj.id).length;
+    const projLinks=links.filter(l=>(l.project||l.projectId)===proj.id).length;
+    const pct=projTasks.length>0?Math.round(done/projTasks.length*100):0;
+    h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;margin-bottom:8px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">'+esc(proj.name)+'</span><span style="font-size:12px;color:'+(pct===100?'#4ade80':'var(--text-muted)')+'">'+pct+'%</span></div>';
+    h+='<div style="width:100%;height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:8px"><div style="width:'+pct+'%;height:100%;background:'+(pct===100?'#4ade80':'var(--accent)')+';border-radius:3px"></div></div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--text-muted)">';
+    h+='<span>Tasks: '+done+'/'+projTasks.length+'</span>';
+    h+='<span>Active: <span style="color:#60a5fa">'+active+'</span></span>';
+    if(overdue>0)h+='<span>Overdue: <span style="color:#f87171">'+overdue+'</span></span>';
+    if(projContent>0)h+='<span>Content: '+projContent+'</span>';
+    if(projDocs>0)h+='<span>Docs: '+projDocs+'</span>';
+    if(projLinks>0)h+='<span>Links: '+projLinks+'</span>';
+    h+='</div></div>';
+    summaryMd+='## '+proj.name+'\n- Progress: '+pct+'%\n- Tasks: '+done+'/'+projTasks.length+' ('+active+' active'+(overdue>0?', '+overdue+' overdue':'')+')\n\n';
+  });
+  h+='<div style="margin-top:12px;padding:8px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">Total: '+tasks.length+' tasks | '+content.length+' content | '+docs.length+' docs | '+links.length+' links</div>';
+  summaryMd+='---\nTotal: '+tasks.length+' tasks, '+content.length+' content, '+docs.length+' docs, '+links.length+' links\n';
+  p.innerHTML=h;document.body.appendChild(p);
+  window._projSummaryMd=summaryMd;
+  window._copyProjSummary=function(){navigator.clipboard.writeText(window._projSummaryMd);};
+}
+function showQuickTableGen(){
+  let w=document.getElementById('tablegen-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='tablegen-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:340px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Table Generator</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="display:flex;gap:6px;margin-bottom:8px"><div><label style="font-size:10px;color:var(--text-muted)">Rows</label><input type="number" id="tbl-rows" value="3" min="1" max="20" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px"></div><div><label style="font-size:10px;color:var(--text-muted)">Cols</label><input type="number" id="tbl-cols" value="3" min="1" max="10" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px"></div><div style="display:flex;gap:4px;align-items:flex-end"><button onclick="window._genTable(\'md\')" style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px 10px;font-size:10px;cursor:pointer">Markdown</button><button onclick="window._genTable(\'html\')" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px 10px;font-size:10px;cursor:pointer">HTML</button></div></div><div id="tbl-output" style="font-family:monospace;font-size:10px;padding:8px;background:var(--bg-surface);border-radius:4px;color:var(--text-primary);max-height:200px;overflow-y:auto;white-space:pre-wrap"></div><button onclick="navigator.clipboard.writeText(document.getElementById(\'tbl-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="margin-top:6px;width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Copy</button>';
+  document.body.appendChild(w);
+  window._genTable=function(format){
+    const rows=parseInt(document.getElementById('tbl-rows').value)||3;
+    const cols=parseInt(document.getElementById('tbl-cols').value)||3;
+    let result='';
+    if(format==='md'){
+      result+='| '+Array.from({length:cols},(_,i)=>'Header '+(i+1)).join(' | ')+' |\n';
+      result+='| '+Array.from({length:cols},()=>'---').join(' | ')+' |\n';
+      for(let r=0;r<rows;r++){result+='| '+Array.from({length:cols},(_,c)=>'Cell '+(r+1)+'-'+(c+1)).join(' | ')+' |\n';}
+    }else{
+      result+='<table>\n  <thead>\n    <tr>\n';
+      for(let c=0;c<cols;c++)result+='      <th>Header '+(c+1)+'</th>\n';
+      result+='    </tr>\n  </thead>\n  <tbody>\n';
+      for(let r=0;r<rows;r++){result+='    <tr>\n';for(let c=0;c<cols;c++)result+='      <td>Cell '+(r+1)+'-'+(c+1)+'</td>\n';result+='    </tr>\n';}
+      result+='  </tbody>\n</table>';
+    }
+    document.getElementById('tbl-output').textContent=result;
+  };
+  window._genTable('md');
+}
+function showTmuxRef(){
+  let p=document.getElementById('tmux-ref-panel');if(p)p.remove();
+  const cmds={'Sessions':['tmux new -s mysession','tmux ls','tmux attach -t mysession','tmux kill-session -t mysession','tmux rename-session -t old new','tmux switch -t mysession','tmux detach (Ctrl+B D)'],'Windows':['Ctrl+B C (new window)','Ctrl+B , (rename window)','Ctrl+B N (next window)','Ctrl+B P (previous window)','Ctrl+B 0-9 (select window)','Ctrl+B W (list windows)','Ctrl+B & (kill window)','tmux new-window -n name'],'Panes':['Ctrl+B % (split vertical)','Ctrl+B " (split horizontal)','Ctrl+B Arrow (navigate panes)','Ctrl+B O (next pane)','Ctrl+B Z (zoom pane)','Ctrl+B X (kill pane)','Ctrl+B { (move pane left)','Ctrl+B } (move pane right)','Ctrl+B Q (show pane numbers)','Ctrl+B Space (cycle layouts)'],'Copy Mode':['Ctrl+B [ (enter copy mode)','Space (start selection)','Enter (copy selection)','Ctrl+B ] (paste)','Q (exit copy mode)','/ (search forward)','? (search backward)','N (next match)'],'Config':['set -g mouse on','set -g default-terminal "screen-256color"','set -g history-limit 10000','set -g base-index 1','set -g pane-base-index 1','set -g status-style bg=black,fg=white','bind r source-file ~/.tmux.conf','tmux source-file ~/.tmux.conf']};
+  p=document.createElement('div');p.id='tmux-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">tmux Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskIdleDetector(){
+  let p=document.getElementById('idle-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();
+  const idle=tasks.filter(t=>{
+    const created=new Date(t.created||'');
+    const daysSinceCreated=(now-created)/(1000*60*60*24);
+    return daysSinceCreated>7&&t.status!=='in-progress'&&t.status!=='inprogress';
+  }).sort((a,b)=>new Date(a.created||'')-new Date(b.created||''));
+  p=document.createElement('div');p.id='idle-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Idle Task Detector</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">'+idle.length+' tasks sitting idle for 7+ days</div>';
+  if(idle.length===0){h+='<div style="text-align:center;padding:30px;color:var(--text-muted)">No idle tasks found. Everything is moving!</div>';}
+  idle.forEach(t=>{
+    const days=Math.floor((now-new Date(t.created||''))/(1000*60*60*24));
+    const color=days>30?'#f87171':days>14?'#fbbf24':'#60a5fa';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid '+color+'">';
+    h+='<div style="flex:1"><div style="font-size:12px;color:var(--text-primary)">'+esc(t.title)+'</div><div style="font-size:10px;color:var(--text-muted)">'+t.status+' | Created '+days+' days ago</div></div>';
+    h+='<span style="font-size:16px;font-weight:700;color:'+color+'">'+days+'d</span>';
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickRandomPicker(){
+  let w=document.getElementById('picker-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='picker-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Random Picker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><textarea id="picker-items" placeholder="Enter items, one per line..." style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:12px;resize:vertical;line-height:1.5">Option A\nOption B\nOption C\nOption D</textarea><button onclick="window._pickRandom()" style="width:100%;margin-top:6px;background:var(--accent);color:#000;border:none;border-radius:4px;padding:8px;font-size:12px;cursor:pointer;font-weight:600">Pick Random</button><div id="picker-result" style="font-size:24px;font-weight:700;color:var(--accent);text-align:center;padding:12px;min-height:40px"></div><div id="picker-history" style="font-size:10px;color:var(--text-muted);text-align:center"></div>';
+  document.body.appendChild(w);
+  window._pickerHistory=[];
+  window._pickRandom=function(){
+    const items=document.getElementById('picker-items').value.split('\n').map(s=>s.trim()).filter(s=>s);
+    if(items.length===0)return;
+    const picked=items[Math.floor(Math.random()*items.length)];
+    document.getElementById('picker-result').textContent=picked;
+    window._pickerHistory.unshift(picked);
+    if(window._pickerHistory.length>5)window._pickerHistory.length=5;
+    document.getElementById('picker-history').textContent='History: '+window._pickerHistory.join(' | ');
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
