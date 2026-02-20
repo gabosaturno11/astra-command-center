@@ -1014,6 +1014,7 @@ textarea{resize:vertical;line-height:1.6}
             <span id="ws-reading">0 min read</span>
             <span id="ws-goal" style="cursor:pointer" onclick="setWriterGoal()" title="Click to set word goal"></span>
             <span id="ws-edited" style="color:var(--text-muted)"></span>
+            <span id="ws-session" style="color:var(--green)"></span>
             <span id="ws-saved" style="margin-left:auto">Saved</span>
           </div>
         </div>
@@ -1686,7 +1687,7 @@ textarea{resize:vertical;line-height:1.6}
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Project</label><input type="text" id="td-project" placeholder="Project name..." list="pdl"></div>
-      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"><div style="display:flex;gap:3px;margin-top:3px"><button class="btn btn-sm btn-ghost" onclick="tdSetDue(0)" style="font-size:8px;padding:1px 5px">Today</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(1)" style="font-size:8px;padding:1px 5px">Tmrw</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(7)" style="font-size:8px;padding:1px 5px">+1W</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(30)" style="font-size:8px;padding:1px 5px">+1M</button></div><input type="text" id="td-due-natural" placeholder="or type: friday, 3d, next week..." style="font-size:9px;padding:3px 6px;margin-top:3px;width:100%;border:1px solid var(--border);border-radius:4px;background:var(--bg-input);color:var(--text-secondary)" onkeydown="if(event.key==='Enter'){const v=parseNaturalDate(this.value);if(v&&v!==this.value){document.getElementById('td-due').value=v;this.value='';toast('Due: '+v);}event.preventDefault();}"></div>
+      <div class="td-field"><label>Due Date</label><input type="date" id="td-due"><div style="display:flex;gap:3px;margin-top:3px"><button class="btn btn-sm btn-ghost" onclick="tdSetDue(0)" style="font-size:8px;padding:1px 5px">Today</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(1)" style="font-size:8px;padding:1px 5px">Tmrw</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(7)" style="font-size:8px;padding:1px 5px">+1W</button><button class="btn btn-sm btn-ghost" onclick="tdSetDue(30)" style="font-size:8px;padding:1px 5px">+1M</button><button class="btn btn-sm btn-ghost" onclick="document.getElementById('td-due').value=''" style="font-size:8px;padding:1px 5px;color:var(--red)">Clear</button></div><input type="text" id="td-due-natural" placeholder="or type: friday, 3d, next week..." style="font-size:9px;padding:3px 6px;margin-top:3px;width:100%;border:1px solid var(--border);border-radius:4px;background:var(--bg-input);color:var(--text-secondary)" onkeydown="if(event.key==='Enter'){const v=parseNaturalDate(this.value);if(v&&v!==this.value){document.getElementById('td-due').value=v;this.value='';toast('Due: '+v);}event.preventDefault();}"></div>
     </div>
     <div class="td-field-row">
       <div class="td-field"><label>Recurrence</label><select id="td-recur"><option value="">None</option><option value="daily">Daily</option><option value="weekday">Weekdays</option><option value="weekly">Weekly</option><option value="biweekly">Bi-weekly</option><option value="monthly">Monthly</option></select></div>
@@ -1728,7 +1729,7 @@ let contentType = 'all', contentTheme = 'all', contentTagFilter = null;
 let taskView = 'list', taskFilter = 'all', taskProjectFilter = null;
 let linkCategory = 'all';
 let editingContentId = null, editingLinkId = null;
-let writerTimer = null, specTimer = null, writerPanelOpen = false, writerAutoBackupTimer = null;
+let writerTimer = null, specTimer = null, writerPanelOpen = false, writerAutoBackupTimer = null, writerSessionStart = {};
 let calMonth = new Date().getMonth(), calYear = new Date().getFullYear();
 let calView = 'month'; // 'month' or 'week'
 let calWeekStart = null; // Date object for week view start (Monday)
@@ -2963,7 +2964,7 @@ function getActiveDoc(){return S.docs.find(d=>d.id===S.activeDoc);}
 function renderWriter(){renderDocList();loadDoc();document.getElementById('writer-count').textContent=S.docs.length;}
 function renderDocList(){const sorted=[...S.docs].sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));document.getElementById('writer-doc-list').innerHTML=sorted.map(d=>{const w=countW(d.body);const dt=d.updated?new Date(d.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';return`<div class="writer-doc-item ${d.id===S.activeDoc?'active':''}" onclick="switchDoc(${d.id})"><div class="writer-doc-title">${esc(d.title||'Untitled')}</div>${(d.tags&&d.tags.length)?`<div style="display:flex;gap:2px;flex-wrap:wrap;margin:2px 0">${d.tags.map(t=>`<span style="font-size:7px;padding:0 4px;border-radius:6px;border:1px solid rgba(74,222,128,0.2);color:var(--accent);opacity:0.7">${esc(t)}</span>`).join('')}</div>`:''}<div class="writer-doc-meta"><span>${w}w</span><span>${dt}</span><span style="margin-left:auto;cursor:pointer;opacity:0.4;font-size:8px" onclick="event.stopPropagation();tagDoc(${d.id})" title="Add tags">T</span><span style="cursor:pointer;opacity:0.4;font-size:8px" onclick="event.stopPropagation();dupDoc(${d.id})" title="Duplicate">D</span>${S.docs.length>1?`<span style="cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delDoc(${d.id})">x</span>`:''}</div></div>`;}).join('');}
 function tagDoc(id){const d=S.docs.find(x=>x.id===id);if(!d)return;const current=(d.tags||[]).join(', ');const input=prompt('Tags (comma-separated):',current);if(input===null)return;d.tags=input.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);save();renderDocList();toast('Tags updated');}
-function loadDoc(){const d=getActiveDoc();if(!d)return;document.getElementById('writer-title').value=d.title||'';document.getElementById('writer-editor').innerHTML=d.body||'';updateWS();renderVersions();}
+function loadDoc(){const d=getActiveDoc();if(!d)return;document.getElementById('writer-title').value=d.title||'';document.getElementById('writer-editor').innerHTML=d.body||'';if(!writerSessionStart[d.id]){const wc=(d.body||'').trim().split(/\s+/).filter(x=>x.length).length;writerSessionStart[d.id]=wc;}updateWS();renderVersions();}
 function switchDoc(id){if(S.activeDoc===id)return;snapshotWriter();save();S.activeDoc=id;renderWriter();const d=S.docs.find(x=>x.id===id);if(d)trackRecent('doc',id,d.title);save();updateBreadcrumb();}
 function newDoc(){snapshotWriter();const d={id:Date.now(),title:'',body:'',versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};S.docs.unshift(d);S.activeDoc=d.id;save();renderWriter();document.getElementById('writer-title').focus();}
 function delDoc(id){if(S.docs.length<=1){toast('Cannot delete last doc');return;}S.docs=S.docs.filter(d=>d.id!==id);if(S.activeDoc===id)S.activeDoc=S.docs[0].id;save();renderWriter();toast('Deleted');}
@@ -2976,6 +2977,7 @@ function scheduleAutoBackup(){
 }
 function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;const paras=t.split(/\n\s*\n/).filter(p=>p.trim().length).length;const headings=e.querySelectorAll('h1,h2,h3,h4,h5,h6').length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=paras+'p / '+headings+'h / '+t.length+'c';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
   const d=getActiveDoc();const editedEl=document.getElementById('ws-edited');if(editedEl&&d&&d.updated)editedEl.textContent='Edited '+timeAgo(d.updated);
+  const sesEl=document.getElementById('ws-session');if(sesEl&&d&&writerSessionStart[d.id]!==undefined){const delta=w-writerSessionStart[d.id];sesEl.textContent=delta>0?'+'+delta+' this session':delta<0?delta+' this session':'';sesEl.style.color=delta>0?'var(--green)':'var(--yellow)';};
   const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
   if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
 function setWriterGoal(){const d=getActiveDoc();if(!d)return;const g=prompt('Word count goal:',d.wordGoal||'');if(g===null)return;d.wordGoal=parseInt(g)||0;save();updateWS();}
@@ -5079,6 +5081,16 @@ function cmdGetItems(q) {
       S.tasks.filter(t=>t.status!=='done'&&t.title&&t.title.toLowerCase().includes(fq)).slice(0,5).forEach(t=>{
         items.unshift({title:'Focus: '+t.title,desc:'Start 25min Pomodoro + time tracking',icon:'F',type:'action',action:()=>{closeCommandPalette();ftStartForTask(t.id);toast('Focus started: '+t.title);}});
       });
+    }
+  }
+  // Status filter from Cmd+K
+  if(ql && ql.startsWith('status:')) {
+    const sq=q.substring(7).trim().toLowerCase();
+    const statuses={todo:'todo',wip:'progress','in progress':'progress',progress:'progress',done:'done',blocked:'blocked',active:'active'};
+    const st=statuses[sq];
+    if(st){
+      const cnt=st==='active'?S.tasks.filter(t=>t.status!=='done').length:S.tasks.filter(t=>t.status===st).length;
+      items.unshift({title:'Filter: '+sq+' ('+cnt+')',desc:'Show '+sq+' tasks',icon:'F',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter(st);renderTasks();}});
     }
   }
   // Due date filter from Cmd+K
