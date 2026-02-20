@@ -2258,7 +2258,8 @@ function updateSidebarCtx() {
   } else if(currentSection==='links') {
     const cats={};S.links.forEach(l=>{const c=l.category||'uncategorized';cats[c]=(cats[c]||0)+1;});
     const pinned=S.links.filter(l=>l.pinned).length;
-    el.innerHTML=`<div class="sidebar-label">Link Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.links.length} links${pinned?` / ${pinned} pinned`:''}</div>`+Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${c}: ${n}</div>`).join('');
+    const domains={};S.links.forEach(l=>{try{const d=new URL(l.url).hostname.replace(/^www\./,'');domains[d]=(domains[d]||0)+1;}catch(e){}});
+    el.innerHTML=`<div class="sidebar-label">Link Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${S.links.length} links${pinned?` / ${pinned} pinned`:''}</div><div class="sidebar-label" style="margin-top:6px">Categories</div>`+Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([c,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted);cursor:pointer" onclick="linkCategory='${escA(c)}';renderLinks()">${esc(c)}: ${n}</div>`).join('')+`<div class="sidebar-label" style="margin-top:6px">Top Domains</div>`+Object.entries(domains).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([d,n])=>`<div style="padding:2px 12px;font-size:10px;color:var(--text-muted)">${esc(d)}: ${n}</div>`).join('');
   } else if(currentSection==='repos') {
     const active=(S.repos||[]).filter(r=>r.status==='active').length;
     const withLive=(S.repos||[]).filter(r=>r.live).length;
@@ -3360,6 +3361,13 @@ function exportAllSpecs(){
     });
   });
   navigator.clipboard.writeText(md).then(()=>toast('All '+S.specs.length+' specs copied as markdown'));
+}
+function exportAllSpecsHTML(){
+  snapshotSpec();if(!S.specs.length){toast('No specs');return;}
+  let h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Living Docs - Saturno Hub</title><style>body{font-family:system-ui;max-width:720px;margin:40px auto;padding:0 20px;line-height:1.8;color:#e0e0e0;background:#0a0a0e}h1{font-size:28px;color:#4ade80;border-bottom:2px solid #4ade80;padding-bottom:8px}h2{font-size:22px;color:#22d3ee;margin-top:32px}h3{font-size:16px;color:#fff;margin-top:16px;padding:6px 0;border-bottom:1px solid #222}hr{border:none;border-top:1px solid #222;margin:24px 0}.meta{font-size:11px;color:#888;margin-bottom:8px}.section{margin:12px 0;padding:12px;background:#101014;border-radius:8px;border-left:3px solid #22d3ee}a{color:#4ade80}</style></head><body>';
+  h+='<h1>Living Docs</h1><p style="color:#888;font-size:13px">'+S.specs.length+' specs | Exported '+new Date().toLocaleDateString()+'</p>';
+  S.specs.forEach(s=>{const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);h+='<hr><h2>'+esc(s.title||'Untitled')+'</h2><div class="meta">'+(proj?esc(proj.name)+' | ':'')+wc+' words | '+(s.sections||[]).length+' sections</div>';(s.sections||[]).forEach(sec=>{h+='<div class="section"><h3>'+esc(sec.title||'Section')+'</h3><div>'+(sec.body||'<em>empty</em>')+'</div></div>';});});
+  h+='</body></html>';const blob=new Blob([h],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-specs-'+new Date().toISOString().split('T')[0]+'.html';a.click();toast('Exported '+S.specs.length+' specs as HTML');
 }
 
 // === LINKS ===
@@ -5121,7 +5129,7 @@ function cmdGetItems(q) {
   if(!ql || 'overdue late past due'.includes(ql)){const ot=new Date().toISOString().split('T')[0];const od=S.tasks.filter(t=>t.due&&t.due<ot&&t.status!=='done');if(od.length)items.push({title:'Overdue Tasks ('+od.length+')',desc:od.slice(0,3).map(t=>t.title).join(', '),icon:'!',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='due';renderTasks();toast(od.length+' overdue tasks');}});}
   if(!ql || 'archive archived completed old'.includes(ql)){const ac=(S.archivedTasks||[]).length;if(ac)items.push({title:'View Archived Tasks ('+ac+')',desc:'Browse and restore archived tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);showArchivedTasks();}});}
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
-  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due: status: p: recent: count: overdue: today:', icon:'?', type:'info'});
+  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due: status: p: recent: count: overdue: today: week:', icon:'?', type:'info'});
   if(!ql || 'clear reset filters'.includes(ql)) items.push({title:'Clear All Filters', desc:'Reset search, filters, and sort to defaults', icon:'X', type:'action', action:()=>{closeCommandPalette();taskFilter='all';taskProjectFilter=null;contentType='all';contentTheme='all';contentTagFilter=null;contentShowAll=false;const ts=document.getElementById('task-search');if(ts)ts.value='';const cs=document.getElementById('content-search');if(cs)cs.value='';const tsort=document.getElementById('task-sort');if(tsort)tsort.value='manual';renderTasks();renderContent();renderLinks();toast('All filters cleared');}});
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
@@ -5134,6 +5142,7 @@ function cmdGetItems(q) {
   if(!ql || 'daily dashboard digest briefing morning'.includes(ql)) items.push({title:'Daily Dashboard', desc:'Full daily briefing copied to clipboard', icon:'*', type:'action', action:()=>{closeCommandPalette();dailyDashboard();}});
   if(!ql || 'import ics calendar'.includes(ql)) items.push({title:'Import ICS', desc:'Import .ics calendar file as tasks', icon:'C', type:'action', action:()=>{closeCommandPalette();importICS();}});
   if(!ql || 'export all specs living docs'.includes(ql)) items.push({title:'Export All Specs', desc:'Combine all Living Docs into one markdown', icon:'S', type:'action', action:()=>{closeCommandPalette();exportAllSpecs();}});
+  if(!ql || 'export specs html download'.includes(ql)) items.push({title:'Export Specs as HTML', desc:'Download all Living Docs as styled HTML', icon:'S', type:'action', action:()=>{closeCommandPalette();exportAllSpecsHTML();}});
   // Quick create task from Cmd+K with @date and !priority
   if(ql && ql.startsWith('task:')) {
     let taskRaw=q.substring(5).trim();
@@ -5207,6 +5216,16 @@ function cmdGetItems(q) {
       items.unshift({title:t.title||'Untitled',desc:'Due today | '+(t.priority||'p2')+' | '+(t.project||'no project'),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
     });
     if(!todayTasks.length)items.unshift({title:'No tasks due today',desc:'Use task: to create one',icon:'T',type:'info'});
+  }
+  // Week prefix - tasks due this week
+  if(ql && (ql.startsWith('week:') || ql==='week')){
+    const today=new Date();const weekEnd=new Date(today);weekEnd.setDate(today.getDate()+(7-today.getDay()));
+    const todayStr=today.toISOString().split('T')[0];const weekEndStr=weekEnd.toISOString().split('T')[0];
+    const weekTasks=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due>=todayStr&&t.due<=weekEndStr);
+    weekTasks.sort((a,b)=>a.due.localeCompare(b.due));
+    const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    weekTasks.forEach(t=>{const d=new Date(t.due+'T12:00:00');items.unshift({title:t.title||'Untitled',desc:dayNames[d.getDay()]+' '+t.due+' | '+(t.priority||'p2')+' | '+(t.project||''),icon:'W',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+    if(!weekTasks.length)items.unshift({title:'No tasks due this week',desc:'Clear schedule ahead',icon:'W',type:'info'});
   }
   // Overdue tasks prefix
   if(ql && ql.startsWith('overdue:') || (ql && ql==='overdue')){
