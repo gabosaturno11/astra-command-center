@@ -845,6 +845,7 @@ textarea{resize:vertical;line-height:1.6}
           <button class="btn btn-sm" onclick="toggleContentCompact()" id="content-compact-btn" title="Toggle compact list view">Compact</button>
           <button class="btn btn-sm" onclick="contentReadLaterFilter=!contentReadLaterFilter;this.style.color=contentReadLaterFilter?'var(--accent-cyan)':'';renderContent()" id="content-rl-btn" title="Show only Read Later items">RL</button>
           <button class="btn btn-sm" onclick="contentShowArchived=!contentShowArchived;this.style.color=contentShowArchived?'var(--yellow)':'';renderContent()" id="content-archive-btn" title="Show/hide archived content">Archived</button>
+          <button class="btn btn-sm" onclick="contentFindDuplicates()" title="Find duplicate/similar content items" style="color:#f59e0b">Dupes</button>
           <button class="btn btn-sm" id="content-bulk-btn" onclick="toggleContentBulk()" title="Select multiple">Select</button>
           <div id="content-bulk-actions" style="display:none;gap:4px">
             <button class="btn btn-sm btn-danger" onclick="contentBulkDelete()">Delete Selected</button>
@@ -1094,6 +1095,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm" onclick="exportCurrentSpecText()" title="Copy spec as plain text" style="font-size:9px">TXT</button>
             <button class="btn btn-sm" onclick="saveSpecVersion()" title="Save snapshot of this spec" style="font-size:9px;color:var(--accent)">v+</button>
             <button class="btn btn-sm" onclick="showSpecVersions()" title="View version history" style="font-size:9px">Hist</button>
+            <button class="btn btn-sm" onclick="specImportMarkdown()" title="Import spec from Markdown" style="font-size:9px;color:#22d3ee">Imp</button>
           </div>
           <div class="specs-sections" id="specs-sections"></div>
           <div class="specs-statusbar">
@@ -2276,7 +2278,7 @@ function updateSidebarCtx() {
     const overdue=active.filter(t=>t.due&&t.due<today).length;
     const pCounts={p0:active.filter(t=>t.priority==='p0').length,p1:active.filter(t=>t.priority==='p1').length,p2:active.filter(t=>t.priority==='p2').length,p3:active.filter(t=>t.priority==='p3').length};
     const doneCount=S.tasks.filter(t=>t.status==='done').length;const pct=S.tasks.length?Math.round(doneCount/S.tasks.length*100):0;
-    el.innerHTML=`<div class="sidebar-label">Quick Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${active.length} active${overdue?` <span style="color:var(--red)">(${overdue} overdue)</span>`:''} / ${doneCount} done</div><div style="padding:2px 12px"><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div></div><span style="font-size:8px;color:var(--accent);font-family:var(--mono)">${pct}%</span></div></div><div style="padding:2px 12px;font-size:9px;color:var(--text-muted);display:flex;gap:6px">${pCounts.p0?`<span style="color:#ef4444">P0:${pCounts.p0}</span>`:''}${pCounts.p1?`<span style="color:#f59e0b">P1:${pCounts.p1}</span>`:''}${pCounts.p2?`<span style="color:#3b82f6">P2:${pCounts.p2}</span>`:''}${pCounts.p3?`<span style="color:var(--text-muted)">P3:${pCounts.p3}</span>`:''}</div><div class="sidebar-label" style="margin-top:8px">Projects</div>`+ps.map(p=>{const pAll=S.tasks.filter(t=>t.project===p);const pDone=pAll.filter(t=>t.status==='done').length;const pPct=pAll.length?Math.round(pDone/pAll.length*100):0;return`<div class="sidebar-item" onclick="filterTaskProject('${p}')"><span class="sidebar-item-icon">.</span><span>${p}</span><span class="sidebar-item-count" title="${pPct}% done">${S.tasks.filter(t=>t.project===p&&t.status!=='done').length}</span></div>`;}).join('');
+    el.innerHTML=`<div class="sidebar-label">Quick Stats</div><div style="padding:4px 12px;font-size:10px;color:var(--text-muted);line-height:1.8">${active.length} active${overdue?` <span style="color:var(--red)">(${overdue} overdue)</span>`:''} / ${doneCount} done</div><div style="padding:2px 12px"><div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:var(--accent);border-radius:2px;transition:width 0.3s"></div></div><span style="font-size:8px;color:var(--accent);font-family:var(--mono)">${pct}%</span></div></div><div style="padding:2px 12px;font-size:9px;color:var(--text-muted);display:flex;gap:6px">${pCounts.p0?`<span style="color:#ef4444">P0:${pCounts.p0}</span>`:''}${pCounts.p1?`<span style="color:#f59e0b">P1:${pCounts.p1}</span>`:''}${pCounts.p2?`<span style="color:#3b82f6">P2:${pCounts.p2}</span>`:''}${pCounts.p3?`<span style="color:var(--text-muted)">P3:${pCounts.p3}</span>`:''}</div><div class="sidebar-label" style="margin-top:8px">Projects</div>`+ps.map(p=>{const pAll=S.tasks.filter(t=>t.project===p);const pDone=pAll.filter(t=>t.status==='done').length;const pPct=pAll.length?Math.round(pDone/pAll.length*100):0;const estMins=pAll.filter(t=>t.status!=='done'&&t.estimate).reduce((a,t)=>{const e=t.estimate||'';const hm=e.match(/(\d+)\s*h/);const mm=e.match(/(\d+)\s*m/);return a+(hm?parseInt(hm[1])*60:0)+(mm?parseInt(mm[1]):0);},0);const estStr=estMins>0?(estMins>=60?Math.floor(estMins/60)+'h'+(estMins%60?estMins%60+'m':''):estMins+'m'):'';return`<div class="sidebar-item" onclick="filterTaskProject('${p}')"><span class="sidebar-item-icon">.</span><span>${p}</span><span class="sidebar-item-count" title="${pPct}% done${estStr?' | Est: '+estStr:''}">${S.tasks.filter(t=>t.project===p&&t.status!=='done').length}${estStr?' <span style="color:#22d3ee;font-size:7px">'+estStr+'</span>':''}</span></div>`;}).join('');
   } else if(currentSection==='content') {
     const types={};S.content.forEach(c=>{types[c.type]=(types[c.type]||0)+1;});
     const totalWords=S.content.reduce((a,c)=>a+c.body.trim().split(/\s+/).filter(x=>x.length).length,0);
@@ -2646,6 +2648,40 @@ function contentInlineEdit(id,el,e){
   function finishEdit(){if(saved)return;saved=true;const v=ta.value.trim();if(v&&v!==c.body){c.body=v;c.updated=new Date().toISOString();save();toast('Saved');}renderContent();}
   ta.addEventListener('blur',finishEdit);
   ta.addEventListener('keydown',ev=>{if(ev.key==='Escape'){saved=true;renderContent();}if((ev.metaKey||ev.ctrlKey)&&ev.key==='Enter')finishEdit();});
+}
+function contentFindDuplicates(){
+  if(S.content.length<2){toast('Need 2+ items');return;}
+  const dupes=[];const normalize=s=>(s||'').toLowerCase().replace(/[^a-z0-9\s]/g,'').replace(/\s+/g,' ').trim();
+  for(let i=0;i<S.content.length;i++){
+    for(let j=i+1;j<S.content.length;j++){
+      const a=normalize(S.content[i].body),b=normalize(S.content[j].body);
+      if(!a||!b||a.length<20)continue;
+      const short=a.length<b.length?a:b;const long=a.length<b.length?b:a;
+      if(short===long||long.includes(short)){
+        dupes.push({a:S.content[i],b:S.content[j],type:short===long?'exact':'contained'});
+      } else {
+        const aWords=new Set(a.split(' '));const bWords=new Set(b.split(' '));
+        const overlap=[...aWords].filter(w=>bWords.has(w)).length;
+        const sim=overlap/Math.max(aWords.size,bWords.size);
+        if(sim>0.7)dupes.push({a:S.content[i],b:S.content[j],type:'similar ('+Math.round(sim*100)+'%)'});
+      }
+    }
+  }
+  if(!dupes.length){toast('No duplicates found');return;}
+  const panel=document.createElement('div');panel.id='content-dupes-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:20px;z-index:9999;max-width:600px;max-height:70vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,0.6)';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:var(--accent);font-weight:600">Potential Duplicates ('+dupes.length+')</span><button onclick="this.closest(\'#content-dupes-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  dupes.slice(0,20).forEach((d,i)=>{
+    const pa=d.a.body.substring(0,60).replace(/\n/g,' ');const pb=d.b.body.substring(0,60).replace(/\n/g,' ');
+    html+='<div style="padding:8px;margin:4px 0;background:var(--bg-elevated);border-radius:6px;font-size:10px;line-height:1.5">';
+    html+='<div style="color:var(--yellow);font-size:9px;margin-bottom:4px">'+esc(d.type)+'</div>';
+    html+='<div style="color:var(--text)">A: '+esc(pa)+'...</div>';
+    html+='<div style="color:var(--text-muted)">B: '+esc(pb)+'...</div>';
+    html+='<button onclick="delContent('+d.b.id+');this.closest(\'#content-dupes-panel\').remove();contentFindDuplicates()" style="margin-top:4px;font-size:9px;padding:2px 8px;background:var(--red);color:#fff;border:none;border-radius:4px;cursor:pointer">Delete B</button>';
+    html+='</div>';
+  });
+  if(dupes.length>20)html+='<div style="color:var(--text-muted);font-size:10px;padding:8px">...and '+(dupes.length-20)+' more</div>';
+  panel.innerHTML=html;document.body.appendChild(panel);
 }
 
 // === TASKS ===
@@ -3764,6 +3800,22 @@ function exportCurrentSpecMD(){
   md+='Sections: '+(s.sections||[]).length+' | Exported: '+new Date().toLocaleDateString()+'\n\n---\n\n';
   (s.sections||[]).forEach(sec=>{md+='## '+(sec.title||'Section')+'\n\n';const d=document.createElement('div');d.innerHTML=sec.body||'';md+=(d.innerText||'(empty)')+'\n\n';});
   navigator.clipboard.writeText(md).then(()=>toast('Copied as Markdown: '+s.title));
+}
+function specImportMarkdown(){
+  const md=prompt('Paste Markdown text to create a new spec.\nUse ## headings to define sections:');
+  if(!md||!md.trim())return;
+  const lines=md.split('\n');let title='Imported Spec';const sections=[];let curTitle='';let curBody=[];
+  lines.forEach(line=>{
+    const h1=line.match(/^#\s+(.+)/);const h2=line.match(/^##\s+(.+)/);
+    if(h1&&!sections.length&&curBody.length===0){title=h1[1].trim();return;}
+    if(h2){if(curTitle||curBody.length){sections.push({id:Date.now()+Math.random(),title:curTitle||'Section',body:'<p>'+curBody.join('</p><p>')+'</p>',icon:'doc',color:'#4ade80'});}curTitle=h2[1].trim();curBody=[];return;}
+    if(line.trim())curBody.push(esc(line));
+  });
+  if(curTitle||curBody.length){sections.push({id:Date.now()+Math.random(),title:curTitle||'Section',body:'<p>'+curBody.join('</p><p>')+'</p>',icon:'doc',color:'#4ade80'});}
+  if(!sections.length){toast('No sections found (use ## headings)');return;}
+  const projId=activeProject||(S.projects[0]&&S.projects[0].id)||null;
+  const spec={id:'spec_'+Date.now(),title:title,projectId:projId,sections:sections,versions:[],created:new Date().toISOString(),updated:new Date().toISOString()};
+  S.specs.push(spec);save();switchSpec(spec.id);toast('Imported: '+title+' ('+sections.length+' sections)');
 }
 
 // === LINKS ===
