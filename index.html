@@ -1791,6 +1791,7 @@ textarea{resize:vertical;line-height:1.6}
       <div class="td-add-subtask" onclick="addSubtaskInModal()">+ Add subtask</div>
     </div>
     <div class="td-field"><label>Notes <span id="td-notes-count" style="font-size:8px;color:var(--text-muted);font-weight:400"></span></label><textarea id="td-notes" placeholder="Quick notes, decisions, updates..." style="min-height:40px;font-size:10px;resize:vertical"></textarea></div>
+    <div class="td-field"><label>Color Labels</label><div id="td-labels" style="display:flex;gap:4px;flex-wrap:wrap"></div></div>
     <div class="td-created" id="td-created"></div>
     <div id="td-log" style="margin-top:8px"></div>
     <div class="td-footer">
@@ -2772,7 +2773,7 @@ function renderTasks(){
     cnt.textContent=f.length+(totalTime?' ('+formatTimeSpent(totalTime)+')':'');
     const wipLimit=st==='progress'?5:0;
     if(wipLimit&&f.length>wipLimit){cnt.style.color='var(--red)';cnt.title='WIP limit: '+wipLimit;}else{cnt.style.color='';cnt.title=f.length+' tasks'+(totalTime?', '+formatTimeSpent(totalTime)+' tracked':'');};
-    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title" title="${t.created?'Created '+timeAgo(t.created):''}${t.description?'\n'+escA(t.description.substring(0,120)):''}">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" onclick="event.stopPropagation();cyclePriority(${t.id})" style="cursor:pointer" title="Click to cycle priority">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue" style="cursor:pointer" onclick="event.stopPropagation();taskProjectFilter='${escA(t.project)}';renderTasks();toast('Filtered: ${escA(t.project)}')">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'};font-family:var(--mono)" title="${t.due}">${relativeDate(t.due)}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}${t.timeSpent?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)" title="Time tracked">${formatTimeSpent(t.timeSpent)}</span>`:''}</div>${(t.tags&&t.tags.length)?`<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${t.tags.map(tag=>`<span style="font-size:7px;padding:1px 4px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:2px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}</span>`).join('')}</div>`:''}</div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
+    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title" title="${t.created?'Created '+timeAgo(t.created):''}${t.description?'\n'+escA(t.description.substring(0,120)):''}">${esc(t.title||'Untitled')}</div>${(t.labels&&t.labels.length)?`<div style="display:flex;gap:3px;margin-bottom:3px">${t.labels.map(c=>`<div style="width:8px;height:8px;border-radius:50%;background:${c}"></div>`).join('')}</div>`:''}${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" onclick="event.stopPropagation();cyclePriority(${t.id})" style="cursor:pointer" title="Click to cycle priority">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue" style="cursor:pointer" onclick="event.stopPropagation();taskProjectFilter='${escA(t.project)}';renderTasks();toast('Filtered: ${escA(t.project)}')">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'};font-family:var(--mono)" title="${t.due}">${relativeDate(t.due)}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}${t.timeSpent?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)" title="Time tracked">${formatTimeSpent(t.timeSpent)}</span>`:''}</div>${(t.tags&&t.tags.length)?`<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${t.tags.map(tag=>`<span style="font-size:7px;padding:1px 4px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:2px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}</span>`).join('')}</div>`:''}</div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
   });
   const activeTasks=S.tasks.filter(t=>t.status!=='done').length;
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
@@ -2980,6 +2981,7 @@ function openTaskDetail(id) {
   if(logEl&&t.log&&t.log.length){const sClr={todo:'var(--accent-cyan)',progress:'var(--green)',done:'var(--accent)',blocked:'var(--orange)'};logEl.innerHTML='<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Activity ('+t.log.length+')</div>'+t.log.slice(-8).reverse().map(e=>`<div style="font-size:8px;padding:2px 0;font-family:var(--mono);display:flex;align-items:center;gap:4px"><span style="width:4px;height:4px;border-radius:50%;background:${sClr[e.to]||'var(--text-muted)'};flex-shrink:0"></span><span style="color:${sClr[e.from]||'var(--text-muted)'}">${e.from}</span><span style="color:var(--text-muted)">-></span><span style="color:${sClr[e.to]||'var(--text-muted)'}">${e.to}</span><span style="color:var(--text-muted);opacity:0.5;margin-left:auto;font-size:7px">${timeAgo(e.at)}</span></div>`).join('');}else if(logEl){logEl.innerHTML='';}
   renderTaskTags(t);
   renderSubtasksInModal(t.subtasks || []);
+  renderTaskLabels(t);
   updateTimerBtn(t);
   const ubBtn=document.getElementById('td-unblock-btn');if(ubBtn)ubBtn.style.display=(t.status==='blocked'||t.blockedBy)?'inline-block':'none';
   document.getElementById('task-detail-modal').classList.add('open');
@@ -2988,6 +2990,7 @@ function openTaskDetail(id) {
 function renderTaskTags(t){const el=document.getElementById('td-tags');if(!el)return;const tags=t.tags||[];el.innerHTML=tags.map(tag=>`<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 6px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:3px;font-size:9px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}<span onclick="removeTaskTag('${escA(tag)}')" style="cursor:pointer;color:var(--red);margin-left:2px;font-size:8px">x</span></span>`).join('')+`<span onclick="addTaskTag()" style="cursor:pointer;font-size:9px;color:var(--accent);padding:2px 4px">+ tag</span>`;}
 function addTaskTag(){const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;const allTags=[...new Set(S.tasks.flatMap(x=>x.tags||[]))].sort();const tag=prompt('Tag:'+((allTags.length)?'\nExisting: '+allTags.join(', '):''));if(!tag||!tag.trim())return;if(!t.tags)t.tags=[];const v=tag.trim().toLowerCase();if(!t.tags.includes(v)){t.tags.push(v);save();renderTaskTags(t);toast('Tag added: '+v);}}
 function removeTaskTag(tag){const t=S.tasks.find(x=>x.id===taskDetailId);if(!t||!t.tags)return;t.tags=t.tags.filter(x=>x!==tag);save();renderTaskTags(t);}
+function renderTaskLabels(t){const el=document.getElementById('td-labels');if(!el)return;const colors=['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899','#06b6d4'];el.innerHTML=colors.map(c=>{const active=(t.labels||[]).includes(c);return `<div onclick="addTaskColorLabel(${t.id},'${c}')" style="width:20px;height:20px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${active?'white':'transparent'};opacity:${active?1:0.4};transition:all 0.15s" title="${active?'Remove':'Add'} label"></div>`;}).join('');}
 function unblockTask(){const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;t.blockedBy='';if(t.status==='blocked')t.status='todo';document.getElementById('td-blocked-by').value='';document.getElementById('td-status').value=t.status;document.getElementById('td-unblock-btn').style.display='none';save();renderTasks();toast('Unblocked');}
 function formatTimeSpent(mins){if(mins<60)return mins+'m';const h=Math.floor(mins/60);const m=mins%60;return h+'h'+(m?' '+m+'m':'');}
 function tdSetDue(days){const d=new Date();d.setDate(d.getDate()+days);document.getElementById('td-due').value=d.toISOString().split('T')[0];}
@@ -5706,6 +5709,8 @@ function cmdGetItems(q) {
       ['burndown','14-day task burndown chart (created vs completed)'],
       ['deadlinks','Check all links for broken URLs'],
       ['notifications','Enable desktop notifications for overdue tasks'],
+      ['timeline','Activity timeline across all sections'],
+      ['backup','Schedule auto-backup (JSON download)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6817,6 +6822,15 @@ function cmdGetItems(q) {
   if(ql && (ql==='notifications' || ql==='notify' || ql==='alerts' || ql==='desktop alerts')){
     items.unshift({title:'Enable Desktop Notifications',desc:'Get alerts for overdue tasks and focus timer',icon:'N',type:'action',action:()=>{closeCommandPalette();enableDesktopNotifications();}});
   }
+  // Timeline prefix
+  if(ql && (ql==='timeline' || ql==='activity' || ql==='activity feed' || ql==='recent')){
+    items.unshift({title:'Activity Timeline',desc:'Chronological feed of recent activity across all sections',icon:'T',type:'action',action:()=>{closeCommandPalette();showActivityTimeline();}});
+  }
+  // Backup prefix
+  if(ql && (ql==='backup' || ql==='auto backup' || ql==='autobackup' || ql==='schedule backup')){
+    items.unshift({title:'Download Full Backup Now',desc:'Export all data as JSON file',icon:'B',type:'action',action:()=>{closeCommandPalette();downloadBackup();}});
+    items.unshift({title:'Toggle Auto-Backup (every 4h)',desc:S._autoBackup?'Currently ON - click to disable':'Currently OFF - click to enable',icon:'B',type:'action',action:()=>{closeCommandPalette();toggleAutoBackup();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -6837,6 +6851,59 @@ function importBookmarks(){
       save();renderLinks();toast('Imported '+count+' bookmarks ('+links.length+' total, dupes skipped)');
     };reader.readAsText(f);
   };input.click();
+}
+function showActivityTimeline(){
+  let panel=document.getElementById('timeline-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='timeline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto';
+  const events=[];
+  S.tasks.forEach(t=>{if(t.created)events.push({date:t.created,type:'task',action:'created',title:t.title,icon:'T',color:'var(--accent-cyan)'});if(t.completedAt)events.push({date:t.completedAt,type:'task',action:'completed',title:t.title,icon:'T',color:'var(--green)'});});
+  S.content.forEach(c=>{if(c.created)events.push({date:c.created,type:'content',action:'added',title:(c.body||'').substring(0,60),icon:'C',color:'var(--yellow)'});});
+  S.docs.forEach(d=>{if(d.created)events.push({date:d.created,type:'doc',action:'created',title:d.title,icon:'D',color:'var(--accent)'});if(d.updated&&d.updated!==d.created)events.push({date:d.updated,type:'doc',action:'updated',title:d.title,icon:'D',color:'var(--accent)'});});
+  S.links.forEach(l=>{if(l.created)events.push({date:l.created,type:'link',action:'saved',title:l.title||l.url,icon:'L',color:'#a78bfa'});});
+  (S.focusSessions||[]).forEach(f=>{events.push({date:f.date+'T12:00:00',type:'focus',action:f.minutes+'min session',title:f.task||'Focus',icon:'F',color:'var(--orange)'});});
+  events.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const recent=events.slice(0,50);
+  let lastDay='';
+  const html=recent.map(e=>{
+    const ds=(e.date||'').split('T')[0];
+    let dayHeader='';
+    if(ds!==lastDay){dayHeader=`<div style="padding:8px 0 4px;font-size:10px;font-weight:600;color:var(--accent);font-family:var(--mono);border-bottom:1px solid var(--border);margin-top:8px">${ds}</div>`;lastDay=ds;}
+    const time=e.date.includes('T')?new Date(e.date).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+    return dayHeader+`<div style="display:flex;gap:8px;padding:4px 0;align-items:flex-start"><span style="min-width:14px;height:14px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:${e.color};background:${e.color}15;border-radius:3px;font-family:var(--mono)">${e.icon}</span><div style="flex:1;font-size:10px"><span style="color:var(--text-muted)">${e.action}</span> <span style="color:var(--text-primary)">${esc((e.title||'').substring(0,70))}</span></div><span style="font-size:8px;color:var(--text-muted);font-family:var(--mono);white-space:nowrap">${time}</span></div>`;
+  }).join('');
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Activity Timeline (${recent.length} events)</span><button onclick="document.getElementById('timeline-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${html||'<div style="padding:20px;text-align:center;color:var(--text-muted)">No activity yet</div>'}`;
+  document.body.appendChild(panel);
+}
+function downloadBackup(){
+  const data=JSON.stringify(S,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='saturno-hub-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(url);
+  S._lastBackup=new Date().toISOString();save();
+  toast('Backup downloaded');
+}
+function toggleAutoBackup(){
+  S._autoBackup=!S._autoBackup;save();
+  if(S._autoBackup){scheduleAutoBackup();toast('Auto-backup enabled (every 4 hours)');}
+  else{if(window._autoBackupTimer)clearInterval(window._autoBackupTimer);toast('Auto-backup disabled');}
+}
+function scheduleAutoBackup(){
+  if(window._autoBackupTimer)clearInterval(window._autoBackupTimer);
+  if(!S._autoBackup)return;
+  window._autoBackupTimer=setInterval(function(){
+    const lastB=S._lastBackup?new Date(S._lastBackup).getTime():0;
+    if(Date.now()-lastB>=4*60*60*1000){downloadBackup();}
+  },30*60*1000);
+}
+function addTaskColorLabel(taskId,color){
+  const t=S.tasks.find(x=>x.id===taskId);if(!t)return;
+  if(!t.labels)t.labels=[];
+  if(t.labels.includes(color)){t.labels=t.labels.filter(c=>c!==color);}
+  else{t.labels.push(color);if(t.labels.length>4)t.labels.shift();}
+  save();renderTasks();
 }
 function showBurndownChart(days){
   days=days||14;
@@ -7362,6 +7429,7 @@ ftUpdateDisplay();updateContextStats();
 document.getElementById('sidebar-date').textContent=new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 setTimeout(function(){ cloudSave(true); }, 3000);
 setTimeout(function(){ if(S._notificationsEnabled) checkOverdueNotify(); }, 5000);
+if(S._autoBackup) scheduleAutoBackup();
 // Whiteboard drop handler for KB items
 document.getElementById('panel-whiteboard')?.addEventListener('drop', handleWbDrop);
 document.getElementById('panel-whiteboard')?.addEventListener('dragover', e => { if(e.dataTransfer?.types?.includes('text/plain')) e.preventDefault(); });
