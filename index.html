@@ -5848,6 +5848,12 @@ function cmdGetItems(q) {
       ['habits','Daily habit tracker with streaks'],
       ['knowledge graph','Wiki-link stats and most referenced items'],
       ['random','Resurface random content for review'],
+      ['clipboard','View clipboard history within ASTRA'],
+      ['world clock','Time zones: Local, NY, London, Tokyo, Sydney, Dubai'],
+      ['diff','Compare two content items side by side'],
+      ['backup','Download or restore workspace backup'],
+      ['burnup','Cumulative task burnup chart (12 weeks)'],
+      ['content metrics','Readability, vocabulary, sentence analysis'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7335,6 +7341,30 @@ function cmdGetItems(q) {
   // Random content prefix
   if(ql && (ql==='random' || ql==='random content' || ql==='surprise' || ql==='resurface')){
     items.unshift({title:'Random Content',desc:'Resurface a random content item for review',icon:'?',type:'action',action:()=>{closeCommandPalette();showRandomContent();}});
+  }
+  // Clipboard history prefix
+  if(ql && (ql==='clipboard' || ql==='clipboard history' || ql==='copy history' || ql==='paste history')){
+    items.unshift({title:'Clipboard History',desc:'View recently copied text within ASTRA',icon:'C',type:'action',action:()=>{closeCommandPalette();showClipboardHistory();}});
+  }
+  // World clock prefix
+  if(ql && (ql==='world clock' || ql==='time zones' || ql==='clock' || ql==='timezone')){
+    items.unshift({title:'World Clock',desc:'Live clocks for 6 time zones',icon:'C',type:'action',action:()=>{closeCommandPalette();showTimeZoneClock();}});
+  }
+  // Content diff prefix
+  if(ql && (ql==='diff' || ql==='content diff' || ql==='compare' || ql==='compare content')){
+    items.unshift({title:'Content Diff Viewer',desc:'Compare two content items side by side',icon:'D',type:'action',action:()=>{closeCommandPalette();showContentDiff();}});
+  }
+  // Backup prefix
+  if(ql && (ql==='backup' || ql==='workspace backup' || ql==='download backup' || ql==='restore backup')){
+    items.unshift({title:'Workspace Backup',desc:'Download or restore full workspace backup',icon:'B',type:'action',action:()=>{closeCommandPalette();showWorkspaceBackupPanel();}});
+  }
+  // Burnup chart prefix
+  if(ql && (ql==='burnup' || ql==='burnup chart' || ql==='task burnup' || ql==='cumulative')){
+    items.unshift({title:'Task Burnup Chart',desc:'Cumulative created vs completed over 12 weeks',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBurnup();}});
+  }
+  // Content metrics prefix
+  if(ql && (ql==='content metrics' || ql==='readability' || ql==='flesch' || ql==='vocabulary')){
+    items.unshift({title:'Content Metrics',desc:'Readability score, vocab richness, sentence analysis',icon:'M',type:'action',action:()=>{closeCommandPalette();showContentMetrics();}});
   }
   return items.slice(0, 20);
 }
@@ -9698,6 +9728,240 @@ function showRandomContent(){
   (item.tags||[]).forEach(t=>{h+=`<span style="font-size:9px;padding:2px 8px;background:var(--bg-surface);border-radius:10px;color:#8b5cf6">${esc(t)}</span>`;});
   h+=`</div>`;
   h+=`<div style="background:var(--bg-surface);padding:16px;border-radius:8px;font-size:12px;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;max-height:400px;overflow-y:auto">${esc(item.body||'(empty)')}</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+var _clipboardHistory=[];
+function trackClipboard(text,source){
+  if(!text||!text.trim())return;
+  _clipboardHistory.unshift({text:text.substring(0,500),source:source||'copy',ts:Date.now()});
+  if(_clipboardHistory.length>50)_clipboardHistory.length=50;
+}
+function showClipboardHistory(){
+  const panel=document.createElement('div');panel.id='clipboard-history-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Clipboard History (${_clipboardHistory.length})</span><button onclick="document.getElementById('clipboard-history-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  if(!_clipboardHistory.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No clipboard history yet. Copy text within ASTRA to track it here.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    _clipboardHistory.forEach((item,i)=>{
+      const ago=Math.round((Date.now()-item.ts)/60000);
+      const timeStr=ago<1?'Just now':ago<60?ago+'m ago':Math.round(ago/60)+'h ago';
+      h+=`<div style="padding:8px;background:var(--bg-surface);border-radius:6px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" onclick="navigator.clipboard.writeText(_clipboardHistory[${i}].text);showToast('Copied')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'">`;
+      h+=`<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:9px;color:var(--accent)">${item.source}</span><span style="font-size:9px;color:var(--text-muted)">${timeStr}</span></div>`;
+      h+=`<div style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(item.text)}</div>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTimeZoneClock(){
+  const zones=[
+    {name:'Local',tz:Intl.DateTimeFormat().resolvedOptions().timeZone},
+    {name:'New York',tz:'America/New_York'},
+    {name:'London',tz:'Europe/London'},
+    {name:'Tokyo',tz:'Asia/Tokyo'},
+    {name:'Sydney',tz:'Australia/Sydney'},
+    {name:'Dubai',tz:'Asia/Dubai'},
+  ];
+  const panel=document.createElement('div');panel.id='timezone-clock-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw';
+  function updateClocks(){
+    const now=new Date();
+    let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">World Clock</span><button onclick="clearInterval(window._tzInterval);document.getElementById('timezone-clock-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+    h+=`<div style="display:grid;gap:8px">`;
+    zones.forEach(z=>{
+      const time=now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      const date=now.toLocaleDateString('en-US',{timeZone:z.tz,weekday:'short',month:'short',day:'numeric'});
+      const hour=parseInt(now.toLocaleTimeString('en-US',{timeZone:z.tz,hour:'numeric',hour12:false}));
+      const isNight=hour<6||hour>=21;
+      h+=`<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-surface);border-radius:8px">`;
+      h+=`<div style="width:8px;height:8px;border-radius:50%;background:${isNight?'#6366f1':'#f59e0b'};flex-shrink:0"></div>`;
+      h+=`<div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--text-primary)">${z.name}</div><div style="font-size:9px;color:var(--text-muted)">${date}</div></div>`;
+      h+=`<div style="font-size:16px;font-weight:700;color:var(--accent);font-family:monospace">${time}</div>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+    panel.innerHTML=h;
+  }
+  updateClocks();
+  window._tzInterval=setInterval(updateClocks,1000);
+  document.body.appendChild(panel);
+}
+function showContentDiff(){
+  const content=S.content||[];
+  if(content.length<2){showToast('Need at least 2 content items to compare');return;}
+  const panel=document.createElement('div');panel.id='content-diff-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Diff Viewer</span><button onclick="document.getElementById('content-diff-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">`;
+  h+=`<div><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Left</label><select id="diff-left" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px">`;
+  content.slice(0,30).forEach((c,i)=>{
+    const preview=(c.body||'').substring(0,40).replace(/\n/g,' ');
+    h+=`<option value="${i}">${esc(preview||'(empty)')}</option>`;
+  });
+  h+=`</select></div>`;
+  h+=`<div><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Right</label><select id="diff-right" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px">`;
+  content.slice(0,30).forEach((c,i)=>{
+    const preview=(c.body||'').substring(0,40).replace(/\n/g,' ');
+    h+=`<option value="${i}" ${i===1?'selected':''}>${esc(preview||'(empty)')}</option>`;
+  });
+  h+=`</select></div></div>`;
+  h+=`<button onclick="runContentDiff()" style="width:100%;padding:8px;background:var(--accent);border:none;border-radius:4px;color:#000;font-weight:600;cursor:pointer;font-size:11px;margin-bottom:12px">Compare</button>`;
+  h+=`<div id="diff-result" style="font-size:11px;color:var(--text-secondary)"></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function runContentDiff(){
+  const content=S.content||[];
+  const leftIdx=parseInt(document.getElementById('diff-left').value);
+  const rightIdx=parseInt(document.getElementById('diff-right').value);
+  const left=(content[leftIdx]&&content[leftIdx].body)||'';
+  const right=(content[rightIdx]&&content[rightIdx].body)||'';
+  const leftLines=left.split('\n');const rightLines=right.split('\n');
+  let html='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  html+='<div style="background:var(--bg-surface);padding:10px;border-radius:6px;max-height:300px;overflow-y:auto">';
+  leftLines.forEach(line=>{
+    const inRight=rightLines.includes(line);
+    html+=`<div style="font-size:10px;padding:2px 4px;color:${inRight?'var(--text-secondary)':'#ef4444'};background:${inRight?'transparent':'rgba(239,68,68,0.1)'};border-radius:2px;font-family:monospace;white-space:pre-wrap">${esc(line)||'&nbsp;'}</div>`;
+  });
+  html+='</div>';
+  html+='<div style="background:var(--bg-surface);padding:10px;border-radius:6px;max-height:300px;overflow-y:auto">';
+  rightLines.forEach(line=>{
+    const inLeft=leftLines.includes(line);
+    html+=`<div style="font-size:10px;padding:2px 4px;color:${inLeft?'var(--text-secondary)':'#4ade80'};background:${inLeft?'transparent':'rgba(74,222,128,0.1)'};border-radius:2px;font-family:monospace;white-space:pre-wrap">${esc(line)||'&nbsp;'}</div>`;
+  });
+  html+='</div></div>';
+  const leftWords=new Set(left.toLowerCase().split(/\s+/));const rightWords=new Set(right.toLowerCase().split(/\s+/));
+  const shared=[...leftWords].filter(w=>rightWords.has(w)).length;
+  const total=new Set([...leftWords,...rightWords]).size||1;
+  const similarity=Math.round((shared/total)*100);
+  html+=`<div style="margin-top:8px;font-size:10px;color:var(--text-muted);text-align:center">Similarity: ${similarity}% | Red = only in left | Green = only in right</div>`;
+  document.getElementById('diff-result').innerHTML=html;
+}
+function downloadWorkspaceBackup(){
+  const data=JSON.parse(JSON.stringify(S));
+  data._backupDate=new Date().toISOString();
+  data._version='astra-backup-v1';
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='astra-backup-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();URL.revokeObjectURL(url);
+  showToast('Workspace backup downloaded');
+}
+function uploadWorkspaceBackup(){
+  const input=document.createElement('input');input.type='file';input.accept='.json';
+  input.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(!data._version||data._version!=='astra-backup-v1'){
+          if(!confirm('This does not look like an ASTRA backup. Import anyway?'))return;
+        }
+        if(!confirm('This will REPLACE all current data. Are you sure?'))return;
+        delete data._backupDate;delete data._version;
+        Object.assign(S,data);save();location.reload();
+      }catch(err){showToast('Invalid JSON file');}
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+}
+function showWorkspaceBackupPanel(){
+  const panel=document.createElement('div');panel.id='backup-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  const size=new Blob([JSON.stringify(S)]).size;
+  const sizeKB=Math.round(size/1024);
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Workspace Backup</span><button onclick="document.getElementById('backup-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:16px">Current workspace: ${sizeKB} KB</div>`;
+  h+=`<div style="display:grid;gap:10px">`;
+  h+=`<button onclick="document.getElementById('backup-panel').remove();downloadWorkspaceBackup()" style="padding:12px;background:var(--accent);border:none;border-radius:8px;color:#000;font-weight:600;cursor:pointer;font-size:12px">Download Backup (.json)</button>`;
+  h+=`<button onclick="document.getElementById('backup-panel').remove();uploadWorkspaceBackup()" style="padding:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-weight:600;cursor:pointer;font-size:12px">Restore from Backup</button>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskBurnup(){
+  const tasks=S.tasks||[];
+  const weeks=12;const now=new Date();
+  const weekData=[];
+  for(let w=weeks-1;w>=0;w--){
+    const weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-w*7);
+    const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+7);
+    const wStr=weekStart.toISOString().split('T')[0];
+    const created=tasks.filter(t=>t.created&&t.created>=wStr&&t.created<weekEnd.toISOString().split('T')[0]).length;
+    const completed=tasks.filter(t=>t.status==='done'&&t.created&&t.created<=weekEnd.toISOString().split('T')[0]).length;
+    weekData.push({label:weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'}),created,completed});
+  }
+  let cumCreated=0,cumCompleted=0;
+  weekData.forEach(w=>{cumCreated+=w.created;w.cumCreated=cumCreated;cumCompleted+=w.completed;w.cumCompleted=cumCompleted;});
+  const maxVal=Math.max(cumCreated,cumCompleted,1);
+  const panel=document.createElement('div');panel.id='burnup-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:95vw';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Task Burnup Chart (12 weeks)</span><button onclick="document.getElementById('burnup-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  const svgW=600,svgH=200,pad=40;
+  h+=`<svg viewBox="0 0 ${svgW} ${svgH+30}" style="width:100%;background:var(--bg-surface);border-radius:8px;padding:8px">`;
+  for(let i=0;i<=4;i++){
+    const y=pad+(svgH-pad*2)*(1-i/4);
+    const val=Math.round(maxVal*i/4);
+    h+=`<line x1="${pad}" y1="${y}" x2="${svgW-10}" y2="${y}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+    h+=`<text x="${pad-5}" y="${y+4}" text-anchor="end" fill="rgba(255,255,255,0.3)" font-size="9">${val}</text>`;
+  }
+  let createdPath='',completedPath='';
+  weekData.forEach((w,i)=>{
+    const x=pad+i*((svgW-pad-10)/(weeks-1));
+    const yC=pad+(svgH-pad*2)*(1-w.cumCreated/maxVal);
+    const yD=pad+(svgH-pad*2)*(1-w.cumCompleted/maxVal);
+    createdPath+=(i===0?'M':'L')+x+','+yC;
+    completedPath+=(i===0?'M':'L')+x+','+yD;
+    if(i%2===0)h+=`<text x="${x}" y="${svgH+15}" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="8">${w.label}</text>`;
+  });
+  h+=`<path d="${createdPath}" fill="none" stroke="#3b82f6" stroke-width="2"/>`;
+  h+=`<path d="${completedPath}" fill="none" stroke="#4ade80" stroke-width="2"/>`;
+  weekData.forEach((w,i)=>{
+    const x=pad+i*((svgW-pad-10)/(weeks-1));
+    const yC=pad+(svgH-pad*2)*(1-w.cumCreated/maxVal);
+    const yD=pad+(svgH-pad*2)*(1-w.cumCompleted/maxVal);
+    h+=`<circle cx="${x}" cy="${yC}" r="3" fill="#3b82f6"/>`;
+    h+=`<circle cx="${x}" cy="${yD}" r="3" fill="#4ade80"/>`;
+  });
+  h+=`</svg>`;
+  h+=`<div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:10px">`;
+  h+=`<span style="color:#3b82f6">Created (${cumCreated})</span>`;
+  h+=`<span style="color:#4ade80">Completed (${cumCompleted})</span>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentMetrics(){
+  const content=S.content||[];const docs=S.writerDocs||[];
+  let allText='';
+  content.forEach(c=>{allText+=' '+(c.body||'');});
+  docs.forEach(d=>{allText+=' '+(d.body||'');});
+  const words=allText.split(/\s+/).filter(w=>w);
+  const sentences=allText.split(/[.!?]+/).filter(s=>s.trim());
+  const uniqueWords=new Set(words.map(w=>w.toLowerCase()));
+  const avgSentLen=sentences.length?Math.round(words.length/sentences.length):0;
+  const syllableCount=w=>{w=w.toLowerCase();if(w.length<=3)return 1;w=w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');w=w.replace(/^y/,'');const m=w.match(/[aeiouy]{1,2}/g);return m?m.length:1;};
+  const totalSyllables=words.reduce((a,w)=>a+syllableCount(w),0);
+  const fleschKincaid=sentences.length?Math.round(206.835-1.015*(words.length/sentences.length)-84.6*(totalSyllables/words.length)):0;
+  const readability=fleschKincaid>=60?'Easy':fleschKincaid>=30?'Moderate':'Difficult';
+  const readColor=fleschKincaid>=60?'#4ade80':fleschKincaid>=30?'#f59e0b':'#ef4444';
+  const vocabRichness=words.length?Math.round((uniqueWords.size/words.length)*100):0;
+  const panel=document.createElement('div');panel.id='content-metrics-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Metrics</span><button onclick="document.getElementById('content-metrics-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--accent)">${words.length.toLocaleString()}</div><div style="font-size:10px;color:var(--text-muted)">Total Words</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#3b82f6">${uniqueWords.size.toLocaleString()}</div><div style="font-size:10px;color:var(--text-muted)">Unique Words</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:${readColor}">${fleschKincaid}</div><div style="font-size:10px;color:var(--text-muted)">Flesch-Kincaid (${readability})</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#8b5cf6">${avgSentLen}</div><div style="font-size:10px;color:var(--text-muted)">Avg Sentence Length</div></div>`;
+  h+=`</div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#f59e0b">${vocabRichness}%</div><div style="font-size:9px;color:var(--text-muted)">Vocab Richness</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#ec4899">${sentences.length}</div><div style="font-size:9px;color:var(--text-muted)">Sentences</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#06b6d4">${content.length+docs.length}</div><div style="font-size:9px;color:var(--text-muted)">Total Items</div></div>`;
+  h+=`</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
