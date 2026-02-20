@@ -5943,6 +5943,8 @@ function cmdGetItems(q) {
       ['captures','Summary of quick captures by type'],
       ['notes explorer','Tree-view content browser organized by category'],
       ['deadlines','Countdown tracker for upcoming task deadlines'],
+      ['content graph','30-day line chart of content creation and word count'],
+      ['advanced search','Search with filters: type, date range'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7813,6 +7815,14 @@ function cmdGetItems(q) {
   // Deadlines prefix
   if(ql && (ql==='deadlines' || ql==='deadline tracker' || ql==='countdowns' || ql==='due soon')){
     items.unshift({title:'Deadline Tracker',desc:'Countdown to upcoming task deadlines',icon:'!',type:'action',action:()=>{closeCommandPalette();showDeadlineTracker();}});
+  }
+  // Content graph prefix
+  if(ql && (ql==='content graph' || ql==='creation graph' || ql==='content trends' || ql==='30 day chart')){
+    items.unshift({title:'Content Creation Graph',desc:'30-day creation trends with word counts',icon:'G',type:'action',action:()=>{closeCommandPalette();showContentGraph();}});
+  }
+  // Advanced search prefix
+  if(ql && (ql==='advanced search' || ql==='filtered search' || ql==='search filters' || ql==='power search')){
+    items.unshift({title:'Advanced Search',desc:'Search with type and date filters',icon:'S',type:'action',action:()=>{closeCommandPalette();showWorkspaceSearch();}});
   }
   return items.slice(0, 20);
 }
@@ -13431,6 +13441,99 @@ function showDeadlineTracker(){
     h+=`</div>`;
   });
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentGraph(){
+  let panel=document.getElementById('content-graph-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-graph-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const days=30;
+  const now=new Date();
+  const dayData=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now);d.setDate(d.getDate()-i);
+    const dateStr=d.toISOString().split('T')[0];
+    const count=content.filter(c=>c.createdAt&&c.createdAt.startsWith(dateStr)).length;
+    const words=content.filter(c=>c.createdAt&&c.createdAt.startsWith(dateStr)).reduce((s,c)=>s+(c.body||'').trim().split(/\s+/).filter(Boolean).length,0);
+    dayData.push({label:d.toLocaleDateString('en',{month:'short',day:'numeric'}),count,words,date:dateStr});
+  }
+  const maxCount=Math.max(...dayData.map(d=>d.count),1);
+  const maxWords=Math.max(...dayData.map(d=>d.words),1);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Content Creation (30 Days)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;gap:12px;margin-bottom:8px"><span style="font-size:10px;color:#4ade80">Items created</span><span style="font-size:10px;color:#60a5fa">Words written</span></div>';
+  const svgW=600,svgH=160,padL=35,padB=25,padT=10;
+  const chartW=svgW-padL-10,chartH=svgH-padT-padB;
+  h+=`<svg width="100%" viewBox="0 0 ${svgW} ${svgH}" style="display:block">`;
+  for(let i=0;i<=3;i++){const y=padT+chartH-i*(chartH/3);h+=`<line x1="${padL}" y1="${y}" x2="${svgW-10}" y2="${y}" stroke="var(--border)" stroke-width="0.5"/>`;h+=`<text x="${padL-3}" y="${y+3}" text-anchor="end" fill="var(--text-muted)" font-size="8">${Math.round(maxCount*i/3)}</text>`;}
+  // Items line
+  let itemsPath='';
+  dayData.forEach((d,i)=>{
+    const x=padL+i*(chartW/(days-1));
+    const y=padT+chartH-d.count/maxCount*chartH;
+    itemsPath+=(i===0?'M':'L')+x+','+y;
+    if(d.count>0)h+=`<circle cx="${x}" cy="${y}" r="2" fill="#4ade80"/>`;
+  });
+  h+=`<path d="${itemsPath}" fill="none" stroke="#4ade80" stroke-width="1.5" opacity="0.8"/>`;
+  // Words line (normalized)
+  let wordsPath='';
+  dayData.forEach((d,i)=>{
+    const x=padL+i*(chartW/(days-1));
+    const y=padT+chartH-d.words/maxWords*chartH;
+    wordsPath+=(i===0?'M':'L')+x+','+y;
+  });
+  h+=`<path d="${wordsPath}" fill="none" stroke="#60a5fa" stroke-width="1" stroke-dasharray="4,2" opacity="0.6"/>`;
+  // X axis labels (every 5 days)
+  dayData.forEach((d,i)=>{if(i%5===0){const x=padL+i*(chartW/(days-1));h+=`<text x="${x}" y="${svgH-3}" text-anchor="middle" fill="var(--text-muted)" font-size="7">${d.label}</text>`;}});
+  h+=`</svg>`;
+  const totalItems=dayData.reduce((s,d)=>s+d.count,0);
+  const totalWords=dayData.reduce((s,d)=>s+d.words,0);
+  const activeDays=dayData.filter(d=>d.count>0).length;
+  h+=`<div style="display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:10px;color:var(--text-muted)"><span>${totalItems} items</span><span>${totalWords.toLocaleString()} words</span><span>${activeDays} active days</span></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWorkspaceSearch(){
+  let panel=document.getElementById('ws-search-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='ws-search-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Advanced Search</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<input id="adv-search-q" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;margin-bottom:8px" placeholder="Search query...">';
+  h+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
+  h+='<select id="adv-search-type" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:11px"><option value="all">All Types</option><option value="task">Tasks</option><option value="content">Content</option><option value="link">Links</option><option value="doc">Docs</option></select>';
+  h+='<select id="adv-search-date" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:11px"><option value="all">Any Time</option><option value="today">Today</option><option value="week">This Week</option><option value="month">This Month</option></select>';
+  h+=`<button onclick="advancedSearch()" style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer">Search</button>`;
+  h+='</div>';
+  h+='<div id="adv-search-results"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const inp=document.getElementById('adv-search-q');if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')advancedSearch();});}},100);
+}
+function advancedSearch(){
+  const q=(document.getElementById('adv-search-q')?.value||'').toLowerCase();
+  const type=document.getElementById('adv-search-type')?.value||'all';
+  const dateRange=document.getElementById('adv-search-date')?.value||'all';
+  const results=document.getElementById('adv-search-results');if(!results)return;
+  if(!q){results.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:11px">Enter a search query</div>';return;}
+  const now=new Date();
+  const dateFilter=d=>{
+    if(dateRange==='all'||!d)return true;
+    const date=new Date(d);
+    if(dateRange==='today')return date.toDateString()===now.toDateString();
+    if(dateRange==='week'){const w=new Date(now);w.setDate(w.getDate()-7);return date>=w;}
+    if(dateRange==='month'){const m=new Date(now);m.setMonth(m.getMonth()-1);return date>=m;}
+    return true;
+  };
+  const items=[];
+  if(type==='all'||type==='task')(S.tasks||[]).forEach(t=>{if(((t.title||'').toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q))&&dateFilter(t.createdAt))items.push({type:'Task',title:t.title,sub:t.status+' | '+t.priority,date:t.createdAt,color:'#60a5fa'});});
+  if(type==='all'||type==='content')(S.content||[]).forEach(c=>{if(((c.title||'').toLowerCase().includes(q)||(c.body||'').toLowerCase().includes(q))&&dateFilter(c.createdAt))items.push({type:'Content',title:c.title,sub:c.theme||'',date:c.createdAt,color:'#a78bfa'});});
+  if(type==='all'||type==='link')(S.links||[]).forEach(l=>{if(((l.title||'').toLowerCase().includes(q)||(l.url||'').toLowerCase().includes(q))&&dateFilter(l.createdAt))items.push({type:'Link',title:l.title||l.url,sub:l.category||'',date:l.createdAt,color:'#38bdf8'});});
+  if(type==='all'||type==='doc')(S.writerDocs||[]).forEach(d=>{if(((d.title||'').toLowerCase().includes(q)||(d.content||'').toLowerCase().includes(q))&&dateFilter(d.updatedAt))items.push({type:'Doc',title:d.title,sub:'',date:d.updatedAt,color:'#fbbf24'});});
+  let h='';
+  if(!items.length)h='<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:11px">No results found</div>';
+  h+=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">${items.length} results</div>`;
+  items.slice(0,30).forEach(item=>{
+    const d=item.date?new Date(item.date).toLocaleDateString('en',{month:'short',day:'numeric'}):'';
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border)"><div style="background:${item.color};color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;min-width:50px;text-align:center">${item.type}</div><div style="flex:1"><div style="font-size:12px;color:var(--text-primary)">${esc((item.title||'').substring(0,45))}</div><div style="font-size:10px;color:var(--text-muted)">${esc(item.sub||'')}</div></div><div style="font-size:9px;color:var(--text-muted)">${d}</div></div>`;
+  });
+  results.innerHTML=h;
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
