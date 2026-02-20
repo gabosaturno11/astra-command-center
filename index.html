@@ -6701,6 +6701,12 @@ function cmdGetItems(q) {
       ['sqlite','SQLite database reference'],
       ['kanban metrics','Kanban WIP cycle time throughput'],
       ['subnet','IP subnet calculator CIDR'],
+      ['git advanced','Git rebase cherry-pick bisect stash ref'],
+      ['sprint','Sprint planner with task assignment'],
+      ['qr code','QR code generator from text URL'],
+      ['yarn','Yarn pnpm package manager ref'],
+      ['timebox','Timebox planner daily schedule'],
+      ['emoji','Emoji search and copy'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10973,6 +10979,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='subnet' || ql==='ip subnet' || ql==='cidr' || ql==='subnet calculator')){
     items.unshift({title:'IP Subnet Calculator',desc:'Network, broadcast, hosts from CIDR',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIpSubnetCalc();}});
+  }
+  if(ql && (ql==='git advanced' || ql==='git rebase' || ql==='cherry-pick' || ql==='git bisect' || ql==='git stash')){
+    items.unshift({title:'Git Advanced Reference',desc:'Rebase, cherry-pick, bisect, stash, reflog',icon:'G',type:'action',action:()=>{closeCommandPalette();showGitAdvancedRef();}});
+  }
+  if(ql && (ql==='sprint' || ql==='sprint planner' || ql==='sprint plan' || ql==='create sprint')){
+    items.unshift({title:'Sprint Planner',desc:'Plan sprints with task assignment',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSprintPlanner();}});
+  }
+  if(ql && (ql==='qr code' || ql==='qr gen' || ql==='qr generator' || ql==='generate qr')){
+    items.unshift({title:'QR Code Generator',desc:'Generate QR code from text/URL',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickQRCodeGen();}});
+  }
+  if(ql && (ql==='yarn' || ql==='pnpm' || ql==='yarn ref' || ql==='pnpm ref')){
+    items.unshift({title:'Yarn/pnpm Reference',desc:'Package management, workspaces',icon:'Y',type:'action',action:()=>{closeCommandPalette();showYarnRef();}});
+  }
+  if(ql && (ql==='timebox' || ql==='time box' || ql==='timebox planner' || ql==='time blocks')){
+    items.unshift({title:'Timebox Planner',desc:'Daily timeboxed schedule',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTimeboxPlanner();}});
+  }
+  if(ql && (ql==='emoji' || ql==='emoji search' || ql==='emojis' || ql==='emoji picker')){
+    items.unshift({title:'Emoji Search',desc:'Browse and copy emojis',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEmojiSearch();}});
   }
   return items.slice(0, 20);
 }
@@ -39229,6 +39253,147 @@ function showQuickIpSubnetCalc(){
     results.forEach(([label,val])=>{el.innerHTML+='<div style="padding:4px 6px;background:var(--bg-surface);border-radius:4px"><div style="font-size:9px;color:var(--text-muted)">'+label+'</div><div style="font-size:11px;font-family:monospace;color:var(--text-primary)">'+val+'</div></div>';});
   };
   window._calcSubnet();
+}
+function showGitAdvancedRef(){
+  let p=document.getElementById('git-adv-ref-panel');if(p)p.remove();
+  const cmds={'Rebase':['git rebase main','git rebase --onto main feature old-feature','git rebase --abort','git rebase --continue','git rebase --skip','git pull --rebase'],'Cherry-pick':['git cherry-pick abc123','git cherry-pick abc123..def456','git cherry-pick --no-commit abc123','git cherry-pick --abort','git cherry-pick --continue'],'Stash':['git stash','git stash push -m "description"','git stash list','git stash show -p stash@{0}','git stash pop','git stash pop stash@{1}','git stash apply','git stash drop stash@{0}','git stash clear','git stash branch new-branch stash@{0}'],'Bisect':['git bisect start','git bisect bad','git bisect good abc123','git bisect reset','git bisect run npm test','git bisect log','git bisect visualize'],'Reset & Restore':['git reset --soft HEAD~1','git reset --mixed HEAD~1','git reset HEAD file.txt','git restore file.txt','git restore --staged file.txt','git restore --source=HEAD~3 file.txt','git checkout -- file.txt'],'Reflog & Recovery':['git reflog','git reflog show --date=iso','git checkout HEAD@{2}','git branch recovered HEAD@{5}','git fsck --lost-found'],'Advanced Log':['git log --oneline --graph --all','git log --author="name"','git log --since="2 weeks ago"','git log --stat','git log -p file.txt','git log --follow file.txt','git shortlog -sn','git blame file.txt','git show abc123'],'Worktree & Submodules':['git worktree add ../feature-branch feature','git worktree list','git worktree remove ../feature-branch','git submodule add URL path','git submodule update --init --recursive','git submodule foreach git pull']};
+  p=document.createElement('div');p.id='git-adv-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Git Advanced Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskSprintPlanner(){
+  let p=document.getElementById('sprint-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  if(!S._sprints)S._sprints=[];
+  p=document.createElement('div');p.id='sprint-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderSprint=function(){
+    const currentSprint=S._sprints.length>0?S._sprints[S._sprints.length-1]:null;
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Sprint Planner</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+    if(!currentSprint){
+      h+='<div style="text-align:center;padding:20px"><div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">No active sprint. Create one to start planning.</div>';
+      h+='<div style="display:flex;gap:6px;justify-content:center;margin-bottom:8px"><input type="text" id="sprint-name" value="Sprint '+(S._sprints.length+1)+'" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;width:120px"><input type="number" id="sprint-days" value="7" min="1" max="30" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;width:60px"><span style="font-size:11px;color:var(--text-muted);line-height:32px">days</span></div>';
+      h+='<button onclick="window._createSprint()" style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:8px 20px;font-size:12px;cursor:pointer">Create Sprint</button></div>';
+    }else{
+      const sprintTasks=tasks.filter(t=>currentSprint.taskIds&&currentSprint.taskIds.includes(t.id));
+      const done=sprintTasks.filter(t=>t.status==='done').length;
+      const startDate=new Date(currentSprint.start);const endDate=new Date(startDate);endDate.setDate(endDate.getDate()+currentSprint.days);
+      const daysLeft=Math.max(0,Math.ceil((endDate-new Date())/(1000*60*60*1000*24)));
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">'+esc(currentSprint.name)+'</span><span style="font-size:11px;color:'+(daysLeft<=1?'#f87171':'var(--text-muted)')+'">'+daysLeft+' days left</span></div>';
+      h+='<div style="width:100%;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden;margin-bottom:12px"><div style="width:'+(sprintTasks.length>0?(done/sprintTasks.length*100):0)+'%;height:100%;background:#4ade80;border-radius:4px"></div></div>';
+      h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+done+'/'+sprintTasks.length+' tasks completed</div>';
+      sprintTasks.forEach(t=>{
+        h+='<div style="display:flex;align-items:center;gap:6px;padding:4px 6px;background:var(--bg-surface);border-radius:4px;margin-bottom:3px"><div style="width:8px;height:8px;border-radius:50%;background:'+(t.status==='done'?'#4ade80':t.status==='in-progress'?'#fbbf24':'#60a5fa')+'"></div><span style="font-size:11px;color:var(--text-primary);flex:1">'+esc(t.title)+'</span><button onclick="window._removeFromSprint(\''+t.id+'\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">x</button></div>';
+      });
+      const available=tasks.filter(t=>!currentSprint.taskIds||!currentSprint.taskIds.includes(t.id));
+      if(available.length>0){
+        h+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted);margin-bottom:4px">Add tasks to sprint:</div>';
+        available.slice(0,8).forEach(t=>{
+          h+='<div onclick="window._addToSprint(\''+t.id+'\')" style="font-size:11px;color:var(--text-secondary);padding:3px 6px;cursor:pointer;border-radius:3px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">+ '+esc(t.title)+'</div>';
+        });
+      }
+      h+='<button onclick="window._endSprint()" style="margin-top:10px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px 12px;font-size:11px;cursor:pointer">End Sprint</button>';
+    }
+    document.getElementById('sprint-panel').innerHTML=h;
+  };
+  window._createSprint=function(){const name=document.getElementById('sprint-name').value||'Sprint';const days=parseInt(document.getElementById('sprint-days').value)||7;S._sprints.push({name,days,start:new Date().toISOString(),taskIds:[]});save();window._renderSprint();};
+  window._addToSprint=function(id){const s=S._sprints[S._sprints.length-1];if(!s.taskIds)s.taskIds=[];s.taskIds.push(id);save();window._renderSprint();};
+  window._removeFromSprint=function(id){const s=S._sprints[S._sprints.length-1];s.taskIds=s.taskIds.filter(t=>t!==id);save();window._renderSprint();};
+  window._endSprint=function(){save();window._renderSprint();};
+  document.body.appendChild(p);
+  window._renderSprint();
+}
+function showQuickQRCodeGen(){
+  let w=document.getElementById('qrgen-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='qrgen-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">QR Code Generator</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><input type="text" id="qr-input" value="https://astra-command-center-sigma.vercel.app" placeholder="URL or text..." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;margin-bottom:8px"><button onclick="window._genQR()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer;margin-bottom:8px">Generate</button><div id="qr-output" style="text-align:center"></div>';
+  document.body.appendChild(w);
+  window._genQR=function(){
+    const text=document.getElementById('qr-input').value.trim();if(!text)return;
+    const url='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(text);
+    document.getElementById('qr-output').innerHTML='<img src="'+url+'" alt="QR Code" style="max-width:200px;border-radius:6px;background:white;padding:8px"><div style="font-size:10px;color:var(--text-muted);margin-top:6px">Right-click to save image</div>';
+  };
+  window._genQR();
+}
+function showYarnRef(){
+  let p=document.getElementById('yarn-ref-panel');if(p)p.remove();
+  const cmds={'Yarn (v1/Classic)':['yarn init','yarn install','yarn add package','yarn add -D package','yarn remove package','yarn upgrade','yarn upgrade-interactive','yarn list','yarn info package','yarn why package','yarn cache clean'],'Yarn (v2+/Berry)':['yarn set version stable','yarn dlx create-next-app','yarn add package','yarn up package','yarn plugin import typescript','yarn workspaces list','yarn workspaces foreach run build','yarn dedupe','yarn constraints'],'pnpm':['pnpm init','pnpm install','pnpm add package','pnpm add -D package','pnpm remove package','pnpm update','pnpm list','pnpm why package','pnpm store prune','pnpm exec command','pnpm dlx create-vite'],'pnpm Workspaces':['pnpm -r run build','pnpm --filter package-name run test','pnpm --filter "./packages/**" run lint','pnpm -r exec -- rm -rf node_modules','pnpm deploy --filter package-name'],'Common Scripts':['yarn/pnpm start','yarn/pnpm test','yarn/pnpm run build','yarn/pnpm run dev','yarn/pnpm run lint','yarn/pnpm run format','yarn/pnpm run typecheck']};
+  p=document.createElement('div');p.id='yarn-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Yarn / pnpm Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskTimeboxPlanner(){
+  let p=document.getElementById('timebox-panel');if(p)p.remove();
+  if(!S._timeboxes)S._timeboxes=[];
+  p=document.createElement('div');p.id='timebox-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderTimeboxes=function(){
+    const today=new Date().toISOString().split('T')[0];
+    const todayBoxes=S._timeboxes.filter(b=>b.date===today);
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Timebox Planner</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+new Date().toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'})+'</div>';
+    const totalMin=todayBoxes.reduce((s,b)=>s+b.minutes,0);
+    h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Total planned: <span style="color:var(--accent)">'+(totalMin/60).toFixed(1)+'h</span> ('+totalMin+'min)</div>';
+    todayBoxes.forEach((box,i)=>{
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid '+(box.done?'#4ade80':'var(--accent)')+'">';
+      h+='<input type="checkbox" '+(box.done?'checked':'')+' onchange="window._toggleTimebox('+i+')" style="cursor:pointer">';
+      h+='<div style="flex:1"><div style="font-size:12px;color:var(--text-primary);'+(box.done?'text-decoration:line-through;opacity:0.6':'')+'">'+esc(box.task)+'</div></div>';
+      h+='<span style="font-size:11px;color:var(--accent);font-weight:600;min-width:40px;text-align:right">'+box.minutes+'m</span>';
+      h+='<button onclick="window._deleteTimebox('+i+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button>';
+      h+='</div>';
+    });
+    h+='<div style="display:flex;gap:6px;margin-top:10px"><input type="text" id="tb-task" placeholder="Task..." onkeydown="if(event.key===\'Enter\')window._addTimebox()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px"><input type="number" id="tb-min" value="30" min="5" max="480" step="5" style="width:55px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;text-align:center"><button onclick="window._addTimebox()" style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px 10px;font-size:11px;cursor:pointer">Add</button></div>';
+    document.getElementById('timebox-panel').innerHTML=h;
+  };
+  window._addTimebox=function(){const task=document.getElementById('tb-task').value.trim();const min=parseInt(document.getElementById('tb-min').value)||30;if(!task)return;S._timeboxes.push({task,minutes:min,done:false,date:new Date().toISOString().split('T')[0]});save();window._renderTimeboxes();};
+  window._toggleTimebox=function(i){const today=new Date().toISOString().split('T')[0];const todayBoxes=S._timeboxes.filter(b=>b.date===today);const globalIdx=S._timeboxes.indexOf(todayBoxes[i]);if(globalIdx>=0){S._timeboxes[globalIdx].done=!S._timeboxes[globalIdx].done;save();window._renderTimeboxes();}};
+  window._deleteTimebox=function(i){const today=new Date().toISOString().split('T')[0];const todayBoxes=S._timeboxes.filter(b=>b.date===today);const globalIdx=S._timeboxes.indexOf(todayBoxes[i]);if(globalIdx>=0){S._timeboxes.splice(globalIdx,1);save();window._renderTimeboxes();}};
+  document.body.appendChild(p);
+  window._renderTimeboxes();
+}
+function showQuickEmojiSearch(){
+  let w=document.getElementById('emoji-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='emoji-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  const emojis=[['Smileys','😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😗😚😋😛😜🤪😝🤑🤗🤭🤫🤔🤐🤨😐😑😶😏😒🙄😬🤥😌😔😪🤤😴😷🤒🤕🤢🤮🤧🥵🥶🥴😵🤯🤠'],['Hands','👋🤚🖐✋🖖👌🤌🤏✌🤞🤟🤘🤙👈👉👆🖕👇☝👍👎✊👊🤛🤜👏🙌👐🤲🤝🙏'],['Hearts','❤🧡💛💚💙💜🖤🤍🤎💔❣💕💞💓💗💖💘💝💟'],['Objects','⌚📱💻⌨🖥🖨🖱💿📀📷📹🎥📞☎📟📠📺📻🔋🔌💡🔦🕯🧯🛢💸💵💴💶💷🪙💰💳💎'],['Nature','🌞🌝🌙⭐🌟✨⚡🔥🌈☀🌤⛅🌥🌦🌧⛈🌩🌨❄☃⛄🌬💨🌪🌫🌊🌺🌸🏵🌹🌻🌼🌷'],['Food','🍏🍎🍐🍊🍋🍌🍉🍇🍓🫐🍑🥝🥑🍅🥦🥬🥒🌶🫑🌽🥕🧄🧅🥔🍞🥐🥖🧀🥚🍳🧈🥞🧇🍖🍗🥩🌭🍔🍟🍕'],['Flags','🏁🚩🎌🏴🏳🇺🇸🇬🇧🇫🇷🇩🇪🇪🇸🇮🇹🇯🇵🇨🇳🇰🇷🇧🇷🇲🇽🇦🇷🇨🇴🇻🇪']];
+  let eh='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Emoji Search</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div>';
+  eh+='<input type="text" id="emoji-search" oninput="window._filterEmojis()" placeholder="Search category..." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;margin-bottom:8px">';
+  eh+='<div id="emoji-grid" style="max-height:250px;overflow-y:auto"></div>';
+  eh+='<div id="emoji-copied" style="font-size:10px;color:#4ade80;text-align:center;min-height:16px;margin-top:4px"></div>';
+  w.innerHTML=eh;document.body.appendChild(w);
+  window._emojiData=emojis;
+  window._filterEmojis=function(){
+    const q=(document.getElementById('emoji-search').value||'').toLowerCase();
+    const el=document.getElementById('emoji-grid');el.innerHTML='';
+    emojis.forEach(([cat,chars])=>{
+      if(q&&!cat.toLowerCase().includes(q))return;
+      el.innerHTML+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:2px;margin-top:6px">'+cat+'</div>';
+      const grid=document.createElement('div');grid.style.cssText='display:flex;flex-wrap:wrap;gap:2px';
+      [...chars].filter(c=>c.trim()).forEach(ch=>{
+        if(ch.codePointAt(0)<256)return;
+        const btn=document.createElement('span');btn.textContent=ch;btn.style.cssText='font-size:20px;cursor:pointer;padding:2px;border-radius:3px';
+        btn.onclick=()=>{navigator.clipboard.writeText(ch);document.getElementById('emoji-copied').textContent='Copied: '+ch;setTimeout(()=>{const e2=document.getElementById('emoji-copied');if(e2)e2.textContent='';},1000);};
+        btn.onmouseover=()=>btn.style.background='var(--bg-surface)';
+        btn.onmouseout=()=>btn.style.background='none';
+        grid.appendChild(btn);
+      });
+      el.appendChild(grid);
+    });
+  };
+  window._filterEmojis();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
