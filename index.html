@@ -5914,6 +5914,12 @@ function cmdGetItems(q) {
       ['content timeline','Vertical timeline of content creation history'],
       ['goals','Set and track weekly/monthly goals with progress bars'],
       ['quick task','Floating quick task creator with priority and due date'],
+      ['data explorer','Browse raw workspace state data in tree view'],
+      ['project comparison','Side-by-side project comparison table'],
+      ['weekly review','Comprehensive weekly review generator (copy to clipboard)'],
+      ['achievements','Gamified milestones: tasks, words, content, streaks'],
+      ['focus history','History of all Pomodoro/focus sessions with 14-day chart'],
+      ['quick link','Floating quick link saver with category'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7668,6 +7674,30 @@ function cmdGetItems(q) {
   // Quick task prefix
   if(ql && (ql==='quick task' || ql==='fast task' || ql==='new task quick' || ql==='task quick')){
     items.unshift({title:'Quick Task',desc:'Floating quick task creator',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTask();}});
+  }
+  // Data explorer prefix
+  if(ql && (ql==='data explorer' || ql==='raw data' || ql==='state data' || ql==='browse data')){
+    items.unshift({title:'Data Explorer',desc:'Browse raw workspace state data',icon:'D',type:'action',action:()=>{closeCommandPalette();showDataExplorer();}});
+  }
+  // Project comparison prefix
+  if(ql && (ql==='project comparison' || ql==='compare projects' || ql==='project compare' || ql==='side by side')){
+    items.unshift({title:'Project Comparison',desc:'Side-by-side project metrics table',icon:'P',type:'action',action:()=>{closeCommandPalette();showProjectComparison();}});
+  }
+  // Weekly review prefix
+  if(ql && (ql==='weekly review' || ql==='week review' || ql==='review' || ql==='week summary')){
+    items.unshift({title:'Weekly Review',desc:'Comprehensive weekly review with copy button',icon:'R',type:'action',action:()=>{closeCommandPalette();showWeeklyReview();}});
+  }
+  // Achievements prefix
+  if(ql && (ql==='achievements' || ql==='badges' || ql==='milestones' || ql==='gamification')){
+    items.unshift({title:'Achievements',desc:'Unlockable milestones based on usage',icon:'*',type:'action',action:()=>{closeCommandPalette();showAchievements();}});
+  }
+  // Focus history prefix
+  if(ql && (ql==='focus history' || ql==='pomodoro history' || ql==='focus sessions' || ql==='session history')){
+    items.unshift({title:'Focus History',desc:'All focus/Pomodoro sessions with 14-day chart',icon:'F',type:'action',action:()=>{closeCommandPalette();showFocusHistory();}});
+  }
+  // Quick link prefix
+  if(ql && (ql==='quick link' || ql==='save link' || ql==='fast link' || ql==='add link quick')){
+    items.unshift({title:'Quick Link',desc:'Floating quick link saver',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLink();}});
   }
   return items.slice(0, 20);
 }
@@ -12344,6 +12374,208 @@ function showQuickTask(){
   h+=`<button onclick="(function(){const title=document.getElementById('quick-task-title').value.trim();if(!title)return;if(!S.tasks)S.tasks=[];const priority=document.getElementById('quick-task-priority').value;const due=document.getElementById('quick-task-due').value;S.tasks.push({id:'t_'+Date.now(),title:title,description:'',status:'todo',priority:priority,due:due||'',project:'',projectId:'',subtasks:[],tags:[],createdAt:new Date().toISOString(),timeTracked:0});save();document.getElementById('quick-task-panel').remove();if(typeof renderTasks==='function')renderTasks();})()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;padding:8px;font-size:12px;font-weight:600;cursor:pointer">Create Task</button>`;
   panel.innerHTML=h;document.body.appendChild(panel);
   setTimeout(()=>{const inp=document.getElementById('quick-task-title');if(inp)inp.focus();},100);
+}
+function showDataExplorer(){
+  let panel=document.getElementById('data-explorer-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='data-explorer-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const keys=['tasks','content','links','projects','writerDocs','specs','repos','_goals','_habits','_moods','_microJournal','_gratitude','_savedSearches','_bookmarks','_changelog'];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Data Explorer</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:12px">Browse workspace state data. Click a section to expand.</div>';
+  keys.forEach(key=>{
+    const val=S[key];
+    if(!val)return;
+    const isArr=Array.isArray(val);
+    const count=isArr?val.length:Object.keys(val).length;
+    const sizeStr=JSON.stringify(val).length;
+    const sizeKB=(sizeStr/1024).toFixed(1);
+    h+=`<div style="margin-bottom:4px">`;
+    h+=`<div onclick="const el=document.getElementById('de-${key}');el.style.display=el.style.display==='none'?'block':'none'" style="display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--bg-surface);border-radius:6px;cursor:pointer">`;
+    h+=`<span style="font-size:12px;color:var(--text-primary);font-weight:500">${key}</span>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${count} items | ${sizeKB} KB</span>`;
+    h+=`</div>`;
+    h+=`<div id="de-${key}" style="display:none;padding:8px;margin-left:12px;border-left:2px solid var(--border)">`;
+    if(isArr){
+      val.slice(0,5).forEach((item,i)=>{
+        const preview=JSON.stringify(item).substring(0,200);
+        h+=`<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px;font-family:monospace;word-break:break-all">[${i}] ${esc(preview)}${preview.length>=200?'...':''}</div>`;
+      });
+      if(val.length>5)h+=`<div style="font-size:10px;color:var(--text-muted);font-style:italic">...and ${val.length-5} more items</div>`;
+    } else {
+      const preview=JSON.stringify(val).substring(0,400);
+      h+=`<div style="font-size:10px;color:var(--text-muted);font-family:monospace;word-break:break-all">${esc(preview)}${preview.length>=400?'...':''}</div>`;
+    }
+    h+=`</div></div>`;
+  });
+  const totalSize=(JSON.stringify(S).length/1024).toFixed(1);
+  h+=`<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);text-align:center;font-size:10px;color:var(--text-muted)">Total state: ${totalSize} KB</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectComparison(){
+  let panel=document.getElementById('proj-compare-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='proj-compare-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=(S.projects||[]);
+  const tasks=(S.tasks||[]);
+  const content=(S.content||[]);
+  const specs=(S.specs||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Project Comparison</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(projects.length<2){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">Need at least 2 projects to compare</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  h+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+  h+='<tr><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border);color:var(--text-muted)">Metric</th>';
+  projects.forEach(p=>{h+=`<th style="text-align:center;padding:8px;border-bottom:1px solid var(--border);color:var(--accent)">${esc((p.name||'Untitled').substring(0,15))}</th>`;});
+  h+='</tr>';
+  const metrics=[
+    {name:'Total Tasks',fn:p=>tasks.filter(t=>t.projectId===p.id||t.project===p.name).length},
+    {name:'Done',fn:p=>tasks.filter(t=>(t.projectId===p.id||t.project===p.name)&&t.status==='done').length},
+    {name:'In Progress',fn:p=>tasks.filter(t=>(t.projectId===p.id||t.project===p.name)&&t.status==='in-progress').length},
+    {name:'Overdue',fn:p=>tasks.filter(t=>(t.projectId===p.id||t.project===p.name)&&t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length},
+    {name:'Content Items',fn:p=>content.filter(c=>c.project===p.name||c.projectId===p.id).length},
+    {name:'Specs',fn:p=>specs.filter(s=>s.projectId===p.id).length},
+    {name:'Completion %',fn:p=>{const pt=tasks.filter(t=>t.projectId===p.id||t.project===p.name);const d=pt.filter(t=>t.status==='done').length;return pt.length?(Math.round(d/pt.length*100)+'%'):'N/A';}},
+  ];
+  metrics.forEach(m=>{
+    h+=`<tr><td style="padding:6px 8px;border-bottom:1px solid var(--border);color:var(--text-secondary)">${m.name}</td>`;
+    const vals=projects.map(p=>m.fn(p));
+    const max=Math.max(...vals.map(v=>typeof v==='number'?v:0));
+    projects.forEach((p,i)=>{
+      const v=vals[i];
+      const isMax=typeof v==='number'&&v===max&&max>0;
+      h+=`<td style="text-align:center;padding:6px 8px;border-bottom:1px solid var(--border);color:${isMax?'#4ade80':'var(--text-primary)'};font-weight:${isMax?'700':'400'}">${v}</td>`;
+    });
+    h+='</tr>';
+  });
+  h+='</table></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWeeklyReview(){
+  let panel=document.getElementById('weekly-review-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='weekly-review-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(weekAgo.getDate()-7);
+  const tasks=(S.tasks||[]);const content=(S.content||[]);const links=(S.links||[]);const docs=(S.writerDocs||[]);
+  const doneThisWeek=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=weekAgo);
+  const createdThisWeek=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=weekAgo);
+  const contentThisWeek=content.filter(c=>c.createdAt&&new Date(c.createdAt)>=weekAgo);
+  const linksThisWeek=links.filter(l=>l.createdAt&&new Date(l.createdAt)>=weekAgo);
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now);
+  const docsEdited=docs.filter(d=>d.updatedAt&&new Date(d.updatedAt)>=weekAgo);
+  let review=`WEEKLY REVIEW - ${weekAgo.toLocaleDateString()} to ${now.toLocaleDateString()}\n`;
+  review+=`${'='.repeat(50)}\n\n`;
+  review+=`TASKS\n`;
+  review+=`- Completed: ${doneThisWeek.length}\n`;
+  review+=`- Created: ${createdThisWeek.length}\n`;
+  review+=`- Overdue: ${overdue.length}\n`;
+  if(doneThisWeek.length){review+=`\nCompleted tasks:\n`;doneThisWeek.forEach(t=>{review+=`  [x] ${t.title}\n`;});}
+  review+=`\nCONTENT\n`;
+  review+=`- Items created: ${contentThisWeek.length}\n`;
+  review+=`- Links saved: ${linksThisWeek.length}\n`;
+  review+=`- Docs edited: ${docsEdited.length}\n`;
+  const wordsWritten=contentThisWeek.reduce((s,c)=>s+(c.body||'').trim().split(/\s+/).filter(Boolean).length,0);
+  review+=`- Words written: ${wordsWritten}\n`;
+  review+=`\nNEXT WEEK\n`;
+  const upcoming=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)>=now&&new Date(t.due)<=new Date(now.getTime()+7*86400000));
+  review+=`- Due next week: ${upcoming.length}\n`;
+  if(upcoming.length){upcoming.forEach(t=>{review+=`  [ ] ${t.title} (due ${t.due})\n`;});}
+  if(overdue.length){review+=`\nOVERDUE (needs attention):\n`;overdue.slice(0,10).forEach(t=>{review+=`  [!] ${t.title} (due ${t.due})\n`;});}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Weekly Review</div><div style="display:flex;gap:8px"><button onclick="navigator.clipboard.writeText(document.getElementById(\'weekly-review-text\').textContent)" style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:600;cursor:pointer">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div></div>';
+  h+=`<pre id="weekly-review-text" style="font-size:11px;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;background:var(--bg-surface);padding:16px;border-radius:8px;max-height:60vh;overflow-y:auto">${esc(review)}</pre>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showAchievements(){
+  let panel=document.getElementById('achievements-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='achievements-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const content=(S.content||[]);const links=(S.links||[]);const docs=(S.writerDocs||[]);
+  const doneTasks=tasks.filter(t=>t.status==='done').length;
+  const totalWords=content.reduce((s,c)=>s+(c.body||'').trim().split(/\s+/).filter(Boolean).length,0)+docs.reduce((s,d)=>s+(d.content||'').trim().split(/\s+/).filter(Boolean).length,0);
+  const achievements=[
+    {id:'first_task',title:'First Steps',desc:'Complete your first task',check:doneTasks>=1,icon:'*'},
+    {id:'task_10',title:'Getting Organized',desc:'Complete 10 tasks',check:doneTasks>=10,icon:'*'},
+    {id:'task_50',title:'Task Machine',desc:'Complete 50 tasks',check:doneTasks>=50,icon:'*'},
+    {id:'task_100',title:'Centurion',desc:'Complete 100 tasks',check:doneTasks>=100,icon:'*'},
+    {id:'content_5',title:'Content Creator',desc:'Create 5 content items',check:content.length>=5,icon:'+'},
+    {id:'content_25',title:'Prolific Writer',desc:'Create 25 content items',check:content.length>=25,icon:'+'},
+    {id:'words_1k',title:'Wordsmith',desc:'Write 1,000 words total',check:totalWords>=1000,icon:'W'},
+    {id:'words_10k',title:'Author',desc:'Write 10,000 words total',check:totalWords>=10000,icon:'W'},
+    {id:'words_50k',title:'NaNoWriMo',desc:'Write 50,000 words total',check:totalWords>=50000,icon:'W'},
+    {id:'links_10',title:'Researcher',desc:'Save 10 links',check:links.length>=10,icon:'L'},
+    {id:'links_50',title:'Link Hoarder',desc:'Save 50 links',check:links.length>=50,icon:'L'},
+    {id:'docs_3',title:'Documenter',desc:'Create 3 writer docs',check:docs.length>=3,icon:'D'},
+    {id:'docs_10',title:'Novelist',desc:'Create 10 writer docs',check:docs.length>=10,icon:'D'},
+    {id:'projects_3',title:'Multi-Tasker',desc:'Have 3 projects',check:(S.projects||[]).length>=3,icon:'P'},
+    {id:'streak_7',title:'Week Warrior',desc:'7-day usage streak',check:(S._streak||0)>=7,icon:'F'},
+    {id:'streak_30',title:'Monthly Champion',desc:'30-day usage streak',check:(S._streak||0)>=30,icon:'F'},
+  ];
+  const unlocked=achievements.filter(a=>a.check).length;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Achievements</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="text-align:center;margin-bottom:16px"><span style="font-size:28px;font-weight:700;color:#4ade80">${unlocked}</span><span style="font-size:14px;color:var(--text-muted)"> / ${achievements.length} unlocked</span></div>`;
+  h+=`<div style="height:8px;background:var(--bg-surface);border-radius:4px;margin-bottom:16px;overflow:hidden"><div style="height:100%;width:${Math.round(unlocked/achievements.length*100)}%;background:#4ade80;border-radius:4px"></div></div>`;
+  achievements.forEach(a=>{
+    h+=`<div style="display:flex;align-items:center;gap:12px;padding:10px;background:var(--bg-surface);border-radius:8px;margin-bottom:6px;opacity:${a.check?'1':'0.4'}">`;
+    h+=`<div style="width:36px;height:36px;border-radius:50%;background:${a.check?'#4ade80':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:${a.check?'#000':'var(--text-muted)'}">${a.check?a.icon:'?'}</div>`;
+    h+=`<div style="flex:1"><div style="font-size:12px;color:var(--text-primary);font-weight:600">${a.title}</div><div style="font-size:10px;color:var(--text-muted)">${a.desc}</div></div>`;
+    if(a.check)h+=`<div style="font-size:10px;color:#4ade80;font-weight:600">UNLOCKED</div>`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showFocusHistory(){
+  let panel=document.getElementById('focus-hist-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='focus-hist-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const sessions=(S._focusSessions||[]);
+  const totalMin=sessions.reduce((s,f)=>s+(f.duration||0),0);
+  const totalSessions=sessions.length;
+  const avgMin=totalSessions?Math.round(totalMin/totalSessions):0;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Focus Session History</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">';
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">${totalSessions}</div><div style="font-size:10px;color:var(--text-muted)">Total Sessions</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#60a5fa">${totalMin}m</div><div style="font-size:10px;color:var(--text-muted)">Total Focus Time</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#facc15">${avgMin}m</div><div style="font-size:10px;color:var(--text-muted)">Avg Session</div></div>`;
+  h+='</div>';
+  if(!sessions.length){
+    h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No focus sessions recorded yet. Start a Pomodoro timer to begin tracking.</div>';
+  } else {
+    const last14=[];
+    const now=new Date();
+    for(let i=13;i>=0;i--){
+      const d=new Date(now);d.setDate(d.getDate()-i);
+      const dateStr=d.toISOString().split('T')[0];
+      const dayMins=sessions.filter(s=>s.date&&s.date.startsWith(dateStr)).reduce((sum,s)=>sum+(s.duration||0),0);
+      last14.push({label:d.toLocaleDateString('en',{month:'short',day:'numeric'}),mins:dayMins});
+    }
+    const maxMins=Math.max(...last14.map(d=>d.mins),1);
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Last 14 days:</div>';
+    h+='<div style="display:flex;align-items:flex-end;gap:4px;height:100px;margin-bottom:8px">';
+    last14.forEach(d=>{
+      const h2=d.mins?Math.max(4,d.mins/maxMins*90):2;
+      const color=d.mins>0?'#4ade80':'var(--border)';
+      h+=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:8px;color:var(--text-muted)">${d.mins||''}</div><div style="width:100%;height:${h2}px;background:${color};border-radius:3px"></div><div style="font-size:7px;color:var(--text-muted)">${d.label.split(' ')[1]}</div></div>`;
+    });
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-top:12px;margin-bottom:6px">Recent sessions:</div>';
+    sessions.slice(-10).reverse().forEach(s=>{
+      const d=s.date?new Date(s.date).toLocaleDateString('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Unknown';
+      h+=`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border)"><span style="color:var(--text-secondary)">${d}</span><span style="color:#4ade80;font-weight:600">${s.duration||0}m</span></div>`;
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickLink(){
+  let panel=document.getElementById('quick-link-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-link-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--text-primary)">Quick Link</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<input id="quick-link-url" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px" placeholder="URL...">';
+  h+='<input id="quick-link-title" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:12px;margin-bottom:8px" placeholder="Title (optional)">';
+  h+='<div style="display:flex;gap:8px">';
+  h+='<select id="quick-link-cat" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px;font-size:11px"><option value="">Category</option><option value="reference">Reference</option><option value="tool">Tool</option><option value="inspiration">Inspiration</option><option value="learning">Learning</option><option value="resource">Resource</option></select>';
+  h+=`<button onclick="(function(){const url=document.getElementById('quick-link-url').value.trim();if(!url)return;if(!S.links)S.links=[];const title=document.getElementById('quick-link-title').value.trim()||url;const cat=document.getElementById('quick-link-cat').value;S.links.unshift({id:'l_'+Date.now(),url:url,title:title,category:cat,tags:[],createdAt:new Date().toISOString(),pinned:false});save();document.getElementById('quick-link-panel').remove();if(typeof renderLinks==='function')renderLinks();})()" style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer">Save</button>`;
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const inp=document.getElementById('quick-link-url');if(inp)inp.focus();},100);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
