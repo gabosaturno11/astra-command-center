@@ -6431,6 +6431,12 @@ function cmdGetItems(q) {
       ['iptables','Linux iptables firewall reference'],
       ['productive hours','When do you complete tasks by time'],
       ['math','Quick math calculator with buttons'],
+      ['tmux','tmux terminal multiplexer reference'],
+      ['backlog','Backlog grooming health check'],
+      ['breathing','Guided breathing exercise'],
+      ['vim','Vim editor command reference'],
+      ['week over week','Compare task output across weeks'],
+      ['focus timer','Pomodoro-style focus timer'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9893,6 +9899,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='math' || ql==='calculator' || ql==='calc' || ql==='quick math')){
     items.unshift({title:'Quick Math',desc:'Calculator with percentage support',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMathSolver();}});
+  }
+  if(ql && (ql==='tmux' || ql==='tmux ref' || ql==='terminal multiplexer' || ql==='tmux keys')){
+    items.unshift({title:'tmux Reference',desc:'tmux keys and commands cheatsheet',icon:'T',type:'action',action:()=>{closeCommandPalette();showTmuxRef();}});
+  }
+  if(ql && (ql==='backlog' || ql==='grooming' || ql==='backlog health' || ql==='groom')){
+    items.unshift({title:'Backlog Grooming',desc:'Check task backlog health',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBacklogGrooming();}});
+  }
+  if(ql && (ql==='breathing' || ql==='breathe' || ql==='breathing exercise' || ql==='4-7-8')){
+    items.unshift({title:'Breathing Exercise',desc:'Guided breathing patterns',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBreathingExercise();}});
+  }
+  if(ql && (ql==='vim' || ql==='vim ref' || ql==='neovim' || ql==='vi')){
+    items.unshift({title:'Vim Reference',desc:'Vim keys and commands cheatsheet',icon:'V',type:'action',action:()=>{closeCommandPalette();showVimRef();}});
+  }
+  if(ql && (ql==='week over week' || ql==='wow' || ql==='weekly compare' || ql==='week compare')){
+    items.unshift({title:'Week over Week',desc:'Compare output across 4 weeks',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeekOverWeek();}});
+  }
+  if(ql && (ql==='focus timer' || ql==='pomodoro' || ql==='focus' || ql==='deep work')){
+    items.unshift({title:'Focus Timer',desc:'Pomodoro-style focus and break timer',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFocusTimer();}});
   }
   return items.slice(0, 20);
 }
@@ -30587,6 +30611,186 @@ function showQuickMathSolver(){
     expr=expr.replace(/sqrt\(/gi,'Math.sqrt(').replace(/pow\(/gi,'Math.pow(').replace(/abs\(/gi,'Math.abs(').replace(/pi/gi,'Math.PI').replace(/\^/g,'**');
     try{const r=new Function('return '+expr)();document.getElementById('_math-result').textContent=typeof r==='number'?parseFloat(r.toFixed(10)):r;}
     catch(e){document.getElementById('_math-result').textContent='Error';}
+  };
+}
+function showTmuxRef(){
+  const cmds={
+    'Sessions':['tmux new -s name|Create named session','tmux attach -t name|Attach to session','tmux ls|List sessions','tmux kill-session -t name|Kill session','tmux rename-session -t old new|Rename session','Ctrl+b d|Detach from session','Ctrl+b $|Rename current session','Ctrl+b s|List and switch sessions'],
+    'Windows':['Ctrl+b c|Create new window','Ctrl+b n|Next window','Ctrl+b p|Previous window','Ctrl+b 0-9|Go to window by number','Ctrl+b ,|Rename current window','Ctrl+b &|Close current window','Ctrl+b w|List windows and select'],
+    'Panes':['Ctrl+b %|Split pane vertically','Ctrl+b "|Split pane horizontally','Ctrl+b arrow|Move between panes','Ctrl+b z|Toggle pane zoom (fullscreen)','Ctrl+b x|Close current pane','Ctrl+b {|Move pane left','Ctrl+b }|Move pane right','Ctrl+b Space|Cycle through layouts','Ctrl+b q|Show pane numbers'],
+    'Copy Mode':['Ctrl+b [|Enter copy mode','q|Exit copy mode','Space|Start selection','Enter|Copy selection','Ctrl+b ]|Paste buffer','/:keyword|Search forward','?:keyword|Search backward'],
+    'Resize':['Ctrl+b Ctrl+arrow|Resize pane by 1 cell','Ctrl+b Alt+arrow|Resize pane by 5 cells','tmux resize-pane -D 10|Resize down by 10','tmux resize-pane -R 20|Resize right by 20'],
+    'Config':['tmux source-file ~/.tmux.conf|Reload config','set -g mouse on|Enable mouse support','set -g base-index 1|Start window numbering at 1','set -g default-terminal "screen-256color"|256 colors']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">tmux Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskBacklogGrooming(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const noPriority=tasks.filter(t=>!t.priority);
+  const noDue=tasks.filter(t=>!t.due);
+  const noProject=tasks.filter(t=>!t.project);
+  const noDesc=tasks.filter(t=>!t.description);
+  const stale=tasks.filter(t=>{const age=t.createdAt?Math.floor((Date.now()-new Date(t.createdAt))/(86400000)):0;return age>30;});
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Backlog Grooming</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+tasks.length+' open tasks need attention</div>';
+  const checks=[
+    {label:'Missing priority',count:noPriority.length,color:noPriority.length>0?'#ef4444':'#4ade80',items:noPriority},
+    {label:'Missing due date',count:noDue.length,color:noDue.length>0?'#f59e0b':'#4ade80',items:noDue},
+    {label:'No project assigned',count:noProject.length,color:noProject.length>0?'#fb923c':'#4ade80',items:noProject},
+    {label:'No description',count:noDesc.length,color:noDesc.length>3?'#f59e0b':'#4ade80',items:noDesc},
+    {label:'Stale (30+ days)',count:stale.length,color:stale.length>0?'#ef4444':'#4ade80',items:stale}
+  ];
+  const score=Math.round(((tasks.length-noPriority.length-noDue.length)/(tasks.length*2||1))*100);
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;margin-bottom:16px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Backlog Health Score</div><div style="font-size:28px;color:'+(score>=70?'#4ade80':score>=40?'#f59e0b':'#ef4444')+';font-weight:700">'+score+'%</div></div>';
+  checks.forEach(c=>{
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;margin-bottom:6px;border-left:3px solid '+c.color+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:var(--text-primary)">'+c.label+'</span><span style="font-size:14px;color:'+c.color+';font-weight:700">'+c.count+'</span></div>';
+    if(c.count>0&&c.count<=3){c.items.forEach(t=>{html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px;padding-left:8px">- '+esc(t.title)+'</div>';});}
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickBreathingExercise(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px;text-align:center">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80;font-size:15px">Breathing Exercise</h3><button onclick="if(window._breathInterval)clearInterval(window._breathInterval);this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div id="_breath-circle" style="width:120px;height:120px;border-radius:50%;border:4px solid #4ade80;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;transition:transform 4s ease-in-out"><div id="_breath-text" style="font-size:16px;color:#4ade80;font-weight:700">Start</div></div>';
+  html+='<div id="_breath-counter" style="font-size:12px;color:var(--text-muted);margin-bottom:12px">4-7-8 pattern</div>';
+  html+='<div style="display:flex;gap:6px;justify-content:center">';
+  ['4-7-8','Box','Calm'].forEach(pattern=>{
+    html+='<button onclick="window._startBreath(\''+pattern+'\')" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:11px">'+pattern+'</button>';
+  });
+  html+='</div>';
+  html+='<div id="_breath-rounds" style="margin-top:10px;font-size:11px;color:var(--text-muted)">0 rounds</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._breathRounds=0;
+  window._startBreath=function(pattern){
+    if(window._breathInterval)clearInterval(window._breathInterval);
+    const patterns={'4-7-8':[{t:'Inhale',s:4},{t:'Hold',s:7},{t:'Exhale',s:8}],'Box':[{t:'Inhale',s:4},{t:'Hold',s:4},{t:'Exhale',s:4},{t:'Hold',s:4}],'Calm':[{t:'Inhale',s:4},{t:'Exhale',s:6}]};
+    const steps=patterns[pattern]||patterns['4-7-8'];
+    let stepIdx=0;let countdown=steps[0].s;window._breathRounds=0;
+    const circle=document.getElementById('_breath-circle');
+    const text=document.getElementById('_breath-text');
+    const counter=document.getElementById('_breath-counter');
+    const rounds=document.getElementById('_breath-rounds');
+    function updateBreath(){
+      if(text)text.textContent=steps[stepIdx].t;
+      if(counter)counter.textContent=countdown+'s';
+      if(circle){
+        if(steps[stepIdx].t==='Inhale'){circle.style.transform='scale(1.3)';circle.style.borderColor='#4ade80';}
+        else if(steps[stepIdx].t==='Exhale'){circle.style.transform='scale(0.8)';circle.style.borderColor='#60a5fa';}
+        else{circle.style.transform='scale(1)';circle.style.borderColor='#f59e0b';}
+      }
+      countdown--;
+      if(countdown<0){stepIdx++;if(stepIdx>=steps.length){stepIdx=0;window._breathRounds++;if(rounds)rounds.textContent=window._breathRounds+' rounds';}countdown=steps[stepIdx].s;}
+    }
+    updateBreath();
+    window._breathInterval=setInterval(updateBreath,1000);
+  };
+}
+function showVimRef(){
+  const cmds={
+    'Movement':['h j k l|Left, Down, Up, Right','w / b|Next word / Previous word','e|End of word','0 / $|Start / End of line','gg / G|Top / Bottom of file','Ctrl+d / Ctrl+u|Half page down / up','{ / }|Previous / Next paragraph','%|Jump to matching bracket','f{char}|Jump to char on line','zz|Center screen on cursor'],
+    'Insert Mode':['i / a|Insert before / after cursor','I / A|Insert at start / end of line','o / O|New line below / above','s|Delete char and insert','c{motion}|Change (delete + insert)','R|Replace mode (overtype)'],
+    'Editing':['x|Delete character','dd|Delete line','D|Delete to end of line','yy|Yank (copy) line','p / P|Paste after / before','u / Ctrl+r|Undo / Redo','.|Repeat last change','>>|Indent line','<<|Unindent line','J|Join lines'],
+    'Visual Mode':['v|Character visual','V|Line visual','Ctrl+v|Block visual','d|Delete selected','y|Yank selected','>|Indent selected','gU|Uppercase selected','gu|Lowercase selected'],
+    'Search & Replace':['/{pattern}|Search forward','?{pattern}|Search backward','n / N|Next / Previous match','*|Search word under cursor',':%s/old/new/g|Replace all in file',':%s/old/new/gc|Replace with confirm'],
+    'Files & Buffers':[':w|Save',':q|Quit',':wq|Save and quit',':q!|Quit without saving',':e file|Open file',':bn / :bp|Next / Previous buffer',':ls|List buffers',':sp / :vsp|Horizontal / Vertical split','Ctrl+w w|Switch between splits']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Vim Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskWeekOverWeek(){
+  const tasks=(S.tasks||[]);const now=new Date();const weeks=[];
+  for(let w=3;w>=0;w--){
+    const wStart=new Date(now);wStart.setDate(now.getDate()-now.getDay()-w*7);wStart.setHours(0,0,0,0);
+    const wEnd=new Date(wStart);wEnd.setDate(wStart.getDate()+7);
+    const created=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=wStart&&new Date(t.createdAt)<wEnd).length;
+    const done=tasks.filter(t=>t.status==='done'&&t.updatedAt&&new Date(t.updatedAt)>=wStart&&new Date(t.updatedAt)<wEnd).length;
+    weeks.push({label:'W'+(4-w),start:(wStart.getMonth()+1)+'/'+wStart.getDate(),created,done});
+  }
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Week over Week</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+  weeks.forEach(w=>{
+    const change=weeks.indexOf(w)>0?(w.done-weeks[weeks.indexOf(w)-1].done):0;
+    const changeColor=change>0?'#4ade80':change<0?'#ef4444':'#6b7280';
+    html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center">';
+    html+='<div style="font-size:10px;color:var(--text-muted)">'+w.label+' ('+w.start+')</div>';
+    html+='<div style="font-size:20px;color:#4ade80;font-weight:700;margin:4px 0">'+w.done+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">done</div>';
+    if(weeks.indexOf(w)>0)html+='<div style="font-size:11px;color:'+changeColor+';margin-top:4px">'+(change>0?'+':'')+change+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  const trend=weeks[3].done>weeks[2].done?'Improving':weeks[3].done<weeks[2].done?'Declining':'Steady';
+  const trendColor=trend==='Improving'?'#4ade80':trend==='Declining'?'#ef4444':'#f59e0b';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Trend</div><div style="font-size:18px;color:'+trendColor+';font-weight:700">'+trend+'</div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickFocusTimer(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px;text-align:center">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:#4ade80;font-size:13px">Focus Timer</h4><button onclick="if(window._ftInterval)clearInterval(window._ftInterval);this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">X</button></div>';
+  html+='<div id="_ft-phase" style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Ready</div>';
+  html+='<div id="_ft-display" style="font-size:36px;color:#4ade80;font-weight:700;font-family:monospace;margin-bottom:8px">25:00</div>';
+  html+='<div id="_ft-progress" style="height:4px;background:var(--bg-surface);border-radius:2px;margin-bottom:10px;overflow:hidden"><div id="_ft-bar" style="width:0%;height:100%;background:#4ade80;border-radius:2px;transition:width 1s linear"></div></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  [{l:'25m Focus',m:25,type:'focus'},{l:'5m Break',m:5,type:'break'},{l:'15m Break',m:15,type:'break'},{l:'50m Deep',m:50,type:'focus'}].forEach(p=>{
+    html+='<button onclick="window._startFt('+p.m+',\''+p.type+'\')" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 2px;border-radius:6px;cursor:pointer;font-size:9px">'+p.l+'</button>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:6px"><button id="_ft-toggle" onclick="window._toggleFt()" style="flex:1;background:#4ade80;color:#000;border:none;padding:8px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Start</button>';
+  html+='<button onclick="window._resetFt()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:12px">Reset</button></div>';
+  html+='<div id="_ft-sessions" style="margin-top:8px;font-size:10px;color:var(--text-muted)">Sessions: 0</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._ftSecs=25*60;window._ftTotal=25*60;window._ftRunning=false;window._ftType='focus';window._ftSessions=0;
+  window._startFt=function(mins,type){
+    if(window._ftInterval)clearInterval(window._ftInterval);
+    window._ftSecs=mins*60;window._ftTotal=mins*60;window._ftRunning=false;window._ftType=type;
+    document.getElementById('_ft-phase').textContent=type==='focus'?'Focus Time':'Break Time';
+    document.getElementById('_ft-display').style.color=type==='focus'?'#4ade80':'#60a5fa';
+    document.getElementById('_ft-bar').style.background=type==='focus'?'#4ade80':'#60a5fa';
+    document.getElementById('_ft-bar').style.width='0%';
+    const m=Math.floor(window._ftSecs/60);const s=window._ftSecs%60;
+    document.getElementById('_ft-display').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    document.getElementById('_ft-toggle').textContent='Start';
+  };
+  window._toggleFt=function(){
+    if(window._ftRunning){clearInterval(window._ftInterval);window._ftRunning=false;document.getElementById('_ft-toggle').textContent='Resume';return;}
+    window._ftRunning=true;document.getElementById('_ft-toggle').textContent='Pause';
+    window._ftInterval=setInterval(()=>{
+      window._ftSecs--;
+      const m=Math.floor(window._ftSecs/60);const s=window._ftSecs%60;
+      document.getElementById('_ft-display').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+      const pct=((window._ftTotal-window._ftSecs)/window._ftTotal*100).toFixed(1);
+      document.getElementById('_ft-bar').style.width=pct+'%';
+      if(window._ftSecs<=0){clearInterval(window._ftInterval);window._ftRunning=false;
+        document.getElementById('_ft-display').textContent='Done!';
+        if(window._ftType==='focus'){window._ftSessions++;document.getElementById('_ft-sessions').textContent='Sessions: '+window._ftSessions;}
+        document.getElementById('_ft-toggle').textContent='Start';
+      }
+    },1000);
+  };
+  window._resetFt=function(){
+    if(window._ftInterval)clearInterval(window._ftInterval);window._ftRunning=false;
+    window._ftSecs=window._ftTotal;
+    const m=Math.floor(window._ftSecs/60);const s=window._ftSecs%60;
+    document.getElementById('_ft-display').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    document.getElementById('_ft-bar').style.width='0%';
+    document.getElementById('_ft-toggle').textContent='Start';
   };
 }
 function showProjectRoadmap(filterProject){
