@@ -872,6 +872,7 @@ textarea{resize:vertical;line-height:1.6}
           <div class="tab-bar">
             <button class="tab-btn active" id="task-view-list" onclick="setTaskView('list')">List</button>
             <button class="tab-btn" id="task-view-board" onclick="setTaskView('board')">Board</button>
+            <button class="tab-btn" id="task-view-eisenhower" onclick="setTaskView('eisenhower')" title="Eisenhower Matrix">EH</button>
           </div>
           <div class="tab-bar" style="margin-left:8px">
             <button class="tab-btn active" id="task-filter-all" onclick="setTaskFilter('all')">All</button>
@@ -939,6 +940,12 @@ textarea{resize:vertical;line-height:1.6}
           <div class="board-col"><div class="board-col-header"><span class="board-col-title">In Progress</span><span class="board-col-count" id="bc-progress" oncontextmenu="event.preventDefault();boardMoveAll('progress')">0</span></div><div class="board-col-tasks" id="board-progress" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'progress')"></div></div>
           <div class="board-col"><div class="board-col-header"><span class="board-col-title">Done</span><span class="board-col-count" id="bc-done" oncontextmenu="event.preventDefault();boardMoveAll('done')">0</span></div><div class="board-col-tasks" id="board-done" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'done')"></div></div>
           <div class="board-col"><div class="board-col-header"><span class="board-col-title">Blocked</span><span class="board-col-count" id="bc-blocked" oncontextmenu="event.preventDefault();boardMoveAll('blocked')">0</span></div><div class="board-col-tasks" id="board-blocked" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="this.classList.remove('drag-over');boardDrop(event,'blocked')"></div></div>
+        </div>
+        <div id="task-eisenhower-view" style="display:none;flex:1;display:none;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:8px;padding:8px;overflow:auto">
+          <div class="eh-quad" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius);padding:12px;overflow-y:auto"><div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Urgent + Important (DO)</div><div id="eh-q1"></div></div>
+          <div class="eh-quad" style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.3);border-radius:var(--radius);padding:12px;overflow-y:auto"><div style="font-size:11px;font-weight:700;color:#eab308;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Not Urgent + Important (SCHEDULE)</div><div id="eh-q2"></div></div>
+          <div class="eh-quad" style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.3);border-radius:var(--radius);padding:12px;overflow-y:auto"><div style="font-size:11px;font-weight:700;color:#f97316;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Urgent + Not Important (DELEGATE)</div><div id="eh-q3"></div></div>
+          <div class="eh-quad" style="background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.3);border-radius:var(--radius);padding:12px;overflow-y:auto"><div style="font-size:11px;font-weight:700;color:#22c55e;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Not Urgent + Not Important (ELIMINATE)</div><div id="eh-q4"></div></div>
         </div>
       </div>
     </div>
@@ -1747,6 +1754,10 @@ textarea{resize:vertical;line-height:1.6}
 <!-- Floating Write Button -->
 <button class="zen-fab" id="zen-fab" onclick="zenOpen()" title="Open Writer (Cmd+Shift+W)">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+</button>
+<!-- Floating Quick Note Button -->
+<button class="zen-fab" onclick="toggleQuickNote()" title="Quick Note" style="left:20px;right:auto;bottom:20px;background:linear-gradient(135deg,rgba(34,211,238,0.15) 0%,rgba(74,222,128,0.1) 100%);border-color:rgba(34,211,238,0.25);color:#22d3ee">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 
 <!-- Task Detail Modal -->
@@ -2725,7 +2736,17 @@ function contentFindDuplicates(){
 }
 
 // === TASKS ===
-function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
+function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-view-eisenhower').classList.toggle('active',v==='eisenhower');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');const ehEl=document.getElementById('task-eisenhower-view');if(ehEl)ehEl.style.display=v==='eisenhower'?'grid':'none';renderTasks();}
+function renderEisenhower(){
+  const today=new Date().toISOString().split('T')[0];
+  const active=S.tasks.filter(t=>t.status!=='done');
+  const isUrgent=t=>t.priority==='p0'||t.priority==='p1'||(t.due&&t.due<=today);
+  const isImportant=t=>t.priority==='p0'||(t.priority==='p1'&&t.status!=='blocked');
+  const q1=[],q2=[],q3=[],q4=[];
+  active.forEach(t=>{const u=isUrgent(t),i=isImportant(t);if(u&&i)q1.push(t);else if(!u&&i)q2.push(t);else if(u&&!i)q3.push(t);else q4.push(t);});
+  const cardHtml=t=>`<div style="padding:6px 8px;background:var(--bg-elevated);border-radius:4px;margin-bottom:4px;cursor:pointer;font-size:11px;border-left:3px solid ${t.priority==='p0'?'var(--red)':t.priority==='p1'?'var(--orange)':t.priority==='p2'?'var(--blue)':'var(--text-muted)'}" onclick="openTaskDetail(${t.id})"><div style="font-weight:600;color:var(--text-primary)">${esc(t.title||'Untitled')}</div><div style="font-size:9px;color:var(--text-muted);margin-top:2px">${(t.priority||'p2').toUpperCase()}${t.due?' | '+t.due:''}${t.project?' | '+esc(t.project):''}</div></div>`;
+  ['eh-q1','eh-q2','eh-q3','eh-q4'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.innerHTML=[q1,q2,q3,q4][i].map(cardHtml).join('')||'<div style="font-size:10px;color:var(--text-muted);font-style:italic">None</div>';});
+}
 function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;['all','active','todo','progress','blocked','done','overdue','urgent'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',f===k);});renderTasks();}
 function clearTaskFilters(){taskFilter='all';taskProjectFilter=null;const ts=document.getElementById('task-search');if(ts)ts.value='';const tsort=document.getElementById('task-sort');if(tsort)tsort.value='manual';const tpf=document.getElementById('task-project-filter');if(tpf)tpf.value='';['all','active','todo','progress','blocked','done','overdue','urgent'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',k==='all');});renderTasks();toast('Filters cleared');}
 function filterTaskProject(p){taskProjectFilter=p;taskFilter='all';renderTasks();}
@@ -2760,6 +2781,7 @@ function renderTasks(){
   document.getElementById('pdl').innerHTML=projects.map(p=>`<option value="${p}">`).join('');
   const tpf=document.getElementById('task-project-filter');if(tpf){tpf.innerHTML='<option value="">All Projects</option>'+projects.map(p=>`<option value="${escA(p)}" ${taskProjectFilter===p?'selected':''}>${esc(p)}</option>`).join('');}
   updateSidebarCtx();
+  if(taskView==='eisenhower')renderEisenhower();
 }
 
 function addTask(){S.tasks.unshift({id:Date.now(),title:'',description:'',subtasks:[],status:'todo',priority:'p1',project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],created:new Date().toISOString()});save();renderTasks();setTimeout(()=>{const i=document.querySelector('.task-title-input');if(i)i.focus();},50);}
@@ -5645,6 +5667,7 @@ function cmdGetItems(q) {
       ['tag-tasks:','Browse tasks by tag'],['project-stats:','Per-project analytics'],
       ['export:','All export options'],['standup','Daily standup summary'],
       ['search: keyword','Deep search across ALL sections'],['find: keyword','Alias for search:'],
+      ['history:','Recent activity across all sections'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6563,6 +6586,21 @@ function cmdGetItems(q) {
       (S.repos||[]).forEach(r=>{if((r.name+' '+(r.desc||'')+' '+(r.techStack||[]).join(' ')+' '+(r.notes||'')).toLowerCase().includes(sq)){items.unshift({title:esc(r.name),desc:'Repo | '+(r.status||'')+(r.live?' | '+r.live.substring(0,30):''),icon:'R',type:'action',action:()=>{closeCommandPalette();switchSection('repos',null);}});}});
       if(!items.length)items.unshift({title:'No results for "'+esc(sq)+'"',desc:'Searched tasks, content, docs, links, specs, repos',icon:'!',type:'info'});
     }else{items.unshift({title:'Type 2+ characters after search:',desc:'Searches tasks, content, docs, links, specs, repos',icon:'?',type:'info'});}
+  }
+  // History prefix — creation timeline across all sections
+  if(ql && (ql==='history' || ql.startsWith('history:') || ql==='log' || ql==='activity')){
+    const days=parseInt(ql.startsWith('history:')?q.substring(8):'')||7;
+    const allItems=[];
+    S.tasks.forEach(t=>{if(t.created)allItems.push({title:esc(t.title||'Untitled'),type:'Task',time:t.created,icon:'T',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+    S.content.forEach(c=>{if(c.created)allItems.push({title:esc((c.body||'').substring(0,50)),type:'Content',time:c.created,icon:'C',action:()=>{closeCommandPalette();switchSection('content',null);}});});
+    S.docs.forEach(d=>{if(d.created||d.updated)allItems.push({title:esc(d.title||'Untitled'),type:'Doc',time:d.updated||d.created,icon:'W',action:()=>{closeCommandPalette();switchDoc(d.id);switchSection('writer',null);}});});
+    S.links.forEach(l=>{if(l.created)allItems.push({title:esc(l.title||l.url),type:'Link',time:l.created,icon:'L',action:()=>{closeCommandPalette();window.open(l.url,'_blank');}});});
+    const cutoff=new Date();cutoff.setDate(cutoff.getDate()-days);
+    const recent=allItems.filter(i=>new Date(i.time)>=cutoff).sort((a,b)=>new Date(b.time)-new Date(a.time));
+    if(recent.length){
+      items.unshift({title:'Activity (last '+days+' days): '+recent.length+' items',desc:'Type history:N for custom range',icon:'H',type:'info'});
+      recent.slice(0,15).forEach(r=>{items.unshift({title:r.title,desc:r.type+' | '+timeAgo(r.time),icon:r.icon,type:'action',action:r.action});});
+    }else{items.unshift({title:'No activity in last '+days+' days',desc:'Type history:N for custom range',icon:'!',type:'info'});}
   }
   return items.slice(0, 20);
 }
@@ -7493,6 +7531,22 @@ function stopFocusTimer(){
   focusTimerTaskId=null;
 }
 function extendFocusTimer(mins){focusTimerEnd+=mins*60*1000;toast('+'+mins+' minutes added');}
+
+// === FLOATING QUICK NOTE ===
+function toggleQuickNote(){
+  let panel=document.getElementById('quick-note-panel');
+  if(panel){panel.style.display=panel.style.display==='none'?'flex':'none';if(panel.style.display==='flex')panel.querySelector('textarea').focus();return;}
+  panel=document.createElement('div');panel.id='quick-note-panel';
+  panel.style.cssText='position:fixed;bottom:72px;left:20px;z-index:950;width:280px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,0.6)';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em">Quick Note</span><button onclick="document.getElementById('quick-note-panel').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px;padding:0">&times;</button></div><textarea id="qn-text" placeholder="Type a quick note..." style="background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;padding:8px;resize:vertical;min-height:60px;max-height:200px;font-family:inherit"></textarea><div style="display:flex;gap:4px"><button onclick="saveQuickNote('content')" class="btn btn-sm btn-primary" style="flex:1;font-size:9px">Save as Content</button><button onclick="saveQuickNote('task')" class="btn btn-sm" style="flex:1;font-size:9px">Save as Task</button></div>`;
+  document.body.appendChild(panel);panel.querySelector('textarea').focus();
+}
+function saveQuickNote(type){
+  const text=document.getElementById('qn-text')?.value?.trim();if(!text){toast('Type something first');return;}
+  if(type==='content'){S.content.unshift({id:Date.now(),body:text,type:'note',theme:'quick-note',tags:['quick-note'],created:new Date().toISOString()});save();if(currentSection==='content')renderContent();toast('Saved as content');}
+  else if(type==='task'){S.tasks.unshift({id:Date.now(),title:text,description:'',subtasks:[],status:'todo',priority:'p2',project:taskProjectFilter||'',due:'',created:new Date().toISOString()});save();if(currentSection==='tasks')renderTasks();toast('Saved as task');}
+  document.getElementById('qn-text').value='';
+}
 
 // === CONTENT WORD CLOUD ===
 function contentWordCloud(){
