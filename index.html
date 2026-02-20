@@ -6671,6 +6671,12 @@ function cmdGetItems(q) {
       ['ansible playbook','Ansible playbook vault galaxy ref'],
       ['scope creep','Scope creep detector 4 weeks'],
       ['markdown preview','Live markdown preview editor'],
+      ['prometheus','Prometheus Grafana PromQL reference'],
+      ['project timeline','Project timeline 6 month view'],
+      ['dice','Dice roller d4-d20 plus custom'],
+      ['npm scripts','npm scripts CLI workspace ref'],
+      ['energy','Energy level tracker burnout risk'],
+      ['password','Secure password generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10853,6 +10859,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='markdown preview' || ql==='md preview' || ql==='markdown editor' || ql==='md editor')){
     items.unshift({title:'Markdown Preview',desc:'Live markdown preview editor',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownPreview();}});
+  }
+  if(ql && (ql==='prometheus' || ql==='grafana' || ql==='promql' || ql==='prom ref')){
+    items.unshift({title:'Prometheus/Grafana Reference',desc:'PromQL, alertmanager, node exporter',icon:'P',type:'action',action:()=>{closeCommandPalette();showPrometheusRef();}});
+  }
+  if(ql && (ql==='project timeline' || ql==='timeline' || ql==='gantt' || ql==='project gantt')){
+    items.unshift({title:'Project Timeline',desc:'6-month project timeline view',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskProjectTimeline();}});
+  }
+  if(ql && (ql==='dice' || ql==='dice roller' || ql==='roll dice' || ql==='d20')){
+    items.unshift({title:'Dice Roller',desc:'d4-d20 + custom dice notation',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDiceRoller();}});
+  }
+  if(ql && (ql==='npm scripts' || ql==='npm ref' || ql==='npm cli' || ql==='npm commands')){
+    items.unshift({title:'npm Scripts Reference',desc:'Install, run, publish, workspaces',icon:'N',type:'action',action:()=>{closeCommandPalette();showNpmScriptsRef();}});
+  }
+  if(ql && (ql==='energy' || ql==='energy level' || ql==='burnout' || ql==='energy tracker')){
+    items.unshift({title:'Energy Level Tracker',desc:'Workload vs burnout risk analysis',icon:'E',type:'action',action:()=>{closeCommandPalette();showTaskEnergyLevelTracker();}});
+  }
+  if(ql && (ql==='password' || ql==='password generator' || ql==='passgen' || ql==='generate password')){
+    items.unshift({title:'Password Generator',desc:'Secure random password generator',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -38442,6 +38466,127 @@ function showQuickMarkdownPreview(){
     document.getElementById('md-output').innerHTML=md;
   };
   window._mdRender();
+}
+function showPrometheusRef(){
+  let p=document.getElementById('prom-ref-panel');if(p)p.remove();
+  const cmds={'PromQL Basics':['up','up{job="myapp"}','rate(http_requests_total[5m])','sum(rate(http_requests_total[5m])) by (status)','histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))','increase(http_requests_total[1h])','avg_over_time(node_cpu_seconds_total[5m])','count(up == 1)','topk(5, rate(http_requests_total[5m]))','bottomk(3, node_memory_MemAvailable_bytes)'],'Prometheus CLI':['prometheus --config.file=prometheus.yml','promtool check config prometheus.yml','promtool check rules rules.yml','promtool query instant http://localhost:9090 up','curl localhost:9090/api/v1/targets','curl localhost:9090/api/v1/query?query=up','curl localhost:9090/-/reload (POST)','curl localhost:9090/-/healthy'],'Alertmanager':['amtool alert query','amtool silence add alertname=MyAlert','amtool silence expire <id>','amtool config routes show','amtool check-config alertmanager.yml','alertmanager --config.file=alertmanager.yml'],'Grafana CLI':['grafana-cli plugins list-remote','grafana-cli plugins install grafana-piechart-panel','grafana-cli admin reset-admin-password newpass','grafana-server --config=/etc/grafana/grafana.ini','curl -u admin:admin localhost:3000/api/dashboards/db','curl -u admin:admin localhost:3000/api/datasources'],'Node Exporter Metrics':['node_cpu_seconds_total','node_memory_MemTotal_bytes','node_memory_MemAvailable_bytes','node_filesystem_avail_bytes','node_disk_io_time_seconds_total','node_network_receive_bytes_total','node_load1','node_load5','node_load15']};
+  p=document.createElement('div');p.id='prom-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Prometheus / Grafana Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskProjectTimeline(){
+  let p=document.getElementById('timeline-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);
+  p=document.createElement('div');p.id='timeline-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projMap={};
+  tasks.forEach(t=>{const pid=t.project||t.projectId||'unassigned';if(!projMap[pid])projMap[pid]={tasks:[],earliest:null,latest:null};projMap[pid].tasks.push(t);const created=new Date(t.created||'');if(!projMap[pid].earliest||created<projMap[pid].earliest)projMap[pid].earliest=created;const due=t.due?new Date(t.due):created;if(!projMap[pid].latest||due>projMap[pid].latest)projMap[pid].latest=due;});
+  const now=new Date();const threeMonthsAgo=new Date(now);threeMonthsAgo.setMonth(threeMonthsAgo.getMonth()-3);const threeMonthsAhead=new Date(now);threeMonthsAhead.setMonth(threeMonthsAhead.getMonth()+3);
+  const totalRange=threeMonthsAhead.getTime()-threeMonthsAgo.getTime();
+  const colors=['#4ade80','#60a5fa','#f472b6','#fbbf24','#a78bfa','#34d399','#fb923c','#e879f9'];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Project Timeline (6 months)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  const months=[];for(let i=-3;i<=3;i++){const d=new Date(now);d.setMonth(d.getMonth()+i);months.push(d);}
+  h+='<div style="display:flex;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:4px">';
+  months.forEach(m=>{h+='<div style="flex:1;font-size:9px;color:var(--text-muted);text-align:center">'+m.toLocaleDateString('en',{month:'short',year:'2-digit'})+'</div>';});
+  h+='</div>';
+  const nowPos=((now.getTime()-threeMonthsAgo.getTime())/totalRange*100);
+  let ci=0;
+  Object.entries(projMap).forEach(([pid,data])=>{
+    const proj=projects.find(pr=>pr.id===pid);const name=proj?proj.name:pid;
+    const startPos=Math.max(0,((data.earliest.getTime()-threeMonthsAgo.getTime())/totalRange*100));
+    const endPos=Math.min(100,((data.latest.getTime()-threeMonthsAgo.getTime())/totalRange*100));
+    const width=Math.max(2,endPos-startPos);
+    const color=colors[ci%colors.length];ci++;
+    const done=data.tasks.filter(t=>t.status==='done').length;
+    const total=data.tasks.length;
+    h+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:11px;font-weight:600;color:var(--text-primary)">'+esc(name)+'</span><span style="font-size:10px;color:var(--text-muted)">'+done+'/'+total+' done</span></div><div style="position:relative;height:12px;background:var(--bg-surface);border-radius:6px;overflow:hidden"><div style="position:absolute;left:'+startPos+'%;width:'+width+'%;height:100%;background:'+color+';border-radius:6px;opacity:0.7"></div><div style="position:absolute;left:'+nowPos+'%;width:1px;height:100%;background:var(--text-muted)"></div></div></div>';
+  });
+  if(Object.keys(projMap).length===0)h+='<div style="text-align:center;padding:40px;color:var(--text-muted)">No tasks found to build timeline.</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickDiceRoller(){
+  let w=document.getElementById('dice-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='dice-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Dice Roller</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="dice-result" style="font-size:48px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:10px;font-family:monospace">-</div><div id="dice-history" style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:10px;min-height:14px"></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">';
+  const dice=[4,6,8,10,12,20];
+  dice.forEach(d=>{
+    w.innerHTML=w.innerHTML;
+  });
+  w=document.createElement('div');w.id='dice-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  let dh='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Dice Roller</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="dice-result" style="font-size:48px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:10px;font-family:monospace">-</div><div id="dice-history" style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:10px;min-height:14px"></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">';
+  dice.forEach(d=>{dh+='<button onclick="window._rollDice('+d+')" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:8px;font-size:12px;cursor:pointer;font-weight:600">d'+d+'</button>';});
+  dh+='</div><div style="margin-top:8px"><input type="text" id="dice-custom" placeholder="2d6+3" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;font-family:monospace"><button onclick="window._rollCustom()" style="width:100%;margin-top:4px;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Roll Custom</button></div>';
+  w.innerHTML=dh;document.body.appendChild(w);
+  window._diceHistory=[];
+  window._rollDice=function(sides){const result=Math.floor(Math.random()*sides)+1;document.getElementById('dice-result').textContent=result;document.getElementById('dice-result').style.color=result===sides?'#4ade80':result===1?'#f87171':'var(--text-primary)';window._diceHistory.unshift('d'+sides+':'+result);if(window._diceHistory.length>8)window._diceHistory.length=8;document.getElementById('dice-history').textContent=window._diceHistory.join(' | ');};
+  window._rollCustom=function(){const input=document.getElementById('dice-custom').value.trim();const m=input.match(/^(\d+)d(\d+)([+-]\d+)?$/);if(!m){document.getElementById('dice-result').textContent='?';return;}const count=parseInt(m[1]);const sides=parseInt(m[2]);const mod=parseInt(m[3]||'0');let total=mod;const rolls=[];for(let i=0;i<count;i++){const r=Math.floor(Math.random()*sides)+1;rolls.push(r);total+=r;}document.getElementById('dice-result').textContent=total;document.getElementById('dice-history').textContent=input+': ['+rolls.join(',')+']'+(mod?'+'+ mod:'')+'='+total;};
+}
+function showNpmScriptsRef(){
+  let p=document.getElementById('npm-scripts-ref-panel');if(p)p.remove();
+  const cmds={'Package Management':['npm init -y','npm install','npm install package-name','npm install -D package-name','npm install -g package-name','npm uninstall package-name','npm update','npm outdated','npm audit','npm audit fix','npm list --depth=0','npm ls package-name'],'Scripts & Run':['npm start','npm test','npm run build','npm run dev','npm run lint','npm run lint:fix','npm run format','npm run typecheck','npm run preview','npx create-next-app@latest','npx create-vite@latest','npx tsc --init'],'Publishing':['npm login','npm whoami','npm publish','npm publish --access public','npm version patch','npm version minor','npm version major','npm deprecate pkg@version "msg"','npm unpublish pkg@version','npm pack'],'Config & Cache':['npm config list','npm config set registry https://registry.npmjs.org/','npm cache clean --force','npm cache verify','npm config get prefix','npm root -g','npm doctor','npm prefix'],'Workspace & Monorepo':['npm init -w packages/mylib','npm install -w packages/mylib','npm run build -w packages/mylib','npm run test --workspaces','npm run build --workspaces --if-present','npx lerna init','npx turbo run build']};
+  p=document.createElement('div');p.id='npm-scripts-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">npm Scripts & CLI Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskEnergyLevelTracker(){
+  let p=document.getElementById('energy-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const priorities={p0:{label:'Critical (P0)',color:'#f87171',count:0,done:0},p1:{label:'High (P1)',color:'#fb923c',count:0,done:0},p2:{label:'Medium (P2)',color:'#60a5fa',count:0,done:0},p3:{label:'Low (P3)',color:'#6b7280',count:0,done:0}};
+  tasks.forEach(t=>{const pr=t.priority||'p2';if(priorities[pr]){priorities[pr].count++;if(t.status==='done')priorities[pr].done++;}});
+  const totalActive=tasks.filter(t=>t.status!=='done').length;
+  const highPressure=priorities.p0.count-priorities.p0.done+priorities.p1.count-priorities.p1.done;
+  const energyScore=totalActive>0?Math.max(0,100-Math.round((highPressure/totalActive)*100)):100;
+  const energyColor=energyScore>=70?'#4ade80':energyScore>=40?'#fbbf24':'#f87171';
+  const energyLabel=energyScore>=70?'High Energy Zone':energyScore>=40?'Moderate Load':'Burnout Risk';
+  p=document.createElement('div');p.id='energy-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Energy Level Tracker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:48px;font-weight:700;color:'+energyColor+'">'+energyScore+'</div><div style="font-size:13px;color:'+energyColor+';font-weight:600">'+energyLabel+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:4px">Based on active high-priority tasks vs total</div></div>';
+  h+='<div style="width:100%;height:12px;background:var(--bg-surface);border-radius:6px;overflow:hidden;margin-bottom:16px"><div style="width:'+energyScore+'%;height:100%;background:'+energyColor+';border-radius:6px;transition:width 0.3s"></div></div>';
+  Object.values(priorities).forEach(pr=>{
+    const active=pr.count-pr.done;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px"><div style="width:8px;height:8px;border-radius:50%;background:'+pr.color+'"></div><div style="flex:1;font-size:12px;color:var(--text-primary)">'+pr.label+'</div><div style="font-size:11px;color:var(--text-muted)">'+active+' active / '+pr.done+' done</div></div>';
+  });
+  h+='<div style="margin-top:12px;padding:8px;background:var(--bg-surface);border-radius:6px;font-size:11px;color:var(--text-muted)">';
+  if(energyScore>=70)h+='You have a healthy task distribution. Keep shipping!';
+  else if(energyScore>=40)h+='Consider delegating or deferring some P0/P1 tasks.';
+  else h+='Too many critical tasks active. Triage and defer non-essentials.';
+  h+='</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickPasswordGenerator(){
+  let w=document.getElementById('passgen-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='passgen-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Password Generator</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="passgen-output" style="font-family:monospace;font-size:16px;padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center;color:var(--text-primary);margin-bottom:10px;word-break:break-all;letter-spacing:1px"></div><div style="display:flex;gap:8px;margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px">Length <input type="number" id="passgen-len" value="16" min="4" max="128" style="width:50px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px"></label></div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"><label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px"><input type="checkbox" id="passgen-upper" checked> Uppercase</label><label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px"><input type="checkbox" id="passgen-lower" checked> Lowercase</label><label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px"><input type="checkbox" id="passgen-nums" checked> Numbers</label><label style="font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px"><input type="checkbox" id="passgen-syms" checked> Symbols</label></div><div style="display:flex;gap:6px"><button onclick="window._genPassword()" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Generate</button><button onclick="navigator.clipboard.writeText(document.getElementById(\'passgen-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Copy</button></div>';
+  document.body.appendChild(w);
+  window._genPassword=function(){
+    const len=parseInt(document.getElementById('passgen-len').value)||16;
+    let chars='';
+    if(document.getElementById('passgen-upper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(document.getElementById('passgen-lower').checked)chars+='abcdefghijklmnopqrstuvwxyz';
+    if(document.getElementById('passgen-nums').checked)chars+='0123456789';
+    if(document.getElementById('passgen-syms').checked)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if(!chars)chars='abcdefghijklmnopqrstuvwxyz';
+    const arr=new Uint32Array(len);crypto.getRandomValues(arr);
+    let pass='';for(let i=0;i<len;i++)pass+=chars[arr[i]%chars.length];
+    document.getElementById('passgen-output').textContent=pass;
+  };
+  window._genPassword();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
