@@ -6515,6 +6515,12 @@ function cmdGetItems(q) {
       ['git flow','Git Flow branching strategy reference'],
       ['quarterly goals','Set and track quarterly OKR goals'],
       ['metronome','Audio metronome with BPM control'],
+      ['makefile','Makefile build system reference'],
+      ['priority trend','Task priority distribution over time'],
+      ['stopwatch','Stopwatch with lap tracking'],
+      ['tmux','tmux terminal multiplexer reference'],
+      ['project health','Project health dashboard overview'],
+      ['pomodoro timer','Pomodoro technique timer widget'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10229,6 +10235,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='metronome' || ql==='bpm' || ql==='tempo' || ql==='beat')){
     items.unshift({title:'Metronome',desc:'Audio metronome with BPM control',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMetronome();}});
+  }
+  if(ql && (ql==='makefile' || ql==='make' || ql==='make ref' || ql==='build system')){
+    items.unshift({title:'Makefile Reference',desc:'GNU Make build system commands',icon:'M',type:'action',action:()=>{closeCommandPalette();showMakefileRef();}});
+  }
+  if(ql && (ql==='priority trend' || ql==='priority history' || ql==='priority chart' || ql==='priority over time')){
+    items.unshift({title:'Priority Trend',desc:'Priority distribution over 8 weeks',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityTrend();}});
+  }
+  if(ql && (ql==='stopwatch' || ql==='timer stopwatch' || ql==='lap timer' || ql==='chronometer')){
+    items.unshift({title:'Stopwatch',desc:'Stopwatch with lap tracking',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickStopwatch();}});
+  }
+  if(ql && (ql==='tmux' || ql==='tmux ref' || ql==='terminal multiplexer' || ql==='tmux commands')){
+    items.unshift({title:'tmux Reference',desc:'Terminal multiplexer commands',icon:'T',type:'action',action:()=>{closeCommandPalette();showTmuxRef();}});
+  }
+  if(ql && (ql==='project health' || ql==='project dashboard' || ql==='health check' || ql==='project status')){
+    items.unshift({title:'Project Health',desc:'Health dashboard for all projects',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectHealth();}});
+  }
+  if(ql && (ql==='pomodoro timer' || ql==='pomodoro' || ql==='pomo' || ql==='focus timer')){
+    items.unshift({title:'Pomodoro Timer',desc:'25/5/15 min Pomodoro technique',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPomodoroTimer();}});
   }
   return items.slice(0, 20);
 }
@@ -32984,6 +33008,271 @@ function showQuickMetronome(){
     if(window._metInterval){clearInterval(window._metInterval);window._metInterval=null;}
     const beat=document.getElementById('met-beat');if(beat)beat.textContent='';
   };
+}
+function showMakefileRef(){
+  const cmds={
+    'Basics':{
+      'make':'Run default target',
+      'make target':'Run specific target',
+      'make -n':'Dry run (show commands without executing)',
+      'make -j4':'Parallel build with 4 jobs',
+      'make -f file':'Use specific Makefile',
+      'make -C dir':'Change to dir before reading Makefile',
+      'make -B':'Force rebuild all targets',
+      'make -k':'Keep going on errors'
+    },
+    'Variables':{
+      'VAR=val make':'Override variable from command line',
+      '$(VAR)':'Reference variable',
+      ':=':'Simply expanded variable',
+      '?=':'Set only if not already defined',
+      '+=':'Append to variable',
+      '$@':'Target name',
+      '$<':'First prerequisite',
+      '$^':'All prerequisites',
+      '$?':'Prerequisites newer than target'
+    },
+    'Patterns':{
+      '%.o: %.c':'Pattern rule (compile .c to .o)',
+      '.PHONY: clean':'Declare phony target (always run)',
+      '.DEFAULT_GOAL := all':'Set default target',
+      'include file.mk':'Include another Makefile',
+      '@cmd':'Silent command (no echo)',
+      '-cmd':'Ignore errors from command',
+      'ifeq/endif':'Conditional directives',
+      'define/endef':'Multi-line variable'
+    },
+    'Functions':{
+      '$(wildcard *.c)':'Match files by pattern',
+      '$(patsubst %.c,%.o,$(SRC))':'Pattern substitution',
+      '$(shell cmd)':'Execute shell command',
+      '$(foreach v,list,text)':'Iterate over list',
+      '$(if cond,then,else)':'Conditional function',
+      '$(filter pattern,text)':'Filter matching words',
+      '$(sort list)':'Sort and deduplicate',
+      '$(dir names)':'Extract directory part'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Makefile Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskPriorityTrend(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const now=new Date();const weeks=[];
+  for(let i=7;i>=0;i--){
+    const start=new Date(now);start.setDate(start.getDate()-i*7);
+    const end=new Date(start);end.setDate(end.getDate()+7);
+    const label='W'+(8-i);
+    const weekTasks=tasks.filter(t=>{const c=new Date(t.created||t.id);return c>=start&&c<end;});
+    const p0=weekTasks.filter(t=>t.priority==='p0').length;
+    const p1=weekTasks.filter(t=>t.priority==='p1').length;
+    const p2=weekTasks.filter(t=>t.priority==='p2').length;
+    const p3=weekTasks.filter(t=>!t.priority||t.priority==='p3').length;
+    weeks.push({label,p0,p1,p2,p3,total:weekTasks.length});
+  }
+  const maxT=Math.max(...weeks.map(w=>w.total),1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Priority Trend (8 Weeks)</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:4px;align-items:flex-end;height:200px;margin-bottom:12px">';
+  weeks.forEach(w=>{
+    const h=Math.max((w.total/maxT)*180,2);
+    const p0h=w.total?(w.p0/w.total)*h:0;
+    const p1h=w.total?(w.p1/w.total)*h:0;
+    const p2h=w.total?(w.p2/w.total)*h:0;
+    const p3h=w.total?(w.p3/w.total)*h:0;
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center">';
+    html+='<div style="width:100%;display:flex;flex-direction:column-reverse">';
+    if(p0h>0)html+='<div style="height:'+p0h+'px;background:#ef4444;border-radius:2px 2px 0 0" title="P0: '+w.p0+'"></div>';
+    if(p1h>0)html+='<div style="height:'+p1h+'px;background:#f97316" title="P1: '+w.p1+'"></div>';
+    if(p2h>0)html+='<div style="height:'+p2h+'px;background:#3b82f6" title="P2: '+w.p2+'"></div>';
+    if(p3h>0)html+='<div style="height:'+p3h+'px;background:#6b7280;border-radius:0 0 2px 2px" title="P3: '+w.p3+'"></div>';
+    html+='</div>';
+    html+='<div style="color:var(--text-muted);font-size:10px;margin-top:4px">'+w.label+'</div></div>';
+  });
+  html+='</div>';
+  html+='<div style="display:flex;gap:16px;justify-content:center;margin-bottom:12px">';
+  html+='<span style="font-size:11px"><span style="display:inline-block;width:10px;height:10px;background:#ef4444;border-radius:2px;margin-right:4px"></span>P0</span>';
+  html+='<span style="font-size:11px"><span style="display:inline-block;width:10px;height:10px;background:#f97316;border-radius:2px;margin-right:4px"></span>P1</span>';
+  html+='<span style="font-size:11px"><span style="display:inline-block;width:10px;height:10px;background:#3b82f6;border-radius:2px;margin-right:4px"></span>P2</span>';
+  html+='<span style="font-size:11px"><span style="display:inline-block;width:10px;height:10px;background:#6b7280;border-radius:2px;margin-right:4px"></span>P3</span>';
+  html+='</div>';
+  const totalP0=tasks.filter(t=>t.priority==='p0').length;
+  const totalP1=tasks.filter(t=>t.priority==='p1').length;
+  html+='<div style="color:var(--text-muted);font-size:11px;text-align:center">Total: '+totalP0+' P0, '+totalP1+' P1 across '+tasks.length+' tasks</div>';
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickStopwatch(){
+  let ex=document.getElementById('stopwatch-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='stopwatch-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:260px';
+  let elapsed=0,running=false,interval=null,laps=[];
+  function fmt(ms){const s=Math.floor(ms/1000);const m=Math.floor(s/60);const h=Math.floor(m/60);return String(h).padStart(2,'0')+':'+String(m%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+'.'+(Math.floor(ms/100)%10);}
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:#4ade80;font-weight:600;font-size:14px">Stopwatch</span><button onclick="document.getElementById(\'stopwatch-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div id="sw-display" style="font-family:monospace;font-size:32px;color:#e2e8f0;text-align:center;margin-bottom:12px">'+fmt(elapsed)+'</div>';
+    html+='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:10px">';
+    html+='<button onclick="window._swToggle()" style="background:'+(running?'#ef4444':'#4ade80')+';color:#000;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">'+(running?'Stop':'Start')+'</button>';
+    html+='<button onclick="window._swLap()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">Lap</button>';
+    html+='<button onclick="window._swReset()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">Reset</button>';
+    html+='</div>';
+    if(laps.length){
+      html+='<div style="max-height:120px;overflow-y:auto">';
+      laps.forEach((l,i)=>{html+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:var(--text-muted)"><span>Lap '+(i+1)+'</span><span style="font-family:monospace">'+fmt(l)+'</span></div>';});
+      html+='</div>';
+    }
+    d.innerHTML=html;
+  }
+  window._swToggle=()=>{
+    running=!running;
+    if(running){let last=Date.now();interval=setInterval(()=>{const now=Date.now();elapsed+=now-last;last=now;const disp=document.getElementById('sw-display');if(disp)disp.textContent=fmt(elapsed);},100);}
+    else{clearInterval(interval);}
+    render();
+  };
+  window._swLap=()=>{if(running)laps.push(elapsed);render();};
+  window._swReset=()=>{running=false;clearInterval(interval);elapsed=0;laps=[];render();};
+  render();
+  document.body.appendChild(d);
+}
+function showTmuxRef(){
+  const cmds={
+    'Sessions':{
+      'tmux new -s name':'Create named session',
+      'tmux ls':'List sessions',
+      'tmux attach -t name':'Attach to session',
+      'tmux kill-session -t name':'Kill session',
+      'tmux rename-session new':'Rename current session',
+      'Ctrl+b d':'Detach from session',
+      'Ctrl+b $':'Rename session',
+      'Ctrl+b s':'List and switch sessions'
+    },
+    'Windows':{
+      'Ctrl+b c':'Create new window',
+      'Ctrl+b w':'List windows',
+      'Ctrl+b n':'Next window',
+      'Ctrl+b p':'Previous window',
+      'Ctrl+b 0-9':'Switch to window number',
+      'Ctrl+b ,':'Rename window',
+      'Ctrl+b &':'Kill window',
+      'Ctrl+b f':'Find window'
+    },
+    'Panes':{
+      'Ctrl+b %':'Split horizontally',
+      'Ctrl+b "':'Split vertically',
+      'Ctrl+b arrows':'Navigate panes',
+      'Ctrl+b o':'Next pane',
+      'Ctrl+b z':'Toggle pane zoom',
+      'Ctrl+b x':'Kill pane',
+      'Ctrl+b {':'Move pane left',
+      'Ctrl+b }':'Move pane right'
+    },
+    'Copy Mode':{
+      'Ctrl+b [':'Enter copy mode',
+      'Space':'Start selection (in copy mode)',
+      'Enter':'Copy selection',
+      'Ctrl+b ]':'Paste buffer',
+      'q':'Exit copy mode',
+      'Ctrl+b :':'Command prompt',
+      'tmux source ~/.tmux.conf':'Reload config',
+      'set -g mouse on':'Enable mouse support'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">tmux Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskProjectHealth(){
+  const projects=S.projects||[];const tasks=S.tasks||[];const contents=S.content||[];const docs=(S.writerDocs||[]);
+  if(!projects.length){alert('No projects');return;}
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Project Health Dashboard</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const active=pTasks.filter(t=>t.status!=='done').length;
+    const overdue=pTasks.filter(t=>t.due&&new Date(t.due)<new Date()&&t.status!=='done').length;
+    const pContent=contents.filter(c=>c.project===p.name||c.projectId===p.id).length;
+    const pDocs=docs.filter(d=>d.project===p.name||d.projectId===p.id).length;
+    const total=pTasks.length;
+    const pct=total?Math.round((done/total)*100):0;
+    let color='#4ade80';
+    if(overdue>3)color='#ef4444';
+    else if(overdue>0)color='#f97316';
+    else if(pct<25&&total>5)color='#f59e0b';
+    html+='<div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;border-left:3px solid '+color+'">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="color:#e2e8f0;font-weight:600;font-size:13px">'+esc(p.name)+'</span>';
+    html+='<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:'+color+'22;color:'+color+'">'+pct+'% done</span></div>';
+    html+='<div style="height:4px;background:var(--bg-base);border-radius:2px;margin-bottom:8px"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:2px"></div></div>';
+    html+='<div style="display:flex;gap:16px;font-size:11px;color:var(--text-muted)">';
+    html+='<span>Tasks: '+total+'</span><span>Active: '+active+'</span><span>Done: '+done+'</span>';
+    if(overdue)html+='<span style="color:#ef4444">Overdue: '+overdue+'</span>';
+    html+='<span>Content: '+pContent+'</span><span>Docs: '+pDocs+'</span>';
+    html+='</div></div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickPomodoroTimer(){
+  let ex=document.getElementById('pomodoro-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='pomodoro-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let timeLeft=25*60,running=false,interval=null,mode='work',sessions=0;
+  const modes={work:25*60,short:5*60,long:15*60};
+  function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+  function render(){
+    const pct=mode==='work'?(1-timeLeft/modes.work)*100:mode==='short'?(1-timeLeft/modes.short)*100:(1-timeLeft/modes.long)*100;
+    const color=mode==='work'?'#ef4444':mode==='short'?'#4ade80':'#3b82f6';
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="color:'+color+';font-weight:600;font-size:14px">Pomodoro</span><button onclick="document.getElementById(\'pomodoro-float\').remove();clearInterval(window._pomInterval)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="text-align:center;margin-bottom:8px">';
+    html+='<svg width="120" height="120" viewBox="0 0 120 120" style="display:block;margin:0 auto">';
+    html+='<circle cx="60" cy="60" r="54" fill="none" stroke="var(--border)" stroke-width="6"/>';
+    html+='<circle cx="60" cy="60" r="54" fill="none" stroke="'+color+'" stroke-width="6" stroke-dasharray="'+((pct/100)*339.3)+' 339.3" stroke-linecap="round" transform="rotate(-90 60 60)"/>';
+    html+='<text x="60" y="60" text-anchor="middle" dy="8" fill="#e2e8f0" font-size="24" font-family="monospace">'+fmt(timeLeft)+'</text>';
+    html+='</svg></div>';
+    html+='<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">';
+    ['work','short','long'].forEach(m=>{
+      html+='<button onclick="window._pomMode(\''+m+'\')" style="background:'+(mode===m?color+'33':'var(--bg-surface)')+';color:'+(mode===m?color:'var(--text-muted)')+';border:1px solid '+(mode===m?color:'var(--border)')+';padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">'+(m==='work'?'Work':m==='short'?'Short':'Long')+'</button>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">';
+    html+='<button onclick="window._pomToggle()" style="background:'+(running?'#ef4444':'#4ade80')+';color:#000;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">'+(running?'Pause':'Start')+'</button>';
+    html+='<button onclick="window._pomReset()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px">Reset</button>';
+    html+='</div>';
+    html+='<div style="color:var(--text-muted);font-size:11px;text-align:center">Sessions: '+sessions+'</div>';
+    d.innerHTML=html;
+  }
+  window._pomToggle=()=>{
+    running=!running;
+    if(running){window._pomInterval=setInterval(()=>{timeLeft--;if(timeLeft<=0){clearInterval(window._pomInterval);running=false;if(mode==='work'){sessions++;mode='short';timeLeft=modes.short;}else{mode='work';timeLeft=modes.work;}render();}else{const disp=d.querySelector('text');if(disp)disp.textContent=fmt(timeLeft);const circ=d.querySelectorAll('circle')[1];if(circ){const pct2=mode==='work'?(1-timeLeft/modes.work)*100:mode==='short'?(1-timeLeft/modes.short)*100:(1-timeLeft/modes.long)*100;circ.setAttribute('stroke-dasharray',((pct2/100)*339.3)+' 339.3');}}},1000);}
+    else{clearInterval(window._pomInterval);}
+    render();
+  };
+  window._pomMode=(m)=>{running=false;clearInterval(window._pomInterval);mode=m;timeLeft=modes[m];render();};
+  window._pomReset=()=>{running=false;clearInterval(window._pomInterval);timeLeft=modes[mode];render();};
+  render();
+  document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
