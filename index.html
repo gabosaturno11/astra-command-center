@@ -5250,7 +5250,7 @@ function cmdSearch() {
   cmdIdx = 0;
   const el = document.getElementById('cmd-results');
   if(!items.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px">No results</div>'; return; }
-  el.innerHTML = items.map((it, i) => {
+  el.innerHTML = (q?`<div style="padding:4px 16px;font-size:8px;color:var(--text-muted);font-family:var(--mono);border-bottom:1px solid var(--border)">${items.length} result${items.length!==1?'s':''}</div>`:'')+items.map((it, i) => {
     const iconHtml = it.icon.startsWith('<') ? it.icon : `<span>${it.icon}</span>`;
     return `<div class="cmd-item ${i===0?'active':''}" data-idx="${i}" onclick="cmdExec(${i})" onmouseenter="cmdHover(${i})">
       <div class="cmd-item-icon">${iconHtml}</div>
