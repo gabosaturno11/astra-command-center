@@ -5811,6 +5811,9 @@ function cmdGetItems(q) {
       ['swimlane','Kanban by project (project x status grid)'],
       ['daily planner','Today\'s schedule with time slots and tasks'],
       ['export workspace','Download full ASTRA workspace as JSON'],
+      ['quick actions','Floating action bar with most-used functions'],
+      ['due heatmap','Calendar heatmap of task due dates (load per day)'],
+      ['writing goals','Set and track daily/weekly word count goals'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7144,6 +7147,18 @@ function cmdGetItems(q) {
   if(ql && (ql==='export workspace' || ql==='export all' || ql==='full export' || ql==='download workspace')){
     items.unshift({title:'Export Full Workspace',desc:'Download everything as single JSON (tasks, content, docs, links, etc.)',icon:'E',type:'action',action:()=>{closeCommandPalette();exportFullWorkspace();}});
   }
+  // Quick actions prefix
+  if(ql && (ql==='quick actions' || ql==='action bar' || ql==='toolbar' || ql==='quick bar')){
+    items.unshift({title:'Toggle Quick Actions Bar',desc:'Floating bar with Task, Note, Journal, Dashboard, Habits',icon:'Q',type:'action',action:()=>{closeCommandPalette();toggleQuickActions();}});
+  }
+  // Due heatmap prefix
+  if(ql && (ql==='due heatmap' || ql==='due calendar' || ql==='task load' || ql==='deadline heatmap')){
+    items.unshift({title:'Due Date Heatmap',desc:'Calendar showing task load per day with color intensity',icon:'H',type:'action',action:()=>{closeCommandPalette();showDueDateHeatmap();}});
+  }
+  // Writing goals prefix
+  if(ql && (ql==='writing goals' || ql==='word goals' || ql==='writing target' || ql==='word count goal')){
+    items.unshift({title:'Writing Goals',desc:'Set and track daily/weekly word count targets',icon:'W',type:'action',action:()=>{closeCommandPalette();showWritingGoals();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -8416,6 +8431,102 @@ function exportFullWorkspace(){
   a.click();
   const sizeKB=(json.length/1024).toFixed(1);
   toast('Exported full workspace ('+sizeKB+'KB)');
+}
+function toggleQuickActions(){
+  let bar=document.getElementById('quick-actions-bar');
+  if(bar){bar.remove();return;}
+  bar=document.createElement('div');bar.id='quick-actions-bar';
+  bar.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:1400;display:flex;gap:6px;padding:8px 12px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5)';
+  const actions=[
+    {label:'Task',icon:'+',fn:'addTask()'},
+    {label:'Note',icon:'N',fn:'toggleQuickNote()'},
+    {label:'Journal',icon:'J',fn:'openDailyJournal()'},
+    {label:'Dashboard',icon:'D',fn:'showHomeDashboard()'},
+    {label:'Habits',icon:'H',fn:'showHabitTracker()'},
+    {label:'Timer',icon:'F',fn:'document.getElementById(\"focus-start\")?document.getElementById(\"focus-start\").click():toast(\"Open context panel first\")'},
+    {label:'Cmd+K',icon:'K',fn:'openCommandPalette()'},
+    {label:'Close',icon:'X',fn:'document.getElementById(\"quick-actions-bar\").remove()'},
+  ];
+  actions.forEach(a=>{
+    bar.innerHTML+=`<button onclick="${a.fn}" style="padding:6px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);font-size:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:40px" onmouseenter="this.style.borderColor='var(--accent)'" onmouseleave="this.style.borderColor='var(--border)'"><span style="font-size:14px;font-weight:600;color:var(--accent)">${a.icon}</span><span>${a.label}</span></button>`;
+  });
+  document.body.appendChild(bar);
+}
+function showDueDateHeatmap(){
+  let panel=document.getElementById('due-heat-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='due-heat-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const todayStr=now.toISOString().split('T')[0];
+  const byDate={};
+  S.tasks.filter(t=>t.due&&t.status!=='done').forEach(t=>{
+    if(!byDate[t.due])byDate[t.due]=[];
+    byDate[t.due].push(t);
+  });
+  let h='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;margin-bottom:4px">';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{h+=`<div style="text-align:center;font-size:9px;color:var(--text-muted);padding:4px 0;font-weight:600">${d}</div>`;});
+  h+='</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+  for(let i=0;i<firstDay;i++){h+='<div style="min-height:50px"></div>';}
+  for(let d=1;d<=daysInMonth;d++){
+    const ds=`${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const tasks=byDate[ds]||[];
+    const count=tasks.length;
+    const isToday=ds===todayStr;
+    const isPast=ds<todayStr;
+    let bg='var(--bg-surface)';
+    if(count>=4)bg='#ef444440';
+    else if(count>=3)bg='#f9731640';
+    else if(count>=2)bg='#f59e0b30';
+    else if(count>=1)bg='#22c55e20';
+    h+=`<div style="min-height:50px;padding:3px;border-radius:4px;background:${bg};${isToday?'border:1px solid var(--accent);':''}cursor:pointer" onclick="if(${count}>0){const t=S.tasks.filter(x=>x.due==='${ds}'&&x.status!=='done');if(t.length)openTaskDetail(t[0].id)}" title="${count} tasks due"><div style="font-size:9px;font-weight:600;color:${isToday?'var(--accent)':isPast?'var(--text-muted)':'var(--text-primary)'}">${d}</div>`;
+    if(count){h+=`<div style="font-size:8px;font-weight:600;color:${count>=3?'#ef4444':count>=2?'#f59e0b':'var(--accent)'}">${count} task${count>1?'s':''}</div>`;}
+    tasks.slice(0,2).forEach(t=>{
+      const priColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':'var(--text-muted)';
+      h+=`<div style="font-size:7px;color:${priColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title||'').substring(0,15)}</div>`;
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  const heaviestDay=Object.entries(byDate).sort((a,b)=>b[1].length-a[1].length)[0];
+  const totalDue=Object.values(byDate).reduce((s,v)=>s+v.length,0);
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Due Date Heatmap - ${monthName}</span><button onclick="document.getElementById('due-heat-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:flex;gap:12px;margin-bottom:8px;font-size:10px"><span style="color:var(--text-muted)">${totalDue} tasks due this month</span>${heaviestDay?`<span style="color:#ef4444">Peak: ${heaviestDay[0].substring(5)} (${heaviestDay[1].length})</span>`:''}</div><div style="display:flex;gap:4px;margin-bottom:8px;font-size:8px;color:var(--text-muted)"><span style="display:flex;align-items:center;gap:2px"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e20"></span>1</span><span style="display:flex;align-items:center;gap:2px"><span style="width:10px;height:10px;border-radius:2px;background:#f59e0b30"></span>2</span><span style="display:flex;align-items:center;gap:2px"><span style="width:10px;height:10px;border-radius:2px;background:#f9731640"></span>3</span><span style="display:flex;align-items:center;gap:2px"><span style="width:10px;height:10px;border-radius:2px;background:#ef444440"></span>4+</span></div>${h}`;
+  document.body.appendChild(panel);
+}
+function showWritingGoals(){
+  let panel=document.getElementById('writing-goals-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='writing-goals-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:75vh;overflow-y:auto';
+  if(!S._writingGoals)S._writingGoals={daily:500,weekly:3000};
+  const today=new Date().toISOString().split('T')[0];
+  const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);const weekStr=weekAgo.toISOString().split('T')[0];
+  let todayWords=0;let weekWords=0;
+  S.content.forEach(c=>{
+    if(!c.createdAt)return;
+    const d=c.createdAt.split('T')[0];
+    const w=(c.body||'').split(/\s+/).length;
+    if(d===today)todayWords+=w;
+    if(d>=weekStr)weekWords+=w;
+  });
+  (S.docs||[]).forEach(d=>{
+    const dt=(d.updatedAt||d.createdAt||'').split('T')[0];
+    const w=(d.body||'').split(/\s+/).length;
+    if(dt===today)todayWords+=w;
+    if(dt>=weekStr)weekWords+=w;
+  });
+  const dailyPct=Math.min(100,Math.round(todayWords/S._writingGoals.daily*100));
+  const weeklyPct=Math.min(100,Math.round(weekWords/S._writingGoals.weekly*100));
+  let h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  h+=`<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Daily Goal</div><div style="font-size:20px;font-weight:700;color:${dailyPct>=100?'#22c55e':'var(--accent)'}">${todayWords}</div><div style="font-size:9px;color:var(--text-muted)">/ ${S._writingGoals.daily} words</div><div style="width:100%;height:6px;background:var(--bg-elevated);border-radius:3px;margin-top:6px;overflow:hidden"><div style="width:${dailyPct}%;height:100%;background:${dailyPct>=100?'#22c55e':dailyPct>=50?'var(--accent)':'#f59e0b'};border-radius:3px;transition:width 0.3s"></div></div><div style="font-size:8px;color:var(--text-muted);margin-top:2px">${dailyPct}%</div></div>`;
+  h+=`<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">Weekly Goal</div><div style="font-size:20px;font-weight:700;color:${weeklyPct>=100?'#22c55e':'#3b82f6'}">${weekWords}</div><div style="font-size:9px;color:var(--text-muted)">/ ${S._writingGoals.weekly} words</div><div style="width:100%;height:6px;background:var(--bg-elevated);border-radius:3px;margin-top:6px;overflow:hidden"><div style="width:${weeklyPct}%;height:100%;background:${weeklyPct>=100?'#22c55e':weeklyPct>=50?'#3b82f6':'#f59e0b'};border-radius:3px;transition:width 0.3s"></div></div><div style="font-size:8px;color:var(--text-muted);margin-top:2px">${weeklyPct}%</div></div>`;
+  h+='</div>';
+  h+='<div style="font-size:10px;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Set Goals</div>';
+  h+=`<div style="display:flex;gap:8px;margin-bottom:12px"><div style="flex:1"><label style="font-size:9px;color:var(--text-muted)">Daily Words</label><input id="wg-daily" type="number" value="${S._writingGoals.daily}" style="width:100%;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;box-sizing:border-box"></div><div style="flex:1"><label style="font-size:9px;color:var(--text-muted)">Weekly Words</label><input id="wg-weekly" type="number" value="${S._writingGoals.weekly}" style="width:100%;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;box-sizing:border-box"></div><button onclick="S._writingGoals={daily:parseInt(document.getElementById('wg-daily').value)||500,weekly:parseInt(document.getElementById('wg-weekly').value)||3000};save();toast('Goals updated');showWritingGoals()" style="padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;font-size:10px;font-weight:600;cursor:pointer;align-self:flex-end">Save</button></div>`;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Writing Goals</span><button onclick="document.getElementById('writing-goals-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>${h}`;
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
