@@ -6479,6 +6479,12 @@ function cmdGetItems(q) {
       ['pnpm','pnpm package manager reference'],
       ['status flow','Task status transition matrix'],
       ['timezone','World timezone converter'],
+      ['permissions','Linux file permissions reference'],
+      ['lifecycle','Average task completion time analysis'],
+      ['qr','QR code generator from text or URL'],
+      ['crontab','Cron schedule syntax and examples'],
+      ['project budget','Time budget by project estimates'],
+      ['ascii','ASCII art dividers boxes and banners'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10085,6 +10091,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='timezone' || ql==='time zone' || ql==='world clock' || ql==='tz convert')){
     items.unshift({title:'Timezone Converter',desc:'World timezone clock comparison',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTimezoneConverter();}});
+  }
+  if(ql && (ql==='permissions' || ql==='chmod' || ql==='linux permissions' || ql==='file permissions')){
+    items.unshift({title:'Linux Permissions',desc:'chmod, chown, ACL reference',icon:'L',type:'action',action:()=>{closeCommandPalette();showLinuxPermissionsRef();}});
+  }
+  if(ql && (ql==='lifecycle' || ql==='task lifecycle' || ql==='average time' || ql==='completion time')){
+    items.unshift({title:'Average Lifecycle',desc:'How long tasks take to complete',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAverageLifecycle();}});
+  }
+  if(ql && (ql==='qr' || ql==='qr code' || ql==='qr generator' || ql==='barcode')){
+    items.unshift({title:'QR Generator',desc:'Generate QR codes from text/URL',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickQrGenerator();}});
+  }
+  if(ql && (ql==='crontab' || ql==='cron' || ql==='cron schedule' || ql==='cron job')){
+    items.unshift({title:'Crontab Reference',desc:'Cron syntax, schedules, management',icon:'C',type:'action',action:()=>{closeCommandPalette();showCrontabRef();}});
+  }
+  if(ql && (ql==='project budget' || ql==='time budget' || ql==='budget' || ql==='estimate budget')){
+    items.unshift({title:'Project Time Budget',desc:'Estimated vs actual time per project',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectBudget();}});
+  }
+  if(ql && (ql==='ascii' || ql==='ascii art' || ql==='divider' || ql==='text art')){
+    items.unshift({title:'ASCII Art Library',desc:'Dividers, boxes, banners, arrows',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAsciiArt();}});
   }
   return items.slice(0, 20);
 }
@@ -32007,6 +32031,139 @@ function showQuickTimezoneConverter(){
     html+='<div style="display:flex;align-items:center;gap:6px"><span style="color:'+(isDay?'#4ade80':'#8b5cf6')+';font-size:10px">'+(isDay?'day':'night')+'</span><span style="color:var(--text-primary);font-size:12px;font-family:monospace;font-weight:600">'+String(zoneTime.getHours()).padStart(2,'0')+':'+String(zoneTime.getMinutes()).padStart(2,'0')+'</span></div></div>';
   });
   html+='<button onclick="this.closest(\'div[style*=fixed]\').remove();showQuickTimezoneConverter()" style="margin-top:8px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;width:100%">Refresh</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showLinuxPermissionsRef(){
+  const cmds={
+    'chmod Numeric':{'Full access owner':'chmod 700 file','Read-write owner':'chmod 600 file','Public read':'chmod 644 file','Executable':'chmod 755 file','All permissions':'chmod 777 file'},
+    'chmod Symbolic':{'Add execute':'chmod +x file','Remove write':'chmod -w file','Owner execute':'chmod u+x file','Group read':'chmod g+r file','Others none':'chmod o-rwx file'},
+    'Ownership':{'Change owner':'chown user file','Change group':'chgrp group file','Recursive owner':'chown -R user:group dir/','List perms':'ls -la file','Stat details':'stat file'},
+    'Special Permissions':{'Setuid':'chmod u+s file (run as owner)','Setgid':'chmod g+s dir/ (inherit group)','Sticky bit':'chmod +t dir/ (only owner can delete)','Find setuid':'find / -perm -4000','Find writable':'find / -writable -type f'},
+    'ACL (Extended)':{'View ACL':'getfacl file','Set ACL':'setfacl -m u:user:rwx file','Remove ACL':'setfacl -x u:user file','Default ACL':'setfacl -d -m g::rx dir/','Remove all ACL':'setfacl -b file'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Linux Permissions Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="margin-bottom:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:10px;color:var(--text-muted)"><code>r=4 w=2 x=1</code> | Owner-Group-Others | Example: <code>755 = rwxr-xr-x</code></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskAverageLifecycle(){
+  const tasks=(S.tasks||[]).filter(t=>t.status==='done'&&(t.created||t.createdAt));
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Average Lifecycle</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(tasks.length===0){
+    html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No completed tasks with creation dates found.</div>';
+  } else {
+    const lifetimes=[];const byPriority={'p0':[],'p1':[],'p2':[],'p3':[]};
+    tasks.forEach(t=>{
+      const created=new Date(t.created||t.createdAt);
+      const completed=t.completedAt?new Date(t.completedAt):new Date();
+      const days=Math.max(0,Math.floor((completed-created)/(1000*60*60*24)));
+      lifetimes.push(days);
+      const p=t.priority||'p2';if(byPriority[p])byPriority[p].push(days);
+    });
+    const avg=lifetimes.length>0?Math.round(lifetimes.reduce((s,d)=>s+d,0)/lifetimes.length):0;
+    const median=lifetimes.sort((a,b)=>a-b)[Math.floor(lifetimes.length/2)]||0;
+    const fastest=Math.min(...lifetimes);const slowest=Math.max(...lifetimes);
+    html+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;font-weight:700;color:#4ade80">'+avg+'</div><div style="color:var(--text-muted);font-size:11px">average days to complete</div></div>';
+    html+='<div style="display:flex;gap:10px;justify-content:center;margin-bottom:16px">';
+    html+='<div style="text-align:center;padding:10px 16px;background:var(--bg-surface);border-radius:6px"><div style="color:#06b6d4;font-size:18px;font-weight:600">'+median+'d</div><div style="color:var(--text-muted);font-size:9px">Median</div></div>';
+    html+='<div style="text-align:center;padding:10px 16px;background:var(--bg-surface);border-radius:6px"><div style="color:#4ade80;font-size:18px;font-weight:600">'+fastest+'d</div><div style="color:var(--text-muted);font-size:9px">Fastest</div></div>';
+    html+='<div style="text-align:center;padding:10px 16px;background:var(--bg-surface);border-radius:6px"><div style="color:#ef4444;font-size:18px;font-weight:600">'+slowest+'d</div><div style="color:var(--text-muted);font-size:9px">Slowest</div></div></div>';
+    html+='<div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:8px">By Priority</div>';
+    const pColors={'p0':'#ef4444','p1':'#f59e0b','p2':'#06b6d4','p3':'#64748b'};
+    Object.entries(byPriority).forEach(([p,days])=>{
+      const pAvg=days.length>0?Math.round(days.reduce((s,d)=>s+d,0)/days.length):0;
+      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="width:30px;font-size:11px;font-weight:600;color:'+pColors[p]+'">'+p.toUpperCase()+'</span>';
+      html+='<div style="flex:1;height:16px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(pAvg/Math.max(slowest,1)*100,100)+'%;background:'+pColors[p]+';border-radius:3px"></div></div>';
+      html+='<span style="width:50px;font-size:10px;color:var(--text-muted);text-align:right">'+pAvg+'d ('+days.length+')</span></div>';
+    });
+  }
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickQrGenerator(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">QR Code Generator</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<input id="qr-input" placeholder="Enter URL or text..." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px 10px;border-radius:4px;font-size:12px;box-sizing:border-box;margin-bottom:8px"/>';
+  html+='<button onclick="window._genQr()" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;width:100%;margin-bottom:8px">Generate QR</button>';
+  html+='<div id="qr-output" style="text-align:center"></div>';
+  html+='<div style="margin-top:6px;font-size:9px;color:var(--text-muted);text-align:center">Uses Google Charts QR API</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._genQr=function(){
+    const text=document.getElementById('qr-input').value.trim();const out=document.getElementById('qr-output');
+    if(!text){out.innerHTML='<span style="color:var(--text-muted);font-size:11px">Enter text or URL</span>';return;}
+    const url='https://chart.googleapis.com/chart?cht=qr&chs=200x200&chl='+encodeURIComponent(text)+'&choe=UTF-8';
+    out.innerHTML='<img src="'+url+'" style="border-radius:8px;background:#fff;padding:8px" alt="QR Code" width="200" height="200"/><div style="margin-top:6px;font-size:10px;color:var(--text-muted)">'+esc(text.substring(0,50))+(text.length>50?'...':'')+'</div>';
+  };
+}
+function showCrontabRef(){
+  const cmds={
+    'Syntax':{'Format':'min hour day month weekday command','Every minute':'* * * * * command','Every hour':'0 * * * * command','Daily at midnight':'0 0 * * * command','Every Monday':'0 9 * * 1 command'},
+    'Common Schedules':{'Every 5 minutes':'*/5 * * * * command','Weekdays 9AM':'0 9 * * 1-5 command','First of month':'0 0 1 * * command','Every 6 hours':'0 */6 * * * command','Sunday 3AM':'0 3 * * 0 command'},
+    'Management':{'Edit crontab':'crontab -e','List crontab':'crontab -l','Remove crontab':'crontab -r','Edit user cron':'crontab -u user -e','System crontab':'/etc/crontab'},
+    'Special Strings':{'At reboot':'@reboot command','Hourly':'@hourly command','Daily':'@daily command','Weekly':'@weekly command','Monthly':'@monthly command'},
+    'Output & Logging':{'Log output':'* * * * * command >> /var/log/cron.log 2>&1','Silent (no email)':'* * * * * command > /dev/null 2>&1','Email output':'MAILTO=user@example.com','With path':'PATH=/usr/local/bin:/usr/bin','Lock file':'flock -n /tmp/lock command'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Crontab Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="margin-bottom:12px;padding:10px;background:var(--bg-surface);border-radius:6px;font-size:10px;color:var(--text-muted);font-family:monospace">* * * * *<br>| | | | +-- day of week (0-7, Sun=0 or 7)<br>| | | +---- month (1-12)<br>| | +------ day of month (1-31)<br>| +-------- hour (0-23)<br>+---------- minute (0-59)</div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskProjectBudget(){
+  const tasks=S.tasks||[];const projMap={};
+  tasks.forEach(t=>{
+    const p=t.project||'Unassigned';if(!projMap[p])projMap[p]={estMin:0,actualMin:0,tasks:0};projMap[p].tasks++;
+    if(t.estimate){const m=t.estimate.match(/(\d+)\s*(m|h|d)/i);if(m){const v=parseInt(m[1]);projMap[p].estMin+=m[2]==='h'?v*60:m[2]==='d'?v*480:v;}}
+    if(t.timeTracked)projMap[p].actualMin+=Math.round(t.timeTracked/60);
+  });
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Project Time Budget</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const sorted=Object.entries(projMap).sort((a,b)=>b[1].estMin-a[1].estMin);
+  const maxEst=sorted.length>0?Math.max(...sorted.map(s=>s[1].estMin),1):1;
+  const colors=['#4ade80','#06b6d4','#f59e0b','#8b5cf6','#ef4444','#ec4899','#14b8a6','#f97316'];
+  sorted.forEach(([name,data],i)=>{
+    const color=colors[i%colors.length];
+    const estH=(data.estMin/60).toFixed(1);const actH=(data.actualMin/60).toFixed(1);
+    const usage=data.estMin>0?Math.round(data.actualMin/data.estMin*100):0;
+    const barW=Math.round(data.estMin/maxEst*100);
+    html+='<div style="margin-bottom:10px;padding:10px 12px;background:var(--bg-surface);border-radius:6px;border-left:3px solid '+color+'">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--text-primary);font-size:12px;font-weight:600">'+esc(name)+'</span><span style="color:var(--text-muted);font-size:10px">'+data.tasks+' tasks</span></div>';
+    html+='<div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:'+barW+'%;background:'+color+';border-radius:3px"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)"><span>Budget: '+estH+'h</span><span>Used: '+actH+'h</span><span style="color:'+(usage>100?'#ef4444':usage>80?'#f59e0b':'#4ade80')+'">'+usage+'% used</span></div>';
+    html+='</div>';
+  });
+  if(sorted.length===0)html+='<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:12px">No task estimates found. Add estimates to tasks to track project budgets.</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickAsciiArt(){
+  const arts={
+    'Dividers':{'Simple':'========================================','Dashed':'- - - - - - - - - - - - - - - - - - -','Stars':'* * * * * * * * * * * * * * * * * * * *','Waves':'~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^','Arrows':'>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>'},
+    'Boxes':{'Simple Box':'+---------+\\n|  TEXT   |\\n+---------+','Double Box':'+==========+\\n||  TEXT  ||\\n+==========+','Round Box':'/---------\\\\\\n|  TEXT   |\\n\\\\---------/','Bold Box':'###########\\n#  TEXT   #\\n###########'},
+    'Banners':{'Star Banner':'***************\\n*   TITLE   *\\n***************','Hash Banner':'###############\\n#   TITLE   #\\n###############','Dash Banner':'---------------\\n|   TITLE   |\\n---------------'},
+    'Arrows':{'Right':'-->','Left':'<--','Both':'<-->','Fat Right':'==>','Up':'^\\n|','Down':'|\\nv'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">ASCII Art Library</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(arts).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,art])=>{
+      html+='<div style="padding:8px 10px;margin-bottom:3px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+art.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="color:var(--text-primary);font-size:11px">'+name+'</span><span style="color:var(--text-muted);font-size:9px">copy</span></div><pre style="color:var(--text-muted);font-size:10px;font-family:monospace;margin:0;white-space:pre;overflow-x:auto">'+esc(art.replace(/\\n/g,'\n'))+'</pre></div>';
+    });
+    html+='</div>';
+  });
   html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
