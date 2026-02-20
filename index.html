@@ -5926,6 +5926,11 @@ function cmdGetItems(q) {
       ['daily planner','Today time blocks: morning, afternoon, evening'],
       ['content length','Content items by word count: tiny to epic'],
       ['project notes','Quick persistent notes per project'],
+      ['duplicates','Find duplicate content and tasks by title similarity'],
+      ['universal search','Search everything with live results panel'],
+      ['eisenhower','2x2 Urgent/Important matrix for task prioritization'],
+      ['writer progress','Word count targets per doc with progress bars'],
+      ['batch ops','Bulk operations: tag all, rename category, archive done'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7728,6 +7733,26 @@ function cmdGetItems(q) {
   // Project notes prefix
   if(ql && (ql==='project notes' || ql==='proj notes' || ql==='notes per project' || ql==='project memo')){
     items.unshift({title:'Project Notes',desc:'Quick persistent notes per project',icon:'N',type:'action',action:()=>{closeCommandPalette();showProjectNotes();}});
+  }
+  // Duplicates prefix
+  if(ql && (ql==='duplicates' || ql==='duplicate detector' || ql==='find dupes' || ql==='dedup')){
+    items.unshift({title:'Duplicate Detector',desc:'Find duplicate content and tasks by similarity',icon:'D',type:'action',action:()=>{closeCommandPalette();showDuplicateDetector();}});
+  }
+  // Universal search prefix
+  if(ql && (ql==='universal search' || ql==='search all' || ql==='find everything' || ql==='deep search')){
+    items.unshift({title:'Universal Search',desc:'Search everything with live results',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSearchPanel();}});
+  }
+  // Eisenhower prefix
+  if(ql && (ql==='eisenhower' || ql==='eisenhower matrix' || ql==='urgent important' || ql==='priority matrix')){
+    items.unshift({title:'Eisenhower Matrix',desc:'2x2 Urgent/Important task matrix',icon:'E',type:'action',action:()=>{closeCommandPalette();showEisenhowerMatrix();}});
+  }
+  // Writer progress prefix
+  if(ql && (ql==='writer progress' || ql==='word targets' || ql==='writing goals' || ql==='doc progress')){
+    items.unshift({title:'Writer Progress',desc:'Word count targets per doc',icon:'W',type:'action',action:()=>{closeCommandPalette();showWriterProgress();}});
+  }
+  // Batch ops prefix
+  if(ql && (ql==='batch ops' || ql==='batch operations' || ql==='bulk operations' || ql==='mass edit')){
+    items.unshift({title:'Batch Operations',desc:'Bulk tag, rename, archive operations',icon:'B',type:'action',action:()=>{closeCommandPalette();showBatchOperations();}});
   }
   return items.slice(0, 20);
 }
@@ -12810,6 +12835,171 @@ function showProjectNotes(){
     h+=`<textarea data-proj-note="${noteKey}" style="width:100%;height:60px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;resize:vertical;font-family:inherit" placeholder="Notes for ${esc(p.name||'')}...">${esc(note)}</textarea></div>`;
   });
   h+=`<button onclick="(function(){document.querySelectorAll('[data-proj-note]').forEach(ta=>{const key=ta.getAttribute('data-proj-note');S._projectNotes[key]=ta.value;});save();document.getElementById('proj-notes-panel').querySelector('button:last-child').textContent='Saved!';setTimeout(()=>{const btn=document.getElementById('proj-notes-panel');if(btn)btn.querySelector('button:last-child').textContent='Save All Notes';},1500);})()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;padding:10px;font-size:12px;font-weight:600;cursor:pointer">Save All Notes</button>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDuplicateDetector(){
+  let panel=document.getElementById('dupe-detect-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='dupe-detect-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  function similar(a,b){const al=a.toLowerCase();const bl=b.toLowerCase();if(al===bl)return 1;const longer=al.length>bl.length?al:bl;const shorter=al.length>bl.length?bl:al;if(longer.length===0)return 1;let matches=0;for(let i=0;i<shorter.length;i++){if(longer.includes(shorter[i]))matches++;}return matches/longer.length;}
+  const content=(S.content||[]);
+  const tasks=(S.tasks||[]);
+  const dupes=[];
+  for(let i=0;i<content.length;i++){
+    for(let j=i+1;j<content.length;j++){
+      const score=similar(content[i].title||'',content[j].title||'');
+      if(score>0.8&&(content[i].title||'').length>3){
+        dupes.push({type:'content',a:content[i],b:content[j],score});
+      }
+    }
+  }
+  for(let i=0;i<tasks.length;i++){
+    for(let j=i+1;j<tasks.length;j++){
+      const score=similar(tasks[i].title||'',tasks[j].title||'');
+      if(score>0.8&&(tasks[i].title||'').length>3){
+        dupes.push({type:'task',a:tasks[i],b:tasks[j],score});
+      }
+    }
+  }
+  dupes.sort((a,b)=>b.score-a.score);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Duplicate Detector</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Scanned ${content.length} content items and ${tasks.length} tasks. Found ${dupes.length} potential duplicates.</div>`;
+  if(!dupes.length){h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No duplicates found. Your data is clean!</div>';}
+  dupes.slice(0,20).forEach(d=>{
+    const pct=Math.round(d.score*100);
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;margin-bottom:8px;border-left:3px solid ${pct>95?'#f87171':'#facc15'}">`;
+    h+=`<div style="font-size:9px;color:var(--text-muted);margin-bottom:4px">${d.type.toUpperCase()} | ${pct}% similar</div>`;
+    h+=`<div style="font-size:11px;color:var(--text-primary);margin-bottom:2px">A: ${esc((d.a.title||'').substring(0,50))}</div>`;
+    h+=`<div style="font-size:11px;color:var(--text-secondary)">B: ${esc((d.b.title||'').substring(0,50))}</div>`;
+    h+=`</div>`;
+  });
+  if(dupes.length>20)h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px">Showing 20 of ${dupes.length} potential duplicates</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickSearchPanel(){
+  let panel=document.getElementById('quick-search-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-search-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Universal Search</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<input id="univ-search-input" style="width:100%;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;margin-bottom:12px" placeholder="Search everything..." oninput="universalSearch(this.value)">';
+  h+='<div id="univ-search-results" style="max-height:50vh;overflow-y:auto"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const inp=document.getElementById('univ-search-input');if(inp)inp.focus();},100);
+}
+function universalSearch(q){
+  const results=document.getElementById('univ-search-results');if(!results)return;
+  if(!q||q.length<2){results.innerHTML='<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:11px">Type at least 2 characters to search</div>';return;}
+  const ql=q.toLowerCase();
+  const items=[];
+  (S.tasks||[]).forEach(t=>{if((t.title||'').toLowerCase().includes(ql)||(t.description||'').toLowerCase().includes(ql))items.push({type:'Task',title:t.title,sub:t.status+' | '+(t.priority||''),color:'#60a5fa'});});
+  (S.content||[]).forEach(c=>{if((c.title||'').toLowerCase().includes(ql)||(c.body||'').toLowerCase().includes(ql))items.push({type:'Content',title:c.title,sub:(c.theme||'')+(c.body?(' | '+c.body.substring(0,60)):''),color:'#a78bfa'});});
+  (S.links||[]).forEach(l=>{if((l.title||'').toLowerCase().includes(ql)||(l.url||'').toLowerCase().includes(ql))items.push({type:'Link',title:l.title||l.url,sub:l.category||l.url||'',color:'#38bdf8'});});
+  (S.writerDocs||[]).forEach(d=>{if((d.title||'').toLowerCase().includes(ql)||(d.content||'').toLowerCase().includes(ql))items.push({type:'Doc',title:d.title,sub:(d.content||'').substring(0,60),color:'#fbbf24'});});
+  (S.projects||[]).forEach(p=>{if((p.name||'').toLowerCase().includes(ql)||(p.description||'').toLowerCase().includes(ql))items.push({type:'Project',title:p.name,sub:p.description||'',color:'#4ade80'});});
+  let h='';
+  if(!items.length)h='<div style="color:var(--text-muted);text-align:center;padding:20px;font-size:11px">No results found</div>';
+  items.slice(0,30).forEach(item=>{
+    h+=`<div style="display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid var(--border)">`;
+    h+=`<div style="background:${item.color};color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;min-width:50px;text-align:center">${item.type}</div>`;
+    h+=`<div style="flex:1"><div style="font-size:12px;color:var(--text-primary)">${esc((item.title||'').substring(0,50))}</div>`;
+    h+=`<div style="font-size:10px;color:var(--text-muted)">${esc((item.sub||'').substring(0,60))}</div></div>`;
+    h+=`</div>`;
+  });
+  if(items.length>30)h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center;padding:8px">${items.length} results (showing 30)</div>`;
+  results.innerHTML=h;
+}
+function showEisenhowerMatrix(){
+  let panel=document.getElementById('eisenhower-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='eisenhower-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();
+  const weekFromNow=new Date(now.getTime()+7*86400000);
+  const urgent=t=>t.due&&new Date(t.due)<=weekFromNow;
+  const important=t=>t.priority==='p0'||t.priority==='p1';
+  const q1=tasks.filter(t=>urgent(t)&&important(t));
+  const q2=tasks.filter(t=>!urgent(t)&&important(t));
+  const q3=tasks.filter(t=>urgent(t)&&!important(t));
+  const q4=tasks.filter(t=>!urgent(t)&&!important(t));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Eisenhower Matrix</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-bottom:8px">Urgent = due within 7 days | Important = P0 or P1</div>';
+  const quads=[
+    {title:'DO FIRST',sub:'Urgent + Important',tasks:q1,color:'#f87171',bg:'rgba(248,113,113,0.1)'},
+    {title:'SCHEDULE',sub:'Not Urgent + Important',tasks:q2,color:'#60a5fa',bg:'rgba(96,165,250,0.1)'},
+    {title:'DELEGATE',sub:'Urgent + Not Important',tasks:q3,color:'#facc15',bg:'rgba(250,204,21,0.1)'},
+    {title:'ELIMINATE',sub:'Not Urgent + Not Important',tasks:q4,color:'#6b7280',bg:'rgba(107,114,128,0.1)'},
+  ];
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  quads.forEach(q=>{
+    h+=`<div style="background:${q.bg};border:1px solid ${q.color}30;border-radius:8px;padding:12px;min-height:120px">`;
+    h+=`<div style="font-size:11px;font-weight:700;color:${q.color};margin-bottom:2px">${q.title} (${q.tasks.length})</div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted);margin-bottom:8px">${q.sub}</div>`;
+    q.tasks.slice(0,6).forEach(t=>{
+      h+=`<div style="font-size:10px;color:var(--text-secondary);padding:3px 0;border-bottom:1px solid ${q.color}15">${esc(t.title||'').substring(0,30)}${t.due?' ('+t.due+')':''}</div>`;
+    });
+    if(q.tasks.length>6)h+=`<div style="font-size:9px;color:var(--text-muted);margin-top:4px">+${q.tasks.length-6} more</div>`;
+    if(!q.tasks.length)h+=`<div style="font-size:10px;color:var(--text-muted);font-style:italic">Empty</div>`;
+    h+=`</div>`;
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWriterProgress(){
+  let panel=document.getElementById('writer-prog-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='writer-prog-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._writerTargets)S._writerTargets={};
+  const docs=(S.writerDocs||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Writer Progress Tracker</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!docs.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No writer docs found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  const totalTarget=Object.values(S._writerTargets).reduce((s,v)=>s+v,0);
+  const totalWords=docs.reduce((s,d)=>s+(d.content||'').trim().split(/\s+/).filter(Boolean).length,0);
+  if(totalTarget>0){
+    const pct=Math.min(100,Math.round(totalWords/totalTarget*100));
+    h+=`<div style="margin-bottom:16px;text-align:center"><span style="font-size:28px;font-weight:700;color:#4ade80">${totalWords.toLocaleString()}</span><span style="font-size:14px;color:var(--text-muted)"> / ${totalTarget.toLocaleString()} words</span></div>`;
+    h+=`<div style="height:12px;background:var(--bg-surface);border-radius:6px;overflow:hidden;margin-bottom:16px"><div style="height:100%;width:${pct}%;background:#4ade80;border-radius:6px"></div></div>`;
+  }
+  docs.forEach(d=>{
+    const words=(d.content||'').trim().split(/\s+/).filter(Boolean).length;
+    const target=S._writerTargets[d.id]||0;
+    const pct=target?Math.min(100,Math.round(words/target*100)):0;
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;margin-bottom:6px">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">`;
+    h+=`<span style="font-size:12px;color:var(--text-primary);font-weight:500">${esc(d.title||'Untitled')}</span>`;
+    h+=`<span style="font-size:10px;color:var(--text-muted)">${words} words</span>`;
+    h+=`</div>`;
+    h+=`<div style="display:flex;align-items:center;gap:8px">`;
+    h+=`<div style="flex:1;height:8px;background:var(--bg-elevated);border-radius:4px;overflow:hidden"><div style="height:100%;width:${target?pct:0}%;background:${pct>=100?'#4ade80':'#60a5fa'};border-radius:4px"></div></div>`;
+    h+=`<input type="number" value="${target||''}" placeholder="Target" style="width:70px;background:var(--bg-elevated);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:10px" onchange="S._writerTargets['${d.id}']=parseInt(this.value)||0;save();showWriterProgress();">`;
+    h+=`</div>`;
+    if(target)h+=`<div style="font-size:9px;color:${pct>=100?'#4ade80':'var(--text-muted)'};margin-top:3px">${pct}%${pct>=100?' - TARGET REACHED':''}</div>`;
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showBatchOperations(){
+  let panel=document.getElementById('batch-ops-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='batch-ops-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const tasks=(S.tasks||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Batch Operations</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:16px">Perform bulk operations across your workspace. Use with caution.</div>';
+  // Content operations
+  h+='<div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px">Content Operations</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">';
+  h+=`<button onclick="(function(){const tag=prompt('Tag to add to ALL content items:');if(!tag)return;(S.content||[]).forEach(c=>{if(!c.tags)c.tags=[];if(!c.tags.includes(tag))c.tags.push(tag);});save();alert('Tagged '+S.content.length+' items with: '+tag);})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Tag All Content</button>`;
+  h+=`<button onclick="(function(){const tag=prompt('Tag to REMOVE from all content:');if(!tag)return;let count=0;(S.content||[]).forEach(c=>{if(c.tags){const idx=c.tags.indexOf(tag);if(idx>-1){c.tags.splice(idx,1);count++;}}});save();alert('Removed tag from '+count+' items');})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Remove Tag</button>`;
+  h+=`<button onclick="(function(){const old=prompt('Old theme/category:');if(!old)return;const nw=prompt('New theme/category:');if(!nw)return;let count=0;(S.content||[]).forEach(c=>{if(c.theme===old){c.theme=nw;count++;}if(c.category===old){c.category=nw;count++;}});save();alert('Renamed '+count+' items from '+old+' to '+nw);})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Rename Category</button>`;
+  h+='</div>';
+  // Task operations
+  h+='<div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px">Task Operations</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">';
+  h+=`<button onclick="(function(){const count=S.tasks?S.tasks.filter(t=>t.status==='done').length:0;if(!count){alert('No done tasks to archive');return;}if(!confirm('Archive '+count+' completed tasks?'))return;S._archivedTasks=(S._archivedTasks||[]).concat(S.tasks.filter(t=>t.status==='done'));S.tasks=S.tasks.filter(t=>t.status!=='done');save();alert('Archived '+count+' tasks');showBatchOperations();})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Archive Done Tasks</button>`;
+  h+=`<button onclick="(function(){const proj=prompt('Project name to assign ALL unassigned tasks:');if(!proj)return;let count=0;(S.tasks||[]).forEach(t=>{if(!t.project&&!t.projectId){t.project=proj;count++;}});save();alert('Assigned '+count+' tasks to '+proj);})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Assign Unassigned</button>`;
+  h+=`<button onclick="(function(){let count=0;(S.tasks||[]).forEach(t=>{if(t.status!=='done'&&t.due&&new Date(t.due)<new Date()){const nd=new Date();nd.setDate(nd.getDate()+7);t.due=nd.toISOString().split('T')[0];count++;}});save();alert('Rescheduled '+count+' overdue tasks to next week');})()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:11px;cursor:pointer">Reschedule Overdue</button>`;
+  h+='</div>';
+  h+=`<div style="font-size:10px;color:var(--text-muted);padding-top:8px;border-top:1px solid var(--border)">Stats: ${content.length} content items, ${tasks.length} tasks (${tasks.filter(t=>t.status==='done').length} done)</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
