@@ -5920,6 +5920,12 @@ function cmdGetItems(q) {
       ['achievements','Gamified milestones: tasks, words, content, streaks'],
       ['focus history','History of all Pomodoro/focus sessions with 14-day chart'],
       ['quick link','Floating quick link saver with category'],
+      ['storage','Visual localStorage breakdown with usage % bar'],
+      ['task aging','Tasks ranked by age: fresh, stale, ancient'],
+      ['word frequency','Top 30 words across all content (stop words excluded)'],
+      ['daily planner','Today time blocks: morning, afternoon, evening'],
+      ['content length','Content items by word count: tiny to epic'],
+      ['project notes','Quick persistent notes per project'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7698,6 +7704,30 @@ function cmdGetItems(q) {
   // Quick link prefix
   if(ql && (ql==='quick link' || ql==='save link' || ql==='fast link' || ql==='add link quick')){
     items.unshift({title:'Quick Link',desc:'Floating quick link saver',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLink();}});
+  }
+  // Storage prefix
+  if(ql && (ql==='storage' || ql==='storage manager' || ql==='disk usage' || ql==='localstorage')){
+    items.unshift({title:'Storage Manager',desc:'Visual localStorage breakdown',icon:'S',type:'action',action:()=>{closeCommandPalette();showStorageManager();}});
+  }
+  // Task aging prefix
+  if(ql && (ql==='task aging' || ql==='stale tasks' || ql==='old tasks' || ql==='aging report')){
+    items.unshift({title:'Task Aging Report',desc:'Tasks ranked by age with stale detection',icon:'!',type:'action',action:()=>{closeCommandPalette();showTaskAging();}});
+  }
+  // Word frequency prefix
+  if(ql && (ql==='word frequency' || ql==='top words' || ql==='word count' || ql==='frequent words')){
+    items.unshift({title:'Word Frequency',desc:'Top 30 words across all content',icon:'W',type:'action',action:()=>{closeCommandPalette();showContentWordFrequency();}});
+  }
+  // Daily planner prefix
+  if(ql && (ql==='daily planner' || ql==='today plan' || ql==='day plan' || ql==='planner')){
+    items.unshift({title:'Daily Planner',desc:'Today time blocks with tasks and overdue',icon:'P',type:'action',action:()=>{closeCommandPalette();showDailyPlanner();}});
+  }
+  // Content length prefix
+  if(ql && (ql==='content length' || ql==='length chart' || ql==='content size' || ql==='word length')){
+    items.unshift({title:'Content Length Distribution',desc:'Items by word count: tiny to epic',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentLengthChart();}});
+  }
+  // Project notes prefix
+  if(ql && (ql==='project notes' || ql==='proj notes' || ql==='notes per project' || ql==='project memo')){
+    items.unshift({title:'Project Notes',desc:'Quick persistent notes per project',icon:'N',type:'action',action:()=>{closeCommandPalette();showProjectNotes();}});
   }
   return items.slice(0, 20);
 }
@@ -12576,6 +12606,211 @@ function showQuickLink(){
   h+='</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
   setTimeout(()=>{const inp=document.getElementById('quick-link-url');if(inp)inp.focus();},100);
+}
+function showStorageManager(){
+  let panel=document.getElementById('storage-mgr-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='storage-mgr-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const sections=[
+    {key:'tasks',label:'Tasks'},
+    {key:'content',label:'Content'},
+    {key:'links',label:'Links'},
+    {key:'projects',label:'Projects'},
+    {key:'writerDocs',label:'Writer Docs'},
+    {key:'specs',label:'Living Docs'},
+    {key:'repos',label:'Repos'},
+    {key:'_goals',label:'Goals'},
+    {key:'_habits',label:'Habits'},
+    {key:'_moods',label:'Moods'},
+    {key:'_microJournal',label:'Micro Journal'},
+    {key:'_gratitude',label:'Gratitude'},
+    {key:'_focusSessions',label:'Focus Sessions'},
+    {key:'_savedSearches',label:'Saved Searches'},
+    {key:'_changelog',label:'Changelog'},
+    {key:'_dailyStats',label:'Daily Stats'},
+  ];
+  const sizes=sections.map(s=>{
+    const val=S[s.key];
+    const size=val?JSON.stringify(val).length:0;
+    return {...s,size,count:Array.isArray(val)?val.length:0};
+  }).sort((a,b)=>b.size-a.size);
+  const totalSize=JSON.stringify(S).length;
+  const totalKB=(totalSize/1024).toFixed(1);
+  const maxLS=5*1024*1024;
+  const usagePct=Math.round(totalSize/maxLS*100);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Storage Manager</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const barColor=usagePct>80?'#f87171':usagePct>50?'#facc15':'#4ade80';
+  h+=`<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted);margin-bottom:4px"><span>${totalKB} KB used</span><span>${(maxLS/1024).toFixed(0)} KB limit (5MB)</span></div>`;
+  h+=`<div style="height:16px;background:var(--bg-surface);border-radius:8px;overflow:hidden"><div style="height:100%;width:${usagePct}%;background:${barColor};border-radius:8px;transition:width 0.3s"></div></div>`;
+  h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:4px">${usagePct}% used</div></div>`;
+  const maxSize=sizes[0]?.size||1;
+  sizes.forEach(s=>{
+    if(s.size===0)return;
+    const pct=Math.round(s.size/maxSize*100);
+    const sizeKB=(s.size/1024).toFixed(1);
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">`;
+    h+=`<div style="width:90px;font-size:10px;color:var(--text-secondary);text-align:right">${s.label}</div>`;
+    h+=`<div style="flex:1;height:12px;background:var(--bg-surface);border-radius:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${barColor};border-radius:6px"></div></div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted);width:70px">${sizeKB}KB (${s.count})</div>`;
+    h+=`</div>`;
+  });
+  h+=`<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-size:10px;color:var(--text-muted)">Tip: Archive old tasks and content to free up space. Use cloud sync to backup before cleanup.</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskAging(){
+  let panel=document.getElementById('task-aging-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-aging-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&t.createdAt);
+  const now=new Date();
+  const aged=tasks.map(t=>{
+    const created=new Date(t.createdAt);
+    const days=Math.floor((now-created)/(1000*60*60*24));
+    return {...t,ageDays:days};
+  }).sort((a,b)=>b.ageDays-a.ageDays);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Task Aging Report</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const brackets=[
+    {label:'Fresh (0-3 days)',min:0,max:3,color:'#4ade80'},
+    {label:'Normal (4-7 days)',min:4,max:7,color:'#60a5fa'},
+    {label:'Aging (8-14 days)',min:8,max:14,color:'#facc15'},
+    {label:'Stale (15-30 days)',min:15,max:30,color:'#fb923c'},
+    {label:'Ancient (30+ days)',min:31,max:9999,color:'#f87171'},
+  ];
+  h+='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">';
+  brackets.forEach(b=>{
+    const count=aged.filter(t=>t.ageDays>=b.min&&t.ageDays<=b.max).length;
+    h+=`<div style="background:var(--bg-surface);padding:8px 12px;border-radius:6px;text-align:center;border-left:3px solid ${b.color}"><div style="font-size:16px;font-weight:700;color:${b.color}">${count}</div><div style="font-size:9px;color:var(--text-muted)">${b.label}</div></div>`;
+  });
+  h+='</div>';
+  if(!aged.length){h+='<div style="color:var(--text-muted);text-align:center;padding:30px">No open tasks found</div>';}
+  aged.slice(0,20).forEach(t=>{
+    const color=t.ageDays>30?'#f87171':t.ageDays>14?'#fb923c':t.ageDays>7?'#facc15':t.ageDays>3?'#60a5fa':'#4ade80';
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">`;
+    h+=`<div style="min-width:45px;font-size:11px;font-weight:700;color:${color}">${t.ageDays}d</div>`;
+    h+=`<div style="flex:1;font-size:11px;color:var(--text-secondary)">${esc(t.title||'Untitled').substring(0,40)}</div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted)">${t.status}</div>`;
+    h+=`</div>`;
+  });
+  if(aged.length>20)h+=`<div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:8px">Showing 20 of ${aged.length} open tasks</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentWordFrequency(){
+  let panel=document.getElementById('word-freq-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='word-freq-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const stopWords=new Set(['the','be','to','of','and','a','in','that','have','i','it','for','not','on','with','he','as','you','do','at','this','but','his','by','from','they','we','her','she','or','an','will','my','one','all','would','there','their','what','so','up','out','if','about','who','get','which','go','me','when','make','can','like','time','no','just','him','know','take','people','into','year','your','good','some','could','them','see','other','than','then','now','look','only','come','its','over','think','also','back','after','use','two','how','our','work','first','well','way','even','new','want','because','any','these','give','day','most','us']);
+  const wordCount={};
+  content.forEach(c=>{
+    const text=((c.body||'')+' '+(c.title||'')).toLowerCase().replace(/[^a-z\s]/g,'');
+    text.split(/\s+/).forEach(w=>{
+      if(w.length>2&&!stopWords.has(w))wordCount[w]=(wordCount[w]||0)+1;
+    });
+  });
+  const words=Object.entries(wordCount).sort((a,b)=>b[1]-a[1]).slice(0,30);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Word Frequency (Top 30)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!words.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No content with enough text to analyze</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  const maxC=words[0][1];
+  const colors=['#4ade80','#60a5fa','#facc15','#fb923c','#a78bfa','#34d399'];
+  words.forEach(([word,count],i)=>{
+    const pct=Math.round(count/maxC*100);
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">`;
+    h+=`<div style="width:80px;font-size:11px;color:var(--text-secondary);text-align:right;font-family:monospace">${word}</div>`;
+    h+=`<div style="flex:1;height:12px;background:var(--bg-surface);border-radius:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${colors[i%colors.length]};border-radius:6px"></div></div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted);width:30px">${count}</div>`;
+    h+=`</div>`;
+  });
+  h+=`<div style="margin-top:12px;font-size:10px;color:var(--text-muted);text-align:center">${Object.keys(wordCount).length} unique words across ${content.length} items (common words excluded)</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDailyPlanner(){
+  let panel=document.getElementById('daily-planner-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='daily-planner-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();
+  const todayStr=now.toISOString().split('T')[0];
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const todayTasks=tasks.filter(t=>t.due&&t.due.startsWith(todayStr));
+  const overdue=tasks.filter(t=>t.due&&t.due<todayStr);
+  const noDue=tasks.filter(t=>!t.due).slice(0,5);
+  const dateDisplay=now.toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Daily Planner</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+=`<div style="font-size:12px;color:var(--accent);margin-bottom:16px">${dateDisplay}</div>`;
+  const blocks=[
+    {name:'Morning (6am-12pm)',icon:'M',tasks:todayTasks.filter((_,i)=>i<Math.ceil(todayTasks.length/3)),color:'#facc15'},
+    {name:'Afternoon (12pm-6pm)',icon:'A',tasks:todayTasks.filter((_,i)=>i>=Math.ceil(todayTasks.length/3)&&i<Math.ceil(todayTasks.length*2/3)),color:'#fb923c'},
+    {name:'Evening (6pm-12am)',icon:'E',tasks:todayTasks.filter((_,i)=>i>=Math.ceil(todayTasks.length*2/3)),color:'#a78bfa'},
+  ];
+  blocks.forEach(b=>{
+    h+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:${b.color};margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${b.name}</div>`;
+    if(b.tasks.length===0)h+=`<div style="font-size:10px;color:var(--text-muted);padding:8px;font-style:italic">No tasks scheduled</div>`;
+    b.tasks.forEach(t=>{
+      const pColor=t.priority==='p0'?'#f87171':t.priority==='p1'?'#fb923c':t.priority==='p2'?'#60a5fa':'#6b7280';
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px"><span style="color:${pColor};font-size:8px">●</span><span style="font-size:11px;color:var(--text-primary)">${esc(t.title||'').substring(0,40)}</span><span style="font-size:9px;color:var(--text-muted);margin-left:auto">${t.priority||''}</span></div>`;
+    });
+    h+=`</div>`;
+  });
+  if(overdue.length){
+    h+=`<div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:#f87171;margin-bottom:6px">Overdue (${overdue.length})</div>`;
+    overdue.slice(0,5).forEach(t=>{
+      h+=`<div style="font-size:11px;color:var(--text-secondary);padding:4px 0">[!] ${esc(t.title||'').substring(0,35)} (due ${t.due})</div>`;
+    });
+    if(overdue.length>5)h+=`<div style="font-size:10px;color:var(--text-muted)">...and ${overdue.length-5} more</div>`;
+    h+=`</div>`;
+  }
+  if(noDue.length){
+    h+=`<div style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Unscheduled (top 5)</div>`;
+    noDue.forEach(t=>{h+=`<div style="font-size:11px;color:var(--text-muted);padding:4px 0">[ ] ${esc(t.title||'').substring(0,40)}</div>`;});
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentLengthChart(){
+  let panel=document.getElementById('content-length-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-length-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const buckets=[
+    {label:'Tiny (<50 words)',min:0,max:49,color:'#60a5fa',items:[]},
+    {label:'Short (50-200)',min:50,max:200,color:'#4ade80',items:[]},
+    {label:'Medium (200-500)',min:200,max:500,color:'#facc15',items:[]},
+    {label:'Long (500-1000)',min:500,max:1000,color:'#fb923c',items:[]},
+    {label:'Epic (1000+)',min:1000,max:999999,color:'#f87171',items:[]},
+  ];
+  content.forEach(c=>{
+    const words=(c.body||'').trim().split(/\s+/).filter(Boolean).length;
+    const bucket=buckets.find(b=>words>=b.min&&words<=b.max);
+    if(bucket)bucket.items.push(c);
+  });
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Content Length Distribution</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!content.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No content found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  const maxCount=Math.max(...buckets.map(b=>b.items.length),1);
+  buckets.forEach(b=>{
+    const pct=Math.round(b.items.length/maxCount*100);
+    h+=`<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span style="color:var(--text-secondary)">${b.label}</span><span style="color:${b.color};font-weight:600">${b.items.length}</span></div>`;
+    h+=`<div style="height:20px;background:var(--bg-surface);border-radius:10px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${b.color};border-radius:10px;opacity:0.8"></div></div></div>`;
+  });
+  const totalWords=content.reduce((s,c)=>s+(c.body||'').trim().split(/\s+/).filter(Boolean).length,0);
+  const avgWords=content.length?Math.round(totalWords/content.length):0;
+  h+=`<div style="margin-top:16px;display:flex;gap:16px;justify-content:center;font-size:10px;color:var(--text-muted)"><span>Total: ${content.length} items</span><span>Avg: ${avgWords} words</span><span>Total: ${totalWords.toLocaleString()} words</span></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectNotes(){
+  let panel=document.getElementById('proj-notes-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='proj-notes-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._projectNotes)S._projectNotes={};
+  const projects=(S.projects||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Project Notes</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!projects.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No projects found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  projects.forEach(p=>{
+    const noteKey=p.id;
+    const note=S._projectNotes[noteKey]||'';
+    h+=`<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:4px">${esc(p.name||'Untitled')}</div>`;
+    h+=`<textarea data-proj-note="${noteKey}" style="width:100%;height:60px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;resize:vertical;font-family:inherit" placeholder="Notes for ${esc(p.name||'')}...">${esc(note)}</textarea></div>`;
+  });
+  h+=`<button onclick="(function(){document.querySelectorAll('[data-proj-note]').forEach(ta=>{const key=ta.getAttribute('data-proj-note');S._projectNotes[key]=ta.value;});save();document.getElementById('proj-notes-panel').querySelector('button:last-child').textContent='Saved!';setTimeout(()=>{const btn=document.getElementById('proj-notes-panel');if(btn)btn.querySelector('button:last-child').textContent='Save All Notes';},1500);})()" style="width:100%;background:var(--accent);color:#000;border:none;border-radius:6px;padding:10px;font-size:12px;font-weight:600;cursor:pointer">Save All Notes</button>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
