@@ -6719,6 +6719,12 @@ function cmdGetItems(q) {
       ['tmux','tmux sessions windows panes ref'],
       ['idle tasks','Idle task detector 7 plus days'],
       ['random','Random picker from list'],
+      ['vim','Vim movement editing search ref'],
+      ['roi','Task ROI impact vs effort analyzer'],
+      ['white noise','White pink brown noise generator'],
+      ['regex','Regex patterns classes quantifiers ref'],
+      ['pareto','Pareto 80/20 task analysis'],
+      ['math','Math expression evaluator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -11045,6 +11051,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='random' || ql==='random picker' || ql==='pick random' || ql==='random choice')){
     items.unshift({title:'Random Picker',desc:'Pick random item from list',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRandomPicker();}});
+  }
+  if(ql && (ql==='vim' || ql==='vim ref' || ql==='vi' || ql==='vim commands')){
+    items.unshift({title:'Vim Reference',desc:'Movement, editing, search, macros',icon:'V',type:'action',action:()=>{closeCommandPalette();showVimRef();}});
+  }
+  if(ql && (ql==='roi' || ql==='task roi' || ql==='impact effort' || ql==='roi analysis')){
+    items.unshift({title:'Task ROI Analyzer',desc:'Impact vs effort prioritization',icon:'R',type:'action',action:()=>{closeCommandPalette();showTaskROI();}});
+  }
+  if(ql && (ql==='white noise' || ql==='noise' || ql==='pink noise' || ql==='brown noise')){
+    items.unshift({title:'White Noise',desc:'White/pink/brown noise generator',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWhiteNoise();}});
+  }
+  if(ql && (ql==='regex' || ql==='regex ref' || ql==='regular expression' || ql==='regex patterns')){
+    items.unshift({title:'Regex Reference',desc:'Patterns, classes, quantifiers, flags',icon:'R',type:'action',action:()=>{closeCommandPalette();showRegexRef();}});
+  }
+  if(ql && (ql==='pareto' || ql==='80/20' || ql==='pareto analysis' || ql==='task distribution')){
+    items.unshift({title:'Pareto Analysis',desc:'80/20 rule for task distribution',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPareto();}});
+  }
+  if(ql && (ql==='math' || ql==='calculator' || ql==='math solver' || ql==='evaluate')){
+    items.unshift({title:'Math Solver',desc:'Evaluate math expressions',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMathSolver();}});
   }
   return items.slice(0, 20);
 }
@@ -39677,6 +39701,132 @@ function showQuickRandomPicker(){
     window._pickerHistory.unshift(picked);
     if(window._pickerHistory.length>5)window._pickerHistory.length=5;
     document.getElementById('picker-history').textContent='History: '+window._pickerHistory.join(' | ');
+  };
+}
+function showVimRef(){
+  let p=document.getElementById('vim-ref-panel');if(p)p.remove();
+  const cmds={'Movement':['h/j/k/l (left/down/up/right)','w/W (next word)','b/B (back word)','e/E (end of word)','0 (line start)','$ (line end)','^ (first non-blank)','gg (file start)','G (file end)','Ctrl+D/U (half page down/up)','Ctrl+F/B (full page down/up)','{/} (paragraph up/down)','% (matching bracket)','f{char} (find char forward)','t{char} (till char forward)'],'Editing':['i (insert before)','I (insert at line start)','a (append after)','A (append at line end)','o (new line below)','O (new line above)','r (replace char)','R (replace mode)','x (delete char)','dd (delete line)','dw (delete word)','D (delete to end)','cc (change line)','cw (change word)','C (change to end)','J (join lines)','u (undo)','Ctrl+R (redo)','. (repeat last)'],'Visual & Select':['v (visual char)','V (visual line)','Ctrl+V (visual block)','y (yank/copy)','yy (yank line)','p (paste after)','P (paste before)','d (delete selected)','> (indent)','< (unindent)','= (auto-indent)'],'Search & Replace':['/{pattern} (search forward)','?{pattern} (search backward)','n/N (next/prev match)','* (search word under cursor)',':%s/old/new/g (replace all)',':%s/old/new/gc (replace with confirm)',':s/old/new/g (replace in line)'],'Files & Buffers':[':w (save)',':q (quit)',':wq (save & quit)',':q! (force quit)',':e file (open file)',':sp file (split horizontal)',':vsp file (split vertical)','Ctrl+W + h/j/k/l (switch splits)',':bn/:bp (next/prev buffer)',':ls (list buffers)',':tabnew file (new tab)','gt/gT (next/prev tab)'],'Macros & Registers':['q{a-z} (record macro)','@{a-z} (play macro)','@@ (replay last macro)','"{a-z}y (yank to register)','"{a-z}p (paste from register)',':reg (show registers)']};
+  p=document.createElement('div');p.id='vim-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Vim Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskROI(){
+  let p=document.getElementById('roi-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);
+  const scored=tasks.filter(t=>t.status!=='done').map(t=>{
+    let impact=1;const pr=t.priority||'p2';
+    if(pr==='p0')impact=4;else if(pr==='p1')impact=3;else if(pr==='p2')impact=2;else impact=1;
+    let effort=2;
+    if(t.estimate){const m=t.estimate.match(/(\d+)\s*(h|m)/);if(m){const mins=m[2]==='h'?parseInt(m[1])*60:parseInt(m[1]);effort=mins<=30?1:mins<=120?2:mins<=480?3:4;}}
+    const roi=impact/effort;
+    return{...t,impact,effort,roi};
+  }).sort((a,b)=>b.roi-a.roi);
+  p=document.createElement('div');p.id='roi-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Task ROI Analyzer</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Impact (from priority) / Effort (from estimate) = ROI score. Higher = do first.</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 50px 50px 50px;gap:4px;margin-bottom:8px;font-size:10px;font-weight:600;color:var(--text-muted)"><div>Task</div><div style="text-align:center">Impact</div><div style="text-align:center">Effort</div><div style="text-align:center">ROI</div></div>';
+  scored.slice(0,15).forEach((t,i)=>{
+    const roiColor=t.roi>=2?'#4ade80':t.roi>=1?'#fbbf24':'#f87171';
+    h+='<div style="display:grid;grid-template-columns:1fr 50px 50px 50px;gap:4px;padding:6px;background:var(--bg-surface);border-radius:4px;margin-bottom:2px;align-items:center">';
+    h+='<div style="font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</div>';
+    h+='<div style="text-align:center;font-size:11px;color:#60a5fa">'+t.impact+'</div>';
+    h+='<div style="text-align:center;font-size:11px;color:#fb923c">'+t.effort+'</div>';
+    h+='<div style="text-align:center;font-size:12px;font-weight:700;color:'+roiColor+'">'+t.roi.toFixed(1)+'</div>';
+    h+='</div>';
+  });
+  if(scored.length===0)h+='<div style="text-align:center;padding:30px;color:var(--text-muted)">No active tasks to analyze.</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickWhiteNoise(){
+  let w=document.getElementById('whitenoise-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='whitenoise-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:240px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">White Noise</div><button onclick="window._stopNoise();this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="wn-status" style="text-align:center;font-size:12px;color:var(--text-muted);margin-bottom:10px">Stopped</div><div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Volume</label><input type="range" id="wn-vol" min="0" max="100" value="30" oninput="window._setNoiseVol()" style="width:100%"></div><div style="display:flex;gap:6px"><button onclick="window._startNoise(\'white\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:10px;cursor:pointer">White</button><button onclick="window._startNoise(\'pink\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:10px;cursor:pointer">Pink</button><button onclick="window._startNoise(\'brown\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:10px;cursor:pointer">Brown</button></div><button onclick="window._stopNoise()" style="width:100%;margin-top:6px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Stop</button>';
+  document.body.appendChild(w);
+  window._noiseCtx=null;window._noiseNode=null;window._noiseGain=null;
+  window._startNoise=function(type){
+    window._stopNoise();
+    window._noiseCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const bufferSize=2*window._noiseCtx.sampleRate;
+    const buffer=window._noiseCtx.createBuffer(1,bufferSize,window._noiseCtx.sampleRate);
+    const output=buffer.getChannelData(0);
+    if(type==='white'){for(let i=0;i<bufferSize;i++)output[i]=Math.random()*2-1;}
+    else if(type==='pink'){let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;for(let i=0;i<bufferSize;i++){const white=Math.random()*2-1;b0=0.99886*b0+white*0.0555179;b1=0.99332*b1+white*0.0750759;b2=0.969*b2+white*0.153852;b3=0.8665*b3+white*0.3104856;b4=0.55*b4+white*0.5329522;b5=-0.7616*b5-white*0.016898;output[i]=b0+b1+b2+b3+b4+b5+b6+white*0.5362;output[i]*=0.11;b6=white*0.115926;}}
+    else{let last=0;for(let i=0;i<bufferSize;i++){const white=Math.random()*2-1;output[i]=(last+0.02*white)/1.02;last=output[i];output[i]*=3.5;}}
+    window._noiseNode=window._noiseCtx.createBufferSource();
+    window._noiseNode.buffer=buffer;window._noiseNode.loop=true;
+    window._noiseGain=window._noiseCtx.createGain();
+    window._noiseGain.gain.value=(parseInt(document.getElementById('wn-vol').value)||30)/100;
+    window._noiseNode.connect(window._noiseGain);window._noiseGain.connect(window._noiseCtx.destination);
+    window._noiseNode.start();
+    document.getElementById('wn-status').textContent='Playing: '+type;document.getElementById('wn-status').style.color='#4ade80';
+  };
+  window._stopNoise=function(){
+    if(window._noiseNode){try{window._noiseNode.stop();}catch(e){}}
+    if(window._noiseCtx){try{window._noiseCtx.close();}catch(e){}}
+    window._noiseNode=null;window._noiseCtx=null;window._noiseGain=null;
+    const el=document.getElementById('wn-status');if(el){el.textContent='Stopped';el.style.color='var(--text-muted)';}
+  };
+  window._setNoiseVol=function(){if(window._noiseGain)window._noiseGain.gain.value=(parseInt(document.getElementById('wn-vol').value)||30)/100;};
+}
+function showRegexRef(){
+  let p=document.getElementById('regex-ref-panel');if(p)p.remove();
+  const cmds={'Character Classes':['[abc] - a, b, or c','[^abc] - NOT a, b, or c','[a-z] - lowercase letter','[A-Z] - uppercase letter','[0-9] - digit','[a-zA-Z0-9] - alphanumeric','\\d - digit [0-9]','\\D - non-digit','\\w - word char [a-zA-Z0-9_]','\\W - non-word char','\\s - whitespace','\\S - non-whitespace','. - any char except newline'],'Quantifiers':['* - 0 or more','+ - 1 or more','? - 0 or 1','{3} - exactly 3','{2,5} - 2 to 5','{3,} - 3 or more','*? - lazy 0 or more','+? - lazy 1 or more'],'Anchors & Groups':['^ - start of string','$ - end of string','\\b - word boundary','\\B - non-word boundary','(abc) - capturing group','(?:abc) - non-capturing group','(?=abc) - positive lookahead','(?!abc) - negative lookahead','(?<=abc) - positive lookbehind','(?<!abc) - negative lookbehind','\\1 - backreference to group 1','(a|b) - alternation'],'Common Patterns':['Email: [\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}','URL: https?://[\\w.-]+(/[\\w./-]*)?','Phone: \\(?\\d{3}\\)?[-.\\s]?\\d{3}[-.\\s]?\\d{4}','IP: \\d{1,3}(\\.\\d{1,3}){3}','Date: \\d{4}-\\d{2}-\\d{2}','Time: \\d{2}:\\d{2}(:\\d{2})?','Hex Color: #[0-9a-fA-F]{3,8}','UUID: [0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'],'Flags':['g - global (match all)','i - case insensitive','m - multiline (^ and $ match lines)','s - dotall (. matches newline)','u - unicode','y - sticky']};
+  p=document.createElement('div');p.id='regex-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Regex Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{const parts=c.split(' - ');h+='<div onclick="navigator.clipboard.writeText(\''+(parts[0]||'').replace(/'/g,"\\'").replace(/\\/g,'\\\\')+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)"><span style="color:var(--accent)">'+(parts[0]||'')+'</span>'+(parts[1]?' <span style="color:var(--text-muted);font-size:10px">'+parts[1]+'</span>':'')+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskPareto(){
+  let p=document.getElementById('pareto-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);const projects=(S.projects||[]);
+  const projCounts={};tasks.forEach(t=>{const pid=t.project||t.projectId||'unassigned';projCounts[pid]=(projCounts[pid]||0)+1;});
+  const sorted=Object.entries(projCounts).sort((a,b)=>b[1]-a[1]);
+  const total=sorted.reduce((s,[_,c])=>s+c,0);
+  let cumulative=0;
+  const paretoData=sorted.map(([pid,count])=>{cumulative+=count;const pct=(count/total*100).toFixed(1);const cumPct=(cumulative/total*100).toFixed(1);const proj=projects.find(pr=>pr.id===pid);return{name:proj?proj.name:pid,count,pct,cumPct};});
+  p=document.createElement('div');p.id='pareto-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Pareto Analysis (80/20)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Which projects consume most of your tasks?</div>';
+  const maxCount=paretoData.length>0?paretoData[0].count:1;
+  paretoData.forEach(d=>{
+    const is80=parseFloat(d.cumPct)<=80;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px'+(is80?';border-left:3px solid var(--accent)':'')+'">';
+    h+='<div style="flex:1"><div style="font-size:12px;color:var(--text-primary)">'+esc(d.name)+'</div><div style="width:100%;height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden;margin-top:3px"><div style="width:'+(d.count/maxCount*100)+'%;height:100%;background:var(--accent);border-radius:3px"></div></div></div>';
+    h+='<div style="text-align:right;min-width:70px"><div style="font-size:12px;font-weight:600;color:var(--text-primary)">'+d.count+' ('+d.pct+'%)</div><div style="font-size:10px;color:var(--text-muted)">cum: '+d.cumPct+'%</div></div>';
+    h+='</div>';
+  });
+  if(paretoData.length===0)h+='<div style="text-align:center;padding:30px;color:var(--text-muted)">No tasks to analyze.</div>';
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showQuickMathSolver(){
+  let w=document.getElementById('math-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='math-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Math Solver</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><input type="text" id="math-input" placeholder="e.g. 2+3*4, sqrt(16), 2**10" oninput="window._evalMath()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:8px;color:var(--text-primary);font-size:14px;font-family:monospace"><div id="math-result" style="font-size:28px;font-weight:700;color:var(--accent);text-align:center;padding:12px;font-family:monospace;min-height:40px"></div><div id="math-history" style="max-height:100px;overflow-y:auto"></div><div style="margin-top:6px;font-size:9px;color:var(--text-muted)">Supports: +, -, *, /, **, %, sqrt(), abs(), ceil(), floor(), round(), sin(), cos(), tan(), log(), PI, E</div>';
+  document.body.appendChild(w);
+  window._mathHistory=[];
+  window._evalMath=function(){
+    const expr=document.getElementById('math-input').value.trim();if(!expr){document.getElementById('math-result').textContent='';return;}
+    try{
+      const safe=expr.replace(/\bsqrt\b/g,'Math.sqrt').replace(/\babs\b/g,'Math.abs').replace(/\bceil\b/g,'Math.ceil').replace(/\bfloor\b/g,'Math.floor').replace(/\bround\b/g,'Math.round').replace(/\bsin\b/g,'Math.sin').replace(/\bcos\b/g,'Math.cos').replace(/\btan\b/g,'Math.tan').replace(/\blog\b/g,'Math.log').replace(/\bPI\b/g,'Math.PI').replace(/\bE\b/g,'Math.E');
+      if(/[^0-9+\-*/%().Math,sqrtabceifloorundsincogtanlgPIE\s]/g.test(safe.replace(/Math\.\w+/g,''))){document.getElementById('math-result').textContent='?';return;}
+      const result=Function('"use strict"; return ('+safe+')')();
+      document.getElementById('math-result').textContent=typeof result==='number'?result:'?';
+    }catch(e){document.getElementById('math-result').textContent='?';}
   };
 }
 function showProjectRoadmap(filterProject){
