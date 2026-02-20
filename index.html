@@ -1009,6 +1009,7 @@ textarea{resize:vertical;line-height:1.6}
             <span id="ws-chars">0 chars</span>
             <span id="ws-reading">0 min read</span>
             <span id="ws-goal" style="cursor:pointer" onclick="setWriterGoal()" title="Click to set word goal"></span>
+            <span id="ws-edited" style="color:var(--text-muted)"></span>
             <span id="ws-saved" style="margin-left:auto">Saved</span>
           </div>
         </div>
@@ -2869,7 +2870,8 @@ function scheduleAutoBackup(){
   writerAutoBackupTimer=setTimeout(()=>{writerAutoBackupTimer=null;const d=getActiveDoc();if(!d)return;snapshotWriter();if(!d.versions)d.versions=[];const last=d.versions[0];const now=Date.now();if(last&&now-new Date(last.date).getTime()<300000)return;d.versions.unshift({id:now,title:d.title+' (auto)',body:d.body,words:countW(d.body),date:new Date().toISOString()});if(d.versions.length>50)d.versions=d.versions.slice(0,50);save();renderVersions();},600000);
 }
 function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;const paras=t.split(/\n\s*\n/).filter(p=>p.trim().length).length;const headings=e.querySelectorAll('h1,h2,h3,h4,h5,h6').length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=paras+'p / '+headings+'h';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
-  const d=getActiveDoc();const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
+  const d=getActiveDoc();const editedEl=document.getElementById('ws-edited');if(editedEl&&d&&d.updated)editedEl.textContent='Edited '+timeAgo(d.updated);
+  const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
   if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
 function setWriterGoal(){const d=getActiveDoc();if(!d)return;const g=prompt('Word count goal:',d.wordGoal||'');if(g===null)return;d.wordGoal=parseInt(g)||0;save();updateWS();}
 function countW(html){const d=document.createElement('div');d.innerHTML=html||'';return(d.innerText||'').trim().split(/\s+/).filter(x=>x.length).length;}
@@ -4924,6 +4926,16 @@ function cmdGetItems(q) {
       items.unshift({title:'Add link: '+linkUrl.substring(0,40),desc:isUrl?'Quick-save link to directory':'Not a valid URL — add anyway?',icon:'L',type:'action',action:()=>{closeCommandPalette();const url=linkUrl.startsWith('http')?linkUrl:'https://'+linkUrl;const title=url.replace(/https?:\/\/(www\.)?/,'').split('/')[0];S.links.unshift({id:Date.now(),title,url,category:'unsorted',desc:'',pinned:false,created:new Date().toISOString()});save();if(currentSection==='links')renderLinks();toast('Link saved: '+title);}});
     }
   }
+  // Global full-text search
+  if(ql && ql.startsWith('all:')) {
+    const aq=q.substring(4).trim().toLowerCase();
+    if(aq){
+      S.tasks.filter(t=>(t.title+' '+(t.description||'')).toLowerCase().includes(aq)).slice(0,3).forEach(t=>{items.push({title:t.title,desc:'Task - '+t.status,icon:'T',type:'task',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+      S.content.filter(c=>c.body.toLowerCase().includes(aq)).slice(0,3).forEach(c=>{items.push({title:c.body.substring(0,50),desc:'Content - '+c.type,icon:'C',type:'content',action:()=>{closeCommandPalette();switchSection('content',null);document.getElementById('content-search').value=aq;renderContent();}});});
+      S.docs.filter(d=>{const tmp=document.createElement('div');tmp.innerHTML=d.body||'';return(d.title||'').toLowerCase().includes(aq)||(tmp.innerText||'').toLowerCase().includes(aq);}).slice(0,3).forEach(d=>{items.push({title:d.title||'Untitled',desc:'Document',icon:'W',type:'doc',action:()=>{closeCommandPalette();switchDoc(d.id);switchSection('writer',null);}});});
+      S.links.filter(l=>(l.title+' '+l.url+' '+(l.desc||'')).toLowerCase().includes(aq)).slice(0,3).forEach(l=>{items.push({title:l.title,desc:l.url,icon:'L',type:'link',action:()=>{closeCommandPalette();window.open(l.url,'_blank');}});});
+    }
+  }
   // Quick tag search from Cmd+K
   if(ql && ql.startsWith('tag:')) {
     const tq=q.substring(4).trim().toLowerCase();
@@ -5753,6 +5765,7 @@ function reposRefresh() {
         <span style="color:${rc};flex-shrink:0">${icon}</span>
         <span style="font-size:13px;font-weight:600;color:var(--text);flex:1">${esc(r.name)}</span>
         <span style="width:8px;height:8px;border-radius:50%;background:${sc}" title="${r.status}"></span>
+        ${r.live?'<span style="font-size:7px;padding:1px 5px;border-radius:3px;background:rgba(74,222,128,0.1);color:var(--accent);border:1px solid rgba(74,222,128,0.2)">LIVE</span>':'<span style="font-size:7px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.04);color:var(--text-muted)">LOCAL</span>'}
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <span style="font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:${rc}">${esc(r.role)}</span>
