@@ -6569,6 +6569,12 @@ function cmdGetItems(q) {
       ['git bisect','Git bisect debugging reference'],
       ['project summary','Cross-project summary report'],
       ['html encoder','HTML encode decode strip tags'],
+      ['sql','SQL query reference with joins'],
+      ['deadline heatmap','Deadline proximity heatmap'],
+      ['bmi','BMI body mass index calculator'],
+      ['redis','Redis key-value store reference'],
+      ['project ranking','Project ranking by completion'],
+      ['tip','Tip calculator with bill splitting'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10445,6 +10451,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='html encoder' || ql==='html encode' || ql==='html decode' || ql==='html entities tool')){
     items.unshift({title:'HTML Encoder',desc:'Encode, decode, strip HTML tags',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHtmlEncoder();}});
+  }
+  if(ql && (ql==='sql' || ql==='sql ref' || ql==='sql commands' || ql==='database query')){
+    items.unshift({title:'SQL Reference',desc:'SQL queries, joins, functions',icon:'S',type:'action',action:()=>{closeCommandPalette();showSqlRef();}});
+  }
+  if(ql && (ql==='deadline heatmap' || ql==='deadlines' || ql==='due dates heatmap' || ql==='deadline map')){
+    items.unshift({title:'Deadline Heatmap',desc:'Deadline proximity visualization',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDeadlineHeatmap();}});
+  }
+  if(ql && (ql==='bmi' || ql==='body mass' || ql==='bmi calc' || ql==='bmi calculator')){
+    items.unshift({title:'BMI Calculator',desc:'Body mass index calculator',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBmiCalc();}});
+  }
+  if(ql && (ql==='redis' || ql==='redis ref' || ql==='redis commands' || ql==='key value store')){
+    items.unshift({title:'Redis Reference',desc:'Key-value store commands',icon:'R',type:'action',action:()=>{closeCommandPalette();showRedisRef();}});
+  }
+  if(ql && (ql==='project ranking' || ql==='rank projects' || ql==='project leaderboard' || ql==='best project')){
+    items.unshift({title:'Project Ranking',desc:'Projects ranked by completion',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProjectRanking();}});
+  }
+  if(ql && (ql==='tip' || ql==='tip calc' || ql==='tip calculator' || ql==='bill split')){
+    items.unshift({title:'Tip Calculator',desc:'Tip calc with bill splitting',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTipCalc();}});
   }
   return items.slice(0, 20);
 }
@@ -35459,6 +35483,237 @@ function showQuickHtmlEncoder(){
   window._htmlEncode=()=>{const inp=document.getElementById('htmlenc-input');const out=document.getElementById('htmlenc-output');if(!inp||!out)return;const el=document.createElement('div');el.textContent=inp.value;out.textContent=el.innerHTML;};
   window._htmlDecode=()=>{const inp=document.getElementById('htmlenc-input');const out=document.getElementById('htmlenc-output');if(!inp||!out)return;const el=document.createElement('div');el.innerHTML=inp.value;out.textContent=el.textContent;};
   window._htmlStrip=()=>{const inp=document.getElementById('htmlenc-input');const out=document.getElementById('htmlenc-output');if(!inp||!out)return;const el=document.createElement('div');el.innerHTML=inp.value;out.textContent=el.textContent;};
+  document.body.appendChild(d);
+}
+function showSqlRef(){
+  const cmds={
+    'SELECT':{
+      'SELECT * FROM table':'Select all columns',
+      'SELECT col1, col2 FROM table':'Select specific columns',
+      'SELECT DISTINCT col FROM table':'Unique values only',
+      'SELECT COUNT(*) FROM table':'Count rows',
+      'SELECT * FROM t WHERE col = val':'Filter rows',
+      'SELECT * FROM t ORDER BY col DESC':'Sort descending',
+      'SELECT * FROM t LIMIT 10 OFFSET 5':'Pagination',
+      'SELECT col, COUNT(*) FROM t GROUP BY col':'Group and count'
+    },
+    'JOIN':{
+      'SELECT * FROM a INNER JOIN b ON a.id = b.a_id':'Inner join',
+      'SELECT * FROM a LEFT JOIN b ON a.id = b.a_id':'Left join',
+      'SELECT * FROM a RIGHT JOIN b ON a.id = b.a_id':'Right join',
+      'SELECT * FROM a FULL OUTER JOIN b ON a.id = b.a_id':'Full outer join',
+      'SELECT * FROM a CROSS JOIN b':'Cross join',
+      'SELECT * FROM a JOIN b USING(col)':'Join using column',
+      'SELECT * FROM a NATURAL JOIN b':'Natural join',
+      'SELECT * FROM a, b WHERE a.id = b.id':'Implicit join'
+    },
+    'Modify':{
+      'INSERT INTO t (col) VALUES (val)':'Insert row',
+      'INSERT INTO t SELECT * FROM t2':'Insert from select',
+      'UPDATE t SET col = val WHERE id = 1':'Update rows',
+      'DELETE FROM t WHERE id = 1':'Delete rows',
+      'TRUNCATE TABLE t':'Delete all rows fast',
+      'CREATE TABLE t (id INT PRIMARY KEY)':'Create table',
+      'ALTER TABLE t ADD COLUMN col TYPE':'Add column',
+      'DROP TABLE t':'Delete table'
+    },
+    'Functions':{
+      'WHERE col LIKE "%pattern%"':'Pattern matching',
+      'WHERE col IN (1, 2, 3)':'Match list of values',
+      'WHERE col BETWEEN 1 AND 10':'Range filter',
+      'WHERE col IS NULL':'Check for NULL',
+      'HAVING COUNT(*) > 5':'Filter groups',
+      'COALESCE(col, default)':'First non-NULL value',
+      'CASE WHEN x THEN y ELSE z END':'Conditional',
+      'WITH cte AS (SELECT ...) SELECT * FROM cte':'Common table expression'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">SQL Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskDeadlineHeatmap(){
+  const tasks=S.tasks||[];
+  const active=tasks.filter(t=>t.status!=='done'&&t.due);
+  if(!active.length){alert('No tasks with deadlines');return;}
+  const now=new Date();
+  const buckets=[{label:'Overdue',color:'#ef4444',tasks:[]},{label:'Today',color:'#f97316',tasks:[]},{label:'Tomorrow',color:'#f59e0b',tasks:[]},{label:'This Week',color:'#3b82f6',tasks:[]},{label:'Next Week',color:'#8b5cf6',tasks:[]},{label:'Later',color:'#6b7280',tasks:[]}];
+  active.forEach(t=>{
+    const due=new Date(t.due);const diff=(due-now)/(1000*60*60*24);
+    if(diff<0)buckets[0].tasks.push(t);
+    else if(diff<1)buckets[1].tasks.push(t);
+    else if(diff<2)buckets[2].tasks.push(t);
+    else if(diff<7)buckets[3].tasks.push(t);
+    else if(diff<14)buckets[4].tasks.push(t);
+    else buckets[5].tasks.push(t);
+  });
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Deadline Heatmap</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="color:var(--text-muted);font-size:11px;margin-bottom:12px">'+active.length+' tasks with deadlines</div>';
+  const maxB=Math.max(...buckets.map(b=>b.tasks.length),1);
+  buckets.forEach(b=>{
+    const pct=Math.round((b.tasks.length/maxB)*100);
+    html+='<div style="margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;margin-bottom:3px"><span style="font-size:12px;color:'+b.color+';font-weight:600">'+b.label+'</span><span style="font-size:11px;color:var(--text-muted)">'+b.tasks.length+'</span></div>';
+    html+='<div style="height:24px;background:var(--bg-base);border-radius:4px;display:flex;align-items:center;overflow:hidden">';
+    html+='<div style="height:100%;width:'+pct+'%;background:'+b.color+'44;display:flex;align-items:center;padding-left:6px">';
+    b.tasks.slice(0,3).forEach(t=>{html+='<span style="font-size:9px;color:'+b.color+';margin-right:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px">'+esc(t.title)+'</span>';});
+    html+='</div></div></div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickBmiCalc(){
+  let ex=document.getElementById('bmi-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='bmi-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">BMI Calculator</span><button onclick="document.getElementById(\'bmi-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Weight (kg)</label><input id="bmi-weight" type="number" placeholder="70" style="width:100%;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px;font-size:12px"></div>';
+  html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Height (cm)</label><input id="bmi-height" type="number" placeholder="175" style="width:100%;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px;font-size:12px"></div>';
+  html+='<button onclick="window._calcBmi()" style="width:100%;background:#4ade80;color:#000;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:8px">Calculate</button>';
+  html+='<div id="bmi-result" style="background:var(--bg-base);border-radius:6px;padding:12px;text-align:center;min-height:50px"></div>';
+  d.innerHTML=html;
+  window._calcBmi=()=>{
+    const w=parseFloat(document.getElementById('bmi-weight')?.value);
+    const h=parseFloat(document.getElementById('bmi-height')?.value)/100;
+    const out=document.getElementById('bmi-result');
+    if(!w||!h||!out)return;
+    const bmi=Math.round((w/(h*h))*10)/10;
+    let cat='',color='';
+    if(bmi<18.5){cat='Underweight';color='#3b82f6';}
+    else if(bmi<25){cat='Normal';color='#4ade80';}
+    else if(bmi<30){cat='Overweight';color='#f59e0b';}
+    else{cat='Obese';color='#ef4444';}
+    out.innerHTML='<div style="font-size:28px;font-weight:700;color:'+color+'">'+bmi+'</div><div style="font-size:12px;color:'+color+'">'+cat+'</div>';
+  };
+  document.body.appendChild(d);
+}
+function showRedisRef(){
+  const cmds={
+    'Strings':{
+      'SET key value':'Set key to value',
+      'GET key':'Get value by key',
+      'MSET k1 v1 k2 v2':'Set multiple keys',
+      'MGET k1 k2':'Get multiple keys',
+      'INCR key':'Increment by 1',
+      'INCRBY key 5':'Increment by N',
+      'APPEND key value':'Append to string',
+      'SETEX key 60 value':'Set with TTL (seconds)'
+    },
+    'Lists':{
+      'LPUSH key value':'Push to left',
+      'RPUSH key value':'Push to right',
+      'LPOP key':'Pop from left',
+      'RPOP key':'Pop from right',
+      'LRANGE key 0 -1':'Get all elements',
+      'LLEN key':'List length',
+      'LINDEX key 0':'Get by index',
+      'LREM key 1 value':'Remove elements'
+    },
+    'Hashes':{
+      'HSET key field value':'Set hash field',
+      'HGET key field':'Get hash field',
+      'HMSET key f1 v1 f2 v2':'Set multiple fields',
+      'HGETALL key':'Get all fields and values',
+      'HDEL key field':'Delete hash field',
+      'HEXISTS key field':'Check field exists',
+      'HKEYS key':'Get all field names',
+      'HINCRBY key field 5':'Increment field'
+    },
+    'Keys & Server':{
+      'KEYS pattern':'Find keys by pattern',
+      'EXISTS key':'Check if key exists',
+      'DEL key':'Delete key',
+      'TTL key':'Get remaining TTL',
+      'EXPIRE key 60':'Set TTL (seconds)',
+      'TYPE key':'Get value type',
+      'DBSIZE':'Number of keys',
+      'FLUSHDB':'Delete all keys in DB'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Redis Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskProjectRanking(){
+  const projects=S.projects||[];const tasks=S.tasks||[];
+  if(!projects.length){alert('No projects');return;}
+  const ranked=projects.map(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const total=pTasks.length;
+    const pct=total?Math.round((done/total)*100):0;
+    const overdue=pTasks.filter(t=>t.due&&new Date(t.due)<new Date()&&t.status!=='done').length;
+    const score=pct-(overdue*10);
+    return{name:p.name,total,done,pct,overdue,score};
+  }).sort((a,b)=>b.score-a.score);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Project Ranking</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  ranked.forEach((p,i)=>{
+    const medal=i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'var(--text-muted)';
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:8px;background:var(--bg-surface);border-radius:8px;margin-bottom:4px'+(i<3?';border-left:3px solid '+medal:'')+'">';
+    html+='<span style="font-size:16px;font-weight:700;color:'+medal+';min-width:24px">#'+(i+1)+'</span>';
+    html+='<div style="flex:1"><div style="font-size:12px;font-weight:600;color:#e2e8f0">'+esc(p.name)+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">'+p.done+'/'+p.total+' done'+(p.overdue?' | '+p.overdue+' overdue':'')+'</div></div>';
+    html+='<div style="text-align:right"><div style="font-size:16px;font-weight:700;color:'+(p.pct>=70?'#4ade80':p.pct>=40?'#f59e0b':'#ef4444')+'">'+p.pct+'%</div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickTipCalc(){
+  let ex=document.getElementById('tipcalc-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='tipcalc-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  let tipPct=18,split=1;
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Tip Calculator</span><button onclick="document.getElementById(\'tipcalc-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="margin-bottom:8px"><label style="font-size:10px;color:var(--text-muted)">Bill Amount ($)</label><input id="tip-bill" type="number" placeholder="50.00" step="0.01" style="width:100%;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px;font-size:13px" oninput="window._tipCalc()"></div>';
+    html+='<div style="margin-bottom:6px"><label style="font-size:10px;color:var(--text-muted)">Tip: '+tipPct+'%</label></div>';
+    html+='<div style="display:flex;gap:4px;margin-bottom:8px">';
+    [10,15,18,20,25].forEach(p=>{
+      html+='<button onclick="window._tipPct('+p+')" style="flex:1;background:'+(tipPct===p?'#4ade8033':'var(--bg-surface)')+';color:'+(tipPct===p?'#4ade80':'var(--text-muted)')+';border:1px solid '+(tipPct===p?'#4ade80':'var(--border)')+';padding:4px;border-radius:4px;cursor:pointer;font-size:11px">'+p+'%</button>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><label style="font-size:10px;color:var(--text-muted)">Split</label>';
+    html+='<input type="number" value="'+split+'" min="1" max="20" onchange="window._tipSplit(this.value)" style="width:50px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:4px;font-size:12px"></div>';
+    html+='<div id="tip-result" style="background:var(--bg-base);border-radius:6px;padding:12px"></div>';
+    d.innerHTML=html;
+  }
+  window._tipPct=(p)=>{tipPct=p;render();window._tipCalc();};
+  window._tipSplit=(s)=>{split=Math.max(1,parseInt(s)||1);window._tipCalc();};
+  window._tipCalc=()=>{
+    const bill=parseFloat(document.getElementById('tip-bill')?.value)||0;
+    const tip=bill*tipPct/100;
+    const total=bill+tip;
+    const perPerson=split>1?total/split:total;
+    const out=document.getElementById('tip-result');
+    if(!out)return;
+    out.innerHTML='<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span style="color:var(--text-muted)">Tip</span><span style="color:#4ade80">$'+tip.toFixed(2)+'</span></div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0"><span style="color:var(--text-muted)">Total</span><span style="color:#e2e8f0;font-weight:600">$'+total.toFixed(2)+'</span></div>'+
+      (split>1?'<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;border-top:1px solid var(--border);margin-top:4px;padding-top:4px"><span style="color:var(--text-muted)">Per person ('+split+')</span><span style="color:#4ade80;font-weight:600">$'+perPerson.toFixed(2)+'</span></div>':'');
+  };
+  render();
   document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
