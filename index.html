@@ -894,6 +894,7 @@ textarea{resize:vertical;line-height:1.6}
             <select id="task-bulk-status" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Status</option><option value="todo">To Do</option><option value="progress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select>
             <select id="task-bulk-priority" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Priority</option><option value="p0">P0</option><option value="p1">P1</option><option value="p2">P2</option><option value="p3">P3</option></select>
             <input type="date" id="task-bulk-due" style="font-size:9px;padding:3px 4px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;width:110px" title="Set due date">
+            <button class="btn btn-sm" onclick="taskBulkTag()" style="color:var(--accent-cyan)">Tag</button>
             <button class="btn btn-sm btn-danger" onclick="taskBulkDelete()">Delete</button>
             <button class="btn btn-sm" onclick="taskBulkApply()">Apply</button>
             <button class="btn btn-sm" onclick="taskBulkSelectAll()">All</button>
@@ -1074,6 +1075,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm" onclick="collapseAllSections()" title="Collapse all">Collapse</button>
             <button class="btn btn-sm" onclick="expandAllSections()" title="Expand all">Expand</button>
             <button class="btn btn-sm" onclick="exportCurrentSpec()" title="Export this spec as HTML" style="font-size:9px">Export</button>
+            <button class="btn btn-sm" onclick="exportCurrentSpecMD()" title="Copy spec as Markdown" style="font-size:9px">MD</button>
           </div>
           <div class="specs-sections" id="specs-sections"></div>
           <div class="specs-statusbar">
@@ -2580,7 +2582,7 @@ function renderTasks(){
     cnt.textContent=f.length+(totalTime?' ('+formatTimeSpent(totalTime)+')':'');
     const wipLimit=st==='progress'?5:0;
     if(wipLimit&&f.length>wipLimit){cnt.style.color='var(--red)';cnt.title='WIP limit: '+wipLimit;}else{cnt.style.color='';cnt.title=f.length+' tasks'+(totalTime?', '+formatTimeSpent(totalTime)+' tracked':'');};
-    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title" title="${t.created?'Created '+timeAgo(t.created):''}${t.description?'\n'+escA(t.description.substring(0,120)):''}">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" onclick="event.stopPropagation();cyclePriority(${t.id})" style="cursor:pointer" title="Click to cycle priority">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'};font-family:var(--mono)" title="${t.due}">${relativeDate(t.due)}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}${t.timeSpent?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)" title="Time tracked">${formatTimeSpent(t.timeSpent)}</span>`:''}</div>${(t.tags&&t.tags.length)?`<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${t.tags.map(tag=>`<span style="font-size:7px;padding:1px 4px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:2px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}</span>`).join('')}</div>`:''}</div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
+    col.innerHTML=f.length?f.map(t=>{const st=t.subtasks||[],stDone=st.filter(s=>s.done).length,stTotal=st.length;return `<div class="board-card" draggable="true" ondragstart="boardDragStart(event,${t.id})" onclick="openTaskDetail(${t.id})"><div class="board-card-title" title="${t.created?'Created '+timeAgo(t.created):''}${t.description?'\n'+escA(t.description.substring(0,120)):''}">${esc(t.title||'Untitled')}</div>${t.description?`<div class="board-card-desc">${esc(t.description)}</div>`:''}${stTotal?`<div class="board-card-subtasks"><span class="done">${stDone}</span>/${stTotal} subtasks<div style="width:100%;height:2px;background:var(--border);border-radius:1px;margin-top:3px"><div style="width:${Math.round(stDone/stTotal*100)}%;height:100%;background:var(--accent);border-radius:1px;transition:width 0.3s"></div></div></div>`:''}<div class="board-card-meta"><span class="badge badge-${t.priority==='p0'?'red':t.priority==='p1'?'orange':t.priority==='p2'?'yellow':'muted'}" onclick="event.stopPropagation();cyclePriority(${t.id})" style="cursor:pointer" title="Click to cycle priority">${t.priority||'p3'}</span>${t.project?`<span class="badge badge-blue" style="cursor:pointer" onclick="event.stopPropagation();taskProjectFilter='${escA(t.project)}';renderTasks();toast('Filtered: ${escA(t.project)}')">${esc(t.project)}</span>`:''}${t.due?`<span style="font-size:9px;color:${t.due<today&&t.status!=='done'?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'};font-family:var(--mono)" title="${t.due}">${relativeDate(t.due)}${t.due<today&&t.status!=='done'?' !':''}</span>`:''}${t.recurrence?`<span style="font-size:8px;color:var(--accent-cyan)" title="Repeats ${t.recurrence}">r</span>`:''}${t.blockedBy?`<span style="font-size:8px;color:var(--red)" title="Blocked by: ${escA(t.blockedBy)}">B</span>`:''}${t.estimate?`<span style="font-size:8px;color:var(--accent-cyan);font-family:var(--mono)" title="Estimate">${esc(t.estimate)}</span>`:''}${t.timeSpent?`<span style="font-size:8px;color:var(--text-muted);font-family:var(--mono)" title="Time tracked">${formatTimeSpent(t.timeSpent)}</span>`:''}</div>${(t.tags&&t.tags.length)?`<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:3px">${t.tags.map(tag=>`<span style="font-size:7px;padding:1px 4px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:2px;color:var(--text-muted);font-family:var(--mono)">${esc(tag)}</span>`).join('')}</div>`:''}</div>`;}).join(''):'<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:10px;opacity:0.5">Drop tasks here</div>';
   });
   const activeTasks=S.tasks.filter(t=>t.status!=='done').length;
   const doneTasks=S.tasks.filter(t=>t.status==='done').length;
@@ -2664,6 +2666,14 @@ function taskBulkApply(){
   let count=0;
   taskSelected.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t){if(status)t.status=status;if(priority)t.priority=priority;if(due)t.due=due;count++;}});
   save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Updated '+count+' tasks');
+}
+function taskBulkTag(){
+  if(!taskSelected.size){toast('No tasks selected');return;}
+  const allTags=[...new Set(S.tasks.flatMap(t=>t.tags||[]))].sort();
+  const tag=prompt('Tag to add to '+taskSelected.size+' tasks:'+(allTags.length?'\nExisting: '+allTags.join(', '):''));
+  if(!tag||!tag.trim())return;const v=tag.trim().toLowerCase();
+  S.tasks.forEach(t=>{if(taskSelected.has(t.id)){if(!t.tags)t.tags=[];if(!t.tags.includes(v))t.tags.push(v);}});
+  save();renderTasks();toast('Tagged '+taskSelected.size+' tasks with "'+v+'"');
 }
 function taskBulkDelete(){
   if(!taskSelected.size){toast('No tasks selected');return;}
@@ -3446,6 +3456,15 @@ function exportCurrentSpec(){
   h+='<h1>'+esc(s.title||'Untitled Spec')+'</h1><div class="meta">'+(proj?esc(proj.name)+' | ':'')+wc+' words | '+(s.sections||[]).length+' sections | Exported '+new Date().toLocaleDateString()+'</div>';
   (s.sections||[]).forEach(sec=>{h+='<div class="section"><h2>'+esc(sec.title||'Section')+'</h2><div>'+(sec.body||'<em>empty</em>')+'</div></div>';});
   h+='</body></html>';const blob=new Blob([h],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=((s.title||'spec').toLowerCase().replace(/\s+/g,'-'))+'.html';a.click();toast('Exported: '+s.title);
+}
+function exportCurrentSpecMD(){
+  snapshotSpec();const s=getActiveSpec();if(!s){toast('No spec selected');return;}
+  const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;
+  let md='# '+(s.title||'Untitled Spec')+'\n\n';
+  if(proj)md+='Project: '+proj.name+'\n';
+  md+='Sections: '+(s.sections||[]).length+' | Exported: '+new Date().toLocaleDateString()+'\n\n---\n\n';
+  (s.sections||[]).forEach(sec=>{md+='## '+(sec.title||'Section')+'\n\n';const d=document.createElement('div');d.innerHTML=sec.body||'';md+=(d.innerText||'(empty)')+'\n\n';});
+  navigator.clipboard.writeText(md).then(()=>toast('Copied as Markdown: '+s.title));
 }
 
 // === LINKS ===
@@ -5507,6 +5526,18 @@ function cmdGetItems(q) {
     const filtered=tq?allTaskTags.filter(t=>t.includes(tq)):allTaskTags;
     filtered.slice(0,8).forEach(tag=>{const cnt=S.tasks.filter(t=>(t.tags||[]).includes(tag)).length;items.unshift({title:'Tag: '+tag,desc:cnt+' tasks',icon:'T',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);document.getElementById('task-search').value='#'+tag;renderTasks();toast('Filtered by tag: '+tag);}});});
     if(!filtered.length)items.unshift({title:'No task tags found',desc:tq?'No tags matching "'+tq+'"':'No tasks have tags yet',icon:'!',type:'info'});
+  }
+  // Daily activity log prefix
+  if(ql && (ql.startsWith('daily:') || ql==='daily' || ql==='activity')){
+    const todayStr=new Date().toISOString().split('T')[0];
+    const doneToday=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(todayStr));
+    const createdToday=S.tasks.filter(t=>t.created&&t.created.startsWith(todayStr));
+    const contentToday=S.content.filter(c=>c.created&&c.created.startsWith(todayStr));
+    const docsToday=S.docs.filter(d=>d.updated&&d.updated.startsWith(todayStr));
+    const linksToday=S.links.filter(l=>l.created&&l.created.startsWith(todayStr));
+    items.unshift({title:'Today: '+doneToday.length+' completed, '+createdToday.length+' created',desc:'Content: '+contentToday.length+' | Docs edited: '+docsToday.length+' | Links: '+linksToday.length,icon:'*',type:'info'});
+    doneToday.slice(0,5).forEach(t=>{items.push({title:'Done: '+t.title,desc:(t.project||'No project')+' | '+t.priority,icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+    createdToday.filter(t=>t.status!=='done').slice(0,3).forEach(t=>{items.push({title:'New: '+t.title,desc:t.status+' | '+t.priority,icon:'+',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
   }
   // Clean prefix — data cleanup actions
   if(ql && (ql.startsWith('clean:') || ql==='clean' || ql==='cleanup')){
