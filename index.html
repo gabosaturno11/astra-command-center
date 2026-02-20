@@ -5781,6 +5781,9 @@ function cmdGetItems(q) {
       ['project health','Per-project health dashboard'],
       ['random','Surface a random content item for review'],
       ['clips','Clipboard history manager'],
+      ['project template','Create project from template with tasks'],
+      ['compare','Side-by-side content comparison'],
+      ['time block','Add time blocks to calendar'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6982,6 +6985,25 @@ function cmdGetItems(q) {
     items.unshift({title:'Clipboard History',desc:(S._clips||[]).length+' saved clips',icon:'C',type:'action',action:()=>{closeCommandPalette();showClipHistory();}});
     items.unshift({title:'Save Current Clipboard',desc:'Save what\'s on your clipboard to history',icon:'C',type:'action',action:()=>{closeCommandPalette();saveToClips();}});
   }
+  // Project template prefix
+  if(ql && (ql==='project template' || ql==='new project' || ql==='create project' || ql==='project preset')){
+    const templates=[
+      {name:'Software Project',tasks:['Set up repository','Define requirements','Design architecture','Implement MVP','Write tests','Deploy to staging','Review and QA','Deploy to production']},
+      {name:'Content Campaign',tasks:['Research topic','Create outline','Write first draft','Review/edit','Design visuals','Schedule publishing','Promote on social','Analyze results']},
+      {name:'Event Planning',tasks:['Define objectives','Set budget','Book venue','Create guest list','Design invitations','Coordinate vendors','Run-of-show doc','Post-event follow-up']},
+      {name:'Product Launch',tasks:['Market research','Define features','Build prototype','User testing','Refine based on feedback','Marketing materials','Launch day prep','Post-launch review']},
+    ];
+    templates.forEach(t=>{items.unshift({title:'Template: '+t.name,desc:t.tasks.length+' tasks: '+t.tasks.slice(0,3).join(', ')+'...',icon:'P',type:'action',action:()=>{closeCommandPalette();createProjectFromTemplate(t);}});});
+  }
+  // Compare prefix
+  if(ql && (ql==='compare' || ql==='diff' || ql==='side by side' || ql==='content compare')){
+    items.unshift({title:'Compare Content Items',desc:'Pick two content items to compare side-by-side',icon:'C',type:'action',action:()=>{closeCommandPalette();startContentCompare();}});
+  }
+  // Time block prefix
+  if(ql && (ql==='time block' || ql==='timeblock' || ql==='block time' || ql==='time blocks')){
+    items.unshift({title:'Add Time Block',desc:'Block out time on calendar for focused work',icon:'T',type:'action',action:()=>{closeCommandPalette();addTimeBlock();}});
+    items.unshift({title:'View Time Blocks',desc:'Show all scheduled time blocks',icon:'T',type:'action',action:()=>{closeCommandPalette();showTimeBlocks();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7358,6 +7380,60 @@ function showClipHistory(){
   panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto';
   panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Clipboard History (${S._clips.length})</span><div style="display:flex;gap:6px"><button onclick="S._clips=[];save();document.getElementById('clips-panel').remove();toast('Cleared')" class="btn btn-sm btn-ghost" style="font-size:8px">Clear All</button><button onclick="document.getElementById('clips-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`+
     S._clips.map((c,i)=>`<div style="padding:6px 8px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:flex-start"><div style="flex:1;font-size:10px;color:var(--text-primary);word-break:break-word;white-space:pre-wrap;max-height:60px;overflow:hidden">${esc(c.text.substring(0,200))}</div><div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0"><button onclick="navigator.clipboard.writeText(S._clips[${i}].text);toast('Copied')" class="btn btn-sm btn-ghost" style="font-size:8px;padding:1px 4px">Copy</button><span style="font-size:7px;color:var(--text-muted)">${timeAgo(c.saved)}</span></div></div>`).join('');
+  document.body.appendChild(panel);
+}
+function createProjectFromTemplate(tmpl){
+  const name=prompt('Project name:',tmpl.name);if(!name||!name.trim())return;
+  const pName=name.trim();
+  const now=new Date();
+  tmpl.tasks.forEach((title,i)=>{
+    const due=new Date(now);due.setDate(due.getDate()+i*2+1);
+    S.tasks.unshift({id:Date.now()+i,title,description:'',subtasks:[],status:'todo',priority:i<2?'p1':'p2',project:pName,due:due.toISOString().split('T')[0],created:now.toISOString()});
+  });
+  save();renderTasks();toast('Created '+tmpl.tasks.length+' tasks for "'+pName+'"');
+}
+function startContentCompare(){
+  const id1=prompt('Enter first content ID (from URL or card):');
+  if(!id1)return;
+  const id2=prompt('Enter second content ID to compare:');
+  if(!id2)return;
+  const c1=S.content.find(c=>c.id===parseInt(id1));
+  const c2=S.content.find(c=>c.id===parseInt(id2));
+  if(!c1||!c2){toast('Content not found. Use valid IDs.');return;}
+  let panel=document.getElementById('compare-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='compare-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:80vh;overflow-y:auto';
+  const wc1=(c1.body||'').trim().split(/\s+/).filter(x=>x.length).length;
+  const wc2=(c2.body||'').trim().split(/\s+/).filter(x=>x.length).length;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Content Compare</span><button onclick="document.getElementById('compare-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div style="background:var(--bg-surface);border-radius:var(--radius);padding:12px;overflow-y:auto;max-height:50vh"><div style="font-size:9px;color:var(--accent);margin-bottom:4px">Item A (${wc1} words) | ${c1.type||''} | ${timeAgo(c1.created||'')}</div><div style="font-size:10px;color:var(--text-primary);white-space:pre-wrap;line-height:1.5">${esc(c1.body||'')}</div></div><div style="background:var(--bg-surface);border-radius:var(--radius);padding:12px;overflow-y:auto;max-height:50vh"><div style="font-size:9px;color:var(--accent-cyan);margin-bottom:4px">Item B (${wc2} words) | ${c2.type||''} | ${timeAgo(c2.created||'')}</div><div style="font-size:10px;color:var(--text-primary);white-space:pre-wrap;line-height:1.5">${esc(c2.body||'')}</div></div></div><div style="margin-top:8px;font-size:9px;color:var(--text-muted)">Word count diff: ${Math.abs(wc1-wc2)} words | ${wc1>wc2?'A is longer':'B is longer'}</div>`;
+  document.body.appendChild(panel);
+}
+function addTimeBlock(){
+  const title=prompt('Time block label (e.g. "Deep work", "Meeting"):');if(!title||!title.trim())return;
+  const date=prompt('Date (YYYY-MM-DD):',new Date().toISOString().split('T')[0]);if(!date)return;
+  const start=prompt('Start time (e.g. "09:00"):','09:00');if(!start)return;
+  const end=prompt('End time (e.g. "11:00"):','11:00');if(!end)return;
+  if(!S._timeBlocks)S._timeBlocks=[];
+  S._timeBlocks.push({id:Date.now(),title:title.trim(),date,start,end,color:'var(--accent)'});
+  save();toast('Time block added: '+title.trim()+' on '+date);
+}
+function showTimeBlocks(){
+  if(!S._timeBlocks||!S._timeBlocks.length){toast('No time blocks. Use "time block" to add one.');return;}
+  let panel=document.getElementById('timeblock-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='timeblock-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:70vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const blocks=(S._timeBlocks||[]).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+  const upcoming=blocks.filter(b=>b.date>=today);
+  const past=blocks.filter(b=>b.date<today);
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Time Blocks (${blocks.length})</span><div style="display:flex;gap:6px"><button onclick="addTimeBlock();document.getElementById('timeblock-panel').remove()" class="btn btn-sm btn-ghost" style="font-size:9px">+ Add</button><button onclick="document.getElementById('timeblock-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`;
+  if(upcoming.length){h+='<div style="font-size:9px;font-weight:600;color:var(--accent);margin-bottom:4px;text-transform:uppercase">Upcoming</div>';}
+  upcoming.forEach(b=>{
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-left:3px solid var(--accent);margin-bottom:4px;border-radius:0 4px 4px 0"><div style="flex:1"><div style="font-size:11px;color:var(--text-primary)">${esc(b.title)}</div><div style="font-size:9px;color:var(--text-muted)">${b.date} | ${b.start} - ${b.end}</div></div><button onclick="S._timeBlocks=S._timeBlocks.filter(x=>x.id!==${b.id});save();document.getElementById('timeblock-panel').remove();showTimeBlocks()" class="btn btn-sm btn-ghost" style="font-size:8px;color:var(--red)">x</button></div>`;
+  });
+  if(past.length){h+=`<div style="font-size:9px;font-weight:600;color:var(--text-muted);margin-top:8px;margin-bottom:4px;text-transform:uppercase">Past (${past.length})</div>`;
+  past.slice(0,5).forEach(b=>{h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 8px;border-left:3px solid var(--border);margin-bottom:2px;opacity:0.5"><div style="flex:1;font-size:10px;color:var(--text-muted)">${esc(b.title)} - ${b.date} ${b.start}-${b.end}</div></div>`;});}
+  panel.innerHTML=h;
   document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
