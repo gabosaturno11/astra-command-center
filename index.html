@@ -6278,6 +6278,9 @@ function cmdGetItems(q) {
       ['sql schema','SQL schema generator'],
       ['project timeline','Project progress timeline'],
       ['coin flip','Coin flip randomizer'],
+      ['prisma','Prisma schema generator'],
+      ['weekly review','Weekly task review summary'],
+      ['random number','Random number generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9281,6 +9284,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='coin flip' || ql==='coin' || ql==='flip coin' || ql==='heads tails')){
     items.unshift({title:'Coin Flip',desc:'Random coin flip with history',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCoinFlip();}});
+  }
+  if(ql && (ql==='prisma' || ql==='prisma schema' || ql==='orm schema' || ql==='prisma model')){
+    items.unshift({title:'Prisma Schema',desc:'Generate Prisma models for auth, blog, e-commerce',icon:'P',type:'action',action:()=>{closeCommandPalette();showPrismaSchemaGen();}});
+  }
+  if(ql && (ql==='weekly review' || ql==='week review' || ql==='week summary' || ql==='weekly summary')){
+    items.unshift({title:'Weekly Review',desc:'7-day task activity summary',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyReview();}});
+  }
+  if(ql && (ql==='random number' || ql==='random' || ql==='rng' || ql==='number generator')){
+    items.unshift({title:'Random Number',desc:'Random number in custom range',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRandomNumber();}});
   }
   return items.slice(0, 20);
 }
@@ -26101,6 +26113,84 @@ function showQuickCoinFlip(){
   window._flipCoin=()=>{
     if(flipping)return;flipping=true;rend();
     let count=0;const anim=setInterval(()=>{count++;if(count>8){clearInterval(anim);flipping=false;const result=Math.random()<0.5?'H':'T';history.unshift(result);rend();}},80);
+  };
+  document.body.appendChild(d);rend();
+}
+function showPrismaSchemaGen(){
+  let ex=document.getElementById('prisma-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'User + Auth':`generator client {\n  provider = "prisma-client-js"\n}\n\ndatasource db {\n  provider = "postgresql"\n  url      = env("DATABASE_URL")\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  email     String   @unique\n  name      String?\n  password  String\n  role      Role     @default(USER)\n  posts     Post[]\n  sessions  Session[]\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Session {\n  id        String   @id @default(cuid())\n  userId    Int\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  expiresAt DateTime\n  createdAt DateTime @default(now())\n}\n\nenum Role {\n  USER\n  ADMIN\n}`,
+    'Blog':`model Post {\n  id          Int       @id @default(autoincrement())\n  title       String\n  slug        String    @unique\n  content     String?\n  published   Boolean   @default(false)\n  author      User      @relation(fields: [authorId], references: [id])\n  authorId    Int\n  categories  Category[]\n  comments    Comment[]\n  publishedAt DateTime?\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n}\n\nmodel Comment {\n  id        Int      @id @default(autoincrement())\n  body      String\n  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)\n  postId    Int\n  author    User     @relation(fields: [authorId], references: [id])\n  authorId  Int\n  createdAt DateTime @default(now())\n}\n\nmodel Category {\n  id    Int    @id @default(autoincrement())\n  name  String @unique\n  posts Post[]\n}`,
+    'E-commerce':`model Product {\n  id          Int         @id @default(autoincrement())\n  name        String\n  description String?\n  price       Decimal     @db.Decimal(10, 2)\n  sku         String      @unique\n  stock       Int         @default(0)\n  images      String[]\n  category    Category?   @relation(fields: [categoryId], references: [id])\n  categoryId  Int?\n  orderItems  OrderItem[]\n  isActive    Boolean     @default(true)\n  createdAt   DateTime    @default(now())\n}\n\nmodel Order {\n  id         Int         @id @default(autoincrement())\n  user       User        @relation(fields: [userId], references: [id])\n  userId     Int\n  status     OrderStatus @default(PENDING)\n  total      Decimal     @db.Decimal(10, 2)\n  items      OrderItem[]\n  createdAt  DateTime    @default(now())\n}\n\nmodel OrderItem {\n  id        Int     @id @default(autoincrement())\n  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)\n  orderId   Int\n  product   Product @relation(fields: [productId], references: [id])\n  productId Int\n  quantity  Int\n  price     Decimal @db.Decimal(10, 2)\n}\n\nenum OrderStatus {\n  PENDING\n  PROCESSING\n  SHIPPED\n  DELIVERED\n  CANCELLED\n}`
+  };
+  let sel='User + Auth';
+  const d=document.createElement('div');d.id='prisma-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-prpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-prpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Prisma Schema Generator</span><span onclick="document.getElementById('prisma-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#prisma-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy schema.prisma',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy schema.prisma</button>
+    </div>`;
+    d.querySelectorAll('[data-prpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.prpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskWeeklyReview(){
+  let ex=document.getElementById('weekly-review-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(weekAgo.getDate()-7);
+  const created=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=weekAgo);
+  const completed=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=weekAgo);
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now);
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  const docs=S.writerDocs||[];
+  const docsCreated=docs.filter(d=>d.created&&new Date(d.created)>=weekAgo);
+  const contentCreated=(S.content||[]).filter(c=>c.createdAt&&new Date(c.createdAt)>=weekAgo);
+  const d=document.createElement('div');d.id='weekly-review-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:75vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:600;color:var(--text-primary)">Weekly Review</span><span onclick="document.getElementById('weekly-review-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">${weekAgo.toLocaleDateString()} - ${now.toLocaleDateString()}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+      <div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">${completed.length}</div><div style="font-size:10px;color:var(--text-muted)">Completed</div></div>
+      <div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:#22d3ee">${created.length}</div><div style="font-size:10px;color:var(--text-muted)">Created</div></div>
+      <div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:#f87171">${overdue.length}</div><div style="font-size:10px;color:var(--text-muted)">Overdue</div></div>
+      <div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:700;color:#fb923c">${inProgress.length}</div><div style="font-size:10px;color:var(--text-muted)">In Progress</div></div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:12px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Also this week:</div>
+      <div style="font-size:11px;color:var(--text-secondary)">Docs created: ${docsCreated.length} | Content added: ${contentCreated.length}</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-top:4px">Net: ${completed.length-created.length>=0?'+':''}${completed.length-created.length} tasks (${completed.length>=created.length?'reducing':'growing'} backlog)</div>
+    </div>
+    <button onclick="const t=document.getElementById('weekly-review-float').innerText;navigator.clipboard.writeText(t);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Summary',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-top:12px">Copy Summary</button>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickRandomNumber(){
+  let ex=document.getElementById('random-num-float');if(ex){ex.remove();return;}
+  let min=1,max=100,result=null,history=[];
+  const d=document.createElement('div');d.id='random-num-float';
+  const rend=()=>{
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:200px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Random Number</span><span onclick="document.getElementById('random-num-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px">
+        <input type="number" value="${min}" onchange="window._rnMin=parseInt(this.value)" style="width:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:11px;text-align:center">
+        <span style="color:var(--text-muted);font-size:11px">to</span>
+        <input type="number" value="${max}" onchange="window._rnMax=parseInt(this.value)" style="width:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:11px;text-align:center">
+      </div>
+      ${result!==null?`<div style="font-size:42px;font-weight:200;color:var(--accent);margin:8px 0">${result}</div>`:'<div style="font-size:14px;color:var(--text-muted);margin:16px 0">Set range and generate</div>'}
+      <button onclick="window._genRandom()" style="background:var(--accent);color:#000;border:none;padding:6px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:8px">Generate</button>
+      ${history.length>1?`<div style="font-size:9px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px">History: ${history.slice(0,10).join(', ')}</div>`:''}
+    </div>`;
+  };
+  window._rnMin=min;window._rnMax=max;
+  window._genRandom=()=>{
+    min=window._rnMin||1;max=window._rnMax||100;
+    result=Math.floor(Math.random()*(max-min+1))+min;
+    history.unshift(result);if(history.length>20)history.length=20;
+    rend();
   };
   document.body.appendChild(d);rend();
 }
