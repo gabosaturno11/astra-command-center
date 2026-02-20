@@ -6611,6 +6611,12 @@ function cmdGetItems(q) {
       ['nextjs','Next.js app router reference'],
       ['forecast','Task completion forecast'],
       ['hash','SHA hash generator'],
+      ['tailwind','Tailwind CSS utility class reference'],
+      ['status flow','Task status distribution flow'],
+      ['epoch','Unix epoch timestamp converter'],
+      ['prisma','Prisma ORM schema and query reference'],
+      ['label cloud','Task label tag cloud visualization'],
+      ['ip info','IP address info lookup'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10613,6 +10619,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='hash' || ql==='sha' || ql==='hash generator' || ql==='sha256')){
     items.unshift({title:'Hash Generator',desc:'SHA-256/384/512 hash tool',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHashGenerator();}});
+  }
+  if(ql && (ql==='tailwind' || ql==='tailwind css' || ql==='tw ref' || ql==='tailwind classes')){
+    items.unshift({title:'Tailwind Reference',desc:'Layout, spacing, colors, effects',icon:'T',type:'action',action:()=>{closeCommandPalette();showTailwindRef();}});
+  }
+  if(ql && (ql==='status flow' || ql==='status distribution' || ql==='task flow' || ql==='kanban flow')){
+    items.unshift({title:'Status Flow',desc:'Task status distribution chart',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStatusFlow();}});
+  }
+  if(ql && (ql==='epoch' || ql==='unix timestamp' || ql==='epoch converter' || ql==='timestamp')){
+    items.unshift({title:'Epoch Converter',desc:'Unix timestamp converter',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEpochConverter();}});
+  }
+  if(ql && (ql==='prisma' || ql==='prisma ref' || ql==='prisma orm' || ql==='prisma schema')){
+    items.unshift({title:'Prisma Reference',desc:'Schema, queries, CLI',icon:'P',type:'action',action:()=>{closeCommandPalette();showPrismaRef();}});
+  }
+  if(ql && (ql==='label cloud' || ql==='tag cloud' || ql==='labels' || ql==='label visualization')){
+    items.unshift({title:'Label Cloud',desc:'Tag cloud from task labels',icon:'L',type:'action',action:()=>{closeCommandPalette();showTaskLabelCloud();}});
+  }
+  if(ql && (ql==='ip info' || ql==='ip lookup' || ql==='my ip' || ql==='ip address')){
+    items.unshift({title:'IP Info Lookup',desc:'Your IP address details',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIpInfoLookup();}});
   }
   return items.slice(0, 20);
 }
@@ -36778,6 +36802,142 @@ function showQuickHashGenerator(){
       out.textContent=arr.map(b=>b.toString(16).padStart(2,'0')).join('');
     }catch(e){out.textContent='Error: '+e.message;}
   };
+}
+function showTailwindRef(){
+  let d=document.getElementById('tw-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='tw-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Layout':['flex items-center justify-between','grid grid-cols-3 gap-4','container mx-auto px-4','block / inline-block / hidden','absolute top-0 right-0','sticky top-0 z-50','overflow-hidden overflow-y-auto'],
+    'Spacing':['p-4 px-6 py-2 pt-8','m-4 mx-auto my-2 mt-0','space-x-4 space-y-2','gap-4 gap-x-6 gap-y-2'],
+    'Typography':['text-sm text-lg text-2xl','font-bold font-medium font-light','text-center text-left text-right','text-gray-500 text-white','leading-tight leading-relaxed','tracking-wide truncate','whitespace-nowrap line-clamp-2'],
+    'Colors & BG':['bg-gray-900 bg-white bg-transparent','bg-gradient-to-r from-blue-500 to-purple-600','text-emerald-400 text-red-500','border-gray-700 border-blue-500','ring-2 ring-blue-500','opacity-50 opacity-75'],
+    'Sizing':['w-full w-1/2 w-screen w-64','h-screen h-full h-auto min-h-screen','max-w-md max-w-4xl max-w-prose','aspect-square aspect-video'],
+    'Effects':['rounded-lg rounded-full rounded-none','shadow-md shadow-xl shadow-none','transition-all duration-300 ease-in-out','hover:bg-gray-700 focus:ring-2','dark:bg-gray-900 dark:text-white','animate-spin animate-pulse','backdrop-blur-sm'],
+    'Responsive':['sm:flex md:grid lg:hidden xl:text-2xl','sm:px-6 md:px-8','max-sm:hidden md:block']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Tailwind CSS Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskStatusFlow(){
+  let d=document.getElementById('status-flow-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='status-flow-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const statuses=['backlog','todo','in-progress','review','done'];
+  const counts={};statuses.forEach(s=>counts[s]=0);
+  tasks.forEach(t=>{const s=t.status||'todo';if(counts[s]!==undefined)counts[s]++;else{counts[s]=counts[s]||0;counts[s]++;}});
+  const total=tasks.length||1;
+  const colors={backlog:'#94a3b8',todo:'#fbbf24','in-progress':'#38bdf8',review:'#a78bfa',done:'#4ade80'};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Status Flow</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:16px">';
+  statuses.forEach((s,i)=>{
+    const pct=Math.max(Math.round((counts[s]/total)*100),2);
+    h+='<div style="flex:'+pct+';height:24px;background:'+(colors[s]||'#666')+';border-radius:'+(i===0?'6px 0 0 6px':i===statuses.length-1?'0 6px 6px 0':'0')+'" title="'+s+': '+counts[s]+'"></div>';
+  });
+  h+='</div>';
+  statuses.forEach(s=>{
+    const pct=Math.round((counts[s]/total)*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;margin:4px 0;background:var(--bg-surface);border-radius:4px"><div style="width:12px;height:12px;border-radius:3px;background:'+(colors[s]||'#666')+'"></div><span style="flex:1;font-size:12px;color:var(--text-secondary);text-transform:capitalize">'+s+'</span><span style="font-size:14px;font-weight:700;color:var(--text-primary)">'+counts[s]+'</span><span style="font-size:11px;color:var(--text-muted)">'+pct+'%</span></div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickEpochConverter(){
+  let d=document.getElementById('epoch-conv-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='epoch-conv-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  const now=Math.floor(Date.now()/1000);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Epoch Converter</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Current epoch:</div>';
+  h+='<div id="epoch-now" style="font-family:monospace;font-size:16px;color:var(--accent);font-weight:700;margin-bottom:10px;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--accent)\',600)">'+now+'</div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Epoch to Date:</div>';
+  h+='<input id="epoch-input" type="number" value="'+now+'" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-family:monospace;font-size:13px;box-sizing:border-box;margin-bottom:4px" oninput="window._epochToDate()">';
+  h+='<div id="epoch-date" style="font-size:12px;color:var(--text-secondary);padding:6px;background:var(--bg-surface);border-radius:4px;margin-bottom:10px">'+new Date(now*1000).toISOString()+'</div>';
+  h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Date to Epoch:</div>';
+  h+='<input id="date-input" type="datetime-local" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;box-sizing:border-box;margin-bottom:4px" onchange="window._dateToEpoch()">';
+  h+='<div id="date-epoch" style="font-family:monospace;font-size:14px;color:var(--accent);padding:6px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent)"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._epochToDate=function(){const v=document.getElementById('epoch-input').value;const out=document.getElementById('epoch-date');if(!out)return;try{const ts=parseInt(v);const d2=ts>1e12?new Date(ts):new Date(ts*1000);out.textContent=d2.toISOString()+' ('+d2.toLocaleString()+')';}catch(e){out.textContent='Invalid';}};
+  window._dateToEpoch=function(){const v=document.getElementById('date-input').value;const out=document.getElementById('date-epoch');if(!out||!v)return;out.textContent=Math.floor(new Date(v).getTime()/1000);};
+  setInterval(()=>{const el=document.getElementById('epoch-now');if(el)el.textContent=Math.floor(Date.now()/1000);},1000);
+}
+function showPrismaRef(){
+  let d=document.getElementById('prisma-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='prisma-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['npx prisma init','npx prisma generate','npx prisma db push','npx prisma migrate dev --name init','npx prisma studio','npx prisma db seed','npx prisma format'],
+    'Schema':['model User { id Int @id @default(autoincrement()) name String email String @unique }','model Post { id Int @id @default(autoincrement()) author User @relation(fields: [authorId], references: [id]) authorId Int }','enum Role { USER ADMIN }','datasource db { provider = "postgresql" url = env("DATABASE_URL") }','generator client { provider = "prisma-client-js" }'],
+    'Queries':['prisma.user.findMany()','prisma.user.findUnique({ where: { id: 1 } })','prisma.user.create({ data: { name: "A", email: "a@b.com" } })','prisma.user.update({ where: { id: 1 }, data: { name: "B" } })','prisma.user.delete({ where: { id: 1 } })','prisma.user.count()'],
+    'Filters':['where: { name: { contains: "search" } }','where: { age: { gt: 18 } }','where: { OR: [{ name: "A" }, { name: "B" }] }','orderBy: { createdAt: "desc" }','take: 10, skip: 20','include: { posts: true }','select: { name: true, email: true }'],
+    'Relations':['@relation(fields: [userId], references: [id])','posts Post[]','author User @relation(...)','onDelete: Cascade','@unique([firstName, lastName])']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Prisma ORM Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskLabelCloud(){
+  let d=document.getElementById('label-cloud-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='label-cloud-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const labels={};
+  tasks.forEach(t=>{
+    (t.tags||[]).forEach(tag=>{labels[tag]=(labels[tag]||0)+1;});
+    if(t.priority)labels[t.priority]=(labels[t.priority]||0)+1;
+    if(t.status)labels[t.status]=(labels[t.status]||0)+1;
+  });
+  const sorted=Object.entries(labels).sort((a,b)=>b[1]-a[1]);
+  const maxV=sorted.length>0?sorted[0][1]:1;
+  const colors=['#4ade80','#38bdf8','#a78bfa','#fb923c','#f87171','#fbbf24','#2dd4bf','#f472b6','#818cf8','#94a3b8'];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Label Cloud</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center">';
+  sorted.slice(0,30).forEach(([label,count],i)=>{
+    const size=Math.max(11,Math.min(24,Math.round(11+(count/maxV)*13)));
+    h+='<span style="font-size:'+size+'px;color:'+colors[i%colors.length]+';cursor:default;padding:2px 6px" title="'+count+' occurrences">'+esc(label)+'</span>';
+  });
+  h+='</div>';
+  if(sorted.length>0){
+    h+='<div style="margin-top:16px;font-size:11px;color:var(--text-muted);text-align:center">'+sorted.length+' unique labels across '+tasks.length+' tasks</div>';
+  }
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickIpInfoLookup(){
+  let d=document.getElementById('ip-info-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='ip-info-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">IP Info Lookup</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<div id="ip-loading" style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px">Loading your IP info...</div>';
+  h+='<div id="ip-results" style="display:none"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  fetch('https://ipapi.co/json/').then(r=>r.json()).then(data=>{
+    const out=document.getElementById('ip-results');
+    const loading=document.getElementById('ip-loading');
+    if(!out)return;if(loading)loading.style.display='none';out.style.display='block';
+    const fields=[
+      {label:'IP',value:data.ip},
+      {label:'City',value:data.city},
+      {label:'Region',value:data.region},
+      {label:'Country',value:data.country_name},
+      {label:'ISP',value:data.org},
+      {label:'Timezone',value:data.timezone},
+      {label:'Lat/Lng',value:data.latitude+', '+data.longitude}
+    ];
+    let r2='';fields.forEach(f=>{
+      r2+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px"><span style="color:var(--text-muted)">'+f.label+'</span><span style="color:var(--text-primary);font-weight:500;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-primary)\',600)">'+esc(String(f.value||'N/A'))+'</span></div>';
+    });
+    out.innerHTML=r2;
+  }).catch(e=>{
+    const loading=document.getElementById('ip-loading');
+    if(loading)loading.textContent='Error: '+e.message;
+  });
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
