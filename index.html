@@ -5787,6 +5787,9 @@ function cmdGetItems(q) {
       ['transform','Text transform tools (uppercase, lowercase, title case)'],
       ['archive url','View link on Wayback Machine'],
       ['dashboard','Show home dashboard with widgets'],
+      ['settings','App preferences and configuration'],
+      ['impact','Task impact-effort matrix (2x2)'],
+      ['export content','Export all content as markdown'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7023,6 +7026,19 @@ function cmdGetItems(q) {
   if(ql && (ql==='dashboard' || ql==='home' || ql==='overview' || ql==='widgets')){
     items.unshift({title:'Home Dashboard',desc:'Overview with today\'s tasks, stats, recent activity',icon:'D',type:'action',action:()=>{closeCommandPalette();showHomeDashboard();}});
   }
+  // Settings prefix
+  if(ql && (ql==='settings' || ql==='preferences' || ql==='config' || ql==='options')){
+    items.unshift({title:'App Settings',desc:'Configure preferences, defaults, and appearance',icon:'S',type:'action',action:()=>{closeCommandPalette();showSettings();}});
+  }
+  // Impact-effort matrix prefix
+  if(ql && (ql==='impact' || ql==='impact effort' || ql==='effort matrix' || ql==='impact matrix')){
+    items.unshift({title:'Impact-Effort Matrix',desc:'2x2 matrix: quick wins, big bets, time sinks, fill-ins',icon:'M',type:'action',action:()=>{closeCommandPalette();showImpactMatrix();}});
+  }
+  // Export content prefix
+  if(ql && (ql==='export content' || ql==='export all content' || ql==='content export' || ql==='download content')){
+    items.unshift({title:'Export All Content as Markdown',desc:'Download '+S.content.length+' items as a single .md file',icon:'C',type:'action',action:()=>{closeCommandPalette();exportAllContent();}});
+    items.unshift({title:'Export All Content as JSON',desc:'Download raw content data',icon:'C',type:'action',action:()=>{closeCommandPalette();exportContentJSON();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7501,6 +7517,76 @@ function showHomeDashboard(){
   h+=`<div style="display:flex;gap:6px;margin-top:16px;flex-wrap:wrap"><button onclick="document.getElementById('dashboard-panel').remove();openDailyJournal()" class="btn btn-sm btn-ghost" style="font-size:9px">Journal</button><button onclick="document.getElementById('dashboard-panel').remove();showHabitTracker()" class="btn btn-sm btn-ghost" style="font-size:9px">Habits</button><button onclick="document.getElementById('dashboard-panel').remove();showActivityTimeline()" class="btn btn-sm btn-ghost" style="font-size:9px">Timeline</button><button onclick="document.getElementById('dashboard-panel').remove();showBurndownChart()" class="btn btn-sm btn-ghost" style="font-size:9px">Burndown</button></div>`;
   panel.innerHTML=h;
   document.body.appendChild(panel);
+}
+function showSettings(){
+  let panel=document.getElementById('settings-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='settings-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:75vh;overflow-y:auto';
+  if(!S._settings)S._settings={};
+  const s=S._settings;
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Settings</span><button onclick="document.getElementById('settings-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>
+  <div style="display:flex;flex-direction:column;gap:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-primary)">Compact Content View</span><button onclick="contentCompact=!contentCompact;this.textContent=contentCompact?'ON':'OFF';this.style.color=contentCompact?'var(--accent)':'var(--text-muted)';renderContent()" class="btn btn-sm btn-ghost" style="font-size:9px;color:${typeof contentCompact!=='undefined'&&contentCompact?'var(--accent)':'var(--text-muted)'}">${typeof contentCompact!=='undefined'&&contentCompact?'ON':'OFF'}</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-primary)">Auto-Backup</span><button onclick="toggleAutoBackup();this.textContent=S._autoBackup?'ON':'OFF';this.style.color=S._autoBackup?'var(--accent)':'var(--text-muted)'" class="btn btn-sm btn-ghost" style="font-size:9px;color:${S._autoBackup?'var(--accent)':'var(--text-muted)'}">${S._autoBackup?'ON':'OFF'}</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-primary)">Desktop Notifications</span><button onclick="enableDesktopNotifications()" class="btn btn-sm btn-ghost" style="font-size:9px;color:${S._notificationsEnabled?'var(--accent)':'var(--text-muted)'}">${S._notificationsEnabled?'ON':'OFF'}</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-primary)">Accent Color</span><div style="display:flex;gap:3px">${['#4ade80','#06b6d4','#8b5cf6','#3b82f6','#f59e0b','#ec4899','#ef4444','#eab308'].map(c=>`<div onclick="document.documentElement.style.setProperty('--accent','${c}');S._accentColor='${c}';save()" style="width:16px;height:16px;border-radius:50%;background:${c};cursor:pointer;border:2px solid ${S._accentColor===c?'white':'transparent'}"></div>`).join('')}</div></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-primary)">Default Task View</span><select onchange="S._settings.defaultTaskView=this.value;save()" style="font-size:9px;padding:2px 6px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:4px"><option value="list" ${(s.defaultTaskView||'list')==='list'?'selected':''}>List</option><option value="board" ${s.defaultTaskView==='board'?'selected':''}>Board</option><option value="eisenhower" ${s.defaultTaskView==='eisenhower'?'selected':''}>Eisenhower</option></select></div>
+  <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:var(--text-primary)">Default Calendar View</span><select onchange="S._settings.defaultCalView=this.value;save()" style="font-size:9px;padding:2px 6px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:4px"><option value="month" ${(s.defaultCalView||'month')==='month'?'selected':''}>Month</option><option value="week" ${s.defaultCalView==='week'?'selected':''}>Week</option><option value="agenda" ${s.defaultCalView==='agenda'?'selected':''}>Agenda</option></select></div>
+  <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px"><div style="font-size:9px;color:var(--text-muted)">Storage: ${(JSON.stringify(S).length/1024).toFixed(0)}KB / 5MB</div><div style="font-size:9px;color:var(--text-muted)">${S.tasks.length} tasks | ${S.content.length} content | ${S.docs.length} docs | ${S.links.length} links</div></div>
+  </div>`;
+  document.body.appendChild(panel);
+}
+function showImpactMatrix(){
+  let panel=document.getElementById('impact-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='impact-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const active=S.tasks.filter(t=>t.status!=='done');
+  // Classify: high impact = p0/p1, low impact = p2/p3
+  // high effort = has estimate >1h or no estimate but has many subtasks, low effort = short estimate or few subtasks
+  const classify=t=>{
+    const highImpact=t.priority==='p0'||t.priority==='p1';
+    const est=t.estimate||'';const stCount=(t.subtasks||[]).length;
+    const highEffort=est.includes('h')&&parseInt(est)>=2||stCount>=4||(!est&&!stCount);
+    return{impact:highImpact?'high':'low',effort:highEffort?'high':'low'};
+  };
+  const quads={hh:[],hl:[],lh:[],ll:[]};
+  active.forEach(t=>{const c=classify(t);const key=(c.impact==='high'?'h':'l')+(c.effort==='high'?'h':'l');quads[key].push(t);});
+  const quadInfo=[
+    {key:'hl',name:'Quick Wins',desc:'High Impact, Low Effort',color:'var(--green)',emoji:''},
+    {key:'hh',name:'Big Bets',desc:'High Impact, High Effort',color:'var(--accent-cyan)',emoji:''},
+    {key:'ll',name:'Fill-Ins',desc:'Low Impact, Low Effort',color:'var(--text-muted)',emoji:''},
+    {key:'lh',name:'Time Sinks',desc:'Low Impact, High Effort',color:'var(--orange)',emoji:''},
+  ];
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Impact-Effort Matrix</span><button onclick="document.getElementById('impact-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">`;
+  quadInfo.forEach(qi=>{
+    h+=`<div style="background:var(--bg-surface);border-radius:var(--radius);padding:10px;border-top:3px solid ${qi.color}"><div style="font-size:10px;font-weight:600;color:${qi.color};margin-bottom:2px">${qi.name} (${quads[qi.key].length})</div><div style="font-size:8px;color:var(--text-muted);margin-bottom:6px">${qi.desc}</div>`;
+    quads[qi.key].slice(0,5).forEach(t=>{h+=`<div onclick="document.getElementById('impact-panel').remove();openTaskDetail(${t.id})" style="font-size:9px;padding:3px 6px;cursor:pointer;border-left:2px solid ${qi.color};margin-bottom:2px;color:var(--text-primary)">${esc(t.title||'').substring(0,40)}</div>`;});
+    if(quads[qi.key].length>5)h+=`<div style="font-size:8px;color:var(--text-muted);padding:2px 6px">+${quads[qi.key].length-5} more</div>`;
+    h+=`</div>`;
+  });
+  h+=`</div><div style="margin-top:10px;font-size:8px;color:var(--text-muted)">Classification: Priority P0/P1 = High Impact. Estimate >= 2h or 4+ subtasks = High Effort.</div>`;
+  panel.innerHTML=h;
+  document.body.appendChild(panel);
+}
+function exportAllContent(){
+  if(!S.content.length){toast('No content');return;}
+  let md='# Content Export\\n# '+new Date().toISOString().split('T')[0]+'\\n# '+S.content.length+' items\\n\\n';
+  const byTheme={};S.content.forEach(c=>{const t=c.theme||'Unthemed';if(!byTheme[t])byTheme[t]=[];byTheme[t].push(c);});
+  Object.keys(byTheme).sort().forEach(theme=>{
+    md+='---\\n\\n## '+theme+' ('+byTheme[theme].length+')\\n\\n';
+    byTheme[theme].forEach(c=>{md+='### '+(c.type||'note')+' | '+(c.created?new Date(c.created).toLocaleDateString():'')+'\\n\\n'+c.body+'\\n\\n';});
+  });
+  const blob=new Blob([md],{type:'text/markdown'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='content-export-'+new Date().toISOString().split('T')[0]+'.md';
+  a.click();toast('Exported '+S.content.length+' items');
+}
+function exportContentJSON(){
+  const data=JSON.stringify(S.content,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='content-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();toast('Exported '+S.content.length+' items as JSON');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
