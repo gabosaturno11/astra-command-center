@@ -6299,6 +6299,9 @@ function cmdGetItems(q) {
       ['socket.io','Socket.IO boilerplate code'],
       ['project radar','Multi-project radar chart'],
       ['markdown preview','Live markdown preview'],
+      ['jwt','JWT token decoder'],
+      ['task dashboard','Full task summary dashboard'],
+      ['ascii art','ASCII art collection'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9365,6 +9368,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='markdown preview' || ql==='md preview' || ql==='markdown' || ql==='preview markdown')){
     items.unshift({title:'Markdown Preview',desc:'Live side-by-side markdown renderer',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownPreview();}});
+  }
+  if(ql && (ql==='jwt' || ql==='jwt decode' || ql==='jwt decoder' || ql==='token decode')){
+    items.unshift({title:'JWT Decoder',desc:'Decode and inspect JWT tokens',icon:'J',type:'action',action:()=>{closeCommandPalette();showJwtDecoder();}});
+  }
+  if(ql && (ql==='task dashboard' || ql==='dashboard' || ql==='task summary' || ql==='overview')){
+    items.unshift({title:'Task Dashboard',desc:'Full task metrics summary',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskSummaryDashboard();}});
+  }
+  if(ql && (ql==='ascii art' || ql==='ascii' || ql==='text art' || ql==='art')){
+    items.unshift({title:'ASCII Art',desc:'Copy fun ASCII art characters',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAsciiArt();}});
   }
   return items.slice(0, 20);
 }
@@ -26757,6 +26769,97 @@ function showQuickMarkdownPreview(){
     const txt=document.getElementById('md-input').value;
     document.getElementById('md-output').innerHTML=renderMd(txt);
   };
+  document.body.appendChild(d);rend();
+}
+function showJwtDecoder(){
+  let ex=document.getElementById('jwt-decoder-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='jwt-decoder-float';
+  const decode=(token)=>{
+    if(!token)return{header:null,payload:null,valid:false};
+    try{
+      const parts=token.split('.');
+      if(parts.length!==3)return{header:null,payload:null,valid:false};
+      const header=JSON.parse(atob(parts[0].replace(/-/g,'+').replace(/_/g,'/')));
+      const payload=JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+      const exp=payload.exp?new Date(payload.exp*1000):null;
+      const expired=exp?exp<new Date():false;
+      return{header,payload,valid:true,exp,expired};
+    }catch(e){return{header:null,payload:null,valid:false};}
+  };
+  const rend=(token)=>{
+    token=token||'';
+    const r=decode(token);
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">JWT Decoder</span><span onclick="document.getElementById('jwt-decoder-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <textarea id="jwt-input" placeholder="Paste JWT token here..." rows="3" oninput="window._decodeJwt()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-bottom:12px">${esc(token)}</textarea>
+      ${r.valid?`
+        <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Header</div><pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;color:#22d3ee;overflow-x:auto;line-height:1.4">${JSON.stringify(r.header,null,2)}</pre></div>
+        <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Payload</div><pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:11px;color:#4ade80;overflow-x:auto;line-height:1.4">${JSON.stringify(r.payload,null,2)}</pre></div>
+        ${r.exp?`<div style="font-size:11px;color:${r.expired?'#f87171':'#4ade80'};margin-bottom:6px">${r.expired?'EXPIRED':'Valid'} | Expires: ${r.exp.toLocaleString()}</div>`:''}`
+      :token?'<div style="color:#f87171;font-size:12px;padding:12px;text-align:center">Invalid JWT format</div>':'<div style="color:var(--text-muted);font-size:12px;padding:12px;text-align:center">Paste a JWT to decode</div>'}
+    </div>`;
+  };
+  window._decodeJwt=()=>{rend(document.getElementById('jwt-input').value);};
+  document.body.appendChild(d);rend();
+}
+function showTaskSummaryDashboard(){
+  let ex=document.getElementById('task-summary-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const total=tasks.length;
+  const done=tasks.filter(t=>t.status==='done').length;
+  const inProg=tasks.filter(t=>t.status==='in-progress').length;
+  const todo=tasks.filter(t=>t.status==='todo').length;
+  const blocked=tasks.filter(t=>t.status==='blocked').length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length;
+  const today=new Date().toISOString().split('T')[0];
+  const createdToday=tasks.filter(t=>t.createdAt&&t.createdAt.startsWith(today)).length;
+  const doneToday=tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(today)).length;
+  const p0=tasks.filter(t=>t.priority==='p0'&&t.status!=='done').length;
+  const p1=tasks.filter(t=>t.priority==='p1'&&t.status!=='done').length;
+  const avgAge=()=>{const open=tasks.filter(t=>t.status!=='done'&&t.createdAt);if(!open.length)return 0;const now=new Date();return Math.round(open.reduce((s,t)=>s+(now-new Date(t.createdAt))/(86400000),0)/open.length);};
+  const metric=(label,val,color)=>`<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:22px;font-weight:700;color:${color}">${val}</div><div style="font-size:9px;color:var(--text-muted);margin-top:2px">${label}</div></div>`;
+  const d=document.createElement('div');d.id='task-summary-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Task Dashboard</span><span onclick="document.getElementById('task-summary-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+      ${metric('Total',total,'var(--text-primary)')}
+      ${metric('Done',done,'#4ade80')}
+      ${metric('In Progress',inProg,'#22d3ee')}
+      ${metric('To Do',todo,'#6b7280')}
+      ${metric('Blocked',blocked,'#f87171')}
+      ${metric('Overdue',overdue,'#fb923c')}
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:10px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px">
+      ${metric('Created Today',createdToday,'#22d3ee')}
+      ${metric('Done Today',doneToday,'#4ade80')}
+      ${metric('P0 Open',p0,'#f87171')}
+      ${metric('Avg Age (days)',avgAge(),'#a78bfa')}
+    </div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickAsciiArt(){
+  let ex=document.getElementById('ascii-art-float');if(ex){ex.remove();return;}
+  const arts={
+    'Rocket':"    /\\\n   /  \\\n  |    |\n  |    |\n  | () |\n  |    |\n /|    |\\\n/ |    | \\\n  |XXXX|\n  |XXXX|\n /------\\\n/________\\",
+    'Computer':" _____________\n|  _________  |\n| |         | |\n| |  ASTRA  | |\n| |_________| |\n|_____________|\n    _[___]_\n   [_______]",
+    'Coffee':"    ( (\n     ) )\n  .______.\n  |      |]\n  \\      /\n   `----'",
+    'Saturn':"     .  *  .\n   *  ___  *\n    /     \\\n---+-------+---\n    \\_____/\n   *       *\n     .  *  .",
+    'Cat':" /\\_/\\\n( o.o )\n > ^ <\n/|   |\\\n(|   |)\n \"\" \"\"",
+    'Ship':"     |\n    /|\\\n   / | \\\n  /  |  \\\n /   |   \\\n/    |    \\\n|____|____|\n\\________/\n \\______/"
+  };
+  let sel='Rocket';
+  const d=document.createElement('div');d.id='ascii-art-float';
+  const rend=()=>{
+    const tabs=Object.keys(arts).map(k=>`<span onclick="window._setAscii('${k}')" style="padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;${k===sel?'background:var(--accent);color:#000':'color:var(--text-muted)'}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:240px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">ASCII Art</span><span onclick="document.getElementById('ascii-art-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border-radius:6px;padding:10px;font-size:10px;color:#4ade80;line-height:1.2;text-align:center;overflow-x:auto">${arts[sel]}</pre>
+      <button onclick="navigator.clipboard.writeText(${JSON.stringify(arts[sel]).replace(/'/g,"\\'")});this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1200)" style="background:var(--accent);color:#000;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;margin-top:6px;width:100%">Copy</button>
+    </div>`;
+  };
+  window._setAscii=(k)=>{sel=k;rend();};
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
