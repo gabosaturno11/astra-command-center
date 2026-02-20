@@ -6248,6 +6248,12 @@ function cmdGetItems(q) {
       ['makefile','Makefile generator'],
       ['overdue chart','Overdue tasks distribution'],
       ['water intake','Daily water intake tracker'],
+      ['webpack','Webpack config generator'],
+      ['tag cloud','Tag cloud visualization'],
+      ['affirmation','Daily affirmation generator'],
+      ['babel','Babel config generator'],
+      ['completion rate','Task completion rate donut'],
+      ['box breathing','Box breathing exercise'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9161,6 +9167,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='water intake' || ql==='water' || ql==='hydration tracker' || ql==='drink water')){
     items.unshift({title:'Water Intake',desc:'Track daily water glasses',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWaterIntake();}});
+  }
+  if(ql && (ql==='webpack' || ql==='webpack config' || ql==='bundler' || ql==='webpack generator')){
+    items.unshift({title:'Webpack Config',desc:'Generate webpack.config.js for React, TS, Node, Library',icon:'W',type:'action',action:()=>{closeCommandPalette();showWebpackConfigGen();}});
+  }
+  if(ql && (ql==='tag cloud' || ql==='tags' || ql==='word cloud' || ql==='tag visualization')){
+    items.unshift({title:'Tag Cloud',desc:'Visual tag cloud from tasks and content',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTagCloud();}});
+  }
+  if(ql && (ql==='affirmation' || ql==='motivate' || ql==='motivation' || ql==='daily affirmation')){
+    items.unshift({title:'Daily Affirmation',desc:'Random motivational affirmation',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAffirmation();}});
+  }
+  if(ql && (ql==='babel' || ql==='babelrc' || ql==='babel config' || ql==='transpiler')){
+    items.unshift({title:'Babel Config',desc:'Generate .babelrc for React, TS, Node',icon:'B',type:'action',action:()=>{closeCommandPalette();showBabelConfigGen();}});
+  }
+  if(ql && (ql==='completion rate' || ql==='completion' || ql==='done rate' || ql==='progress rate')){
+    items.unshift({title:'Completion Rate',desc:'Donut chart of task completion',icon:'C',type:'action',action:()=>{closeCommandPalette();showTaskCompletionRate();}});
+  }
+  if(ql && (ql==='box breathing' || ql==='box breath' || ql==='breathing box' || ql==='square breathing')){
+    items.unshift({title:'Box Breathing',desc:'4-4-4-4 box breathing exercise',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBreathingBox();}});
   }
   return items.slice(0, 20);
 }
@@ -25133,6 +25157,181 @@ function showQuickWaterIntake(){
     </div>`;
   };
   window._waterTap=(i)=>{S._waterLog[today]=i+1;save();rend();};
+  document.body.appendChild(d);rend();
+}
+function showWebpackConfigGen(){
+  let ex=document.getElementById('webpack-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'React':`const path = require('path');\nconst HtmlWebpackPlugin = require('html-webpack-plugin');\n\nmodule.exports = {\n  entry: './src/index.jsx',\n  output: {\n    path: path.resolve(__dirname, 'dist'),\n    filename: '[name].[contenthash].js',\n    clean: true\n  },\n  module: {\n    rules: [\n      { test: /\\.jsx?$/, exclude: /node_modules/, use: 'babel-loader' },\n      { test: /\\.css$/, use: ['style-loader', 'css-loader'] },\n      { test: /\\.(png|svg|jpg)$/, type: 'asset/resource' }\n    ]\n  },\n  plugins: [new HtmlWebpackPlugin({ template: './public/index.html' })],\n  resolve: { extensions: ['.js', '.jsx'] },\n  devServer: { port: 3000, hot: true, open: true }\n};`,
+    'TypeScript':`const path = require('path');\n\nmodule.exports = {\n  entry: './src/index.ts',\n  output: {\n    path: path.resolve(__dirname, 'dist'),\n    filename: 'bundle.js',\n    clean: true\n  },\n  module: {\n    rules: [\n      { test: /\\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ }\n    ]\n  },\n  resolve: { extensions: ['.ts', '.tsx', '.js'] },\n  devtool: 'source-map'\n};`,
+    'Library':`const path = require('path');\n\nmodule.exports = {\n  entry: './src/index.js',\n  output: {\n    path: path.resolve(__dirname, 'dist'),\n    filename: 'index.js',\n    library: { name: 'MyLib', type: 'umd' },\n    globalObject: 'this',\n    clean: true\n  },\n  externals: {},\n  module: {\n    rules: [\n      { test: /\\.js$/, exclude: /node_modules/, use: 'babel-loader' }\n    ]\n  }\n};`,
+    'Node.js':`const path = require('path');\nconst nodeExternals = require('webpack-node-externals');\n\nmodule.exports = {\n  target: 'node',\n  entry: './src/server.js',\n  output: {\n    path: path.resolve(__dirname, 'dist'),\n    filename: 'server.js',\n    clean: true\n  },\n  externals: [nodeExternals()],\n  module: {\n    rules: [\n      { test: /\\.js$/, exclude: /node_modules/, use: 'babel-loader' }\n    ]\n  }\n};`
+  };
+  let sel='React';
+  const d=document.createElement('div');d.id='webpack-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-wpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-wpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:620px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Webpack Config Generator</span><span onclick="document.getElementById('webpack-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#webpack-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Config',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Config</button>
+    </div>`;
+    d.querySelectorAll('[data-wpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.wpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskTagCloud(){
+  let ex=document.getElementById('tag-cloud-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const tagMap={};
+  tasks.forEach(t=>{
+    if(t.project){tagMap[t.project]=(tagMap[t.project]||0)+1;}
+    if(t.priority){tagMap['P'+t.priority]=(tagMap['P'+t.priority]||0)+1;}
+    if(t.status){tagMap[t.status]=(tagMap[t.status]||0)+1;}
+  });
+  const content=(S.content||[]);
+  content.forEach(c=>{
+    if(c.tags&&Array.isArray(c.tags)){c.tags.forEach(tg=>{tagMap[tg]=(tagMap[tg]||0)+1;});}
+    if(c.theme){tagMap[c.theme]=(tagMap[c.theme]||0)+1;}
+  });
+  const entries=Object.entries(tagMap).sort((a,b)=>b[1]-a[1]).slice(0,40);
+  const mx=entries.length?entries[0][1]:1;
+  const colors=['#4ade80','#22d3ee','#a78bfa','#fb923c','#f87171','#facc15','#34d399','#60a5fa'];
+  const tags=entries.map((e,i)=>{
+    const sz=Math.max(10,Math.round((e[1]/mx)*28));
+    return `<span style="font-size:${sz}px;color:${colors[i%colors.length]};padding:4px 8px;display:inline-block;cursor:default;opacity:${0.6+(e[1]/mx)*0.4}" title="${e[1]} items">${esc(e[0])}</span>`;
+  }).join('');
+  const d=document.createElement('div');d.id='tag-cloud-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Tag Cloud</span><span onclick="document.getElementById('tag-cloud-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="text-align:center;line-height:2.2">${tags||'<span style="color:var(--text-muted);font-size:12px">No tags found</span>'}</div>
+    <div style="margin-top:12px;font-size:10px;color:var(--text-muted);text-align:center">${entries.length} unique tags from ${tasks.length} tasks + ${content.length} content items</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickAffirmation(){
+  let ex=document.getElementById('affirmation-float');if(ex){ex.remove();return;}
+  const affirmations=[
+    'I am capable of solving any challenge that comes my way.',
+    'My code makes a difference and creates value.',
+    'I grow stronger with every problem I solve.',
+    'Progress, not perfection, is what matters.',
+    'I trust my ability to figure things out.',
+    'Today I will ship something I am proud of.',
+    'I am building something meaningful.',
+    'Every line of code is a step forward.',
+    'I embrace complexity and turn it into clarity.',
+    'My work ethic is my superpower.',
+    'I am not behind. I am exactly where I need to be.',
+    'The obstacle is the way.',
+    'I choose progress over procrastination.',
+    'My focus is my greatest asset.',
+    'I am creating the future I want to live in.'
+  ];
+  const pick=affirmations[Math.floor(Math.random()*affirmations.length)];
+  const d=document.createElement('div');d.id='affirmation-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:32px 28px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;text-align:center">
+    <div style="font-size:14px;color:var(--text-muted);margin-bottom:16px;letter-spacing:1px">DAILY AFFIRMATION</div>
+    <div style="font-size:20px;color:var(--text-primary);line-height:1.6;font-weight:300;margin-bottom:24px;font-style:italic">"${esc(pick)}"</div>
+    <div style="display:flex;gap:10px;justify-content:center">
+      <button onclick="document.getElementById('affirmation-float').remove();showQuickAffirmation()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px">Another</button>
+      <button onclick="navigator.clipboard.writeText('${esc(pick).replace(/'/g,"\\'")}');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy</button>
+      <button onclick="document.getElementById('affirmation-float').remove()" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px">Close</button>
+    </div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showBabelConfigGen(){
+  let ex=document.getElementById('babel-gen-float');if(ex){ex.remove();return;}
+  const presets={
+    'React + ES2022':`{\n  "presets": [\n    ["@babel/preset-env", {\n      "targets": "> 0.25%, not dead",\n      "useBuiltIns": "usage",\n      "corejs": 3\n    }],\n    ["@babel/preset-react", {\n      "runtime": "automatic"\n    }]\n  ],\n  "plugins": [\n    "@babel/plugin-proposal-optional-chaining",\n    "@babel/plugin-proposal-nullish-coalescing-operator"\n  ]\n}`,
+    'TypeScript':`{\n  "presets": [\n    ["@babel/preset-env", {\n      "targets": { "node": "current" }\n    }],\n    "@babel/preset-typescript"\n  ],\n  "plugins": [\n    ["@babel/plugin-proposal-decorators", { "legacy": true }],\n    "@babel/plugin-proposal-class-properties"\n  ]\n}`,
+    'Node.js':`{\n  "presets": [\n    ["@babel/preset-env", {\n      "targets": { "node": "18" },\n      "modules": "commonjs"\n    }]\n  ],\n  "plugins": [\n    "@babel/plugin-transform-runtime"\n  ]\n}`,
+    'Minimal':`{\n  "presets": [\n    ["@babel/preset-env", {\n      "targets": "> 1%, not dead"\n    }]\n  ]\n}`
+  };
+  let sel='React + ES2022';
+  const d=document.createElement('div');d.id='babel-gen-float';
+  const rend=()=>{
+    let tabs=Object.keys(presets).map(k=>`<span onclick="document.querySelector('[data-bpre=\\''+k+'\\']').click()" style="padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;${k===sel?'background:var(--accent);color:#000':'background:var(--bg-surface);color:var(--text-secondary)'}" data-bpre="${k}">${k}</span>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:580px;width:90vw;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Babel Config Generator</span><span onclick="document.getElementById('babel-gen-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <pre style="background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:12px;line-height:1.5">${esc(presets[sel])}</pre>
+      <button onclick="navigator.clipboard.writeText(document.querySelector('#babel-gen-float pre').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy .babelrc',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy .babelrc</button>
+    </div>`;
+    d.querySelectorAll('[data-bpre]').forEach(b=>b.onclick=()=>{sel=b.dataset.bpre;rend();});
+  };
+  document.body.appendChild(d);rend();
+}
+function showTaskCompletionRate(){
+  let ex=document.getElementById('completion-rate-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const total=tasks.length;
+  const done=tasks.filter(t=>t.status==='done').length;
+  const inProg=tasks.filter(t=>t.status==='in-progress').length;
+  const todo=tasks.filter(t=>t.status==='todo').length;
+  const blocked=tasks.filter(t=>t.status==='blocked').length;
+  const rate=total?Math.round((done/total)*100):0;
+  const r=60;const circ=2*Math.PI*r;
+  const segments=[
+    {pct:done/Math.max(total,1),color:'#4ade80',label:'Done'},
+    {pct:inProg/Math.max(total,1),color:'#22d3ee',label:'In Progress'},
+    {pct:todo/Math.max(total,1),color:'#6b7280',label:'To Do'},
+    {pct:blocked/Math.max(total,1),color:'#f87171',label:'Blocked'}
+  ];
+  let offset=0;
+  const arcs=segments.map(s=>{
+    const dash=s.pct*circ;const gap=circ-dash;
+    const arc=`<circle cx="75" cy="75" r="${r}" fill="none" stroke="${s.color}" stroke-width="14" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offset}" opacity="0.85"/>`;
+    offset+=dash;return arc;
+  }).join('');
+  const legend=segments.map(s=>`<div style="display:flex;align-items:center;gap:6px"><div style="width:10px;height:10px;border-radius:2px;background:${s.color}"></div><span style="font-size:11px;color:var(--text-secondary)">${s.label}: ${Math.round(s.pct*total)}</span></div>`).join('');
+  const d=document.createElement('div');d.id='completion-rate-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:320px;width:90vw">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Completion Rate</span><span onclick="document.getElementById('completion-rate-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <div style="text-align:center"><svg width="150" height="150" viewBox="0 0 150 150">${arcs}<text x="75" y="72" text-anchor="middle" fill="var(--text-primary)" font-size="28" font-weight="700">${rate}%</text><text x="75" y="90" text-anchor="middle" fill="var(--text-muted)" font-size="10">${done}/${total}</text></svg></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:8px">${legend}</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickBreathingBox(){
+  let ex=document.getElementById('box-breath-float');if(ex){ex.remove();return;}
+  const phases=['Inhale','Hold','Exhale','Hold'];
+  const dur=4;
+  let phase=0,sec=dur,running=false,timer=null;
+  const d=document.createElement('div');d.id='box-breath-float';
+  const rend=()=>{
+    const sz=100;const progress=running?(dur-sec)/dur:0;
+    const pts=[[10,10],[sz-10,10],[sz-10,sz-10],[10,sz-10]];
+    const px=phase===0?10+(sz-20)*progress:phase===1?sz-10:phase===2?sz-10-(sz-20)*progress:10;
+    const py=phase===0?10:phase===1?10+(sz-20)*progress:phase===2?sz-10:sz-10-(sz-20)*progress;
+    d.innerHTML=`<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);width:180px;text-align:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:12px;color:var(--text-primary)">Box Breathing</span><span onclick="if(window._boxTimer)clearInterval(window._boxTimer);document.getElementById('box-breath-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:14px">x</span></div>
+      <svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">
+        <rect x="10" y="10" width="${sz-20}" height="${sz-20}" rx="6" fill="none" stroke="var(--border)" stroke-width="2"/>
+        <circle cx="${px}" cy="${py}" r="6" fill="#4ade80"/>
+      </svg>
+      <div style="font-size:18px;font-weight:700;color:var(--accent);margin:8px 0">${phases[phase]}</div>
+      <div style="font-size:24px;color:var(--text-primary);font-weight:300">${sec}s</div>
+      <div style="margin-top:8px">
+        <button onclick="window._toggleBoxBreath()" style="background:${running?'#f87171':'var(--accent)'};color:${running?'#fff':'#000'};border:none;padding:6px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">${running?'Pause':'Start'}</button>
+      </div>
+    </div>`;
+  };
+  window._toggleBoxBreath=()=>{
+    running=!running;
+    if(running){
+      window._boxTimer=setInterval(()=>{
+        sec--;
+        if(sec<=0){phase=(phase+1)%4;sec=dur;}
+        rend();
+      },1000);
+    } else {
+      clearInterval(window._boxTimer);
+    }
+    rend();
+  };
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
