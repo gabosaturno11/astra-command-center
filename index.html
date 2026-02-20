@@ -2148,7 +2148,8 @@ function seedKernel() {
   S.activeSpec = kernel.id;
 }
 
-function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); scheduleCloudSync(); updateSidebarCounts(); }
+function save() { snapshotWriter(); snapshotSpec(); localStorage.setItem(SK,JSON.stringify(S)); updateStorage(); flashSave(); scheduleCloudSync(); updateSidebarCounts(); updateTabTitle(); }
+function updateTabTitle(){const today=new Date().toISOString().split('T')[0];const overdue=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today).length;document.title=overdue?'('+overdue+') SATURNO HUB':'SATURNO HUB';}
 function updateSidebarCounts(){document.getElementById('content-count').textContent=S.content.length;const active=S.tasks.filter(t=>t.status!=='done');const today=new Date().toISOString().split('T')[0];const overdue=active.filter(t=>t.due&&t.due<today).length;const tc=document.getElementById('tasks-count');tc.textContent=active.length;tc.style.color=overdue>0?'var(--red)':'';tc.title=overdue?overdue+' overdue':'';document.getElementById('writer-count').textContent=S.docs.length;document.getElementById('specs-count').textContent=S.specs.length;document.getElementById('links-count').textContent=S.links.length;updateHeaderStats();}
 function updateHeaderStats(){const el=document.getElementById('header-stats');if(!el)return;const today=new Date().toISOString().split('T')[0];const active=S.tasks.filter(t=>t.status!=='done').length;const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done').length;const todayDue=S.tasks.filter(t=>t.due===today&&t.status!=='done').length;const inProg=S.tasks.filter(t=>t.status==='progress').length;let h='';if(overdue)h+=`<span style="color:var(--red)">${overdue} overdue</span>`;if(todayDue)h+=`<span style="color:var(--accent)">${todayDue} today</span>`;if(inProg)h+=`<span style="color:var(--green)">${inProg} wip</span>`;h+=`<span>${active}T ${S.content.length}C ${S.docs.length}D ${S.links.length}L</span>`;el.innerHTML=h;}
 function flashSave() { const el=document.getElementById('save-indicator'); if(!el) return; const now=new Date(); const bytes=localStorage.getItem(SK)?.length||0; const kb=Math.round(bytes/1024); el.textContent='Saved '+now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); el.title='State: '+kb+'KB in localStorage'; el.style.opacity='1'; clearTimeout(el._t); el._t=setTimeout(()=>{el.style.opacity='0';},2000); }
@@ -5688,6 +5689,7 @@ function cmdGetItems(q) {
       ['streak','Activity streak + weekly heatmap'],['heatmap','90-day activity heatmap popup'],
       ['deps','Task dependency chain visualization'],['accent','Change accent color (8 presets)'],
       ['pomodoro','Focus session stats + start timer'],['collections','Auto-detect content groups'],
+      ['scratch','Persistent floating scratchpad'],['review','Weekly review + copy markdown'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6722,7 +6724,34 @@ function cmdGetItems(q) {
       });
     }else{items.unshift({title:'No collections detected yet',desc:'Add more content with recurring themes',icon:'!',type:'info'});}
   }
+  // Scratchpad prefix
+  if(ql && (ql==='scratch' || ql==='scratchpad' || ql==='pad')){
+    items.unshift({title:'Open Scratchpad',desc:'Persistent floating notepad (saves across sessions)',icon:'S',type:'action',action:()=>{closeCommandPalette();toggleScratchpad();}});
+    const len=(S._scratchpad||'').length;
+    if(len)items.unshift({title:'Scratchpad has '+len+' chars',desc:'Content persists in localStorage',icon:'i',type:'info'});
+  }
+  // Review prefix — weekly review
+  if(ql && (ql==='review' || ql.startsWith('review:') || ql==='weekly review')){
+    const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-7);const ws=weekStart.toISOString().split('T')[0];
+    const completed=S.tasks.filter(t=>t.completedAt&&t.completedAt>=ws).sort((a,b)=>b.completedAt.localeCompare(a.completedAt));
+    const created=S.tasks.filter(t=>t.created&&t.created>=ws&&t.status!=='done');
+    const contentAdded=S.content.filter(c=>c.created&&c.created>=ws);
+    const docsEdited=S.docs.filter(d=>d.updated&&d.updated>=ws);
+    const wordsWritten=docsEdited.reduce((a,d)=>a+countW(d.body),0);
+    const focusMins=(S.focusSessions||[]).filter(s=>s.date>=ws).reduce((a,s)=>a+s.minutes,0);
+    items.unshift({title:'Weekly Review (7 days)',desc:completed.length+' done | '+created.length+' new | '+contentAdded.length+' content | '+wordsWritten+' words | '+focusMins+'min focus',icon:'R',type:'info'});
+    items.unshift({title:'Copy Review as Markdown',desc:'Copy weekly summary to clipboard',icon:'C',type:'action',action:()=>{closeCommandPalette();const md=['# Weekly Review','',`**Period:** ${ws} to ${now.toISOString().split('T')[0]}`,'',`## Completed (${completed.length})`,...completed.map(t=>'- [x] '+t.title+(t.project?' ('+t.project+')':'')),``,`## Still Active (${created.length})`,...created.map(t=>'- [ ] '+t.title+' ['+t.status+']'),``,`## Stats`,'- '+contentAdded.length+' content items added','- '+docsEdited.length+' docs edited ('+wordsWritten+' words)','- '+focusMins+' minutes focused'].join('\n');navigator.clipboard.writeText(md);toast('Weekly review copied');}});
+    completed.slice(0,8).forEach(t=>{items.unshift({title:'[x] '+esc(t.title),desc:(t.project||'No project')+' | Completed '+timeAgo(t.completedAt),icon:'*',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+  }
   return items.slice(0, 20);
+}
+function toggleScratchpad(){
+  let panel=document.getElementById('scratchpad-panel');
+  if(panel){panel.style.display=panel.style.display==='none'?'flex':'none';if(panel.style.display==='flex')panel.querySelector('textarea').focus();return;}
+  panel=document.createElement('div');panel.id='scratchpad-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1400;width:400px;max-width:90vw;height:300px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 48px rgba(0,0,0,0.6);resize:both;overflow:hidden';
+  panel.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em">Scratchpad</span><div style="display:flex;gap:6px"><button onclick="navigator.clipboard.writeText(document.getElementById('scratch-text').value);toast('Copied')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">Copy</button><button onclick="document.getElementById('scratchpad-panel').style.display='none'" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">&times;</button></div></div><textarea id="scratch-text" oninput="S._scratchpad=this.value;save()" placeholder="Type anything... auto-saved." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;padding:8px;resize:none;font-family:var(--mono);line-height:1.6">${esc(S._scratchpad||'')}</textarea>`;
+  document.body.appendChild(panel);panel.querySelector('textarea').focus();
 }
 function showActivityHeatmap(){
   let panel=document.getElementById('heatmap-panel');if(panel)panel.remove();
