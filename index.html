@@ -5972,6 +5972,12 @@ function cmdGetItems(q) {
       ['mind dump','Brain dump: type everything, sort later, convert to tasks'],
       ['milestones','Project milestones with due dates and tracking'],
       ['link health','Link health report: score, duplicates, missing titles'],
+      ['journal','Daily journal with mood tracking and gratitude'],
+      ['burndown','Project burndown charts with status breakdown'],
+      ['quick timer','Floating countdown timer with presets'],
+      ['content duplicates','Find and remove duplicate content items'],
+      ['priority report','Task priority breakdown with completion rates'],
+      ['embed','Save embeddable URLs (YouTube, Twitter, Figma)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7958,6 +7964,30 @@ function cmdGetItems(q) {
   // Link health prefix
   if(ql && (ql==='link health' || ql==='links health' || ql==='link report' || ql==='link score')){
     items.unshift({title:'Link Health Report',desc:'Score, duplicates, and missing titles audit',icon:'L',type:'action',action:()=>{closeCommandPalette();showLinkHealth();}});
+  }
+  // Journal prefix
+  if(ql && (ql==='journal' || ql==='daily journal' || ql==='diary' || ql==='mood')){
+    items.unshift({title:'Daily Journal',desc:'Journal with mood tracking and gratitude',icon:'J',type:'action',action:()=>{closeCommandPalette();showDailyJournal();}});
+  }
+  // Burndown prefix
+  if(ql && (ql==='burndown' || ql==='project burndown' || ql==='burn down' || ql==='progress chart')){
+    items.unshift({title:'Project Burndown',desc:'Visual burndown with status breakdown per project',icon:'B',type:'action',action:()=>{closeCommandPalette();showProjectBurndown();}});
+  }
+  // Quick timer prefix
+  if(ql && (ql==='quick timer' || ql==='timer' || ql==='countdown' || ql==='stopwatch')){
+    items.unshift({title:'Quick Timer',desc:'Floating countdown timer with preset durations',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTimer();}});
+  }
+  // Content duplicates prefix
+  if(ql && (ql==='content duplicates' || ql==='find duplicates' || ql==='dedup content' || ql==='content dupes')){
+    items.unshift({title:'Content Duplicates',desc:'Find and remove duplicate content items',icon:'D',type:'action',action:()=>{closeCommandPalette();showContentDuplicates();}});
+  }
+  // Priority report prefix
+  if(ql && (ql==='priority report' || ql==='priority breakdown' || ql==='priority stats' || ql==='task priorities')){
+    items.unshift({title:'Priority Report',desc:'Task priority breakdown with completion rates',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityReport();}});
+  }
+  // Embed prefix
+  if(ql && (ql==='embed' || ql==='quick embed' || ql==='embeds' || ql==='save embed')){
+    items.unshift({title:'Quick Embed',desc:'Save embeddable URLs for quick access',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEmbed();}});
   }
   return items.slice(0, 20);
 }
@@ -14456,6 +14486,193 @@ function showLinkHealth(){
     const col=i.severity==='error'?'#ef4444':i.severity==='warn'?'#f97316':'var(--accent)';
     h+='<div style="padding:8px;border-left:3px solid '+col+';background:var(--bg-surface);border-radius:0 6px 6px 0;margin-bottom:6px;font-size:11px">'+esc(i.text)+'</div>';
   });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDailyJournal(){
+  let panel=document.getElementById('daily-journal-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='daily-journal-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._journal)S._journal=[];
+  const todayKey=new Date().toISOString().split('T')[0];
+  let todayEntry=S._journal.find(j=>j.date===todayKey);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Daily Journal</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">'+todayKey+'</div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">How are you feeling? (1-5)</label>';
+  h+='<div style="display:flex;gap:6px">';
+  for(let i=1;i<=5;i++){
+    const selected=todayEntry&&todayEntry.mood===i;
+    h+='<button onclick="(function(){let e=S._journal.find(j=>j.date===\''+todayKey+'\');if(!e){e={date:\''+todayKey+'\',mood:0,text:\'\',gratitude:\'\'};S._journal.unshift(e);}e.mood='+i+';save();showDailyJournal();})()" style="width:32px;height:32px;border-radius:50%;border:2px solid '+(selected?'var(--accent)':'var(--border)')+';background:'+(selected?'var(--accent)':'transparent')+';color:'+(selected?'#000':'var(--text-primary)')+';cursor:pointer;font-size:12px;font-weight:bold">'+i+'</button>';
+  }
+  h+='</div></div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">What happened today?</label>';
+  h+='<textarea id="journal-text" style="width:100%;height:100px;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box">'+(todayEntry?esc(todayEntry.text):'')+'</textarea></div>';
+  h+='<div style="margin-bottom:12px"><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Gratitude (what went well?)</label>';
+  h+='<textarea id="journal-gratitude" style="width:100%;height:60px;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box">'+(todayEntry?esc(todayEntry.gratitude||''):'')+'</textarea></div>';
+  h+='<button onclick="(function(){let e=S._journal.find(j=>j.date===\''+todayKey+'\');if(!e){e={date:\''+todayKey+'\',mood:0,text:\'\',gratitude:\'\'};S._journal.unshift(e);}e.text=document.getElementById(\'journal-text\').value;e.gratitude=document.getElementById(\'journal-gratitude\').value;save();if(typeof showNotification===\'function\')showNotification(\'Journal saved\');})()" style="background:var(--accent);color:#000;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:16px">Save Entry</button>';
+  const past=S._journal.filter(j=>j.date!==todayKey).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,7);
+  if(past.length>0){
+    h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Previous Entries</h4>';
+    past.forEach(j=>{
+      const moodColors=['','#ef4444','#f97316','#eab308','#22d3ee','#4ade80'];
+      h+='<div style="padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px">';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted)">'+j.date+'</span>'+(j.mood?'<span style="font-size:11px;color:'+(moodColors[j.mood]||'var(--text-muted)')+'">Mood: '+j.mood+'/5</span>':'')+'</div>';
+      if(j.text)h+='<div style="font-size:11px;line-height:1.4">'+esc(j.text.substring(0,150))+(j.text.length>150?'...':'')+'</div>';
+      h+='</div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectBurndown(){
+  let panel=document.getElementById('project-burndown-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='project-burndown-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=S.projects||[];const tasks=S.tasks||[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Project Burndown</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  if(projects.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No projects found.</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id);
+    const total=pTasks.length;const done=pTasks.filter(t=>t.status==='done').length;
+    const remaining=total-done;
+    const pct=total>0?Math.round(done/total*100):0;
+    // Simple burndown: show stacked bars
+    h+='<div style="padding:14px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;font-weight:600">'+esc(p.name)+'</span><span style="font-size:11px;color:var(--accent)">'+pct+'%</span></div>';
+    h+='<div style="display:flex;height:24px;border-radius:4px;overflow:hidden;margin-bottom:8px">';
+    if(done>0)h+='<div style="background:var(--accent);width:'+(done/total*100)+'%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#000;font-weight:bold">'+done+'</div>';
+    const inProg=pTasks.filter(t=>t.status==='in-progress').length;
+    if(inProg>0)h+='<div style="background:#f97316;width:'+(inProg/total*100)+'%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#000;font-weight:bold">'+inProg+'</div>';
+    const todo=pTasks.filter(t=>t.status==='todo').length;
+    if(todo>0)h+='<div style="background:var(--bg-surface);width:'+(todo/total*100)+'%;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-muted)">'+todo+'</div>';
+    const other=remaining-inProg-todo;
+    if(other>0)h+='<div style="background:var(--bg-surface);width:'+(other/total*100)+'%"></div>';
+    h+='</div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted)">';
+    h+='<span><span style="display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:2px;margin-right:4px"></span>Done ('+done+')</span>';
+    h+='<span><span style="display:inline-block;width:8px;height:8px;background:#f97316;border-radius:2px;margin-right:4px"></span>In Progress ('+inProg+')</span>';
+    h+='<span><span style="display:inline-block;width:8px;height:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:2px;margin-right:4px"></span>Todo ('+todo+')</span></div>';
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickTimer(){
+  let panel=document.getElementById('quick-timer-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-timer-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:280px';
+  const presets=[5,10,15,25,45,60];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Quick Timer</h4><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<div id="qt-display" style="text-align:center;font-size:36px;font-weight:bold;color:var(--text-primary);margin-bottom:12px;font-variant-numeric:tabular-nums">00:00</div>';
+  h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;justify-content:center">';
+  presets.forEach(m=>{
+    h+='<button onclick="(function(){window._qtMinutes='+m+';window._qtSeconds='+m+'*60;document.getElementById(\'qt-display\').textContent=String('+m+').padStart(2,\'0\')+\':00\';})()" style="padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:11px">'+m+'m</button>';
+  });
+  h+='</div>';
+  h+='<div style="display:flex;gap:6px;justify-content:center">';
+  h+='<button onclick="(function(){if(window._qtInterval)return;if(!window._qtSeconds)window._qtSeconds=25*60;window._qtInterval=setInterval(function(){window._qtSeconds--;if(window._qtSeconds<=0){clearInterval(window._qtInterval);window._qtInterval=null;document.getElementById(\'qt-display\').textContent=\'DONE\';document.getElementById(\'qt-display\').style.color=\'var(--accent)\';return;}const m=Math.floor(window._qtSeconds/60);const s=window._qtSeconds%60;document.getElementById(\'qt-display\').textContent=String(m).padStart(2,\'0\')+\':\'+String(s).padStart(2,\'0\');},1000);})()" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Start</button>';
+  h+='<button onclick="(function(){if(window._qtInterval){clearInterval(window._qtInterval);window._qtInterval=null;}})()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:6px 16px;border-radius:4px;cursor:pointer;font-size:11px">Pause</button>';
+  h+='<button onclick="(function(){if(window._qtInterval){clearInterval(window._qtInterval);window._qtInterval=null;}window._qtSeconds=0;document.getElementById(\'qt-display\').textContent=\'00:00\';document.getElementById(\'qt-display\').style.color=\'var(--text-primary)\';})()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:6px 16px;border-radius:4px;cursor:pointer;font-size:11px">Reset</button></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentDuplicates(){
+  let panel=document.getElementById('content-dupes-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-dupes-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=S.content||[];
+  const dupes=[];
+  for(let i=0;i<content.length;i++){
+    for(let j=i+1;j<content.length;j++){
+      const a=content[i].title.toLowerCase().trim();
+      const b=content[j].title.toLowerCase().trim();
+      if(a===b||(a.length>5&&b.length>5&&(a.includes(b)||b.includes(a)))){
+        dupes.push({a:content[i],b:content[j],reason:'similar title'});
+      }else{
+        const bodyA=(content[i].body||'').substring(0,200).toLowerCase();
+        const bodyB=(content[j].body||'').substring(0,200).toLowerCase();
+        if(bodyA.length>50&&bodyB.length>50&&bodyA===bodyB){
+          dupes.push({a:content[i],b:content[j],reason:'identical body'});
+        }
+      }
+    }
+  }
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Duplicate Finder</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Scanned '+content.length+' items. Found '+dupes.length+' potential duplicates.</div>';
+  if(dupes.length===0){h+='<div style="color:var(--accent);text-align:center;padding:30px 0">No duplicates found. Your content is clean!</div>';}
+  dupes.forEach(d=>{
+    h+='<div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px">';
+    h+='<div style="font-size:9px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+esc(d.reason)+'</div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    [d.a,d.b].forEach(item=>{
+      h+='<div style="padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:11px;font-weight:600;margin-bottom:4px">'+esc(item.title)+'</div>';
+      h+='<div style="font-size:10px;color:var(--text-muted)">'+((item.body||'').split(/\s+/).filter(w=>w).length)+' words</div>';
+      h+='<button onclick="(function(){if(!confirm(\'Delete: '+esc(item.title).replace(/'/g,"\\'")+' ?\'))return;S.content=S.content.filter(c=>c.id!==\''+item.id+'\');save();showContentDuplicates();})()" style="background:none;border:1px solid #ef4444;color:#ef4444;padding:2px 6px;border-radius:3px;cursor:pointer;font-size:9px;margin-top:4px">Delete</button></div>';
+    });
+    h+='</div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskPriorityReport(){
+  let panel=document.getElementById('priority-report-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='priority-report-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=S.tasks||[];
+  const active=tasks.filter(t=>t.status!=='done');
+  const done=tasks.filter(t=>t.status==='done');
+  const priorities=['p0','p1','p2','p3'];
+  const colors={'p0':'#ef4444','p1':'#f97316','p2':'#3b82f6','p3':'#6b7280'};
+  const labels={'p0':'Critical','p1':'High','p2':'Medium','p3':'Low'};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Priority Report</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  // Active by priority
+  h+='<h4 style="margin:0 0 10px;font-size:12px;color:var(--text-muted)">Active Tasks by Priority</h4>';
+  const maxCount=Math.max(...priorities.map(p=>active.filter(t=>(t.priority||'p3')===p).length),1);
+  priorities.forEach(p=>{
+    const count=active.filter(t=>(t.priority||'p3')===p).length;
+    const pct=Math.round(count/maxCount*100);
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    h+='<span style="font-size:11px;width:70px;color:'+colors[p]+';font-weight:600">'+labels[p]+'</span>';
+    h+='<div style="flex:1;height:20px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;background:'+colors[p]+';width:'+pct+'%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:10px;color:#fff;font-weight:bold">'+(count>0?count:'')+'</div></div>';
+    h+='<span style="font-size:11px;color:var(--text-muted);width:30px;text-align:right">'+count+'</span></div>';
+  });
+  // Completion rate by priority
+  h+='<h4 style="margin:16px 0 10px;font-size:12px;color:var(--text-muted)">Completion Rate by Priority</h4>';
+  priorities.forEach(p=>{
+    const all=tasks.filter(t=>(t.priority||'p3')===p).length;
+    const completed=done.filter(t=>(t.priority||'p3')===p).length;
+    const rate=all>0?Math.round(completed/all*100):0;
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+    h+='<span style="font-size:11px;width:70px;color:'+colors[p]+'">'+labels[p]+'</span>';
+    h+='<div style="flex:1;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+colors[p]+';width:'+rate+'%;opacity:0.7"></div></div>';
+    h+='<span style="font-size:10px;color:var(--text-muted);width:40px;text-align:right">'+rate+'%</span></div>';
+  });
+  // Summary
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px">';
+  h+='<div>Total tasks: <strong>'+tasks.length+'</strong></div>';
+  h+='<div>Active: <strong>'+active.length+'</strong></div>';
+  h+='<div>Completed: <strong>'+done.length+'</strong></div>';
+  h+='<div>Completion: <strong style="color:var(--accent)">'+(tasks.length>0?Math.round(done.length/tasks.length*100):0)+'%</strong></div></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickEmbed(){
+  let panel=document.getElementById('quick-embed-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-embed-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._embeds)S._embeds=[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Quick Embed</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Save embeddable URLs (YouTube, tweets, Figma, etc.) for quick access.</div>';
+  h+='<input id="qe-url" placeholder="Paste URL (YouTube, Twitter, Figma...)" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px;box-sizing:border-box">';
+  h+='<input id="qe-label" placeholder="Label (optional)" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px;box-sizing:border-box">';
+  h+='<button onclick="(function(){const url=document.getElementById(\'qe-url\').value.trim();if(!url)return;const label=document.getElementById(\'qe-label\').value.trim()||url;S._embeds.unshift({id:Date.now(),url:url,label:label,created:new Date().toISOString()});save();showQuickEmbed();})()" style="background:var(--accent);color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600;margin-bottom:16px">Save Embed</button>';
+  if(S._embeds.length>0){
+    h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Saved Embeds ('+S._embeds.length+')</h4>';
+    S._embeds.forEach(e=>{
+      let type='link';
+      if(e.url.includes('youtube.com')||e.url.includes('youtu.be'))type='youtube';
+      else if(e.url.includes('twitter.com')||e.url.includes('x.com'))type='tweet';
+      else if(e.url.includes('figma.com'))type='figma';
+      else if(e.url.includes('github.com'))type='github';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px">';
+      h+='<div><span style="font-size:9px;color:var(--accent);text-transform:uppercase;margin-right:6px">'+type+'</span><a href="'+esc(e.url)+'" target="_blank" style="font-size:11px;color:var(--text-primary);text-decoration:none">'+esc(e.label)+'</a></div>';
+      h+='<button onclick="(function(){S._embeds=S._embeds.filter(x=>x.id!=='+e.id+');save();showQuickEmbed();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">X</button></div>';
+    });
+  }
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
