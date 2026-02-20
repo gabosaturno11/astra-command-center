@@ -6641,6 +6641,12 @@ function cmdGetItems(q) {
       ['git hooks','Git hooks and commit conventions'],
       ['project health','Project health dashboard'],
       ['box shadow','CSS box shadow generator'],
+      ['deno','Deno runtime and API reference'],
+      ['goal','Goal tracker with progress bars'],
+      ['slugify','Text to URL slug file name'],
+      ['bun','Bun runtime reference'],
+      ['work diary','7-day work diary log'],
+      ['flexbox','CSS flexbox cheat sheet'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10733,6 +10739,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='box shadow' || ql==='shadow gen' || ql==='css shadow' || ql==='box shadow generator')){
     items.unshift({title:'Box Shadow Generator',desc:'Visual CSS box-shadow builder',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBoxShadowGen();}});
+  }
+  if(ql && (ql==='deno' || ql==='deno ref' || ql==='deno runtime' || ql==='deno reference')){
+    items.unshift({title:'Deno Reference',desc:'Runtime, permissions, APIs',icon:'D',type:'action',action:()=>{closeCommandPalette();showDenoRef();}});
+  }
+  if(ql && (ql==='goal' || ql==='goal tracker' || ql==='goals' || ql==='goal progress')){
+    items.unshift({title:'Goal Tracker',desc:'Track task completion goals',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskGoalTracker();}});
+  }
+  if(ql && (ql==='slugify' || ql==='slug' || ql==='url slug' || ql==='slug generator')){
+    items.unshift({title:'Slugify',desc:'Text to URL slug, filename, CSS class',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSlugify();}});
+  }
+  if(ql && (ql==='bun' || ql==='bun ref' || ql==='bun runtime' || ql==='bun reference')){
+    items.unshift({title:'Bun Reference',desc:'Runtime, APIs, SQLite, testing',icon:'B',type:'action',action:()=>{closeCommandPalette();showBunRef();}});
+  }
+  if(ql && (ql==='work diary' || ql==='diary' || ql==='work log' || ql==='activity diary')){
+    items.unshift({title:'Work Diary',desc:'7-day work activity log',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWorkDiary();}});
+  }
+  if(ql && (ql==='flexbox' || ql==='flex' || ql==='css flex' || ql==='flexbox ref')){
+    items.unshift({title:'Flexbox Reference',desc:'CSS flexbox cheat sheet',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFlexboxRef();}});
   }
   return items.slice(0, 20);
 }
@@ -37686,6 +37710,147 @@ function showQuickBoxShadowGen(){
     const css=document.getElementById('bs-css');
     if(css)css.textContent='box-shadow: '+shadow;
   };
+}
+function showDenoRef(){
+  let d=document.getElementById('deno-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='deno-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['deno run script.ts','deno run --allow-net server.ts','deno run --allow-read --allow-write file.ts','deno compile --output app script.ts','deno fmt','deno lint','deno test','deno bench','deno check script.ts','deno task dev'],
+    'Permissions':['--allow-net','--allow-read','--allow-write','--allow-env','--allow-run','--allow-ffi','--allow-all / -A','--deny-net=example.com'],
+    'Standard Library':['import { serve } from "https://deno.land/std/http/server.ts"','import { join } from "https://deno.land/std/path/mod.ts"','import { readAll } from "https://deno.land/std/io/read_all.ts"','import { parse } from "https://deno.land/std/flags/mod.ts"'],
+    'APIs':['Deno.readTextFile("file.txt")','Deno.writeTextFile("file.txt", data)','Deno.serve(handler)','Deno.cwd()','Deno.env.get("KEY")','Deno.exit(0)','Deno.args'],
+    'Config (deno.json)':['{ "tasks": { "dev": "deno run -A main.ts" } }','{ "imports": { "@/": "./src/" } }','{ "compilerOptions": { "strict": true } }','{ "fmt": { "indentWidth": 2 } }']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Deno Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskGoalTracker(){
+  let d=document.getElementById('goal-tracker-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='goal-tracker-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  const goals=S._goals||[
+    {title:'Complete 10 tasks this week',target:10,metric:'weekly_done'},
+    {title:'Clear all overdue tasks',target:0,metric:'overdue'},
+    {title:'Get 100 tasks to done',target:100,metric:'total_done'}
+  ];
+  if(!S._goals){S._goals=goals;save();}
+  const tasks=(S.tasks||[]);
+  const now=new Date();const weekAgo=new Date(now-7*86400000);
+  const metrics={
+    weekly_done:tasks.filter(t=>{const dd=t.completedAt||t.doneAt;return dd&&new Date(dd)>=weekAgo;}).length,
+    overdue:tasks.filter(t=>t.status!=='done'&&t.due&&t.due<now.toISOString().split('T')[0]).length,
+    total_done:tasks.filter(t=>t.status==='done').length,
+    total_tasks:tasks.length,
+    open_tasks:tasks.filter(t=>t.status!=='done').length
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Goal Tracker</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  goals.forEach((g,i)=>{
+    const current=metrics[g.metric]||0;
+    const isInverse=g.metric==='overdue'||g.metric==='open_tasks';
+    const pct=isInverse?(g.target===0&&current===0?100:Math.max(0,100-current*10)):Math.min(100,Math.round((current/Math.max(g.target,1))*100));
+    const color=pct>=100?'#4ade80':pct>=50?'#fbbf24':'#f87171';
+    h+='<div style="margin:10px 0;padding:10px;background:var(--bg-surface);border-radius:6px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px"><span style="color:var(--text-primary);font-weight:600">'+esc(g.title)+'</span><span style="color:'+color+';font-weight:700">'+pct+'%</span></div>';
+    h+='<div style="height:8px;background:var(--bg-elevated);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:4px;transition:width 0.3s"></div></div>';
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px">Current: '+current+(isInverse?' (target: '+g.target+')':' / '+g.target)+'</div></div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickSlugify(){
+  let d=document.getElementById('slugify-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='slugify-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Slugify</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<input id="slug-input" placeholder="Enter text to slugify..." style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-bottom:8px" oninput="window._slugify()">';
+  h+='<div id="slug-output" style="font-size:12px"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._slugify=function(){
+    const inp=document.getElementById('slug-input').value;
+    const out=document.getElementById('slug-output');if(!out)return;
+    const slugs=[
+      {label:'URL Slug',value:inp.toLowerCase().trim().replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-').replace(/^-+|-+$/g,'')},
+      {label:'File Name',value:inp.toLowerCase().trim().replace(/[^\w\s.-]/g,'').replace(/[\s]+/g,'_')},
+      {label:'CSS Class',value:inp.toLowerCase().trim().replace(/[^\w\s-]/g,'').replace(/[\s_]+/g,'-')},
+      {label:'Constant',value:inp.toUpperCase().trim().replace(/[^\w\s]/g,'').replace(/[\s]+/g,'_')},
+    ];
+    let r='';slugs.forEach(s=>{
+      r+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-muted);font-size:10px">'+s.label+'</span><span style="color:var(--text-primary);font-family:monospace;font-size:11px;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-primary)\',600)">'+s.value+'</span></div>';
+    });
+    out.innerHTML=r;
+  };
+}
+function showBunRef(){
+  let d=document.getElementById('bun-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='bun-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['bun run script.ts','bun install','bun add package','bun remove package','bun test','bun build ./index.ts --outdir ./out','bun init','bun create app-name'],
+    'Runtime':['bun run dev','bun --hot server.ts','bun run --watch script.ts','bun x create-next-app (npx equivalent)'],
+    'APIs':['Bun.serve({ fetch(req) { return new Response("Hello") } })','Bun.file("path").text()','Bun.write("file.txt", data)','Bun.env.API_KEY','Bun.sleep(1000)','Bun.hash("text")','Bun.password.hash("password")','Bun.password.verify("password", hash)'],
+    'Package.json':['{ "scripts": { "dev": "bun run --hot server.ts" } }','bun.lockb (binary lockfile)'],
+    'Testing':['import { test, expect } from "bun:test"','test("name", () => { expect(1 + 1).toBe(2) })','bun test --timeout 10000','bun test --watch'],
+    'SQLite':['import { Database } from "bun:sqlite"','const db = new Database("mydb.sqlite")','db.run("CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT)")','db.query("SELECT * FROM users").all()']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Bun Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskWorkDiary(){
+  let d=document.getElementById('work-diary-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='work-diary-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const now=new Date();
+  const days=[];
+  for(let i=0;i<7;i++){
+    const d2=new Date(now);d2.setDate(d2.getDate()-i);
+    const key=d2.toISOString().split('T')[0];
+    const label=d2.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'});
+    const created=tasks.filter(t=>(t.createdAt||'').split('T')[0]===key);
+    const completed=tasks.filter(t=>{const dd=(t.completedAt||t.doneAt||'').split('T')[0];return dd===key;});
+    days.push({key,label,created,completed});
+  }
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Work Diary (7 Days)</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  days.forEach((day,i)=>{
+    const isToday=i===0;
+    if(day.created.length===0&&day.completed.length===0)return;
+    h+='<div style="margin:8px 0;padding:10px;background:'+(isToday?'rgba(74,222,128,0.06)':'var(--bg-surface)')+';border-radius:6px;border-left:3px solid '+(isToday?'var(--accent)':'var(--border)')+'">';
+    h+='<div style="font-size:12px;font-weight:600;color:'+(isToday?'var(--accent)':'var(--text-primary)')+';margin-bottom:6px">'+day.label+(isToday?' (Today)':'')+'</div>';
+    if(day.completed.length>0){
+      h+='<div style="font-size:10px;color:#4ade80;margin-bottom:3px">Completed ('+day.completed.length+')</div>';
+      day.completed.slice(0,4).forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:1px 0">'+esc(t.title)+'</div>';});
+    }
+    if(day.created.length>0){
+      h+='<div style="font-size:10px;color:#38bdf8;margin-bottom:3px;margin-top:4px">Created ('+day.created.length+')</div>';
+      day.created.slice(0,4).forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:1px 0">'+esc(t.title)+'</div>';});
+    }
+    h+='</div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickFlexboxRef(){
+  let d=document.getElementById('flexbox-ref-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='flexbox-ref-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  const props={
+    'Container':['display: flex','flex-direction: row | column | row-reverse | column-reverse','flex-wrap: nowrap | wrap | wrap-reverse','justify-content: flex-start | center | flex-end | space-between | space-around | space-evenly','align-items: stretch | flex-start | center | flex-end | baseline','align-content: flex-start | center | flex-end | space-between | space-around | stretch','gap: 8px','row-gap: 8px','column-gap: 8px'],
+    'Items':['flex: 1','flex-grow: 1','flex-shrink: 0','flex-basis: 200px','order: 1','align-self: auto | flex-start | center | flex-end | stretch']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Flexbox Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  Object.entries(props).forEach(([cat,arr])=>{
+    h+='<div style="font-size:10px;color:var(--accent);margin:10px 0 4px;font-weight:600">'+cat+'</div>';
+    arr.forEach(p=>{
+      h+='<div style="font-size:11px;padding:3px 6px;margin:2px 0;background:var(--bg-surface);border-radius:3px;font-family:monospace;color:var(--text-secondary);cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+p+'</div>';
+    });
+  });
+  d.innerHTML=h;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
