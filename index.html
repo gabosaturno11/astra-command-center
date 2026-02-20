@@ -5784,6 +5784,9 @@ function cmdGetItems(q) {
       ['project template','Create project from template with tasks'],
       ['compare','Side-by-side content comparison'],
       ['time block','Add time blocks to calendar'],
+      ['transform','Text transform tools (uppercase, lowercase, title case)'],
+      ['archive url','View link on Wayback Machine'],
+      ['dashboard','Show home dashboard with widgets'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7004,6 +7007,22 @@ function cmdGetItems(q) {
     items.unshift({title:'Add Time Block',desc:'Block out time on calendar for focused work',icon:'T',type:'action',action:()=>{closeCommandPalette();addTimeBlock();}});
     items.unshift({title:'View Time Blocks',desc:'Show all scheduled time blocks',icon:'T',type:'action',action:()=>{closeCommandPalette();showTimeBlocks();}});
   }
+  // Transform prefix
+  if(ql && (ql==='transform' || ql==='text transform' || ql==='uppercase' || ql==='lowercase' || ql==='title case' || ql==='slug')){
+    items.unshift({title:'UPPERCASE',desc:'Transform clipboard text to UPPERCASE',icon:'A',type:'action',action:()=>{closeCommandPalette();textTransform('upper');}});
+    items.unshift({title:'lowercase',desc:'Transform clipboard text to lowercase',icon:'a',type:'action',action:()=>{closeCommandPalette();textTransform('lower');}});
+    items.unshift({title:'Title Case',desc:'Transform clipboard text to Title Case',icon:'T',type:'action',action:()=>{closeCommandPalette();textTransform('title');}});
+    items.unshift({title:'slug-case',desc:'Transform to URL-friendly slug',icon:'-',type:'action',action:()=>{closeCommandPalette();textTransform('slug');}});
+  }
+  // Archive URL prefix
+  if(ql && (ql==='archive url' || ql==='wayback' || ql==='web archive' || ql==='archive')){
+    items.unshift({title:'View Link on Wayback Machine',desc:'Enter a URL to view its archived version',icon:'W',type:'action',action:()=>{closeCommandPalette();archiveUrl();}});
+    S.links.slice(0,3).forEach(l=>{items.unshift({title:'Archive: '+l.title.substring(0,40),desc:l.url,icon:'W',type:'action',action:()=>{closeCommandPalette();window.open('https://web.archive.org/web/'+l.url,'_blank');toast('Opened Wayback Machine');}});});
+  }
+  // Dashboard prefix
+  if(ql && (ql==='dashboard' || ql==='home' || ql==='overview' || ql==='widgets')){
+    items.unshift({title:'Home Dashboard',desc:'Overview with today\'s tasks, stats, recent activity',icon:'D',type:'action',action:()=>{closeCommandPalette();showHomeDashboard();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7433,6 +7452,53 @@ function showTimeBlocks(){
   });
   if(past.length){h+=`<div style="font-size:9px;font-weight:600;color:var(--text-muted);margin-top:8px;margin-bottom:4px;text-transform:uppercase">Past (${past.length})</div>`;
   past.slice(0,5).forEach(b=>{h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 8px;border-left:3px solid var(--border);margin-bottom:2px;opacity:0.5"><div style="flex:1;font-size:10px;color:var(--text-muted)">${esc(b.title)} - ${b.date} ${b.start}-${b.end}</div></div>`;});}
+  panel.innerHTML=h;
+  document.body.appendChild(panel);
+}
+function textTransform(type){
+  navigator.clipboard.readText().then(text=>{
+    if(!text){toast('Clipboard empty');return;}
+    let result;
+    if(type==='upper')result=text.toUpperCase();
+    else if(type==='lower')result=text.toLowerCase();
+    else if(type==='title')result=text.replace(/\w\S*/g,t=>t.charAt(0).toUpperCase()+t.substr(1).toLowerCase());
+    else if(type==='slug')result=text.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    else result=text;
+    navigator.clipboard.writeText(result);
+    toast('Transformed and copied to clipboard: '+result.substring(0,40)+(result.length>40?'...':''));
+  }).catch(()=>toast('Could not read clipboard'));
+}
+function archiveUrl(){
+  const url=prompt('Enter URL to view on Wayback Machine:');
+  if(!url||!url.trim())return;
+  window.open('https://web.archive.org/web/'+url.trim(),'_blank');
+  toast('Opened Wayback Machine');
+}
+function showHomeDashboard(){
+  let panel=document.getElementById('dashboard-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='dashboard-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const today=new Date().toISOString().split('T')[0];
+  const todayTasks=S.tasks.filter(t=>t.due===today&&t.status!=='done');
+  const overdue=S.tasks.filter(t=>t.due&&t.due<today&&t.status!=='done');
+  const inProgress=S.tasks.filter(t=>t.status==='progress');
+  const doneToday=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(today));
+  const recentContent=S.content.filter(c=>c.created&&c.created.startsWith(today));
+  const recentDocs=S.docs.filter(d=>(d.updated||d.created||'').startsWith(today));
+  const focusToday=(S.focusSessions||[]).filter(f=>f.date===today);
+  const focusMins=focusToday.reduce((a,f)=>a+(f.minutes||0),0);
+  const streak=(()=>{let s=0;const cd=new Date();for(let i=0;i<365;i++){const ds=cd.toISOString().split('T')[0];if(S.tasks.some(t=>(t.completedAt&&t.completedAt.startsWith(ds))||(t.created&&t.created.startsWith(ds)))||S.content.some(c=>c.created&&c.created.startsWith(ds)))s++;else if(i>0)break;cd.setDate(cd.getDate()-1);}return s;})();
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:15px;font-weight:700;color:var(--text-primary)">Good ${new Date().getHours()<12?'morning':new Date().getHours()<18?'afternoon':'evening'}.</span><button onclick="document.getElementById('dashboard-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  // Stats row
+  h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px"><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:${overdue.length?'var(--red)':'var(--accent)'}">${todayTasks.length}</div><div style="font-size:8px;color:var(--text-muted)">Due Today</div></div><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:var(--green)">${doneToday.length}</div><div style="font-size:8px;color:var(--text-muted)">Done Today</div></div><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:var(--accent-cyan)">${focusMins?formatTimeSpent(focusMins):'0m'}</div><div style="font-size:8px;color:var(--text-muted)">Focus</div></div><div style="text-align:center;padding:10px;background:var(--bg-surface);border-radius:var(--radius)"><div style="font-size:20px;font-weight:700;color:var(--yellow)">${streak}</div><div style="font-size:8px;color:var(--text-muted)">Day Streak</div></div></div>`;
+  // Overdue
+  if(overdue.length){h+=`<div style="font-size:10px;font-weight:600;color:var(--red);margin-bottom:4px;text-transform:uppercase">Overdue (${overdue.length})</div>`;overdue.slice(0,5).forEach(t=>{h+=`<div onclick="document.getElementById('dashboard-panel').remove();openTaskDetail(${t.id})" style="font-size:10px;padding:3px 8px;cursor:pointer;border-left:2px solid var(--red);margin-bottom:2px;color:var(--text-primary)">${esc(t.title)} <span style="color:var(--text-muted);font-size:8px">${relativeDate(t.due)}</span></div>`;});}
+  // Today
+  if(todayTasks.length){h+=`<div style="font-size:10px;font-weight:600;color:var(--accent);margin-top:8px;margin-bottom:4px;text-transform:uppercase">Today (${todayTasks.length})</div>`;todayTasks.forEach(t=>{h+=`<div onclick="document.getElementById('dashboard-panel').remove();openTaskDetail(${t.id})" style="font-size:10px;padding:3px 8px;cursor:pointer;border-left:2px solid var(--accent);margin-bottom:2px;color:var(--text-primary)">${esc(t.title)} <span style="color:var(--text-muted);font-size:8px">${t.priority||'p2'}</span></div>`;});}
+  // In progress
+  if(inProgress.length){h+=`<div style="font-size:10px;font-weight:600;color:var(--yellow);margin-top:8px;margin-bottom:4px;text-transform:uppercase">In Progress (${inProgress.length})</div>`;inProgress.slice(0,5).forEach(t=>{h+=`<div onclick="document.getElementById('dashboard-panel').remove();openTaskDetail(${t.id})" style="font-size:10px;padding:3px 8px;cursor:pointer;border-left:2px solid var(--yellow);margin-bottom:2px;color:var(--text-primary)">${esc(t.title)}</div>`;});}
+  // Quick actions
+  h+=`<div style="display:flex;gap:6px;margin-top:16px;flex-wrap:wrap"><button onclick="document.getElementById('dashboard-panel').remove();openDailyJournal()" class="btn btn-sm btn-ghost" style="font-size:9px">Journal</button><button onclick="document.getElementById('dashboard-panel').remove();showHabitTracker()" class="btn btn-sm btn-ghost" style="font-size:9px">Habits</button><button onclick="document.getElementById('dashboard-panel').remove();showActivityTimeline()" class="btn btn-sm btn-ghost" style="font-size:9px">Timeline</button><button onclick="document.getElementById('dashboard-panel').remove();showBurndownChart()" class="btn btn-sm btn-ghost" style="font-size:9px">Burndown</button></div>`;
   panel.innerHTML=h;
   document.body.appendChild(panel);
 }
