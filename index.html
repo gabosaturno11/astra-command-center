@@ -6485,6 +6485,12 @@ function cmdGetItems(q) {
       ['crontab','Cron schedule syntax and examples'],
       ['project budget','Time budget by project estimates'],
       ['ascii','ASCII art dividers boxes and banners'],
+      ['aws','AWS CLI S3 EC2 Lambda IAM reference'],
+      ['weekly report','This week task summary with stats'],
+      ['ip','IP address lookup with location info'],
+      ['gcloud','Google Cloud CLI reference'],
+      ['task content','Task and content correlation analysis'],
+      ['unit converter','Length weight temperature data converter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10109,6 +10115,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='ascii' || ql==='ascii art' || ql==='divider' || ql==='text art')){
     items.unshift({title:'ASCII Art Library',desc:'Dividers, boxes, banners, arrows',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAsciiArt();}});
+  }
+  if(ql && (ql==='aws' || ql==='aws cli' || ql==='s3' || ql==='ec2' || ql==='lambda')){
+    items.unshift({title:'AWS CLI Reference',desc:'S3, EC2, Lambda, IAM, CloudFormation',icon:'A',type:'action',action:()=>{closeCommandPalette();showAwsCliRef();}});
+  }
+  if(ql && (ql==='weekly report' || ql==='week report' || ql==='this week' || ql==='weekly summary')){
+    items.unshift({title:'Weekly Report',desc:'This week task completion summary',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyReport();}});
+  }
+  if(ql && (ql==='ip' || ql==='ip lookup' || ql==='my ip' || ql==='ip address')){
+    items.unshift({title:'IP Lookup',desc:'Your IP address with location info',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIpLookup();}});
+  }
+  if(ql && (ql==='gcloud' || ql==='google cloud' || ql==='gcp' || ql==='gsutil')){
+    items.unshift({title:'Google Cloud CLI',desc:'Compute, Run, Functions, Storage',icon:'G',type:'action',action:()=>{closeCommandPalette();showGcloudRef();}});
+  }
+  if(ql && (ql==='task content' || ql==='correlation' || ql==='task vs content' || ql==='cross section')){
+    items.unshift({title:'Task-Content Correlation',desc:'Tasks and content distribution comparison',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskContentCorrelation();}});
+  }
+  if(ql && (ql==='unit' || ql==='unit converter' || ql==='convert' || ql==='measurement')){
+    items.unshift({title:'Unit Converter',desc:'Length, weight, temperature, data',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUnitConverter();}});
   }
   return items.slice(0, 20);
 }
@@ -32165,6 +32189,141 @@ function showQuickAsciiArt(){
     html+='</div>';
   });
   html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showAwsCliRef(){
+  const cmds={
+    'S3':{'List buckets':'aws s3 ls','List files':'aws s3 ls s3://bucket/path/','Copy file':'aws s3 cp file.txt s3://bucket/','Sync dir':'aws s3 sync ./dir s3://bucket/dir/','Remove file':'aws s3 rm s3://bucket/file.txt'},
+    'EC2':{'List instances':'aws ec2 describe-instances','Start instance':'aws ec2 start-instances --instance-ids i-xxxxx','Stop instance':'aws ec2 stop-instances --instance-ids i-xxxxx','Instance status':'aws ec2 describe-instance-status','Security groups':'aws ec2 describe-security-groups'},
+    'Lambda':{'List functions':'aws lambda list-functions','Invoke function':'aws lambda invoke --function-name myFunc out.txt','Deploy zip':'aws lambda update-function-code --function-name myFunc --zip-file fileb://code.zip','View logs':'aws logs tail /aws/lambda/myFunc --follow','Create function':'aws lambda create-function --function-name myFunc --runtime nodejs20.x --handler index.handler --zip-file fileb://code.zip --role arn:aws:iam::role'},
+    'IAM':{'List users':'aws iam list-users','Get user':'aws iam get-user','List roles':'aws iam list-roles','Who am I':'aws sts get-caller-identity','List policies':'aws iam list-policies --scope Local'},
+    'CloudFormation':{'List stacks':'aws cloudformation list-stacks','Deploy stack':'aws cloudformation deploy --template-file template.yaml --stack-name mystack','Delete stack':'aws cloudformation delete-stack --stack-name mystack','Stack events':'aws cloudformation describe-stack-events --stack-name mystack','Validate':'aws cloudformation validate-template --template-body file://template.yaml'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">AWS CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskWeeklyReport(){
+  const tasks=S.tasks||[];const now=new Date();
+  const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());weekStart.setHours(0,0,0,0);
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekStart.getDate()+7);
+  const created=tasks.filter(t=>{const d=new Date(t.created||t.createdAt||0);return d>=weekStart&&d<weekEnd;});
+  const completed=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=weekStart&&new Date(t.completedAt)<weekEnd);
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  const overdue=tasks.filter(t=>t.due&&new Date(t.due)<now&&t.status!=='done');
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Weekly Report</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Week of '+weekStart.toLocaleDateString()+' to '+weekEnd.toLocaleDateString()+'</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">'+completed.length+'</div><div style="font-size:10px;color:var(--text-muted)">Completed</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:24px;font-weight:700;color:#06b6d4">'+created.length+'</div><div style="font-size:10px;color:var(--text-muted)">Created</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:24px;font-weight:700;color:#f59e0b">'+inProgress.length+'</div><div style="font-size:10px;color:var(--text-muted)">In Progress</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:24px;font-weight:700;color:#ef4444">'+overdue.length+'</div><div style="font-size:10px;color:var(--text-muted)">Overdue</div></div>';
+  html+='</div>';
+  if(completed.length>0){
+    html+='<div style="margin-bottom:12px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px">Completed This Week</div>';
+    completed.slice(0,10).forEach(t=>{html+='<div style="padding:4px 8px;margin-bottom:2px;background:var(--bg-surface);border-radius:3px;font-size:11px;color:var(--text-primary)">'+esc(t.title)+'</div>';});
+    html+='</div>';
+  }
+  if(overdue.length>0){
+    html+='<div style="margin-bottom:12px"><div style="color:#ef4444;font-size:11px;font-weight:600;margin-bottom:6px">Overdue</div>';
+    overdue.slice(0,10).forEach(t=>{html+='<div style="padding:4px 8px;margin-bottom:2px;background:#ef444410;border-radius:3px;font-size:11px;color:#ef4444">'+esc(t.title)+' (due: '+t.due+')</div>';});
+    html+='</div>';
+  }
+  html+='<button onclick="const t=document.querySelector(\'#weekly-report-text\');navigator.clipboard.writeText(t.textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Report\',600)" style="background:#4ade80;color:#000;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">Copy Report</button>';
+  html+='<div id="weekly-report-text" style="display:none">Weekly Report ('+weekStart.toLocaleDateString()+')\\nCompleted: '+completed.length+'\\nCreated: '+created.length+'\\nIn Progress: '+inProgress.length+'\\nOverdue: '+overdue.length+'</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickIpLookup(){
+  let html='<div style="position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">IP Lookup</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<div id="ip-result" style="text-align:center;padding:10px;color:var(--text-muted);font-size:11px">Loading your IP info...</div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  fetch('https://ipapi.co/json/').then(r=>r.json()).then(data=>{
+    const out=document.getElementById('ip-result');
+    if(!out)return;
+    let r='<div style="text-align:left">';
+    r+='<div style="margin-bottom:8px"><span style="color:var(--text-muted);font-size:10px">IP Address</span><div style="color:#4ade80;font-size:16px;font-weight:600;font-family:monospace">'+(data.ip||'Unknown')+'</div></div>';
+    r+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">';
+    const fields=[['City',data.city],['Region',data.region],['Country',data.country_name],['ISP',data.org],['Timezone',data.timezone],['Postal',data.postal]];
+    fields.forEach(([label,val])=>{
+      r+='<div style="padding:6px 8px;background:var(--bg-surface);border-radius:4px"><div style="color:var(--text-muted);font-size:9px">'+label+'</div><div style="color:var(--text-primary);font-size:11px">'+(val||'N/A')+'</div></div>';
+    });
+    r+='</div>';
+    r+='<button onclick="navigator.clipboard.writeText(\''+data.ip+'\');this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy IP\',600)" style="margin-top:8px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:4px 12px;border-radius:4px;cursor:pointer;font-size:10px;width:100%">Copy IP</button>';
+    r+='</div>';
+    out.innerHTML=r;
+  }).catch(()=>{const out=document.getElementById('ip-result');if(out)out.innerHTML='<span style="color:#ef4444">Failed to fetch IP info</span>';});
+}
+function showGcloudRef(){
+  const cmds={
+    'Auth & Config':{'Login':'gcloud auth login','Service account':'gcloud auth activate-service-account --key-file=key.json','Set project':'gcloud config set project PROJECT_ID','Set region':'gcloud config set compute/region us-central1','List configs':'gcloud config list'},
+    'Compute Engine':{'List instances':'gcloud compute instances list','Create instance':'gcloud compute instances create myvm --machine-type=e2-medium','SSH into VM':'gcloud compute ssh myvm','Stop instance':'gcloud compute instances stop myvm','Delete instance':'gcloud compute instances delete myvm'},
+    'Cloud Run':{'Deploy service':'gcloud run deploy myservice --source .','List services':'gcloud run services list','View logs':'gcloud run services logs myservice','Update traffic':'gcloud run services update-traffic myservice --to-latest','Delete service':'gcloud run services delete myservice'},
+    'Cloud Functions':{'Deploy function':'gcloud functions deploy myFunc --runtime=nodejs20 --trigger-http','List functions':'gcloud functions list','Call function':'gcloud functions call myFunc --data=\'{"key":"val"}\'','View logs':'gcloud functions logs read myFunc','Delete function':'gcloud functions delete myFunc'},
+    'Storage':{'List buckets':'gsutil ls','Create bucket':'gsutil mb gs://my-bucket','Upload file':'gsutil cp file.txt gs://my-bucket/','Sync dir':'gsutil rsync -r ./dir gs://my-bucket/dir/','Make public':'gsutil iam ch allUsers:objectViewer gs://my-bucket'}
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:750px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Google Cloud CLI Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([name,cmd])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;margin-bottom:2px;background:var(--bg-surface);border-radius:4px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><div><span style="color:var(--text-primary);font-size:12px">'+name+'</span><div style="color:var(--text-muted);font-size:10px;font-family:monospace">'+esc(cmd)+'</div></div><span style="color:var(--text-muted);font-size:10px">copy</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskContentCorrelation(){
+  const tasks=S.tasks||[];const content=S.content||[];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Task-Content Correlation</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const projTaskMap={};const projContentMap={};
+  tasks.forEach(t=>{const p=t.project||'Unassigned';projTaskMap[p]=(projTaskMap[p]||0)+1;});
+  content.forEach(c=>{const tags=c.tags||[];tags.forEach(tag=>{projContentMap[tag]=(projContentMap[tag]||0)+1;});if(tags.length===0)projContentMap['(untagged)']=(projContentMap['(untagged)']||0)+1;});
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">'+tasks.length+'</div><div style="font-size:10px;color:var(--text-muted)">Tasks</div></div>';
+  html+='<div style="padding:12px;background:var(--bg-surface);border-radius:6px;text-align:center"><div style="font-size:24px;font-weight:700;color:#06b6d4">'+content.length+'</div><div style="font-size:10px;color:var(--text-muted)">Content Items</div></div>';
+  html+='</div>';
+  html+='<div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin-bottom:8px">Tasks by Project</div>';
+  Object.entries(projTaskMap).sort((a,b)=>b[1]-a[1]).slice(0,8).forEach(([name,count])=>{
+    const maxT=Math.max(...Object.values(projTaskMap));const pct=Math.round(count/maxT*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:100px;font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(name)+'</span>';
+    html+='<div style="flex:1;height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#4ade80;border-radius:3px"></div></div>';
+    html+='<span style="width:25px;font-size:10px;color:var(--text-muted);text-align:right">'+count+'</span></div>';
+  });
+  html+='<div style="color:var(--text-secondary);font-size:11px;font-weight:600;margin:12px 0 8px">Content by Tag</div>';
+  Object.entries(projContentMap).sort((a,b)=>b[1]-a[1]).slice(0,8).forEach(([name,count])=>{
+    const maxC=Math.max(...Object.values(projContentMap));const pct=Math.round(count/maxC*100);
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:100px;font-size:10px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(name)+'</span>';
+    html+='<div style="flex:1;height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:#06b6d4;border-radius:3px"></div></div>';
+    html+='<span style="width:25px;font-size:10px;color:var(--text-muted);text-align:right">'+count+'</span></div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickUnitConverter(){
+  let html='<div style="position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="color:#4ade80;margin:0;font-size:14px">Unit Converter</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  html+='<select id="unit-cat" onchange="window._unitConvert()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:6px;border-radius:4px;font-size:11px;margin-bottom:8px"><option value="length">Length</option><option value="weight">Weight</option><option value="temp">Temperature</option><option value="data">Data Size</option></select>';
+  html+='<input id="unit-input" type="number" placeholder="Enter value" oninput="window._unitConvert()" style="width:100%;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:4px;font-size:12px;box-sizing:border-box;margin-bottom:8px"/>';
+  html+='<div id="unit-output" style="font-size:11px;color:var(--text-secondary)"></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._unitConvert=function(){
+    const cat=document.getElementById('unit-cat').value;const val=parseFloat(document.getElementById('unit-input').value);const out=document.getElementById('unit-output');
+    if(isNaN(val)){out.innerHTML='';return;}
+    let r='';
+    if(cat==='length'){r='<div style="padding:4px 0">'+val+' m = '+(val*3.28084).toFixed(2)+' ft</div><div style="padding:4px 0">'+val+' m = '+(val*39.3701).toFixed(2)+' in</div><div style="padding:4px 0">'+val+' m = '+(val/1000).toFixed(4)+' km</div><div style="padding:4px 0">'+val+' m = '+(val*0.000621371).toFixed(4)+' mi</div><div style="padding:4px 0">'+val+' m = '+(val*100).toFixed(0)+' cm</div>';}
+    else if(cat==='weight'){r='<div style="padding:4px 0">'+val+' kg = '+(val*2.20462).toFixed(2)+' lbs</div><div style="padding:4px 0">'+val+' kg = '+(val*35.274).toFixed(2)+' oz</div><div style="padding:4px 0">'+val+' kg = '+(val*1000).toFixed(0)+' g</div><div style="padding:4px 0">'+val+' kg = '+(val*0.157473).toFixed(4)+' stone</div>';}
+    else if(cat==='temp'){r='<div style="padding:4px 0">'+val+' C = '+((val*9/5)+32).toFixed(1)+' F</div><div style="padding:4px 0">'+val+' C = '+(val+273.15).toFixed(1)+' K</div><div style="padding:4px 0">'+val+' F = '+((val-32)*5/9).toFixed(1)+' C</div><div style="padding:4px 0">'+val+' F = '+((val-32)*5/9+273.15).toFixed(1)+' K</div>';}
+    else if(cat==='data'){r='<div style="padding:4px 0">'+val+' MB = '+(val/1024).toFixed(4)+' GB</div><div style="padding:4px 0">'+val+' MB = '+(val*1024).toFixed(0)+' KB</div><div style="padding:4px 0">'+val+' MB = '+(val*1048576).toFixed(0)+' B</div><div style="padding:4px 0">'+val+' MB = '+(val/1048576).toFixed(6)+' TB</div>';}
+    out.innerHTML=r;
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
