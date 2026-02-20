@@ -6707,6 +6707,12 @@ function cmdGetItems(q) {
       ['yarn','Yarn pnpm package manager ref'],
       ['timebox','Timebox planner daily schedule'],
       ['emoji','Emoji search and copy'],
+      ['ffmpeg','FFmpeg video audio conversion ref'],
+      ['decision log','Decision log with status tracking'],
+      ['gradient','CSS gradient generator linear radial'],
+      ['chmod','Linux permissions chmod chown ref'],
+      ['win log','Accomplishments and wins tracker'],
+      ['brain dump','Quick thought capture to task or content'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10997,6 +11003,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='emoji' || ql==='emoji search' || ql==='emojis' || ql==='emoji picker')){
     items.unshift({title:'Emoji Search',desc:'Browse and copy emojis',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEmojiSearch();}});
+  }
+  if(ql && (ql==='ffmpeg' || ql==='ffmpeg ref' || ql==='video convert' || ql==='ffprobe')){
+    items.unshift({title:'FFmpeg Reference',desc:'Video/audio conversion, editing',icon:'F',type:'action',action:()=>{closeCommandPalette();showFFmpegRef();}});
+  }
+  if(ql && (ql==='decision log' || ql==='decisions' || ql==='decision' || ql==='log decision')){
+    items.unshift({title:'Decision Log',desc:'Track decisions with status',icon:'D',type:'action',action:()=>{closeCommandPalette();showTaskDecisionLog();}});
+  }
+  if(ql && (ql==='gradient' || ql==='css gradient' || ql==='gradient gen' || ql==='gradient generator')){
+    items.unshift({title:'Gradient Generator',desc:'CSS linear/radial gradient builder',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGradientGen();}});
+  }
+  if(ql && (ql==='chmod' || ql==='permissions' || ql==='linux permissions' || ql==='chown')){
+    items.unshift({title:'Linux Permissions Reference',desc:'chmod, chown, ACL, special bits',icon:'P',type:'action',action:()=>{closeCommandPalette();showLinuxPermissionsRef();}});
+  }
+  if(ql && (ql==='win log' || ql==='wins' || ql==='accomplishments' || ql==='victories')){
+    items.unshift({title:'Win Log',desc:'Log and celebrate accomplishments',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWinLog();}});
+  }
+  if(ql && (ql==='brain dump' || ql==='braindump' || ql==='thought capture' || ql==='dump thoughts')){
+    items.unshift({title:'Brain Dump',desc:'Quick capture to thought/task/content',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBrainDump();}});
   }
   return items.slice(0, 20);
 }
@@ -39394,6 +39418,115 @@ function showQuickEmojiSearch(){
     });
   };
   window._filterEmojis();
+}
+function showFFmpegRef(){
+  let p=document.getElementById('ffmpeg-ref-panel');if(p)p.remove();
+  const cmds={'Basic Conversion':['ffmpeg -i input.mp4 output.avi','ffmpeg -i input.mov -c:v libx264 output.mp4','ffmpeg -i input.mp4 -c:v libx265 output.mp4','ffmpeg -i input.webm output.mp4','ffmpeg -i input.mp4 -c copy output.mkv','ffmpeg -i input.mp4 -an output_noaudio.mp4','ffmpeg -i input.mp4 -vn output.mp3'],'Audio':['ffmpeg -i input.mp3 -b:a 192k output.mp3','ffmpeg -i input.wav output.mp3','ffmpeg -i input.mp4 -vn -acodec copy output.aac','ffmpeg -i input.mp4 -vn output.wav','ffmpeg -i input.m4a -c:a libmp3lame -q:a 2 output.mp3','ffmpeg -i input.mp3 -ss 00:00:30 -to 00:01:00 -c copy clip.mp3'],'Video Editing':['ffmpeg -i input.mp4 -ss 00:01:00 -to 00:02:00 -c copy clip.mp4','ffmpeg -i input.mp4 -vf "scale=1280:720" output.mp4','ffmpeg -i input.mp4 -vf "scale=-1:720" output.mp4','ffmpeg -i input.mp4 -r 30 output.mp4','ffmpeg -i input.mp4 -crf 23 output.mp4','ffmpeg -i input.mp4 -vf "crop=640:480:0:0" output.mp4','ffmpeg -i input.mp4 -vf "transpose=1" rotated.mp4','ffmpeg -i input.mp4 -vf "setpts=0.5*PTS" fast.mp4'],'Images & GIF':['ffmpeg -i input.mp4 -vf fps=1 frame_%04d.png','ffmpeg -i input.mp4 -ss 00:00:05 -vframes 1 thumb.jpg','ffmpeg -i input.mp4 -vf "fps=10,scale=320:-1" output.gif','ffmpeg -pattern_type glob -i "*.png" -r 24 output.mp4','ffmpeg -i input.mp4 -vf "palettegen" palette.png'],'Concat & Merge':['ffmpeg -f concat -i list.txt -c copy output.mp4','ffmpeg -i video.mp4 -i audio.mp3 -c:v copy -c:a aac output.mp4','ffmpeg -i input1.mp4 -i input2.mp4 -filter_complex hstack side.mp4'],'Info & Stream':['ffprobe input.mp4','ffprobe -v error -show_format input.mp4','ffmpeg -i input.mp4 -f null - (validate)','ffmpeg -formats','ffmpeg -codecs','ffmpeg -encoders']};
+  p=document.createElement('div');p.id='ffmpeg-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">FFmpeg Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskDecisionLog(){
+  let p=document.getElementById('decision-panel');if(p)p.remove();
+  if(!S._decisions)S._decisions=[];
+  p=document.createElement('div');p.id='decision-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderDecisions=function(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Decision Log</div><div style="display:flex;gap:6px;align-items:center"><button onclick="window._copyDecisions()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer">Copy All</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div></div>';
+    h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">'+S._decisions.length+' decisions logged</div>';
+    S._decisions.slice().reverse().forEach((d,i)=>{
+      const idx=S._decisions.length-1-i;
+      const statusColor=d.status==='approved'?'#4ade80':d.status==='rejected'?'#f87171':d.status==='pending'?'#fbbf24':'#60a5fa';
+      h+='<div style="padding:10px;background:var(--bg-surface);border-radius:8px;margin-bottom:6px;border-left:3px solid '+statusColor+'">';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(d.title)+'</span><button onclick="window._deleteDecision('+idx+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px">&times;</button></div>';
+      if(d.context)h+='<div style="font-size:11px;color:var(--text-secondary);margin-bottom:4px">'+esc(d.context)+'</div>';
+      h+='<div style="display:flex;gap:8px;font-size:10px;color:var(--text-muted)"><span style="color:'+statusColor+'">'+d.status+'</span><span>'+new Date(d.date).toLocaleDateString()+'</span></div>';
+      h+='</div>';
+    });
+    h+='<div style="margin-top:12px;padding:10px;background:var(--bg-surface);border-radius:8px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px">Log a Decision</div>';
+    h+='<input type="text" id="dec-title" placeholder="Decision title..." style="width:100%;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;margin-bottom:4px">';
+    h+='<input type="text" id="dec-context" placeholder="Context/reasoning (optional)..." style="width:100%;background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px;margin-bottom:4px">';
+    h+='<div style="display:flex;gap:4px"><select id="dec-status" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:11px"><option value="approved">Approved</option><option value="pending">Pending</option><option value="rejected">Rejected</option><option value="revisit">Revisit</option></select><button onclick="window._addDecision()" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Log Decision</button></div></div>';
+    document.getElementById('decision-panel').innerHTML=h;
+  };
+  window._addDecision=function(){const title=document.getElementById('dec-title').value.trim();if(!title)return;const context=document.getElementById('dec-context').value.trim();const status=document.getElementById('dec-status').value;S._decisions.push({title,context,status,date:new Date().toISOString()});save();window._renderDecisions();};
+  window._deleteDecision=function(i){S._decisions.splice(i,1);save();window._renderDecisions();};
+  window._copyDecisions=function(){const md='# Decision Log\n\n'+S._decisions.map(d=>'## '+d.title+'\n- Status: '+d.status+'\n- Date: '+new Date(d.date).toLocaleDateString()+'\n'+(d.context?'- Context: '+d.context+'\n':'')).join('\n');navigator.clipboard.writeText(md);};
+  document.body.appendChild(p);
+  window._renderDecisions();
+}
+function showQuickGradientGen(){
+  let w=document.getElementById('gradient-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='gradient-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Gradient Generator</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div id="grad-preview" style="height:60px;border-radius:6px;margin-bottom:8px"></div><div style="display:flex;gap:6px;margin-bottom:8px"><div><label style="font-size:10px;color:var(--text-muted)">Color 1</label><input type="color" id="grad-c1" value="#4ade80" oninput="window._updateGradient()" style="width:100%;height:30px;border:none;cursor:pointer"></div><div><label style="font-size:10px;color:var(--text-muted)">Color 2</label><input type="color" id="grad-c2" value="#06b6d4" oninput="window._updateGradient()" style="width:100%;height:30px;border:none;cursor:pointer"></div><div><label style="font-size:10px;color:var(--text-muted)">Angle</label><input type="number" id="grad-angle" value="135" min="0" max="360" oninput="window._updateGradient()" style="width:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px;text-align:center"></div></div><div style="display:flex;gap:4px;margin-bottom:8px"><button onclick="document.getElementById(\'grad-angle\').value=\'90\';window._updateGradient()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer">90</button><button onclick="document.getElementById(\'grad-angle\').value=\'135\';window._updateGradient()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer">135</button><button onclick="document.getElementById(\'grad-angle\').value=\'180\';window._updateGradient()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer">180</button><button onclick="document.getElementById(\'grad-angle\').value=\'45\';window._updateGradient()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:10px;cursor:pointer">45</button><select id="grad-type" onchange="window._updateGradient()" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:3px;color:var(--text-primary);font-size:10px"><option value="linear">Linear</option><option value="radial">Radial</option></select></div><div id="grad-css" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-primary)\',600)" style="font-family:monospace;font-size:10px;padding:8px;background:var(--bg-surface);border-radius:4px;color:var(--text-primary);cursor:pointer;word-break:break-all"></div>';
+  document.body.appendChild(w);
+  window._updateGradient=function(){
+    const c1=document.getElementById('grad-c1').value;const c2=document.getElementById('grad-c2').value;
+    const angle=document.getElementById('grad-angle').value;const type=document.getElementById('grad-type').value;
+    let css;
+    if(type==='linear')css='linear-gradient('+angle+'deg, '+c1+', '+c2+')';
+    else css='radial-gradient(circle, '+c1+', '+c2+')';
+    document.getElementById('grad-preview').style.background=css;
+    document.getElementById('grad-css').textContent='background: '+css+';';
+  };
+  window._updateGradient();
+}
+function showLinuxPermissionsRef(){
+  let p=document.getElementById('perms-ref-panel');if(p)p.remove();
+  const cmds={'chmod':['chmod 755 file','chmod 644 file','chmod 600 file','chmod 700 dir/','chmod +x script.sh','chmod -R 755 dir/','chmod u+x file','chmod g+rw file','chmod o-rwx file','chmod a+r file','chmod u=rwx,g=rx,o=r file'],'chown':['chown user file','chown user:group file','chown -R user:group dir/','chown --reference=ref_file target','chgrp group file','chgrp -R group dir/'],'Permission Numbers':['0 = ---','1 = --x','2 = -w-','3 = -wx','4 = r--','5 = r-x','6 = rw-','7 = rwx'],'Common Patterns':['755 = rwxr-xr-x (executables)','644 = rw-r--r-- (regular files)','600 = rw------- (private files)','700 = rwx------ (private dirs)','775 = rwxrwxr-x (shared dirs)','664 = rw-rw-r-- (shared files)','444 = r--r--r-- (read-only)','000 = --------- (no access)'],'Special':['chmod 4755 file (setuid)','chmod 2755 dir/ (setgid)','chmod 1777 dir/ (sticky bit)','umask 022','umask -S','stat -c "%a %U:%G %n" file','find . -perm 777','find . -not -perm 644 -type f'],'ACL':['getfacl file','setfacl -m u:user:rwx file','setfacl -m g:group:rx file','setfacl -x u:user file','setfacl -b file (remove all ACLs)','setfacl -R -m u:user:rx dir/']};
+  p=document.createElement('div');p.id='perms-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Linux Permissions (chmod) Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskWinLog(){
+  let p=document.getElementById('winlog-panel');if(p)p.remove();
+  if(!S._winLog)S._winLog=[];
+  p=document.createElement('div');p.id='winlog-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderWins=function(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Win Log</div><div style="display:flex;gap:6px;align-items:center"><button onclick="window._copyWins()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div></div>';
+    h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Celebrate your accomplishments. '+S._winLog.length+' wins logged.</div>';
+    S._winLog.slice().reverse().forEach((w2,i)=>{
+      const idx=S._winLog.length-1-i;
+      h+='<div style="display:flex;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px;border-left:3px solid #4ade80"><div style="flex:1"><div style="font-size:12px;color:var(--text-primary)">'+esc(w2.text)+'</div><div style="font-size:10px;color:var(--text-muted);margin-top:2px">'+new Date(w2.date).toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'})+'</div></div><button onclick="window._deleteWin('+idx+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div>';
+    });
+    h+='<div style="display:flex;gap:6px;margin-top:10px"><input type="text" id="win-input" placeholder="Log a win..." onkeydown="if(event.key===\'Enter\')window._addWin()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px"><button onclick="window._addWin()" style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px 12px;font-size:11px;cursor:pointer">Add</button></div>';
+    document.getElementById('winlog-panel').innerHTML=h;
+  };
+  window._addWin=function(){const input=document.getElementById('win-input');if(!input||!input.value.trim())return;S._winLog.push({text:input.value.trim(),date:new Date().toISOString()});save();window._renderWins();};
+  window._deleteWin=function(i){S._winLog.splice(i,1);save();window._renderWins();};
+  window._copyWins=function(){const md='# Win Log\n\n'+S._winLog.map(w2=>'- ['+new Date(w2.date).toLocaleDateString()+'] '+w2.text).join('\n');navigator.clipboard.writeText(md);};
+  document.body.appendChild(p);
+  window._renderWins();
+}
+function showQuickBrainDump(){
+  let w=document.getElementById('braindump-widget');if(w)w.remove();
+  if(!S._brainDumps)S._brainDumps=[];
+  w=document.createElement('div');w.id='braindump-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:340px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Brain Dump</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Capture thoughts fast. Press Enter or click Save.</div><textarea id="bd-input" placeholder="What is on your mind..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:12px;resize:vertical;line-height:1.5"></textarea><div style="display:flex;gap:6px;margin-top:6px;margin-bottom:8px"><button onclick="window._saveBrainDump()" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Save</button><button onclick="window._saveBrainDumpAsTask()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Save as Task</button><button onclick="window._saveBrainDumpAsContent()" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:11px;cursor:pointer">Save as Content</button></div><div id="bd-recent" style="max-height:120px;overflow-y:auto"></div>';
+  document.body.appendChild(w);
+  window._renderBDRecent=function(){
+    const el=document.getElementById('bd-recent');el.innerHTML='';
+    S._brainDumps.slice(-5).reverse().forEach(d=>{el.innerHTML+='<div style="font-size:10px;color:var(--text-muted);padding:3px 0;border-top:1px solid var(--border)"><span style="color:var(--text-secondary)">'+esc(d.text.substring(0,60))+'</span> <span style="font-size:9px">'+new Date(d.date).toLocaleTimeString()+'</span></div>';});
+  };
+  window._saveBrainDump=function(){const text=document.getElementById('bd-input').value.trim();if(!text)return;S._brainDumps.push({text,date:new Date().toISOString(),type:'thought'});save();document.getElementById('bd-input').value='';window._renderBDRecent();};
+  window._saveBrainDumpAsTask=function(){const text=document.getElementById('bd-input').value.trim();if(!text)return;if(!S.tasks)S.tasks=[];S.tasks.push({id:'t_'+Date.now(),title:text,status:'todo',priority:'p2',created:new Date().toISOString()});S._brainDumps.push({text,date:new Date().toISOString(),type:'task'});save();document.getElementById('bd-input').value='';window._renderBDRecent();};
+  window._saveBrainDumpAsContent=function(){const text=document.getElementById('bd-input').value.trim();if(!text)return;if(!S.content)S.content=[];S.content.push({id:'c_'+Date.now(),text,tags:['brain-dump'],created:new Date().toISOString()});S._brainDumps.push({text,date:new Date().toISOString(),type:'content'});save();document.getElementById('bd-input').value='';window._renderBDRecent();};
+  window._renderBDRecent();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
