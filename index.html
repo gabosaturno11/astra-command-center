@@ -6539,6 +6539,12 @@ function cmdGetItems(q) {
       ['docker compose','Docker Compose commands and config'],
       ['kanban metrics','Kanban board metrics and cycle time'],
       ['url bookmarks','Save and organize URL bookmarks'],
+      ['grep','grep search reference with regex'],
+      ['sprint planner','Auto-plan next sprint from backlog'],
+      ['math','Math calculator with expression eval'],
+      ['systemd','systemd service management reference'],
+      ['habit tracker','Daily habit tracker with streaks'],
+      ['text transform','Text case and format transformer'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10325,6 +10331,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='url bookmarks' || ql==='bookmarks' || ql==='url manager' || ql==='quick urls')){
     items.unshift({title:'URL Bookmarks',desc:'Save and organize URL bookmarks',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUrlShortener();}});
+  }
+  if(ql && (ql==='grep' || ql==='grep ref' || ql==='grep commands' || ql==='search files')){
+    items.unshift({title:'grep Reference',desc:'Text search with regex patterns',icon:'G',type:'action',action:()=>{closeCommandPalette();showGrepRef();}});
+  }
+  if(ql && (ql==='sprint planner' || ql==='sprint' || ql==='plan sprint' || ql==='next sprint')){
+    items.unshift({title:'Sprint Planner',desc:'Auto-plan sprint from backlog',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskSprintPlanner();}});
+  }
+  if(ql && (ql==='math' || ql==='calculator' || ql==='calc' || ql==='math calc')){
+    items.unshift({title:'Math Calculator',desc:'Expression evaluator with history',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMathCalc();}});
+  }
+  if(ql && (ql==='systemd' || ql==='systemctl' || ql==='systemd ref' || ql==='service management')){
+    items.unshift({title:'systemd Reference',desc:'Service management and journalctl',icon:'S',type:'action',action:()=>{closeCommandPalette();showSystemdRef();}});
+  }
+  if(ql && (ql==='habit tracker' || ql==='habits' || ql==='daily habits' || ql==='habit')){
+    items.unshift({title:'Habit Tracker',desc:'Daily habit tracker with 7-day grid',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskDailyHabitTracker();}});
+  }
+  if(ql && (ql==='text transform' || ql==='text case' || ql==='case convert' || ql==='transform text')){
+    items.unshift({title:'Text Transform',desc:'Convert text case and format',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTextTransform();}});
   }
   return items.slice(0, 20);
 }
@@ -34083,6 +34107,268 @@ function showQuickUrlShortener(){
     S._shortUrls.push({url,alias,created:new Date().toISOString()});save();render();
   };
   window._delShortUrl=(i)=>{S._shortUrls.splice(i,1);save();render();};
+  render();
+  document.body.appendChild(d);
+}
+function showGrepRef(){
+  const cmds={
+    'Basic Search':{
+      'grep "pattern" file':'Search for pattern in file',
+      'grep -i "pat" file':'Case-insensitive search',
+      'grep -r "pat" dir/':'Recursive search in directory',
+      'grep -n "pat" file':'Show line numbers',
+      'grep -c "pat" file':'Count matching lines',
+      'grep -l "pat" dir/*':'List files with matches',
+      'grep -L "pat" dir/*':'List files without matches',
+      'grep -w "word" file':'Match whole words only'
+    },
+    'Extended Regex':{
+      'grep -E "a|b" file':'Extended regex (OR)',
+      'grep -E "^start" file':'Match line start',
+      'grep -E "end$" file':'Match line end',
+      'grep -E "[0-9]+" file':'One or more digits',
+      'grep -E "a{3}" file':'Exactly 3 occurrences',
+      'grep -P "\\d+" file':'Perl-compatible regex',
+      'grep -o "pat" file':'Only print matching part',
+      'grep -v "pat" file':'Invert match (exclude)'
+    },
+    'Context':{
+      'grep -A 3 "pat" file':'Show 3 lines after match',
+      'grep -B 3 "pat" file':'Show 3 lines before match',
+      'grep -C 3 "pat" file':'Show 3 lines around match',
+      'grep --color "pat" file':'Highlight matches',
+      'grep -m 5 "pat" file':'Stop after 5 matches',
+      'grep -q "pat" file':'Quiet mode (exit status only)',
+      'grep -H "pat" file':'Show filename with match',
+      'grep -h "pat" files':'Hide filename in output'
+    },
+    'Advanced':{
+      'grep -e "p1" -e "p2"':'Multiple patterns',
+      'grep -f patterns.txt file':'Patterns from file',
+      'grep --include="*.js" -r':'Filter by file type',
+      'grep --exclude-dir=node_modules':'Exclude directories',
+      'grep -Z "pat" | xargs -0':'Null-delimited output',
+      'grep -rl "old" | xargs sed':'Find and replace combo',
+      'zgrep "pat" file.gz':'Search compressed files',
+      'rg "pat" --type js':'ripgrep (faster alternative)'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">grep Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskSprintPlanner(){
+  const tasks=S.tasks||[];
+  if(!tasks.length){alert('No tasks');return;}
+  const active=tasks.filter(t=>t.status!=='done');
+  const byPriority={'p0':[],'p1':[],'p2':[],'p3':[]};
+  active.forEach(t=>{const p=t.priority||'p3';if(byPriority[p])byPriority[p].push(t);else byPriority.p3.push(t);});
+  const sprintDays=5;
+  const capacityPerDay=4;
+  const totalCapacity=sprintDays*capacityPerDay;
+  let sprint=[];let remaining=totalCapacity;
+  ['p0','p1','p2','p3'].forEach(p=>{
+    byPriority[p].sort((a,b)=>{
+      if(a.due&&b.due)return new Date(a.due)-new Date(b.due);
+      if(a.due)return -1;if(b.due)return 1;return 0;
+    });
+    byPriority[p].forEach(t=>{if(remaining>0){sprint.push({...t,sprintPriority:p});remaining--;}});
+  });
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Sprint Planner</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:12px;margin-bottom:16px">';
+  html+='<div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Sprint Capacity</div><div style="font-size:18px;font-weight:700;color:#4ade80">'+totalCapacity+' tasks</div></div>';
+  html+='<div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Selected</div><div style="font-size:18px;font-weight:700;color:#e2e8f0">'+sprint.length+'</div></div>';
+  html+='<div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Backlog</div><div style="font-size:18px;font-weight:700;color:var(--text-muted)">'+(active.length-sprint.length)+'</div></div>';
+  html+='</div>';
+  const pColors={'p0':'#ef4444','p1':'#f97316','p2':'#3b82f6','p3':'#6b7280'};
+  sprint.forEach(t=>{
+    const color=pColors[t.sprintPriority]||'#6b7280';
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-left:3px solid '+color+';background:var(--bg-surface);border-radius:0 6px 6px 0;margin-bottom:4px">';
+    html+='<span style="font-size:10px;color:'+color+';font-weight:600;min-width:24px">'+t.sprintPriority.toUpperCase()+'</span>';
+    html+='<span style="flex:1;font-size:12px;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</span>';
+    if(t.due)html+='<span style="font-size:10px;color:var(--text-muted)">'+new Date(t.due).toLocaleDateString()+'</span>';
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showQuickMathCalc(){
+  let ex=document.getElementById('mathcalc-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='mathcalc-float';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let history=[];
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Math Calculator</span><button onclick="document.getElementById(\'mathcalc-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<div style="display:flex;gap:6px;margin-bottom:10px">';
+    html+='<input id="mathcalc-input" placeholder="e.g. 2*Math.PI, Math.sqrt(144)" style="flex:1;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:8px;font-size:13px;font-family:monospace" onkeydown="if(event.key===\'Enter\')window._calcEval()">';
+    html+='<button onclick="window._calcEval()" style="background:#4ade80;color:#000;border:none;padding:8px 12px;border-radius:4px;cursor:pointer;font-weight:600">=</button>';
+    html+='</div>';
+    if(history.length){
+      html+='<div style="max-height:180px;overflow-y:auto;background:var(--bg-base);border-radius:6px;padding:6px">';
+      history.slice(-10).reverse().forEach(h=>{
+        html+='<div style="display:flex;justify-content:space-between;padding:3px 4px;font-size:12px;font-family:monospace;border-bottom:1px solid var(--border)">';
+        html+='<span style="color:var(--text-muted)">'+esc(h.expr)+'</span>';
+        html+='<span style="color:'+(h.error?'#ef4444':'#4ade80')+';cursor:pointer" onclick="navigator.clipboard.writeText(\''+String(h.result).replace(/'/g,"\\'")+'\')">'+esc(String(h.result))+'</span>';
+        html+='</div>';
+      });
+      html+='</div>';
+    }
+    html+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">Supports: +, -, *, /, %, **, Math.*, parentheses</div>';
+    d.innerHTML=html;
+    setTimeout(()=>{const inp=document.getElementById('mathcalc-input');if(inp)inp.focus();},50);
+  }
+  window._calcEval=()=>{
+    const inp=document.getElementById('mathcalc-input');if(!inp)return;
+    const expr=inp.value.trim();if(!expr)return;
+    try{
+      const safe=expr.replace(/[^0-9+\-*/.%() ,a-zA-Z]/g,'');
+      const result=new Function('return '+safe)();
+      history.push({expr,result,error:false});
+    }catch(e){history.push({expr,result:'Error: '+e.message,error:true});}
+    render();
+  };
+  render();
+  document.body.appendChild(d);
+}
+function showSystemdRef(){
+  const cmds={
+    'Service Management':{
+      'systemctl start svc':'Start a service',
+      'systemctl stop svc':'Stop a service',
+      'systemctl restart svc':'Restart a service',
+      'systemctl reload svc':'Reload configuration',
+      'systemctl status svc':'Show service status',
+      'systemctl enable svc':'Enable on boot',
+      'systemctl disable svc':'Disable on boot',
+      'systemctl is-active svc':'Check if running'
+    },
+    'System Commands':{
+      'systemctl list-units':'List all units',
+      'systemctl list-units --failed':'List failed units',
+      'systemctl daemon-reload':'Reload unit files',
+      'systemctl reboot':'Reboot system',
+      'systemctl poweroff':'Power off system',
+      'systemctl suspend':'Suspend system',
+      'systemctl isolate multi-user':'Switch to multi-user',
+      'systemctl get-default':'Get default target'
+    },
+    'Journalctl':{
+      'journalctl -u svc':'Logs for service',
+      'journalctl -f':'Follow live logs',
+      'journalctl -b':'Logs from current boot',
+      'journalctl --since "1 hour ago"':'Recent logs',
+      'journalctl -p err':'Error priority only',
+      'journalctl --disk-usage':'Log storage size',
+      'journalctl --vacuum-size=500M':'Trim logs to 500M',
+      'journalctl -o json':'JSON output format'
+    },
+    'Unit Files':{
+      '/etc/systemd/system/':'System unit directory',
+      '[Unit] Description=':'Service description',
+      '[Service] ExecStart=':'Command to start',
+      '[Service] Restart=always':'Auto-restart policy',
+      '[Service] User=www':'Run as specific user',
+      '[Service] WorkingDirectory=':'Working directory',
+      '[Install] WantedBy=multi-user.target':'Enable target',
+      'Type=simple|forking|oneshot':'Service type'
+    }
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:720px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">systemd Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,items])=>{
+    html+='<div style="margin-bottom:14px"><div style="color:#4ade80;font-size:11px;font-weight:600;margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    Object.entries(items).forEach(([cmd,desc])=>{
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:12px" onmouseover="this.style.background=\'rgba(74,222,128,0.1)\'" onmouseout="this.style.background=\'none\'" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'rgba(74,222,128,0.3)\';setTimeout(()=>this.style.background=\'none\',300)">';
+      html+='<code style="color:#e2e8f0;font-size:12px">'+esc(cmd)+'</code>';
+      html+='<span style="color:var(--text-muted);font-size:11px;text-align:right;margin-left:12px">'+esc(desc)+'</span></div>';
+    });
+    html+='</div>';
+  });
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+}
+function showTaskDailyHabitTracker(){
+  if(!S._habits)S._habits=[];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="color:#4ade80;margin:0">Daily Habit Tracker</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:12px">';
+  html+='<input id="habit-input" placeholder="New habit..." style="flex:1;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:12px">';
+  html+='<button onclick="window._addHabit()" style="background:#4ade80;color:#000;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Add</button>';
+  html+='</div>';
+  const today=new Date().toISOString().split('T')[0];
+  const days=[];for(let i=6;i>=0;i--){const d2=new Date();d2.setDate(d2.getDate()-i);days.push(d2.toISOString().split('T')[0]);}
+  const dayLabels=days.map(d2=>{const dt=new Date(d2);return['Su','Mo','Tu','We','Th','Fr','Sa'][dt.getDay()];});
+  if(S._habits.length){
+    html+='<div style="display:grid;grid-template-columns:1fr repeat(7,32px) 40px;gap:4px;align-items:center">';
+    html+='<div></div>';
+    dayLabels.forEach(l=>{html+='<div style="text-align:center;font-size:10px;color:var(--text-muted)">'+l+'</div>';});
+    html+='<div style="text-align:center;font-size:10px;color:var(--text-muted)">Streak</div>';
+    S._habits.forEach((h,hi)=>{
+      html+='<div style="font-size:12px;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;gap:4px"><button onclick="window._delHabit('+hi+')" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:10px;padding:0">x</button>'+esc(h.name)+'</div>';
+      let streak=0;
+      days.forEach(day=>{
+        const done=h.log&&h.log[day];
+        html+='<div onclick="window._toggleHabit('+hi+',\''+day+'\')" style="width:28px;height:28px;border-radius:6px;background:'+(done?'#4ade8033':'var(--bg-base)')+';border:1px solid '+(done?'#4ade80':'var(--border)')+';cursor:pointer;display:flex;align-items:center;justify-content:center;margin:0 auto">';
+        if(done)html+='<span style="color:#4ade80;font-size:14px">&#10003;</span>';
+        html+='</div>';
+        if(done)streak++;else streak=0;
+      });
+      html+='<div style="text-align:center;font-size:12px;font-weight:600;color:'+(streak>=7?'#4ade80':streak>=3?'#f59e0b':'var(--text-muted)')+'">'+streak+'</div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<div style="color:var(--text-muted);font-size:11px;text-align:center;padding:20px">No habits tracked yet. Add one above.</div>';
+  }
+  html+='</div>';
+  const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d.firstElementChild);
+  window._addHabit=()=>{const inp=document.getElementById('habit-input');if(!inp||!inp.value.trim())return;S._habits.push({name:inp.value.trim(),log:{}});save();document.querySelector('div[style*=fixed]:last-child')?.remove();showTaskDailyHabitTracker();};
+  window._toggleHabit=(hi,day)=>{if(!S._habits[hi].log)S._habits[hi].log={};S._habits[hi].log[day]=!S._habits[hi].log[day];save();document.querySelector('#habit-tracker-wrap')?.remove();const el=document.querySelector('div[style*=fixed]');if(el)el.remove();showTaskDailyHabitTracker();};
+  window._delHabit=(hi)=>{S._habits.splice(hi,1);save();const el=document.querySelector('div[style*="Habit Tracker"]');if(el)el.closest('div[style*=fixed]')?.remove();showTaskDailyHabitTracker();};
+}
+function showQuickTextTransform(){
+  let ex=document.getElementById('texttrans-float');if(ex){ex.remove();return;}
+  const d=document.createElement('div');d.id='texttrans-float';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:350px';
+  window._ttFns=[
+    t=>t.toUpperCase(),
+    t=>t.toLowerCase(),
+    t=>t.replace(/\w\S*/g,w=>w[0].toUpperCase()+w.slice(1).toLowerCase()),
+    t=>t.replace(/[^a-zA-Z0-9]+(.)/g,(_,c)=>c.toUpperCase()).replace(/^./,c=>c.toLowerCase()),
+    t=>t.replace(/[A-Z]/g,c=>'_'+c.toLowerCase()).replace(/[^a-z0-9]+/g,'_').replace(/^_/,''),
+    t=>t.replace(/[A-Z]/g,c=>'-'+c.toLowerCase()).replace(/[^a-z0-9]+/g,'-').replace(/^-/,''),
+    t=>[...t].reverse().join(''),
+    t=>t.replace(/\s+/g,' ').trim()
+  ];
+  const labels=['UPPER','lower','Title','camelCase','snake_case','kebab-case','Reverse','Trim'];
+  function render(){
+    let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="color:#4ade80;font-weight:600;font-size:14px">Text Transform</span><button onclick="document.getElementById(\'texttrans-float\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+    html+='<textarea id="texttrans-input" style="width:100%;height:80px;background:var(--bg-base);color:#e2e8f0;border:1px solid var(--border);border-radius:6px;padding:8px;font-size:12px;font-family:monospace;resize:none;margin-bottom:8px" placeholder="Paste text here..."></textarea>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+    labels.forEach((label,i)=>{
+      html+='<button onclick="window._applyTransform('+i+')" style="background:var(--bg-surface);color:var(--text-secondary);border:1px solid var(--border);padding:4px 8px;border-radius:4px;cursor:pointer;font-size:11px">'+label+'</button>';
+    });
+    html+='</div>';
+    html+='<div id="texttrans-output" style="background:var(--bg-base);padding:8px;border-radius:6px;font-size:12px;color:#4ade80;font-family:monospace;min-height:40px;max-height:80px;overflow-y:auto;word-break:break-all"></div>';
+    html+='<button onclick="const o=document.getElementById(\'texttrans-output\');if(o)navigator.clipboard.writeText(o.textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Result\',500)" style="width:100%;margin-top:8px;background:#4ade80;color:#000;border:none;padding:6px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Copy Result</button>';
+    d.innerHTML=html;
+  }
+  window._applyTransform=(idx)=>{
+    const inp=document.getElementById('texttrans-input');
+    const out=document.getElementById('texttrans-output');
+    if(!inp||!out)return;
+    try{const result=window._ttFns[idx](inp.value);out.textContent=result;}catch(e){out.textContent='Error: '+e.message;}
+  };
   render();
   document.body.appendChild(d);
 }
