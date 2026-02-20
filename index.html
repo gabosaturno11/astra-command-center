@@ -5897,6 +5897,8 @@ function cmdGetItems(q) {
       ['micro journal','Quick daily one-liner journal'],
       ['completion rate','Weekly task completion rate chart'],
       ['export book','Export all content as markdown book'],
+      ['overview','Full workspace overview dashboard'],
+      ['sentiment','Content sentiment analysis (positive/negative)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7583,6 +7585,14 @@ function cmdGetItems(q) {
   // Export book prefix
   if(ql && (ql==='export book' || ql==='content book' || ql==='markdown book' || ql==='book export')){
     items.unshift({title:'Export Content as Book',desc:'Download all content as structured markdown book',icon:'B',type:'action',action:()=>{closeCommandPalette();exportContentAsBook();}});
+  }
+  // Workspace overview prefix
+  if(ql && (ql==='overview' || ql==='workspace overview' || ql==='dashboard overview' || ql==='everything')){
+    items.unshift({title:'Workspace Overview',desc:'Full dashboard: tasks, content, links, docs, projects, storage',icon:'O',type:'action',action:()=>{closeCommandPalette();showWorkspaceOverview();}});
+  }
+  // Sentiment prefix
+  if(ql && (ql==='sentiment' || ql==='content sentiment' || ql==='mood analysis' || ql==='positive negative')){
+    items.unshift({title:'Content Sentiment',desc:'Keyword-based positive/neutral/negative analysis',icon:'S',type:'action',action:()=>{closeCommandPalette();showContentSentiment();}});
   }
   return items.slice(0, 20);
 }
@@ -11684,6 +11694,72 @@ function exportContentAsBook(){
   a.href=url;a.download='astra-content-book-'+new Date().toISOString().split('T')[0]+'.md';
   a.click();URL.revokeObjectURL(url);
   showToast('Content book exported ('+content.length+' items, '+docs.length+' docs)');
+}
+function showWorkspaceOverview(){
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];const docs=S.writerDocs||[];const projects=S.projects||[];const repos=S.repos||[];
+  const now=new Date();const today=now.toISOString().split('T')[0];
+  const storageKB=Math.round(new Blob([JSON.stringify(S)]).size/1024);
+  const done=tasks.filter(t=>t.status==='done').length;
+  const overdue=tasks.filter(t=>t.due&&t.due<today&&t.status!=='done').length;
+  const inProg=tasks.filter(t=>t.status==='in-progress').length;
+  const totalWords=content.reduce((a,c)=>a+((c.body||'').split(/\s+/).filter(w=>w).length),0)+docs.reduce((a,d)=>a+((d.body||'').split(/\s+/).filter(w=>w).length),0);
+  const panel=document.createElement('div');panel.id='workspace-overview-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Workspace Overview</span><button onclick="document.getElementById('workspace-overview-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--accent)">${tasks.length}</div><div style="font-size:8px;color:var(--text-muted)">Tasks</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#3b82f6">${content.length}</div><div style="font-size:8px;color:var(--text-muted)">Content</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#f59e0b">${links.length}</div><div style="font-size:8px;color:var(--text-muted)">Links</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:22px;font-weight:700;color:#8b5cf6">${docs.length}</div><div style="font-size:8px;color:var(--text-muted)">Docs</div></div>`;
+  h+=`</div>`;
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Tasks</div>`;
+  h+=`<div style="font-size:10px;color:var(--text-secondary)">Done: <span style="color:#4ade80">${done}</span> | In Progress: <span style="color:#3b82f6">${inProg}</span> | Overdue: <span style="color:#ef4444">${overdue}</span></div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Writing</div>`;
+  h+=`<div style="font-size:10px;color:var(--text-secondary)">Total words: <span style="color:var(--accent)">${totalWords.toLocaleString()}</span></div></div>`;
+  h+=`</div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:6px;text-align:center"><div style="font-size:14px;font-weight:600;color:#ec4899">${projects.length}</div><div style="font-size:8px;color:var(--text-muted)">Projects</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:6px;text-align:center"><div style="font-size:14px;font-weight:600;color:#06b6d4">${repos.length}</div><div style="font-size:8px;color:var(--text-muted)">Repos</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:8px;border-radius:6px;text-align:center"><div style="font-size:14px;font-weight:600;color:#f97316">${storageKB}KB</div><div style="font-size:8px;color:var(--text-muted)">Storage</div></div>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentSentiment(){
+  const content=S.content||[];
+  const positive=['great','good','excellent','amazing','wonderful','happy','love','awesome','fantastic','beautiful','perfect','success','win','best','excited','grateful','brilliant','incredible','outstanding'];
+  const negative=['bad','terrible','awful','horrible','sad','angry','frustrated','hate','worst','fail','problem','issue','bug','broken','stuck','difficult','painful','disappointing','annoying'];
+  let posCount=0,negCount=0,neutralCount=0;
+  const results=[];
+  content.forEach(c=>{
+    const words=(c.body||'').toLowerCase().split(/\s+/);
+    let pos=0,neg=0;
+    words.forEach(w=>{
+      if(positive.some(p=>w.includes(p)))pos++;
+      if(negative.some(n=>w.includes(n)))neg++;
+    });
+    const sentiment=pos>neg?'positive':neg>pos?'negative':'neutral';
+    if(sentiment==='positive')posCount++;
+    else if(sentiment==='negative')negCount++;
+    else neutralCount++;
+    results.push({body:(c.body||'').substring(0,50),sentiment,pos,neg});
+  });
+  const panel=document.createElement('div');panel.id='sentiment-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Sentiment</span><button onclick="document.getElementById('sentiment-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">${posCount}</div><div style="font-size:9px;color:var(--text-muted)">Positive</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#6b7280">${neutralCount}</div><div style="font-size:9px;color:var(--text-muted)">Neutral</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#ef4444">${negCount}</div><div style="font-size:9px;color:var(--text-muted)">Negative</div></div>`;
+  h+=`</div>`;
+  const total=content.length||1;
+  h+=`<div style="display:flex;gap:2px;height:16px;border-radius:4px;overflow:hidden;margin-bottom:12px">`;
+  h+=`<div style="width:${(posCount/total)*100}%;background:#4ade80"></div>`;
+  h+=`<div style="width:${(neutralCount/total)*100}%;background:#6b7280"></div>`;
+  h+=`<div style="width:${(negCount/total)*100}%;background:#ef4444"></div>`;
+  h+=`</div>`;
+  h+=`<div style="font-size:9px;color:var(--text-muted);text-align:center">Keyword-based analysis of ${content.length} items (approximate)</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
