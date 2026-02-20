@@ -5880,6 +5880,9 @@ function cmdGetItems(q) {
       ['global search','Dedicated search panel across all sections'],
       ['notifications','Overdue, WIP, streak, and storage alerts'],
       ['stats history','Daily stats tracked over time (90 days)'],
+      ['board filters','Filter kanban by priority, project, due date'],
+      ['scratchpad','Quick persistent notepad'],
+      ['print export','Downloadable printable HTML export'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7498,6 +7501,18 @@ function cmdGetItems(q) {
   // Stats history prefix
   if(ql && (ql==='stats history' || ql==='daily stats' || ql==='growth' || ql==='workspace growth')){
     items.unshift({title:'Stats History',desc:'Daily stats tracked over 90 days with bar chart',icon:'S',type:'action',action:()=>{closeCommandPalette();showStatsHistory();}});
+  }
+  // Board filters prefix
+  if(ql && (ql==='board filters' || ql==='kanban filters' || ql==='filter board' || ql==='board filter')){
+    items.unshift({title:'Board Filters',desc:'Filter kanban by priority, project, due date',icon:'F',type:'action',action:()=>{closeCommandPalette();showKanbanFilters();}});
+  }
+  // Scratchpad prefix
+  if(ql && (ql==='scratchpad' || ql==='scratch' || ql==='notepad' || ql==='pad')){
+    items.unshift({title:'Scratchpad',desc:'Quick persistent notepad for scratch work',icon:'S',type:'action',action:()=>{closeCommandPalette();showScratchpad();}});
+  }
+  // Printable export prefix
+  if(ql && (ql==='print export' || ql==='print' || ql==='printable' || ql==='html export')){
+    items.unshift({title:'Printable Export',desc:'Download formatted HTML with tasks and content',icon:'P',type:'action',action:()=>{closeCommandPalette();printableExport();}});
   }
   return items.slice(0, 20);
 }
@@ -11055,6 +11070,64 @@ function showStatsHistory(){
     h+=`</div>`;
   }
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showKanbanFilters(){
+  const projects=S.projects||[];
+  const panel=document.createElement('div');panel.id='kanban-filters-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  if(!S._kanbanFilters)S._kanbanFilters={priority:'all',project:'all',dueSoon:false};
+  const kf=S._kanbanFilters;
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Board Filters</span><button onclick="document.getElementById('kanban-filters-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Priority</div>`;
+  h+=`<div style="display:flex;gap:6px;flex-wrap:wrap">`;
+  ['all','p0','p1','p2','p3'].forEach(p=>{
+    const selected=kf.priority===p;
+    const color=p==='p0'?'#ef4444':p==='p1'?'#f59e0b':p==='p2'?'#3b82f6':p==='p3'?'#6b7280':'var(--accent)';
+    h+=`<button onclick="S._kanbanFilters.priority='${p}';save();document.getElementById('kanban-filters-panel').remove();showKanbanFilters()" style="padding:4px 12px;border-radius:4px;border:1px solid ${selected?color:'var(--border)'};background:${selected?color+'20':'var(--bg-surface)'};color:${selected?color:'var(--text-muted)'};cursor:pointer;font-size:10px;font-weight:${selected?'600':'400'}">${p==='all'?'All':p.toUpperCase()}</button>`;
+  });
+  h+=`</div></div>`;
+  h+=`<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:6px">Project</div>`;
+  h+=`<select onchange="S._kanbanFilters.project=this.value;save()" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px">`;
+  h+=`<option value="all" ${kf.project==='all'?'selected':''}>All Projects</option>`;
+  projects.forEach(p=>{h+=`<option value="${esc(p.name)}" ${kf.project===p.name?'selected':''}>${esc(p.name)}</option>`;});
+  h+=`</select></div>`;
+  h+=`<div style="margin-bottom:16px"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${kf.dueSoon?'checked':''} onchange="S._kanbanFilters.dueSoon=this.checked;save()"><span style="font-size:11px;color:var(--text-secondary)">Show only due within 7 days</span></label></div>`;
+  h+=`<button onclick="S._kanbanFilters={priority:'all',project:'all',dueSoon:false};save();document.getElementById('kanban-filters-panel').remove();renderTasks()" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary);cursor:pointer;font-size:11px">Reset Filters</button>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showScratchpad(){
+  if(!S._scratchpad)S._scratchpad='';
+  const panel=document.createElement('div');panel.id='scratchpad-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Scratchpad</span><div><button onclick="navigator.clipboard.writeText(document.getElementById('scratchpad-textarea').value);showToast('Copied')" style="font-size:10px;padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary);cursor:pointer;margin-right:8px">Copy</button><button onclick="document.getElementById('scratchpad-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`;
+  h+=`<textarea id="scratchpad-textarea" style="width:100%;height:300px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:12px;padding:12px;resize:vertical;font-family:monospace;line-height:1.6;box-sizing:border-box" oninput="S._scratchpad=this.value;save()" placeholder="Quick notes, scratch work, temporary ideas...">${esc(S._scratchpad)}</textarea>`;
+  h+=`<div style="font-size:9px;color:var(--text-muted);margin-top:6px;text-align:right">${S._scratchpad.split(/\s+/).filter(w=>w).length} words | Auto-saved</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+  document.getElementById('scratchpad-textarea').focus();
+}
+function printableExport(){
+  const tasks=S.tasks||[];const content=S.content||[];
+  let html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>ASTRA Export</title>';
+  html+='<style>body{font-family:system-ui;max-width:800px;margin:0 auto;padding:20px;color:#222}h1{border-bottom:2px solid #333}h2{color:#444;margin-top:24px}table{width:100%;border-collapse:collapse;margin:12px 0}th,td{border:1px solid #ddd;padding:6px 10px;text-align:left;font-size:12px}th{background:#f5f5f5;font-weight:600}.done{text-decoration:line-through;color:#999}.p0{color:#dc2626}.p1{color:#d97706}.p2{color:#2563eb}.overdue{color:#dc2626;font-weight:600}@media print{body{font-size:11px}}</style>';
+  html+='</head><body>';
+  html+=`<h1>ASTRA Command Center Export</h1><p>Generated: ${new Date().toLocaleString()}</p>`;
+  html+='<h2>Tasks ('+tasks.length+')</h2><table><tr><th>Title</th><th>Status</th><th>Priority</th><th>Due</th></tr>';
+  tasks.slice(0,50).forEach(t=>{
+    const isDone=t.status==='done';
+    const isOverdue=t.due&&new Date(t.due)<new Date()&&!isDone;
+    html+=`<tr class="${isDone?'done':''}"><td>${esc(t.title)}</td><td>${t.status}</td><td class="${t.priority||''}">${(t.priority||'p3').toUpperCase()}</td><td class="${isOverdue?'overdue':''}">${t.due||'-'}</td></tr>`;
+  });
+  html+='</table>';
+  html+='<h2>Content ('+content.length+')</h2>';
+  content.slice(0,20).forEach(c=>{
+    html+=`<div style="border-left:3px solid #4ade80;padding:8px 12px;margin:8px 0;background:#f9f9f9"><p style="font-size:11px;color:#666">${c.theme||''} | ${c.created?new Date(c.created).toLocaleDateString():''}</p><p>${esc((c.body||'').substring(0,300))}</p></div>`;
+  });
+  html+='</body></html>';
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
+  a.href=url;a.download='astra-export-'+new Date().toISOString().split('T')[0]+'.html';
+  a.click();URL.revokeObjectURL(url);
+  showToast('Printable HTML exported');
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
