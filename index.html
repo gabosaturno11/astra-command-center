@@ -6683,6 +6683,12 @@ function cmdGetItems(q) {
       ['systemd','systemd journalctl service ref'],
       ['project budget','Project time budget tracker'],
       ['binary','Binary hex octal decimal converter'],
+      ['rust','Rust Cargo build test publish ref'],
+      ['weekly review','Weekly review summary generator'],
+      ['color palette','Color palette generator analogous'],
+      ['python','Python pip venv pytest ref'],
+      ['daily goals','Daily goals tracker with checkboxes'],
+      ['text counter','Text counter words chars sentences'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10901,6 +10907,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='binary' || ql==='binary converter' || ql==='hex converter' || ql==='base converter')){
     items.unshift({title:'Number Base Converter',desc:'Dec/Bin/Hex/Oct converter',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBinaryConverter();}});
+  }
+  if(ql && (ql==='rust' || ql==='cargo' || ql==='rust ref' || ql==='cargo ref')){
+    items.unshift({title:'Rust/Cargo Reference',desc:'Build, test, publish, clippy',icon:'R',type:'action',action:()=>{closeCommandPalette();showRustCargoRef();}});
+  }
+  if(ql && (ql==='weekly review' || ql==='week review' || ql==='review week' || ql==='weekly summary')){
+    items.unshift({title:'Weekly Review',desc:'This week summary with copy',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyReview();}});
+  }
+  if(ql && (ql==='color palette' || ql==='palette gen' || ql==='palette generator' || ql==='color gen')){
+    items.unshift({title:'Color Palette',desc:'Generate color palettes from base',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickColorPaletteGen();}});
+  }
+  if(ql && (ql==='python' || ql==='pip' || ql==='python ref' || ql==='pip ref')){
+    items.unshift({title:'Python/pip Reference',desc:'Venv, pip, pytest, build, publish',icon:'P',type:'action',action:()=>{closeCommandPalette();showPythonPipRef();}});
+  }
+  if(ql && (ql==='daily goals' || ql==='goals' || ql==='today goals' || ql==='goal tracker')){
+    items.unshift({title:'Daily Goals',desc:'Daily goals tracker with checkboxes',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskDailyGoals();}});
+  }
+  if(ql && (ql==='text counter' || ql==='word counter' || ql==='char count' || ql==='text stats')){
+    items.unshift({title:'Text Counter',desc:'Words, chars, sentences, read time',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTextCounter();}});
   }
   return items.slice(0, 20);
 }
@@ -38750,6 +38774,136 @@ function showQuickBinaryConverter(){
       if(from!=='oct')document.getElementById('bin-oct').value=val.toString(8);
     }catch(e){}
   };
+}
+function showRustCargoRef(){
+  let p=document.getElementById('cargo-ref-panel');if(p)p.remove();
+  const cmds={'Project Setup':['cargo new myproject','cargo new mylib --lib','cargo init','cargo init --lib','cargo build','cargo build --release','cargo run','cargo run --release','cargo check','cargo clean'],'Dependencies':['cargo add serde','cargo add serde --features derive','cargo add tokio -F full','cargo remove package','cargo update','cargo tree','cargo tree -d (duplicates)','cargo vendor','cargo fetch'],'Testing & Docs':['cargo test','cargo test test_name','cargo test -- --nocapture','cargo bench','cargo doc','cargo doc --open','cargo doc --no-deps','cargo clippy','cargo clippy --fix','cargo fmt','cargo fmt --check'],'Publishing':['cargo login','cargo publish','cargo publish --dry-run','cargo package','cargo yank --vers 1.0.0','cargo owner --add user','cargo search keyword','cargo install package'],'Advanced':['cargo watch -x run','cargo expand','cargo audit','cargo deny check','cargo machete','cargo bloat','cargo flamegraph','cargo miri test','cargo +nightly build','RUSTFLAGS="-C target-cpu=native" cargo build --release']};
+  p=document.createElement('div');p.id='cargo-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Rust / Cargo Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskWeeklyReview(){
+  let p=document.getElementById('weeklyreview-panel');if(p)p.remove();
+  const tasks=(S.tasks||[]);const now=new Date();
+  const weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-weekStart.getDay());weekStart.setHours(0,0,0,0);
+  const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+7);
+  const doneThisWeek=tasks.filter(t=>t.status==='done'&&new Date(t.completedAt||t.created||'')>=weekStart&&new Date(t.completedAt||t.created||'')<weekEnd);
+  const createdThisWeek=tasks.filter(t=>new Date(t.created||'')>=weekStart&&new Date(t.created||'')<weekEnd);
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now);
+  const upcomingWeek=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)>=now&&new Date(t.due)<new Date(now.getTime()+7*24*60*60*1000));
+  const inProgress=tasks.filter(t=>t.status==='in-progress'||t.status==='inprogress');
+  p=document.createElement('div');p.id='weeklyreview-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Weekly Review</div><div style="display:flex;gap:6px;align-items:center"><button onclick="window._copyWeeklyReview()" style="background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:10px;cursor:pointer">Copy</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div></div>';
+  h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">Week of '+weekStart.toLocaleDateString('en',{month:'short',day:'numeric'})+' - '+weekEnd.toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'})+'</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">';
+  h+='<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:20px;font-weight:700;color:#4ade80">'+doneThisWeek.length+'</div><div style="font-size:9px;color:var(--text-muted)">Completed</div></div>';
+  h+='<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:20px;font-weight:700;color:#60a5fa">'+createdThisWeek.length+'</div><div style="font-size:9px;color:var(--text-muted)">Created</div></div>';
+  h+='<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:20px;font-weight:700;color:#fbbf24">'+inProgress.length+'</div><div style="font-size:9px;color:var(--text-muted)">In Progress</div></div>';
+  h+='<div style="text-align:center;padding:8px;background:var(--bg-surface);border-radius:6px"><div style="font-size:20px;font-weight:700;color:#f87171">'+overdue.length+'</div><div style="font-size:9px;color:var(--text-muted)">Overdue</div></div>';
+  h+='</div>';
+  if(doneThisWeek.length>0){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:#4ade80;margin-bottom:6px">COMPLETED</div>';doneThisWeek.slice(0,10).forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0">- '+esc(t.title)+'</div>';});if(doneThisWeek.length>10)h+='<div style="font-size:10px;color:var(--text-muted)">+'+(doneThisWeek.length-10)+' more</div>';h+='</div>';}
+  if(overdue.length>0){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:#f87171;margin-bottom:6px">OVERDUE</div>';overdue.slice(0,8).forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0">- '+esc(t.title)+' <span style="color:#f87171;font-size:10px">('+new Date(t.due).toLocaleDateString()+')</span></div>';});h+='</div>';}
+  if(upcomingWeek.length>0){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:600;color:#60a5fa;margin-bottom:6px">DUE NEXT WEEK</div>';upcomingWeek.forEach(t=>{h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0">- '+esc(t.title)+' <span style="color:var(--text-muted);font-size:10px">('+new Date(t.due).toLocaleDateString()+')</span></div>';});h+='</div>';}
+  p.innerHTML=h;document.body.appendChild(p);
+  window._copyWeeklyReview=function(){
+    let md='# Weekly Review\n## '+weekStart.toLocaleDateString()+' - '+weekEnd.toLocaleDateString()+'\n\n';
+    md+='Completed: '+doneThisWeek.length+' | Created: '+createdThisWeek.length+' | In Progress: '+inProgress.length+' | Overdue: '+overdue.length+'\n\n';
+    if(doneThisWeek.length)md+='### Completed\n'+doneThisWeek.map(t=>'- '+t.title).join('\n')+'\n\n';
+    if(overdue.length)md+='### Overdue\n'+overdue.map(t=>'- '+t.title).join('\n')+'\n\n';
+    if(upcomingWeek.length)md+='### Due Next Week\n'+upcomingWeek.map(t=>'- '+t.title).join('\n')+'\n';
+    navigator.clipboard.writeText(md);
+  };
+}
+function showQuickColorPaletteGen(){
+  let w=document.getElementById('colorpal-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='colorpal-widget';
+  w.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Color Palette</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><div style="margin-bottom:8px"><label style="font-size:11px;color:var(--text-muted)">Base Color</label><div style="display:flex;gap:6px;margin-top:4px"><input type="color" id="pal-base" value="#4ade80" style="width:40px;height:30px;border:none;cursor:pointer"><input type="text" id="pal-hex" value="#4ade80" oninput="document.getElementById(\'pal-base\').value=this.value" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:4px;color:var(--text-primary);font-size:12px;font-family:monospace"></div></div><div style="display:flex;gap:4px;margin-bottom:10px"><button onclick="window._genPalette(\'analogous\')" style="flex:1;background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px;font-size:10px;cursor:pointer">Analogous</button><button onclick="window._genPalette(\'complementary\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:10px;cursor:pointer">Complement</button><button onclick="window._genPalette(\'shades\')" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:6px;font-size:10px;cursor:pointer">Shades</button></div><div id="pal-output" style="display:flex;flex-direction:column;gap:4px"></div>';
+  document.body.appendChild(w);
+  document.getElementById('pal-base').addEventListener('input',function(){document.getElementById('pal-hex').value=this.value;});
+  window._hexToHSL=function(hex){let r=parseInt(hex.slice(1,3),16)/255,g=parseInt(hex.slice(3,5),16)/255,b=parseInt(hex.slice(5,7),16)/255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min)h=s=0;else{const d=max-min;s=l>0.5?d/(2-max-min):d/(max+min);switch(max){case r:h=((g-b)/d+(g<b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;case b:h=((r-g)/d+4)/6;break;}}return[Math.round(h*360),Math.round(s*100),Math.round(l*100)];};
+  window._hslToHex=function(h,s,l){s/=100;l/=100;const a=s*Math.min(l,1-l);const f=n=>{const k=(n+h/30)%12;const color=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*color).toString(16).padStart(2,'0');};return'#'+f(0)+f(8)+f(4);};
+  window._genPalette=function(type){
+    const hex=document.getElementById('pal-base').value;const[h,s,l]=window._hexToHSL(hex);
+    let colors=[];
+    if(type==='analogous'){for(let i=-2;i<=2;i++)colors.push(window._hslToHex((h+i*30+360)%360,s,l));}
+    else if(type==='complementary'){colors=[hex,window._hslToHex((h+180)%360,s,l),window._hslToHex((h+120)%360,s,l),window._hslToHex((h+240)%360,s,l),window._hslToHex((h+60)%360,s,l)];}
+    else{for(let i=0;i<5;i++)colors.push(window._hslToHex(h,s,Math.max(10,l-20+i*10)));}
+    const el=document.getElementById('pal-output');el.innerHTML='';
+    colors.forEach(c=>{el.innerHTML+='<div onclick="navigator.clipboard.writeText(\''+c+'\');this.querySelector(\'.pal-label\').textContent=\'Copied!\';setTimeout(()=>this.querySelector(\'.pal-label\').textContent=\''+c+'\',600)" style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:4px"><div style="width:32px;height:32px;border-radius:6px;background:'+c+';border:1px solid var(--border)"></div><span class="pal-label" style="font-family:monospace;font-size:12px;color:var(--text-primary)">'+c+'</span></div>';});
+  };
+  window._genPalette('analogous');
+}
+function showPythonPipRef(){
+  let p=document.getElementById('pip-ref-panel');if(p)p.remove();
+  const cmds={'Virtual Environments':['python -m venv venv','source venv/bin/activate','deactivate','python -m venv --clear venv','pip install virtualenv','virtualenv myenv','conda create -n myenv python=3.11','conda activate myenv','conda deactivate','conda env list'],'Package Management':['pip install package','pip install package==1.0.0','pip install -r requirements.txt','pip install -e . (editable)','pip uninstall package','pip install --upgrade package','pip list','pip list --outdated','pip show package','pip freeze > requirements.txt'],'Tools & Linting':['pip install black','black .','pip install ruff','ruff check .','ruff format .','pip install mypy','mypy .','pip install pytest','pytest','pytest -v','pytest -x (stop on first fail)','pytest --cov=src'],'Build & Publish':['pip install build','python -m build','pip install twine','twine upload dist/*','twine check dist/*','pip install setuptools wheel','python setup.py sdist bdist_wheel'],'Misc':['pip cache purge','pip config list','pip debug --verbose','python -c "import sys; print(sys.version)"','python -m site --user-site','pip install ipython','pip install jupyter','jupyter notebook','python -m http.server 8000']};
+  p=document.createElement('div');p.id='pip-ref-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--accent)">Python / pip Reference</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    h+='<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">'+cat+'</div>';
+    list.forEach(c=>{h+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="font-family:monospace;font-size:12px;padding:3px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;color:var(--text-primary)">'+c+'</div>';});
+    h+='</div>';
+  });
+  p.innerHTML=h;document.body.appendChild(p);
+}
+function showTaskDailyGoals(){
+  let p=document.getElementById('dailygoals-panel');if(p)p.remove();
+  const today=new Date().toISOString().split('T')[0];
+  if(!S._dailyGoals)S._dailyGoals={};
+  if(!S._dailyGoals[today])S._dailyGoals[today]=[];
+  p=document.createElement('div');p.id='dailygoals-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:440px;width:90vw;max-height:80vh;overflow-y:auto';
+  window._renderDailyGoals=function(){
+    const goals=S._dailyGoals[today]||[];
+    const done=goals.filter(g=>g.done).length;
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-weight:700;font-size:16px;color:var(--accent)">Daily Goals</div><div style="font-size:11px;color:var(--text-muted)">'+new Date().toLocaleDateString('en',{weekday:'long',month:'short',day:'numeric'})+'</div></div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+    h+='<div style="width:100%;height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden;margin-bottom:12px"><div style="width:'+(goals.length>0?(done/goals.length*100):0)+'%;height:100%;background:#4ade80;border-radius:4px;transition:width 0.3s"></div></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+done+'/'+goals.length+' completed</div>';
+    goals.forEach((g,i)=>{
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px'+(g.done?';opacity:0.6':'')+'">';
+      h+='<input type="checkbox" '+(g.done?'checked':'')+' onchange="window._toggleGoal('+i+')" style="cursor:pointer">';
+      h+='<span style="flex:1;font-size:12px;color:var(--text-primary);'+(g.done?'text-decoration:line-through':'')+'">'+esc(g.text)+'</span>';
+      h+='<button onclick="window._deleteGoal('+i+')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">&times;</button>';
+      h+='</div>';
+    });
+    h+='<div style="display:flex;gap:6px;margin-top:10px"><input type="text" id="goal-input" placeholder="Add a goal..." onkeydown="if(event.key===\'Enter\')window._addGoal()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;padding:6px;color:var(--text-primary);font-size:12px"><button onclick="window._addGoal()" style="background:var(--accent);color:#000;border:none;border-radius:4px;padding:6px 12px;font-size:11px;cursor:pointer">Add</button></div>';
+    document.getElementById('dailygoals-panel').innerHTML=h;
+  };
+  window._addGoal=function(){const input=document.getElementById('goal-input');if(!input||!input.value.trim())return;S._dailyGoals[today].push({text:input.value.trim(),done:false});save();window._renderDailyGoals();};
+  window._toggleGoal=function(i){S._dailyGoals[today][i].done=!S._dailyGoals[today][i].done;save();window._renderDailyGoals();};
+  window._deleteGoal=function(i){S._dailyGoals[today].splice(i,1);save();window._renderDailyGoals();};
+  document.body.appendChild(p);
+  window._renderDailyGoals();
+}
+function showQuickTextCounter(){
+  let w=document.getElementById('textcount-widget');if(w)w.remove();
+  w=document.createElement('div');w.id='textcount-widget';
+  w.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:320px';
+  w.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--accent)">Text Counter</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button></div><textarea id="textcount-input" oninput="window._updateTextCount()" placeholder="Paste or type text to analyze..." style="width:100%;height:120px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:8px;color:var(--text-primary);font-size:12px;resize:vertical;line-height:1.5"></textarea><div id="textcount-stats" style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:4px"></div>';
+  document.body.appendChild(w);
+  window._updateTextCount=function(){
+    const text=document.getElementById('textcount-input').value;
+    const chars=text.length;
+    const charsNoSpace=text.replace(/\s/g,'').length;
+    const words=text.trim()?text.trim().split(/\s+/).length:0;
+    const lines=text?text.split('\n').length:0;
+    const sentences=text.trim()?text.split(/[.!?]+/).filter(s=>s.trim()).length:0;
+    const paragraphs=text.trim()?text.split(/\n\n+/).filter(s=>s.trim()).length:0;
+    const readTime=Math.ceil(words/200);
+    const speakTime=Math.ceil(words/130);
+    const stats=[['Characters',chars],['No spaces',charsNoSpace],['Words',words],['Lines',lines],['Sentences',sentences],['Paragraphs',paragraphs],['Read time',readTime+'m'],['Speak time',speakTime+'m']];
+    const el=document.getElementById('textcount-stats');el.innerHTML='';
+    stats.forEach(([label,val])=>{el.innerHTML+='<div style="padding:4px 8px;background:var(--bg-surface);border-radius:4px;display:flex;justify-content:space-between"><span style="font-size:10px;color:var(--text-muted)">'+label+'</span><span style="font-size:11px;font-weight:600;color:var(--text-primary)">'+val+'</span></div>';});
+  };
+  window._updateTextCount();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
