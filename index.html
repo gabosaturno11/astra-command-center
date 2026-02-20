@@ -6374,6 +6374,9 @@ function cmdGetItems(q) {
       ['maven','Maven command reference'],
       ['tag breakdown','Content tag usage breakdown'],
       ['shadow','CSS box-shadow generator'],
+      ['nuget','NuGet/.NET command reference'],
+      ['productivity','Productivity index by time period'],
+      ['gradient','CSS gradient generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9665,6 +9668,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='shadow' || ql==='box shadow' || ql==='shadow generator' || ql==='css shadow')){
     items.unshift({title:'Shadow Generator',desc:'CSS box-shadow presets with preview',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickShadowGenerator();}});
+  }
+  if(ql && (ql==='nuget' || ql==='dotnet' || ql==='.net' || ql==='nuget ref')){
+    items.unshift({title:'.NET/NuGet Reference',desc:'dotnet CLI and NuGet cheatsheet',icon:'N',type:'action',action:()=>{closeCommandPalette();showNugetRef();}});
+  }
+  if(ql && (ql==='productivity' || ql==='productivity index' || ql==='output ratio' || ql==='done ratio')){
+    items.unshift({title:'Productivity Index',desc:'Done/created ratio by time period',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProductivityIndex();}});
+  }
+  if(ql && (ql==='gradient' || ql==='css gradient' || ql==='gradient generator' || ql==='linear gradient')){
+    items.unshift({title:'Gradient Generator',desc:'CSS gradient presets with preview',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGradientGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -28955,6 +28967,85 @@ function showQuickShadowGenerator(){
   });
   html+='<div style="font-size:9px;color:var(--text-muted);margin-top:6px;text-align:center">Click CSS to copy</div>';
   d.innerHTML=html;document.body.appendChild(d);
+}
+function showNugetRef(){
+  const d=document.createElement('div');d.id='nuget-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Package':['dotnet add package <pkg>','dotnet remove package <pkg>','dotnet list package','dotnet restore'],
+    'Build':['dotnet build','dotnet run','dotnet publish','dotnet clean','dotnet watch run'],
+    'Test':['dotnet test','dotnet test --filter <name>','dotnet test --collect:"XPlat Code Coverage"'],
+    'Create':['dotnet new webapi','dotnet new console','dotnet new classlib','dotnet new blazorserver','dotnet new list'],
+    'Tools':['dotnet tool install -g <tool>','dotnet tool list -g','dotnet tool update -g <tool>','dotnet format'],
+    'Other':['dotnet --version','dotnet --info','dotnet nuget push','dotnet ef migrations add <name>','dotnet ef database update']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">.NET/NuGet Reference</h3><button onclick="document.getElementById(\'nuget-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskProductivityIndex(){
+  const d=document.createElement('div');d.id='productivity-index-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const now=new Date();
+  const periods=[
+    {label:'Today',start:new Date(now.getFullYear(),now.getMonth(),now.getDate())},
+    {label:'This Week',start:new Date(now.getTime()-now.getDay()*86400000)},
+    {label:'This Month',start:new Date(now.getFullYear(),now.getMonth(),1)},
+    {label:'All Time',start:new Date(0)}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Productivity Index</h3><button onclick="document.getElementById(\'productivity-index-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  periods.forEach(p=>{
+    const created=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=p.start).length;
+    const done=tasks.filter(t=>t.status==='done'&&t.updatedAt&&new Date(t.updatedAt)>=p.start).length;
+    const ratio=created>0?(done/created*100).toFixed(0):0;
+    const col=ratio>=80?'#4ade80':ratio>=50?'#f59e0b':'#ef4444';
+    html+='<div style="background:var(--bg-surface);padding:12px;border-radius:6px;margin-bottom:8px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:13px;color:var(--text-primary);font-weight:600">'+p.label+'</span><span style="font-size:16px;color:'+col+';font-weight:700">'+ratio+'%</span></div>';
+    html+='<div style="display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--bg-base)"><div style="width:'+Math.min(100,ratio)+'%;background:'+col+'"></div></div>';
+    html+='<div style="display:flex;gap:12px;font-size:10px;color:var(--text-muted);margin-top:6px"><span>Created: '+created+'</span><span>Done: '+done+'</span><span>Ratio: '+ratio+'%</span></div></div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickGradientGenerator(){
+  const d=document.createElement('div');d.id='gradient-gen-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  const presets=[
+    {label:'Mint',val:'linear-gradient(135deg, #4ade80, #059669)'},
+    {label:'Ocean',val:'linear-gradient(135deg, #3b82f6, #06b6d4)'},
+    {label:'Sunset',val:'linear-gradient(135deg, #f59e0b, #ef4444)'},
+    {label:'Purple',val:'linear-gradient(135deg, #8b5cf6, #ec4899)'},
+    {label:'Dark',val:'linear-gradient(135deg, #1a1a2e, #16213e)'},
+    {label:'Gold',val:'linear-gradient(135deg, #fbbf24, #d97706)'},
+    {label:'Rose',val:'linear-gradient(135deg, #f43f5e, #ec4899)'},
+    {label:'Forest',val:'linear-gradient(135deg, #059669, #065f46)'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Gradient Generator</h3><button onclick="document.getElementById(\'gradient-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div id="grad-preview" style="width:100%;height:80px;border-radius:8px;margin-bottom:10px;background:linear-gradient(135deg, #4ade80, #059669)"></div>';
+  html+='<div id="grad-css" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:10px;color:#4ade80;cursor:pointer;word-break:break-all;margin-bottom:10px">background: linear-gradient(135deg, #4ade80, #059669);</div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:10px"><input id="grad-c1" type="color" value="#4ade80" oninput="window._gradUpdate()" style="flex:1;height:30px;border:none;cursor:pointer"/><input id="grad-c2" type="color" value="#059669" oninput="window._gradUpdate()" style="flex:1;height:30px;border:none;cursor:pointer"/></div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Presets:</div>';
+  presets.forEach(p=>{
+    html+='<div onclick="window._gradSet(\''+p.val+'\')" style="display:flex;align-items:center;gap:8px;padding:4px 8px;font-size:11px;cursor:pointer;border-radius:3px;margin-bottom:1px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'"><div style="width:24px;height:14px;border-radius:3px;background:'+p.val+'"></div><span style="color:var(--text-secondary)">'+p.label+'</span></div>';
+  });
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:6px;text-align:center">Click CSS to copy</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._gradUpdate=function(){
+    const c1=document.getElementById('grad-c1').value;const c2=document.getElementById('grad-c2').value;
+    const val='linear-gradient(135deg, '+c1+', '+c2+')';
+    document.getElementById('grad-preview').style.background=val;
+    document.getElementById('grad-css').textContent='background: '+val+';';
+  };
+  window._gradSet=function(val){
+    document.getElementById('grad-preview').style.background=val;
+    document.getElementById('grad-css').textContent='background: '+val+';';
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
