@@ -6212,6 +6212,9 @@ function cmdGetItems(q) {
       ['gitignore','.gitignore file generator with presets'],
       ['project balance','Task balance across all projects'],
       ['daily review','End-of-day review and reflection'],
+      ['readme','README.md generator with templates'],
+      ['status timeline','Task status stacked area timeline'],
+      ['mood','Daily mood tracker with 7-day trend'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9017,6 +9020,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='daily review' || ql==='review' || ql==='end of day' || ql==='day review')){
     items.unshift({title:'Daily Review',desc:'End-of-day review and reflection',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickDailyReview();}});
+  }
+  if(ql && (ql==='readme' || ql==='readme.md' || ql==='readme generator' || ql==='project readme')){
+    items.unshift({title:'README Generator',desc:'Generate README.md with form fields',icon:'R',type:'action',action:()=>{closeCommandPalette();showReadmeGen();}});
+  }
+  if(ql && (ql==='status timeline' || ql==='timeline' || ql==='status area' || ql==='stacked area')){
+    items.unshift({title:'Status Timeline',desc:'14-day stacked area chart of task status',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskStatusTimeline();}});
+  }
+  if(ql && (ql==='mood' || ql==='mood tracker' || ql==='mood log' || ql==='how am i feeling')){
+    items.unshift({title:'Mood Tracker',desc:'Track daily mood with 7-day trend',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMoodTracker();}});
   }
   return items.slice(0, 20);
 }
@@ -23825,6 +23837,153 @@ function showQuickDailyReview(){
       S._dailyReviews[today]=review;save();
       this.textContent='Saved!';setTimeout(()=>{this.textContent='Save Review';},1200);
     };
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showReadmeGen(){
+  let p=document.getElementById('readme-gen-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='readme-gen-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:80vh;overflow-y:auto';
+  let cfg=S._readmeCfg||{name:'My Project',desc:'A brief description of your project',install:'npm install',usage:'npm start',license:'MIT',features:['Feature 1','Feature 2','Feature 3'],tech:['JavaScript','Node.js']};
+  function gen(){
+    let lines=['# '+cfg.name,'',cfg.desc,'','## Features',''];
+    cfg.features.forEach(f=>{lines.push('- '+f);});
+    lines.push('','## Tech Stack','');
+    cfg.tech.forEach(t=>{lines.push('- '+t);});
+    lines.push('','## Getting Started','','### Installation','','```bash',cfg.install,'```','','### Usage','','```bash',cfg.usage,'```','','## License','',''+cfg.license,'');
+    return lines.join('\n');
+  }
+  function rend(){
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">README.md Generator</span><button onclick="document.getElementById(\'readme-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+      +'<div style="display:grid;gap:6px;margin-bottom:10px">'
+      +'<input id="rm-name" value="'+esc(cfg.name)+'" placeholder="Project Name" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:12px">'
+      +'<textarea id="rm-desc" rows="2" placeholder="Description" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;resize:vertical">'+esc(cfg.desc)+'</textarea>'
+      +'<input id="rm-install" value="'+esc(cfg.install)+'" placeholder="Install command" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;font-family:monospace">'
+      +'<input id="rm-usage" value="'+esc(cfg.usage)+'" placeholder="Usage command" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px;font-family:monospace">'
+      +'<input id="rm-features" value="'+esc(cfg.features.join(', '))+'" placeholder="Features (comma-separated)" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px">'
+      +'<input id="rm-tech" value="'+esc(cfg.tech.join(', '))+'" placeholder="Tech stack (comma-separated)" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px">'
+      +'<select id="rm-license" style="padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-primary);font-size:11px">'+['MIT','Apache-2.0','GPL-3.0','BSD-3-Clause','ISC','Unlicense'].map(l=>'<option'+(l===cfg.license?' selected':'')+'>'+l+'</option>').join('')+'</select>'
+      +'</div>'
+      +'<pre style="background:#0a0a0f;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;overflow-x:auto;white-space:pre;margin-bottom:8px;line-height:1.4;max-height:200px;overflow-y:auto">'+esc(gen())+'</pre>'
+      +'<button id="rm-copy" style="width:100%;padding:8px;background:var(--accent);color:var(--bg-base);border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">Copy README.md</button>';
+    let update=function(){
+      cfg.name=document.getElementById('rm-name').value;
+      cfg.desc=document.getElementById('rm-desc').value;
+      cfg.install=document.getElementById('rm-install').value;
+      cfg.usage=document.getElementById('rm-usage').value;
+      cfg.features=document.getElementById('rm-features').value.split(',').map(s=>s.trim()).filter(Boolean);
+      cfg.tech=document.getElementById('rm-tech').value.split(',').map(s=>s.trim()).filter(Boolean);
+      cfg.license=document.getElementById('rm-license').value;
+      S._readmeCfg=cfg;save();
+    };
+    ['rm-name','rm-desc','rm-install','rm-usage','rm-features','rm-tech'].forEach(id=>{document.getElementById(id).oninput=update;});
+    document.getElementById('rm-license').onchange=function(){update();rend();};
+    document.getElementById('rm-copy').onclick=function(){update();navigator.clipboard.writeText(gen());this.textContent='Copied!';setTimeout(()=>{this.textContent='Copy README.md';},1200);};
+  }
+  document.body.appendChild(p);
+  rend();
+}
+function showTaskStatusTimeline(){
+  let p=document.getElementById('status-timeline-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='status-timeline-panel';
+  p.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  let tasks=(S.tasks||[]);
+  let days=14;let now=new Date();
+  let data=[];
+  let statusColors={backlog:'#94a3b8',todo:'#fbbf24','in-progress':'#22d3ee',done:'#4ade80'};
+  for(let d=days-1;d>=0;d--){
+    let date=new Date(now);date.setDate(date.getDate()-d);
+    let ds=date.toISOString().slice(0,10);
+    let label=(date.getMonth()+1)+'/'+date.getDate();
+    let counts={backlog:0,todo:0,'in-progress':0,done:0};
+    tasks.forEach(t=>{
+      let created=new Date(t.created||t.id);
+      let createdStr=created.toISOString().slice(0,10);
+      if(createdStr<=ds){
+        if(t.status==='done'&&t.completedAt){
+          let doneStr=new Date(t.completedAt).toISOString().slice(0,10);
+          if(doneStr<=ds)counts.done++;
+          else counts[t.status==='in-progress'?'in-progress':'todo']++;
+        } else {
+          counts[t.status||'todo']++;
+        }
+      }
+    });
+    data.push({label,ds,...counts});
+  }
+  let svgW=480,svgH=180,pad=30;
+  let maxT=Math.max(...data.map(d=>d.backlog+d.todo+d['in-progress']+d.done),1);
+  let gap=(svgW-pad*2)/data.length;
+  let points={backlog:[],todo:[],'in-progress':[],done:[]};
+  let statuses=['done','in-progress','todo','backlog'];
+  data.forEach((d,i)=>{
+    let x=pad+i*gap+gap/2;
+    let cumul=0;
+    statuses.forEach(s=>{
+      cumul+=d[s];
+      points[s].push({x,y:svgH-pad-(cumul/maxT)*(svgH-pad*2)});
+    });
+  });
+  let areas='';
+  statuses.forEach(s=>{
+    let pts=points[s];
+    let pathD='M'+pts[0].x+','+(svgH-pad);
+    pts.forEach(pt=>{pathD+=' L'+pt.x+','+pt.y;});
+    pathD+=' L'+pts[pts.length-1].x+','+(svgH-pad)+' Z';
+    areas+='<path d="'+pathD+'" fill="'+statusColors[s]+'" opacity="0.3"/>';
+    let lineD='M'+pts.map(pt=>pt.x+','+pt.y).join(' L');
+    areas+='<path d="'+lineD+'" fill="none" stroke="'+statusColors[s]+'" stroke-width="1.5"/>';
+  });
+  let labels='';
+  data.forEach((d,i)=>{if(i%2===0){let x=pad+i*gap+gap/2;labels+='<text x="'+x+'" y="'+(svgH-pad+14)+'" text-anchor="middle" fill="#888" font-size="8">'+d.label+'</text>';}});
+  let svg='<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%"><rect width="'+svgW+'" height="'+svgH+'" fill="transparent"/>'+areas+labels+'</svg>';
+  let legend=Object.entries(statusColors).map(([s,c])=>'<span style="display:flex;align-items:center;gap:3px;font-size:9px;color:var(--text-muted)"><span style="width:8px;height:8px;background:'+c+';border-radius:2px;display:inline-block"></span>'+s+'</span>').join('');
+  p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Status Timeline (14 Days)</span><button onclick="document.getElementById(\'status-timeline-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>'
+    +'<div style="display:flex;gap:12px;justify-content:center;margin-bottom:8px">'+legend+'</div>'
+    +svg;
+  document.body.appendChild(p);
+}
+function showQuickMoodTracker(){
+  let p=document.getElementById('mood-track-panel');if(p)p.remove();
+  p=document.createElement('div');p.id='mood-track-panel';
+  p.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  if(!S._moodLog)S._moodLog=[];
+  let today=new Date().toISOString().slice(0,10);
+  let moods=[
+    {label:'Great',color:'#4ade80',val:5},
+    {label:'Good',color:'#22d3ee',val:4},
+    {label:'Okay',color:'#fbbf24',val:3},
+    {label:'Low',color:'#fb923c',val:2},
+    {label:'Bad',color:'#f87171',val:1}
+  ];
+  let todayMood=S._moodLog.find(m=>m.date===today);
+  function rend(){
+    todayMood=S._moodLog.find(m=>m.date===today);
+    let btns=moods.map(m=>'<button data-mv="'+m.val+'" style="padding:6px;border-radius:var(--radius);border:1px solid '+(todayMood&&todayMood.val===m.val?m.color:'var(--border)')+';background:'+(todayMood&&todayMood.val===m.val?m.color+'25':'var(--bg-surface)')+';color:'+(todayMood&&todayMood.val===m.val?m.color:'var(--text-muted)')+';cursor:pointer;font-size:10px;flex:1">'+m.label+'</button>').join('');
+    let last7=[];
+    for(let i=6;i>=0;i--){
+      let d=new Date();d.setDate(d.getDate()-i);
+      let ds=d.toISOString().slice(0,10);
+      let entry=S._moodLog.find(m=>m.date===ds);
+      let moodInfo=entry?moods.find(m=>m.val===entry.val):null;
+      last7.push('<div style="width:24px;height:24px;border-radius:4px;background:'+(moodInfo?moodInfo.color+'40':'var(--bg-surface)')+';border:1px solid '+(moodInfo?moodInfo.color:'var(--border)')+';display:flex;align-items:center;justify-content:center;font-size:9px;color:'+(moodInfo?moodInfo.color:'var(--text-muted)')+'">'+['S','M','T','W','T','F','S'][d.getDay()]+'</div>');
+    }
+    let avg=0;let recent=S._moodLog.slice(-7);
+    if(recent.length)avg=Math.round(recent.reduce((s,m)=>s+m.val,0)/recent.length*10)/10;
+    p.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-weight:600;color:var(--text-primary);font-size:13px">Mood Tracker</span><button onclick="document.getElementById(\'mood-track-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>'
+      +'<div style="display:flex;gap:4px;margin-bottom:10px">'+btns+'</div>'
+      +'<div style="display:flex;gap:4px;justify-content:center;margin-bottom:8px">'+last7.join('')+'</div>'
+      +'<div style="text-align:center;font-size:10px;color:var(--text-muted)">7-day avg: <span style="color:var(--text-primary);font-weight:600">'+avg+'/5</span> | '+S._moodLog.length+' entries</div>';
+    p.querySelectorAll('[data-mv]').forEach(b=>{
+      b.onclick=function(){
+        let val=parseInt(this.dataset.mv);
+        let existing=S._moodLog.findIndex(m=>m.date===today);
+        if(existing>=0)S._moodLog[existing]={date:today,val,ts:Date.now()};
+        else S._moodLog.push({date:today,val,ts:Date.now()});
+        save();rend();
+      };
+    });
   }
   document.body.appendChild(p);
   rend();
