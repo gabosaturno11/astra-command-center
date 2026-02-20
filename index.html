@@ -6062,6 +6062,9 @@ function cmdGetItems(q) {
       ['date calculator','Add/subtract days and find date differences'],
       ['gantt','Simple Gantt chart showing task durations'],
       ['memo','Floating persistent memo pad'],
+      ['base64','Encode and decode Base64 strings'],
+      ['mini kanban','Quick kanban with click-to-move status buttons'],
+      ['clock','Floating live clock widget'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8408,6 +8411,18 @@ function cmdGetItems(q) {
   // Memo prefix
   if(ql && (ql==='memo' || ql==='memo pad' || ql==='notepad' || ql==='scratch pad')){
     items.unshift({title:'Quick Memo',desc:'Floating persistent memo pad',icon:'M',type:'action',action:()=>{closeCommandPalette();showQuickMemo();}});
+  }
+  // Base64 prefix
+  if(ql && (ql==='base64' || ql==='encode' || ql==='decode' || ql==='base 64')){
+    items.unshift({title:'Base64 Tool',desc:'Encode and decode Base64',icon:'B',type:'action',action:()=>{closeCommandPalette();showBase64Tool();}});
+  }
+  // Mini kanban prefix
+  if(ql && (ql==='mini kanban' || ql==='kanban mini' || ql==='quick kanban' || ql==='move tasks')){
+    items.unshift({title:'Mini Kanban',desc:'Click-to-move task status board',icon:'K',type:'action',action:()=>{closeCommandPalette();showTaskKanbanMini();}});
+  }
+  // Clock prefix
+  if(ql && (ql==='clock' || ql==='time' || ql==='watch' || ql==='current time')){
+    items.unshift({title:'Clock Widget',desc:'Floating live clock',icon:'C',type:'action',action:()=>{closeCommandPalette();showClockWidget();}});
   }
   return items.slice(0, 20);
 }
@@ -17775,6 +17790,69 @@ function showQuickMemo(){
   h+='<textarea id="qm-text" style="width:100%;height:150px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5" placeholder="Write anything here... Auto-saved on close.">'+esc(S._memo)+'</textarea>';
   h+='<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:9px;color:var(--text-muted)">'+S._memo.split(/\s+/).filter(Boolean).length+' words</span><button onclick="navigator.clipboard.writeText(document.getElementById(\'qm-text\').value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">Copy</button></div>';
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showBase64Tool(){
+  let panel=document.getElementById('b64-tool-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='b64-tool-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Base64 Encode/Decode</span><button onclick="this.closest(\'#b64-tool-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="b64-input" placeholder="Paste text to encode or Base64 to decode..." style="width:100%;height:80px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:monospace;margin-bottom:6px"></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  h+='<button onclick="try{document.getElementById(\'b64-output\').textContent=btoa(document.getElementById(\'b64-input\').value);document.getElementById(\'b64-error\').textContent=\'\'}catch(e){document.getElementById(\'b64-error\').textContent=e.message}" style="flex:1;padding:6px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Encode</button>';
+  h+='<button onclick="try{document.getElementById(\'b64-output\').textContent=atob(document.getElementById(\'b64-input\').value.trim());document.getElementById(\'b64-error\').textContent=\'\'}catch(e){document.getElementById(\'b64-error\').textContent=e.message}" style="flex:1;padding:6px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Decode</button>';
+  h+='<button onclick="const o=document.getElementById(\'b64-output\').textContent;if(o)navigator.clipboard.writeText(o);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="padding:6px 12px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Copy</button>';
+  h+='</div>';
+  h+='<div id="b64-error" style="font-size:11px;color:#ef4444;margin-bottom:4px"></div>';
+  h+='<pre id="b64-output" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:150px;overflow-y:auto;min-height:30px"></pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskKanbanMini(){
+  let panel=document.getElementById('kanban-mini-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='kanban-mini-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:95vw;max-height:85vh;overflow-y:auto';
+  const statuses=['todo','in-progress','review','done'];
+  const statusColors={'todo':'#6b7280','in-progress':'#f59e0b','review':'#3b82f6','done':'#4ade80'};
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Mini Kanban</span><button onclick="this.closest(\'#kanban-mini-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Click status buttons to move tasks between columns</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">';
+    statuses.forEach(s=>{
+      const col=statusColors[s];
+      const tasks=(S.tasks||[]).filter(t=>t.status===s);
+      h+='<div style="background:var(--bg-surface);border-radius:var(--radius);padding:8px;border-top:3px solid '+col+';min-height:100px">';
+      h+='<div style="font-size:10px;font-weight:700;color:'+col+';text-transform:uppercase;margin-bottom:6px">'+s+' ('+tasks.length+')</div>';
+      tasks.slice(0,8).forEach(t=>{
+        const nextStatus=s==='todo'?'in-progress':s==='in-progress'?'review':s==='review'?'done':'todo';
+        const nextCol=statusColors[nextStatus];
+        h+='<div style="padding:4px 6px;margin-bottom:3px;background:var(--bg-elevated);border-radius:var(--radius);display:flex;gap:4px;align-items:center">';
+        h+='<span style="flex:1;font-size:9px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</span>';
+        h+='<button onclick="const t=(S.tasks||[]).find(x=>x.id===\''+t.id+'\');if(t){t.status=\''+nextStatus+'\';if(\''+nextStatus+'\'===\'done\')t.completedAt=new Date().toISOString();save();this.closest(\'#kanban-mini-panel\')._render()}" style="background:'+nextCol+'22;border:none;border-radius:2px;color:'+nextCol+';cursor:pointer;font-size:8px;padding:1px 4px;flex-shrink:0" title="Move to '+nextStatus+'">&gt;</button>';
+        h+='</div>';
+      });
+      if(tasks.length>8)h+='<div style="font-size:9px;color:var(--text-muted)">+'+(tasks.length-8)+' more</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showClockWidget(){
+  let panel=document.getElementById('clock-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='clock-widget';
+  panel.style.cssText='position:fixed;top:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 4px 16px rgba(0,0,0,0.5);display:flex;gap:12px;align-items:center';
+  function tick(){
+    const now=new Date();
+    const time=now.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+    const date=now.toLocaleDateString('en',{weekday:'short',month:'short',day:'numeric'});
+    let h='<div><div style="font-size:20px;font-weight:700;color:var(--text);font-family:monospace">'+time+'</div>';
+    h+='<div style="font-size:10px;color:var(--text-muted)">'+date+'</div></div>';
+    h+='<button onclick="clearInterval(this.closest(\'#clock-widget\')._interval);this.closest(\'#clock-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px">X</button>';
+    panel.innerHTML=h;
+  }
+  tick();
+  panel._interval=setInterval(tick,1000);
+  document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
