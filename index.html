@@ -6443,6 +6443,9 @@ function cmdGetItems(q) {
       ['jq','jq JSON processor command reference'],
       ['astra score','Overall ASTRA workspace health score'],
       ['white noise','Ambient white/pink/brown noise generator'],
+      ['ffmpeg','FFmpeg video/audio processing reference'],
+      ['workload','Open task workload balance by project'],
+      ['quote','Random inspirational quote'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9941,6 +9944,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='white noise' || ql==='noise' || ql==='pink noise' || ql==='ambient')){
     items.unshift({title:'White Noise',desc:'Ambient noise generator for focus',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWhiteNoise();}});
+  }
+  if(ql && (ql==='ffmpeg' || ql==='ffmpeg ref' || ql==='video convert' || ql==='ffprobe')){
+    items.unshift({title:'FFmpeg Reference',desc:'Video/audio processing cheatsheet',icon:'F',type:'action',action:()=>{closeCommandPalette();showFfmpegRef();}});
+  }
+  if(ql && (ql==='workload' || ql==='workload balance' || ql==='load balance' || ql==='task balance')){
+    items.unshift({title:'Workload Balance',desc:'Open task distribution by project',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWorkloadBalance();}});
+  }
+  if(ql && (ql==='quote' || ql==='random quote' || ql==='inspiration' || ql==='motivate')){
+    items.unshift({title:'Random Quote',desc:'Inspirational programming quote',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickRandomQuote();}});
   }
   return items.slice(0, 20);
 }
@@ -30972,6 +30984,86 @@ function showQuickWhiteNoise(){
     if(window._wnCtx){window._wnCtx.close();window._wnCtx=null;}
     const s=document.getElementById('_wn-status');if(s){s.textContent='Stopped';s.style.color='var(--text-muted)';}
   };
+}
+function showFfmpegRef(){
+  const cmds={
+    'Convert':['ffmpeg -i input.mp4 output.avi|Convert format','ffmpeg -i input.mov -c:v libx264 output.mp4|Convert to H.264 MP4','ffmpeg -i input.mp4 -c:v libx265 output.mp4|Convert to H.265','ffmpeg -i input.mp4 output.gif|Video to GIF','ffmpeg -i input.mp4 -vn output.mp3|Extract audio','ffmpeg -i input.mp4 -an output.mp4|Remove audio'],
+    'Trim & Merge':['ffmpeg -i in.mp4 -ss 00:01:00 -t 30 out.mp4|Trim 30s from 1:00','ffmpeg -i in.mp4 -ss 00:01:00 -to 00:02:00 out.mp4|Trim between timestamps','ffmpeg -f concat -i list.txt -c copy out.mp4|Concatenate videos','ffmpeg -i in.mp4 -vf "trim=start=10:end=20" out.mp4|Trim with filter'],
+    'Resize & Scale':['ffmpeg -i in.mp4 -vf scale=1280:720 out.mp4|Scale to 720p','ffmpeg -i in.mp4 -vf scale=-1:480 out.mp4|Scale height, keep ratio','ffmpeg -i in.mp4 -vf "crop=640:480:100:50" out.mp4|Crop video','ffmpeg -i in.mp4 -vf "pad=1920:1080:(ow-iw)/2:(oh-ih)/2" out.mp4|Add padding'],
+    'Audio':['ffmpeg -i in.mp3 -b:a 128k out.mp3|Set audio bitrate','ffmpeg -i in.wav -c:a libmp3lame out.mp3|WAV to MP3','ffmpeg -i in.mp4 -af "volume=2.0" out.mp4|Double volume','ffmpeg -i in.mp4 -af "atempo=1.5" out.mp4|Speed up audio 1.5x'],
+    'Images':['ffmpeg -i in.mp4 -vf fps=1 frame_%04d.png|Extract 1 frame/sec','ffmpeg -i in.mp4 -ss 00:00:05 -frames:v 1 thumb.jpg|Single frame','ffmpeg -framerate 30 -i frame_%04d.png out.mp4|Images to video','ffmpeg -i in.mp4 -vf "thumbnail" -frames:v 1 best.jpg|Best thumbnail'],
+    'Info & Streaming':['ffprobe -i input.mp4|Show file info','ffmpeg -i input.mp4 -f null -|Validate file','ffmpeg -re -i in.mp4 -f flv rtmp://server/live|Stream to RTMP','ffmpeg -i in.mp4 -c copy -movflags +faststart out.mp4|Optimize for web']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">FFmpeg Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskWorkloadBalance(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const projects=(S.projects||[]);
+  const projMap={};
+  tasks.forEach(t=>{const p=t.project||'Unassigned';projMap[p]=(projMap[p]||0)+1;});
+  const entries=Object.entries(projMap).sort((a,b)=>b[1]-a[1]);
+  const totalOpen=tasks.length;const maxProj=entries.length>0?entries[0][1]:1;
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Workload Balance</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+totalOpen+' open tasks across '+entries.length+' projects</div>';
+  const colors=['#4ade80','#60a5fa','#f59e0b','#a78bfa','#fb923c','#22d3ee','#f472b6','#34d399','#ef4444','#6b7280'];
+  html+='<svg viewBox="0 0 200 200" style="width:180px;height:180px;display:block;margin:0 auto 16px">';
+  let startAngle=0;
+  entries.forEach(([name,count],i)=>{
+    const pct=count/totalOpen;const angle=pct*360;const endAngle=startAngle+angle;
+    const x1=100+80*Math.cos((startAngle-90)*Math.PI/180);const y1=100+80*Math.sin((startAngle-90)*Math.PI/180);
+    const x2=100+80*Math.cos((endAngle-90)*Math.PI/180);const y2=100+80*Math.sin((endAngle-90)*Math.PI/180);
+    const large=angle>180?1:0;const color=colors[i%colors.length];
+    if(pct>=0.999){html+='<circle cx="100" cy="100" r="80" fill="'+color+'"/>';}
+    else if(pct>0.01){html+='<path d="M100,100 L'+x1+','+y1+' A80,80 0 '+large+',1 '+x2+','+y2+' Z" fill="'+color+'" opacity="0.85"/>';}
+    startAngle=endAngle;
+  });
+  html+='<circle cx="100" cy="100" r="40" fill="var(--bg-elevated)"/>';
+  html+='<text x="100" y="95" fill="var(--text-primary)" font-size="18" text-anchor="middle" font-weight="700">'+totalOpen+'</text>';
+  html+='<text x="100" y="110" fill="var(--text-muted)" font-size="9" text-anchor="middle">open</text>';
+  html+='</svg>';
+  entries.forEach(([name,count],i)=>{
+    const pct=totalOpen>0?Math.round(count/totalOpen*100):0;const color=colors[i%colors.length];
+    html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="width:10px;height:10px;border-radius:2px;background:'+color+'"></div>';
+    html+='<span style="flex:1;font-size:12px;color:var(--text-secondary)">'+esc(name)+'</span>';
+    html+='<span style="font-size:12px;color:'+color+';font-weight:600">'+count+' ('+pct+'%)</span></div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickRandomQuote(){
+  const quotes=[
+    {q:'The only way to do great work is to love what you do.',a:'Steve Jobs'},
+    {q:'Done is better than perfect.',a:'Sheryl Sandberg'},
+    {q:'Simplicity is the ultimate sophistication.',a:'Leonardo da Vinci'},
+    {q:'The best time to plant a tree was 20 years ago. The second best time is now.',a:'Chinese Proverb'},
+    {q:'Talk is cheap. Show me the code.',a:'Linus Torvalds'},
+    {q:'First, solve the problem. Then, write the code.',a:'John Johnson'},
+    {q:'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.',a:'Martin Fowler'},
+    {q:'Make it work, make it right, make it fast.',a:'Kent Beck'},
+    {q:'The most dangerous phrase is: We have always done it this way.',a:'Grace Hopper'},
+    {q:'Premature optimization is the root of all evil.',a:'Donald Knuth'},
+    {q:'Programs must be written for people to read, and only incidentally for machines to execute.',a:'Harold Abelson'},
+    {q:'The function of good software is to make the complex appear to be simple.',a:'Grady Booch'},
+    {q:'Measuring programming progress by lines of code is like measuring aircraft building progress by weight.',a:'Bill Gates'},
+    {q:'Give me six hours to chop down a tree and I will spend the first four sharpening the axe.',a:'Abraham Lincoln'},
+    {q:'It does not matter how slowly you go as long as you do not stop.',a:'Confucius'}
+  ];
+  const quote=quotes[Math.floor(Math.random()*quotes.length)];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;text-align:center">';
+  html+='<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button>';
+  html+='<div style="font-size:32px;color:#4ade80;margin-bottom:16px;line-height:1">"</div>';
+  html+='<div style="font-size:15px;color:var(--text-primary);line-height:1.6;margin-bottom:16px;font-style:italic">'+esc(quote.q)+'</div>';
+  html+='<div style="font-size:12px;color:var(--text-muted)">- '+esc(quote.a)+'</div>';
+  html+='<button onclick="this.closest(\'div[style*=fixed]\').remove();showQuickRandomQuote()" style="margin-top:16px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px">Another Quote</button>';
+  html+='<button onclick="navigator.clipboard.writeText(\''+esc(quote.q)+' - '+esc(quote.a)+'\');this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="margin-top:16px;margin-left:8px;background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Copy</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
