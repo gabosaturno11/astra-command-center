@@ -6095,6 +6095,12 @@ function cmdGetItems(q) {
       ['hash generator','SHA-256/384/512/1 hash generator for text'],
       ['project progress','Progress bars for all projects with stats'],
       ['quick sketch','Mini drawing canvas with colors and sizes'],
+      ['ip info','Lookup your IP address and geolocation'],
+      ['task funnel','Task pipeline funnel with conversion rates'],
+      ['gratitude','Daily gratitude log with history'],
+      ['json formatter','Format, minify, and validate JSON data'],
+      ['task scorecard','Dashboard of key task metrics and stats'],
+      ['quick todos','Lightweight todo checklist widget'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8549,6 +8555,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='quick sketch' || ql==='sketch' || ql==='draw' || ql==='doodle')){
     items.unshift({title:'Quick Sketch',desc:'Mini drawing canvas',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickWhiteboard();}});
+  }
+  if(ql && (ql==='ip info' || ql==='ip address' || ql==='my ip' || ql==='ip lookup')){
+    items.unshift({title:'IP Info',desc:'IP address and geolocation lookup',icon:'I',type:'action',action:()=>{closeCommandPalette();showIpInfo();}});
+  }
+  if(ql && (ql==='task funnel' || ql==='funnel' || ql==='conversion' || ql==='pipeline funnel')){
+    items.unshift({title:'Task Funnel',desc:'Task pipeline funnel chart',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskFunnel();}});
+  }
+  if(ql && (ql==='gratitude' || ql==='grateful' || ql==='gratitude log' || ql==='thankful')){
+    items.unshift({title:'Gratitude Log',desc:'Daily gratitude practice',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGratitude();}});
+  }
+  if(ql && (ql==='json formatter' || ql==='json format' || ql==='format json' || ql==='json beautify')){
+    items.unshift({title:'JSON Formatter',desc:'Format, minify, validate JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showJsonFormatter();}});
+  }
+  if(ql && (ql==='task scorecard' || ql==='scorecard' || ql==='task metrics' || ql==='task dashboard')){
+    items.unshift({title:'Task Scorecard',desc:'Key task metrics dashboard',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskScorecard();}});
+  }
+  if(ql && (ql==='quick todos' || ql==='todos' || ql==='todo list' || ql==='checklist')){
+    items.unshift({title:'Quick Todos',desc:'Lightweight checklist widget',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTodo();}});
   }
   return items.slice(0, 20);
 }
@@ -19062,6 +19086,197 @@ function showQuickWhiteboard(){
   canvas.addEventListener('mousemove',function(e){if(!window._qwbDrawing)return;ctx.strokeStyle=window._qwbColor;ctx.lineWidth=window._qwbSize;var p=getPos(e);ctx.lineTo(p.x,p.y);ctx.stroke();});
   canvas.addEventListener('mouseup',function(){window._qwbDrawing=false;});
   canvas.addEventListener('mouseleave',function(){window._qwbDrawing=false;});
+}
+function showIpInfo(){
+  let panel=document.getElementById('ip-info-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='ip-info-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">IP Info</span><button onclick="document.getElementById(\'ip-info-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div id="ip-info-content" style="font-size:11px;color:var(--text-muted)">Loading...</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  fetch('https://ipapi.co/json/').then(function(r){return r.json();}).then(function(d){
+    var el=document.getElementById('ip-info-content');if(!el)return;
+    var fields=[
+      {label:'IP Address',value:d.ip,accent:true},
+      {label:'City',value:d.city},
+      {label:'Region',value:d.region},
+      {label:'Country',value:d.country_name+' ('+d.country_code+')'},
+      {label:'Postal',value:d.postal},
+      {label:'Latitude',value:d.latitude},
+      {label:'Longitude',value:d.longitude},
+      {label:'Timezone',value:d.timezone},
+      {label:'ISP',value:d.org},
+      {label:'ASN',value:d.asn}
+    ];
+    el.innerHTML=fields.map(function(f){
+      return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-muted);font-size:10px">'+f.label+'</span><span style="color:'+(f.accent?'var(--accent)':'var(--text)')+';font-size:10px;font-family:var(--mono)">'+(f.value||'N/A')+'</span></div>';
+    }).join('');
+  }).catch(function(){
+    var el=document.getElementById('ip-info-content');if(el)el.textContent='Failed to fetch IP info';
+  });
+}
+function showTaskFunnel(){
+  let panel=document.getElementById('task-funnel-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-funnel-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw';
+  var stages=[
+    {label:'Total Created',count:S.tasks.length,color:'#3b82f6'},
+    {label:'Has Due Date',count:S.tasks.filter(function(t){return t.due;}).length,color:'#8b5cf6'},
+    {label:'In Progress',count:S.tasks.filter(function(t){return t.status==='in-progress';}).length,color:'#f59e0b'},
+    {label:'Completed',count:S.tasks.filter(function(t){return t.status==='done';}).length,color:'#4ade80'}
+  ];
+  var maxW=400;var maxCount=Math.max.apply(null,stages.map(function(s){return s.count;}).concat([1]));
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Funnel</span><button onclick="document.getElementById(\'task-funnel-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  stages.forEach(function(s,i){
+    var w=Math.max(60,Math.round(s.count/maxCount*maxW));
+    var pct=maxCount>0?Math.round(s.count/stages[0].count*100):0;
+    h+='<div style="text-align:center;margin-bottom:8px">';
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">'+s.label+'</div>';
+    h+='<div style="width:'+w+'px;margin:0 auto;background:'+s.color+'22;border:1px solid '+s.color+';border-radius:var(--radius);padding:8px;position:relative">';
+    h+='<span style="font-size:14px;font-weight:700;color:'+s.color+';font-family:var(--mono)">'+s.count+'</span>';
+    h+='<span style="font-size:9px;color:var(--text-muted);margin-left:6px">('+pct+'%)</span>';
+    h+='</div>';
+    if(i<stages.length-1)h+='<div style="color:var(--text-muted);font-size:10px;margin:4px 0">v</div>';
+    h+='</div>';
+  });
+  var convRate=stages[0].count>0?Math.round(stages[3].count/stages[0].count*100):0;
+  h+='<div style="text-align:center;margin-top:8px;font-size:11px;color:var(--accent);font-weight:600">Overall Conversion: '+convRate+'%</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickGratitude(){
+  let panel=document.getElementById('gratitude-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='gratitude-widget';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px;max-height:400px;overflow-y:auto';
+  if(!S._gratitude)S._gratitude=[];
+  var today=new Date().toISOString().split('T')[0];
+  window._gratAdd=function(){
+    var inp=document.getElementById('grat-input');if(!inp||!inp.value.trim())return;
+    S._gratitude.unshift({text:inp.value.trim(),date:today});
+    save();window._gratRender();
+  };
+  window._gratDel=function(i){S._gratitude.splice(i,1);save();window._gratRender();};
+  window._gratRender=function(){
+    var el=document.getElementById('gratitude-widget');if(!el)return;
+    var todayCount=S._gratitude.filter(function(g){return g.date===today;}).length;
+    var h2='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:11px;color:var(--text-muted)">Gratitude Log</span><button onclick="document.getElementById(\'gratitude-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+    h2+='<div style="font-size:9px;color:var(--accent);margin-bottom:6px">'+todayCount+' entries today | '+S._gratitude.length+' total</div>';
+    h2+='<div style="display:flex;gap:4px;margin-bottom:8px"><input id="grat-input" placeholder="I am grateful for..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 8px;font-size:10px;color:var(--text);outline:none" onkeydown="if(event.key===\'Enter\')window._gratAdd()"><button onclick="window._gratAdd()" style="padding:4px 8px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600">+</button></div>';
+    S._gratitude.slice(0,20).forEach(function(g,i){
+      h2+='<div style="display:flex;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)"><span style="font-size:10px;color:var(--text);flex:1">'+esc(g.text)+'</span><span style="font-size:8px;color:#555;font-family:var(--mono);white-space:nowrap">'+g.date+'</span><button onclick="window._gratDel('+i+')" style="background:none;border:none;color:#666;cursor:pointer;font-size:9px">x</button></div>';
+    });
+    if(S._gratitude.length===0)h2+='<div style="padding:8px;text-align:center;font-size:10px;color:var(--text-muted)">Start your gratitude practice</div>';
+    el.innerHTML=h2;
+  };
+  window._gratRender();
+}
+function showJsonFormatter(){
+  let panel=document.getElementById('json-fmt-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='json-fmt-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:85vh;overflow-y:auto';
+  window._jsonFmt=function(indent){
+    var src=document.getElementById('json-src');var dest=document.getElementById('json-dest');var info=document.getElementById('json-info');
+    if(!src||!dest)return;
+    try{
+      var obj=JSON.parse(src.value);
+      var out=JSON.stringify(obj,null,indent||2);
+      dest.textContent=out;
+      if(info){
+        var keys=0;function countKeys(o){if(typeof o==='object'&&o!==null){if(Array.isArray(o))o.forEach(countKeys);else{var k=Object.keys(o);keys+=k.length;k.forEach(function(kk){countKeys(o[kk]);});}}}
+        countKeys(obj);
+        info.textContent='Valid JSON | '+out.length+' chars | '+keys+' keys | Type: '+(Array.isArray(obj)?'Array':'Object');
+        info.style.color='#4ade80';
+      }
+    }catch(e){
+      dest.textContent='Error: '+e.message;
+      if(info){info.textContent='Invalid JSON';info.style.color='#ef4444';}
+    }
+  };
+  window._jsonMinify=function(){
+    var src=document.getElementById('json-src');var dest=document.getElementById('json-dest');
+    if(!src||!dest)return;
+    try{dest.textContent=JSON.stringify(JSON.parse(src.value));}catch(e){dest.textContent='Error: '+e.message;}
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">JSON Formatter</span><button onclick="document.getElementById(\'json-fmt-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="json-src" placeholder="Paste JSON here..." style="width:100%;height:100px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:10px;color:var(--text);font-family:var(--mono);resize:vertical;outline:none;margin-bottom:6px;box-sizing:border-box"></textarea>';
+  h+='<div style="display:flex;gap:4px;margin-bottom:8px">';
+  h+='<button onclick="window._jsonFmt(2)" style="padding:4px 10px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600">Format (2)</button>';
+  h+='<button onclick="window._jsonFmt(4)" style="padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Format (4)</button>';
+  h+='<button onclick="window._jsonMinify()" style="padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Minify</button>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'json-dest\').textContent)" style="padding:4px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Copy</button>';
+  h+='</div>';
+  h+='<div id="json-info" style="font-size:9px;margin-bottom:4px"></div>';
+  h+='<pre id="json-dest" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:var(--text);font-family:var(--mono);max-height:200px;overflow-y:auto;white-space:pre-wrap"></pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskScorecard(){
+  let panel=document.getElementById('task-score-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-score-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw';
+  var total=S.tasks.length;
+  var done=S.tasks.filter(function(t){return t.status==='done';}).length;
+  var active=S.tasks.filter(function(t){return t.status!=='done';}).length;
+  var today=new Date().toISOString().split('T')[0];
+  var overdue=S.tasks.filter(function(t){return t.due&&t.due<today&&t.status!=='done';}).length;
+  var dueToday=S.tasks.filter(function(t){return t.due===today&&t.status!=='done';}).length;
+  var thisWeek=0;var wd=new Date();wd.setDate(wd.getDate()+7);var weekEnd=wd.toISOString().split('T')[0];
+  thisWeek=S.tasks.filter(function(t){return t.due&&t.due>=today&&t.due<=weekEnd&&t.status!=='done';}).length;
+  var withDesc=S.tasks.filter(function(t){return t.description&&t.description.trim();}).length;
+  var withSub=S.tasks.filter(function(t){return t.subtasks&&t.subtasks.length>0;}).length;
+  var avgSubs=0;var subTasks=S.tasks.filter(function(t){return t.subtasks&&t.subtasks.length>0;});
+  if(subTasks.length)avgSubs=(subTasks.reduce(function(s,t){return s+t.subtasks.length;},0)/subTasks.length).toFixed(1);
+  var projects=[...new Set(S.tasks.map(function(t){return t.project||'No Project';}))].length;
+  var metrics=[
+    {label:'Total Tasks',value:total,color:'var(--text)'},
+    {label:'Completed',value:done+' ('+Math.round(total?done/total*100:0)+'%)',color:'#4ade80'},
+    {label:'Active',value:active,color:'#3b82f6'},
+    {label:'Overdue',value:overdue,color:overdue>0?'#ef4444':'#4ade80'},
+    {label:'Due Today',value:dueToday,color:dueToday>0?'#f59e0b':'var(--text-muted)'},
+    {label:'Due This Week',value:thisWeek,color:'#8b5cf6'},
+    {label:'With Description',value:withDesc+' ('+Math.round(total?withDesc/total*100:0)+'%)',color:'var(--text)'},
+    {label:'With Subtasks',value:withSub,color:'var(--text)'},
+    {label:'Avg Subtasks',value:avgSubs,color:'var(--text-muted)'},
+    {label:'Projects',value:projects,color:'#06b6d4'}
+  ];
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Scorecard</span><button onclick="document.getElementById(\'task-score-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  metrics.forEach(function(m){
+    h+='<div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center">';
+    h+='<div style="font-size:18px;font-weight:700;color:'+m.color+';font-family:var(--mono)">'+m.value+'</div>';
+    h+='<div style="font-size:9px;color:var(--text-muted);margin-top:2px">'+m.label+'</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickTodo(){
+  let panel=document.getElementById('qtodo-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='qtodo-widget';
+  panel.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px;max-height:400px;overflow-y:auto';
+  if(!S._quickTodos)S._quickTodos=[];
+  window._qtdAdd=function(){
+    var inp=document.getElementById('qtd-input');if(!inp||!inp.value.trim())return;
+    S._quickTodos.push({text:inp.value.trim(),done:false});
+    inp.value='';save();window._qtdRender();
+  };
+  window._qtdToggle=function(i){S._quickTodos[i].done=!S._quickTodos[i].done;save();window._qtdRender();};
+  window._qtdDel=function(i){S._quickTodos.splice(i,1);save();window._qtdRender();};
+  window._qtdClear=function(){S._quickTodos=S._quickTodos.filter(function(t){return !t.done;});save();window._qtdRender();};
+  window._qtdRender=function(){
+    var el=document.getElementById('qtodo-widget');if(!el)return;
+    var doneCount=S._quickTodos.filter(function(t){return t.done;}).length;
+    var h2='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:11px;color:var(--text-muted)">Quick Todos</span><div style="display:flex;gap:4px"><button onclick="window._qtdClear()" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:8px;padding:2px 6px">Clear done</button><button onclick="document.getElementById(\'qtodo-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div></div>';
+    h2+='<div style="font-size:9px;color:var(--accent);margin-bottom:6px">'+doneCount+'/'+S._quickTodos.length+' done</div>';
+    S._quickTodos.forEach(function(t,i){
+      h2+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)">';
+      h2+='<button onclick="window._qtdToggle('+i+')" style="width:16px;height:16px;border-radius:3px;border:1px solid '+(t.done?'var(--accent)':'var(--border)')+';background:'+(t.done?'var(--accent)':'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center;color:#000;font-size:9px;font-weight:700;flex-shrink:0">'+(t.done?'V':'')+'</button>';
+      h2+='<span style="font-size:10px;color:'+(t.done?'var(--text-muted)':'var(--text)')+';flex:1;text-decoration:'+(t.done?'line-through':'none')+'">'+esc(t.text)+'</span>';
+      h2+='<button onclick="window._qtdDel('+i+')" style="background:none;border:none;color:#666;cursor:pointer;font-size:9px">x</button>';
+      h2+='</div>';
+    });
+    h2+='<div style="display:flex;gap:4px;margin-top:6px"><input id="qtd-input" placeholder="Add todo..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 8px;font-size:10px;color:var(--text);outline:none" onkeydown="if(event.key===\'Enter\')window._qtdAdd()"><button onclick="window._qtdAdd()" style="padding:4px 8px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600">+</button></div>';
+    el.innerHTML=h2;
+  };
+  window._qtdRender();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
