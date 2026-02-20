@@ -6356,6 +6356,12 @@ function cmdGetItems(q) {
       ['pip','Python pip command reference'],
       ['daily goal','Daily task completion goal tracker'],
       ['uuid','UUID generator'],
+      ['cargo','Cargo/Rust command reference'],
+      ['weekly report','Weekly task summary report'],
+      ['cron builder','Cron expression builder'],
+      ['go','Go command reference'],
+      ['archive stats','Task archive statistics'],
+      ['markdown table','Markdown table generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9593,6 +9599,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='uuid' || ql==='uuid generator' || ql==='generate uuid' || ql==='guid')){
     items.unshift({title:'UUID Generator',desc:'Generate and copy UUIDs',icon:'U',type:'action',action:()=>{closeCommandPalette();showQuickUuidGenerator();}});
+  }
+  if(ql && (ql==='cargo' || ql==='rust' || ql==='cargo commands' || ql==='cargo ref')){
+    items.unshift({title:'Cargo/Rust Reference',desc:'Cargo and Rust CLI cheatsheet',icon:'R',type:'action',action:()=>{closeCommandPalette();showCargoRef();}});
+  }
+  if(ql && (ql==='weekly report' || ql==='week report' || ql==='week summary' || ql==='this week')){
+    items.unshift({title:'Weekly Report',desc:'This week task summary with stats',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeeklyReport();}});
+  }
+  if(ql && (ql==='cron builder' || ql==='cron' || ql==='crontab' || ql==='cron expression')){
+    items.unshift({title:'Cron Builder',desc:'Build cron expressions with presets',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCronBuilder();}});
+  }
+  if(ql && (ql==='go' || ql==='golang' || ql==='go commands' || ql==='go ref')){
+    items.unshift({title:'Go Reference',desc:'Go CLI cheatsheet by category',icon:'G',type:'action',action:()=>{closeCommandPalette();showGoModRef();}});
+  }
+  if(ql && (ql==='archive stats' || ql==='archive' || ql==='archived tasks' || ql==='archive count')){
+    items.unshift({title:'Archive Stats',desc:'Archive and active task statistics',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskArchiveStats();}});
+  }
+  if(ql && (ql==='markdown table' || ql==='md table' || ql==='table generator' || ql==='generate table')){
+    items.unshift({title:'Markdown Table Generator',desc:'Generate markdown tables quickly',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickMarkdownTable();}});
   }
   return items.slice(0, 20);
 }
@@ -28450,6 +28474,157 @@ function showQuickUuidGenerator(){
   }
   window._uuidRegen=rend;
   rend();document.body.appendChild(d);
+}
+function showCargoRef(){
+  const d=document.createElement('div');d.id='cargo-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Build':['cargo build','cargo build --release','cargo run','cargo run --release','cargo check'],
+    'Test':['cargo test','cargo test <name>','cargo bench','cargo doc --open'],
+    'Package':['cargo new <name>','cargo init','cargo add <pkg>','cargo remove <pkg>','cargo update'],
+    'Publish':['cargo publish','cargo package','cargo login','cargo yank --version <ver>'],
+    'Tools':['cargo fmt','cargo clippy','cargo fix','cargo clean','cargo tree'],
+    'Other':['cargo --version','cargo search <query>','cargo install <pkg>','cargo audit','rustup update']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Cargo/Rust Reference</h3><button onclick="document.getElementById(\'cargo-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskWeeklyReport(){
+  const d=document.createElement('div');d.id='weekly-report-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();const weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-now.getDay()+1);weekStart.setHours(0,0,0,0);
+  const tasks=(S.tasks||[]);
+  const createdThisWeek=tasks.filter(t=>t.createdAt&&new Date(t.createdAt)>=weekStart);
+  const doneThisWeek=tasks.filter(t=>t.status==='done'&&t.updatedAt&&new Date(t.updatedAt)>=weekStart);
+  const overdue=tasks.filter(t=>t.due&&new Date(t.due)<now&&t.status!=='done');
+  const inProgress=tasks.filter(t=>t.status==='in-progress');
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Weekly Report</h3><button onclick="document.getElementById(\'weekly-report-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Week of '+weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})+'</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);padding:12px;border-radius:6px;text-align:center"><div style="font-size:22px;color:#4ade80;font-weight:700">'+doneThisWeek.length+'</div><div style="font-size:10px;color:var(--text-muted)">Completed</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:12px;border-radius:6px;text-align:center"><div style="font-size:22px;color:#3b82f6;font-weight:700">'+createdThisWeek.length+'</div><div style="font-size:10px;color:var(--text-muted)">Created</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:12px;border-radius:6px;text-align:center"><div style="font-size:22px;color:#f59e0b;font-weight:700">'+inProgress.length+'</div><div style="font-size:10px;color:var(--text-muted)">In Progress</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:12px;border-radius:6px;text-align:center"><div style="font-size:22px;color:#ef4444;font-weight:700">'+overdue.length+'</div><div style="font-size:10px;color:var(--text-muted)">Overdue</div></div></div>';
+  if(doneThisWeek.length){
+    html+='<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">Completed This Week</div>';
+    doneThisWeek.slice(0,10).forEach(t=>{
+      html+='<div style="padding:4px 8px;font-size:12px;color:var(--text-secondary);border-left:2px solid #4ade80;margin-bottom:3px;padding-left:8px">'+esc(t.title)+'</div>';
+    });
+    if(doneThisWeek.length>10)html+='<div style="font-size:10px;color:var(--text-muted);padding:4px 8px">+'+(doneThisWeek.length-10)+' more</div>';
+  }
+  html+='<button onclick="window._copyWeeklyReport()" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-secondary);font-size:11px;cursor:pointer;margin-top:12px">Copy as Markdown</button>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._copyWeeklyReport=function(){
+    let md='# Weekly Report - '+weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})+'\n\n';
+    md+='- Completed: '+doneThisWeek.length+'\n- Created: '+createdThisWeek.length+'\n- In Progress: '+inProgress.length+'\n- Overdue: '+overdue.length+'\n\n';
+    if(doneThisWeek.length){md+='## Completed\n';doneThisWeek.forEach(t=>{md+='- '+t.title+'\n';});}
+    navigator.clipboard.writeText(md);
+  };
+}
+function showQuickCronBuilder(){
+  const d=document.createElement('div');d.id='cron-builder-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  const presets=[
+    {label:'Every minute',cron:'* * * * *'},
+    {label:'Every hour',cron:'0 * * * *'},
+    {label:'Every day at midnight',cron:'0 0 * * *'},
+    {label:'Every day at 9am',cron:'0 9 * * *'},
+    {label:'Every Monday',cron:'0 0 * * 1'},
+    {label:'Every weekday at 9am',cron:'0 9 * * 1-5'},
+    {label:'1st of every month',cron:'0 0 1 * *'},
+    {label:'Every 5 minutes',cron:'*/5 * * * *'},
+    {label:'Every 15 minutes',cron:'*/15 * * * *'},
+    {label:'Every Sunday at 6pm',cron:'0 18 * * 0'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Cron Builder</h3><button onclick="document.getElementById(\'cron-builder-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;gap:4px;margin-bottom:10px">';
+  const fields=['min','hr','day','mon','dow'];
+  fields.forEach((f,i)=>{
+    html+='<div style="flex:1;text-align:center"><div style="font-size:8px;color:var(--text-muted);margin-bottom:2px">'+f+'</div><input id="cron-'+i+'" type="text" value="*" style="width:100%;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:#4ade80;font-size:12px;font-family:monospace;text-align:center;box-sizing:border-box"/></div>';
+  });
+  html+='</div>';
+  html+='<div id="cron-expr" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;font-family:monospace;font-size:14px;color:#4ade80;text-align:center;cursor:pointer;margin-bottom:10px">* * * * *</div>';
+  html+='<div style="font-size:9px;color:var(--text-muted);text-align:center;margin-bottom:10px">Click expression to copy</div>';
+  html+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:6px">Presets:</div>';
+  presets.forEach(p=>{
+    html+='<div onclick="window._setCron(\''+p.cron+'\')" style="padding:4px 8px;font-size:11px;cursor:pointer;border-radius:3px;display:flex;justify-content:space-between;margin-bottom:1px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'"><span style="color:var(--text-secondary)">'+p.label+'</span><span style="color:var(--text-muted);font-family:monospace;font-size:10px">'+p.cron+'</span></div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+  function updateExpr(){
+    const parts=[];for(let i=0;i<5;i++)parts.push(document.getElementById('cron-'+i).value||'*');
+    document.getElementById('cron-expr').textContent=parts.join(' ');
+  }
+  for(let i=0;i<5;i++)document.getElementById('cron-'+i).addEventListener('input',updateExpr);
+  window._setCron=function(cron){
+    const parts=cron.split(' ');for(let i=0;i<5;i++)document.getElementById('cron-'+i).value=parts[i]||'*';
+    updateExpr();
+  };
+}
+function showGoModRef(){
+  const d=document.createElement('div');d.id='go-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Build':['go build','go build -o <name>','go run .','go run <file>.go','go install'],
+    'Modules':['go mod init <module>','go mod tidy','go mod download','go mod vendor','go mod verify','go get <pkg>@latest'],
+    'Test':['go test','go test ./...','go test -v','go test -cover','go test -bench=.','go test -race'],
+    'Tools':['go fmt ./...','go vet ./...','go doc <pkg>','go generate ./...','go clean'],
+    'Info':['go version','go env','go list -m all','go list ./...','go tool pprof']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Go Reference</h3><button onclick="document.getElementById(\'go-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:12px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskArchiveStats(){
+  const d=document.createElement('div');d.id='archive-stats-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:420px;width:90vw;max-height:75vh;overflow-y:auto';
+  const archived=(S._archivedTasks||[]);const active=(S.tasks||[]);
+  const totalDone=active.filter(t=>t.status==='done').length;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Archive Stats</h3><button onclick="document.getElementById(\'archive-stats-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);padding:14px;border-radius:6px;text-align:center"><div style="font-size:24px;color:#4ade80;font-weight:700">'+archived.length+'</div><div style="font-size:10px;color:var(--text-muted)">Archived</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:14px;border-radius:6px;text-align:center"><div style="font-size:24px;color:#3b82f6;font-weight:700">'+active.length+'</div><div style="font-size:10px;color:var(--text-muted)">Active</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:14px;border-radius:6px;text-align:center"><div style="font-size:24px;color:#f59e0b;font-weight:700">'+totalDone+'</div><div style="font-size:10px;color:var(--text-muted)">Done (Active)</div></div>';
+  html+='<div style="background:var(--bg-surface);padding:14px;border-radius:6px;text-align:center"><div style="font-size:24px;color:var(--text-secondary);font-weight:700">'+(archived.length+active.length)+'</div><div style="font-size:10px;color:var(--text-muted)">Total Ever</div></div></div>';
+  if(archived.length){
+    html+='<div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">Recent Archives</div>';
+    archived.slice(0,8).forEach(t=>{
+      html+='<div style="padding:4px 8px;font-size:11px;color:var(--text-secondary);border-left:2px solid var(--border);margin-bottom:2px">'+esc(t.title)+'</div>';
+    });
+    if(archived.length>8)html+='<div style="font-size:10px;color:var(--text-muted);padding:4px 8px">+'+(archived.length-8)+' more in archive</div>';
+  }
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickMarkdownTable(){
+  const d=document.createElement('div');d.id='md-table-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:80vh;overflow-y:auto';
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Markdown Table Generator</h3><button onclick="document.getElementById(\'md-table-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:10px"><div><label style="font-size:10px;color:var(--text-muted)">Cols</label><input id="mt-cols" type="number" value="3" min="1" max="10" style="width:50px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px"/></div>';
+  html+='<div><label style="font-size:10px;color:var(--text-muted)">Rows</label><input id="mt-rows" type="number" value="3" min="1" max="20" style="width:50px;padding:4px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px"/></div>';
+  html+='<button onclick="window._mtGenerate()" style="padding:4px 12px;background:#4ade80;color:#000;border:none;border-radius:4px;font-size:11px;cursor:pointer;font-weight:600;align-self:flex-end">Generate</button></div>';
+  html+='<pre id="mt-output" onclick="navigator.clipboard.writeText(this.textContent)" style="padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:#4ade80;font-size:11px;font-family:monospace;white-space:pre;overflow-x:auto;margin:0;cursor:pointer;min-height:60px"></pre>';
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click output to copy</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+  window._mtGenerate=function(){
+    const cols=parseInt(document.getElementById('mt-cols').value)||3;const rows=parseInt(document.getElementById('mt-rows').value)||3;
+    let md='| ';for(let c=0;c<cols;c++)md+='Header'+(c+1)+' | ';md=md.trim()+'\n| ';
+    for(let c=0;c<cols;c++)md+='--- | ';md=md.trim()+'\n';
+    for(let r=0;r<rows;r++){md+='| ';for(let c=0;c<cols;c++)md+='data | ';md=md.trim()+'\n';}
+    document.getElementById('mt-output').textContent=md;
+  };
+  window._mtGenerate();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
