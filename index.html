@@ -1013,6 +1013,7 @@ textarea{resize:vertical;line-height:1.6}
               <button class="writer-toolbar-btn" onclick="writerDetailedStats()" title="Detailed writing statistics">St</button>
               <button class="writer-toolbar-btn" onclick="mergeDocs()" title="Merge another doc into current">Mg</button>
               <button class="writer-toolbar-btn" onclick="writerOutline()" title="Show document outline (headings)">Out</button>
+              <button class="writer-toolbar-btn" onclick="writerWordFreq()" title="Word frequency analysis">Fq</button>
               <select class="writer-toolbar-select" id="writer-export-sel" onchange="writerExport(this.value);this.selectedIndex=0">
                 <option value="">Export</option>
                 <option value="md">Markdown</option>
@@ -1088,6 +1089,8 @@ textarea{resize:vertical;line-height:1.6}
             <button class="btn btn-sm" onclick="exportCurrentSpec()" title="Export this spec as HTML" style="font-size:9px">Export</button>
             <button class="btn btn-sm" onclick="exportCurrentSpecMD()" title="Copy spec as Markdown" style="font-size:9px">MD</button>
             <button class="btn btn-sm" onclick="exportCurrentSpecText()" title="Copy spec as plain text" style="font-size:9px">TXT</button>
+            <button class="btn btn-sm" onclick="saveSpecVersion()" title="Save snapshot of this spec" style="font-size:9px;color:var(--accent)">v+</button>
+            <button class="btn btn-sm" onclick="showSpecVersions()" title="View version history" style="font-size:9px">Hist</button>
           </div>
           <div class="specs-sections" id="specs-sections"></div>
           <div class="specs-statusbar">
@@ -3325,6 +3328,24 @@ function writerDetailedStats(){
   ];
   alert((d.title||'Untitled')+'\n\n'+stats.join('\n'));
 }
+function writerWordFreq(){
+  const ed=document.getElementById('writer-editor');if(!ed)return;
+  const text=(ed.innerText||'').trim();if(!text){toast('Document is empty');return;}
+  const stopWords=new Set(['the','a','an','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','shall','should','may','might','must','can','could','and','but','or','nor','for','yet','so','in','on','at','to','of','by','with','from','as','into','through','during','before','after','above','below','up','down','out','off','over','under','again','further','then','once','here','there','when','where','why','how','all','each','every','both','few','more','most','other','some','such','no','not','only','own','same','than','too','very','just','because','also','about','its','it','this','that','these','those','i','me','my','we','us','our','you','your','he','him','his','she','her','they','them','their','what','which','who']);
+  const words=text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>2&&!stopWords.has(w));
+  const freq={};words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,25);
+  if(!sorted.length){toast('Not enough words for analysis');return;}
+  let existing=document.getElementById('writer-freq-panel');if(existing){existing.remove();return;}
+  const panel=document.createElement('div');panel.id='writer-freq-panel';
+  panel.style.cssText='position:absolute;right:8px;top:40px;width:200px;max-height:60vh;overflow-y:auto;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.4)';
+  const maxF=sorted[0][1];
+  let html='<div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;display:flex;justify-content:space-between"><span>Word Frequency</span><span onclick="this.closest(\'#writer-freq-panel\').remove()" style="cursor:pointer;font-size:10px">x</span></div>';
+  sorted.forEach(([w,c])=>{const pct=Math.round(c/maxF*100);html+=`<div style="display:flex;align-items:center;gap:6px;padding:2px 0;font-size:10px"><span style="width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-secondary);font-family:var(--mono)">${esc(w)}</span><div style="flex:1;height:3px;background:var(--bg-secondary);border-radius:2px"><div style="width:${pct}%;height:100%;background:var(--accent);border-radius:2px"></div></div><span style="font-size:8px;color:var(--text-muted);font-family:var(--mono);min-width:16px;text-align:right">${c}</span></div>`;});
+  panel.innerHTML=html;
+  ed.parentElement.style.position='relative';
+  ed.parentElement.appendChild(panel);
+}
 function writerOutline(){
   const ed=document.getElementById('writer-editor');if(!ed)return;
   const headings=ed.querySelectorAll('h1,h2,h3,h4,h5');
@@ -3625,6 +3646,38 @@ function exportAllSpecsHTML(){
   h+='<h1>Living Docs</h1><p style="color:#888;font-size:13px">'+S.specs.length+' specs | Exported '+new Date().toLocaleDateString()+'</p>';
   S.specs.forEach(s=>{const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);h+='<hr><h2>'+esc(s.title||'Untitled')+'</h2><div class="meta">'+(proj?esc(proj.name)+' | ':'')+wc+' words | '+(s.sections||[]).length+' sections</div>';(s.sections||[]).forEach(sec=>{h+='<div class="section"><h3>'+esc(sec.title||'Section')+'</h3><div>'+(sec.body||'<em>empty</em>')+'</div></div>';});});
   h+='</body></html>';const blob=new Blob([h],{type:'text/html'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='saturno-specs-'+new Date().toISOString().split('T')[0]+'.html';a.click();toast('Exported '+S.specs.length+' specs as HTML');
+}
+function saveSpecVersion(){
+  snapshotSpec();const s=getActiveSpec();if(!s){toast('No spec selected');return;}
+  if(!s.versions)s.versions=[];
+  const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);
+  s.versions.unshift({id:Date.now(),title:s.title,sections:JSON.parse(JSON.stringify(s.sections||[])),words:wc,date:new Date().toISOString()});
+  if(s.versions.length>20)s.versions=s.versions.slice(0,20);
+  save();toast('Spec version saved ('+wc+'w, '+(s.sections||[]).length+' sections)');
+}
+function showSpecVersions(){
+  snapshotSpec();const s=getActiveSpec();if(!s){toast('No spec selected');return;}
+  if(!s.versions||!s.versions.length){toast('No versions saved. Click v+ to save first.');return;}
+  let existing=document.getElementById('spec-versions-panel');if(existing){existing.remove();return;}
+  const panel=document.createElement('div');panel.id='spec-versions-panel';
+  panel.style.cssText='position:fixed;right:20px;top:80px;width:260px;max-height:70vh;overflow-y:auto;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,0.5)';
+  const curWc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);
+  let html='<div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between"><span>Spec Versions ('+s.versions.length+')</span><span onclick="this.closest(\'#spec-versions-panel\').remove()" style="cursor:pointer;font-size:12px;color:var(--text-muted)">x</span></div>';
+  s.versions.forEach((v,i)=>{
+    const diff=v.words-curWc;const diffStr=diff>0?'+'+diff:diff<0?''+diff:'=';
+    html+=`<div style="padding:8px;margin-bottom:4px;background:var(--bg-secondary);border-radius:4px;border:1px solid var(--border)"><div style="font-size:10px;font-weight:600;color:var(--text)">${esc(v.title||'Untitled')}</div><div style="font-size:9px;color:var(--text-muted);margin-top:2px">${timeAgo(v.date)} | ${v.words}w | ${v.sections.length} secs <span style="color:${diff>0?'var(--green)':diff<0?'var(--red)':'var(--text-muted)'}">${diffStr}w</span></div><div style="display:flex;gap:4px;margin-top:4px"><button class="btn btn-sm btn-ghost" onclick="restoreSpecVersion(${i})" style="font-size:8px;padding:1px 5px">Restore</button><button class="btn btn-sm btn-ghost btn-danger" onclick="deleteSpecVersion(${i})" style="font-size:8px;padding:1px 5px">Del</button></div></div>`;
+  });
+  panel.innerHTML=html;document.body.appendChild(panel);
+}
+function restoreSpecVersion(i){
+  const s=getActiveSpec();if(!s||!s.versions||!s.versions[i])return;
+  if(!confirm('Restore this version? Current content will be overwritten.'))return;
+  const v=s.versions[i];s.title=v.title;s.sections=JSON.parse(JSON.stringify(v.sections));s.updated=new Date().toISOString();
+  save();renderSpecDetail(s);const p=document.getElementById('spec-versions-panel');if(p)p.remove();toast('Restored version from '+timeAgo(v.date));
+}
+function deleteSpecVersion(i){
+  const s=getActiveSpec();if(!s||!s.versions)return;
+  s.versions.splice(i,1);save();const p=document.getElementById('spec-versions-panel');if(p)p.remove();showSpecVersions();toast('Version deleted');
 }
 function exportCurrentSpec(){
   snapshotSpec();const s=getActiveSpec();if(!s){toast('No spec selected');return;}
@@ -6002,6 +6055,14 @@ function cmdGetItems(q) {
       items.unshift({title:p+' ('+pct+'%)',desc:active+' active, '+done+' done | '+specs+' specs'+(tm?' | '+formatTimeSpent(tm)+' tracked':''),icon:'P',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);taskProjectFilter=p;renderTasks();}});
     });
     if(!filtered.length)items.unshift({title:'No projects found',desc:'Tasks have no project assignments',icon:'!',type:'info'});
+  }
+  // Dependency chain prefix
+  if(ql && (ql.startsWith('deps:') || ql==='deps' || ql==='dependencies')){
+    const blocked=S.tasks.filter(t=>t.blockedBy&&t.status!=='done');
+    const blocking=S.tasks.filter(t=>{const tl=t.title.toLowerCase();return S.tasks.some(x=>x.blockedBy&&x.blockedBy.toLowerCase().includes(tl)&&x.status!=='done');});
+    if(blocked.length){blocked.forEach(t=>{items.unshift({title:'BLOCKED: '+t.title,desc:'Blocked by: '+t.blockedBy,icon:'!',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}
+    if(blocking.length){blocking.forEach(t=>{const deps=S.tasks.filter(x=>x.blockedBy&&x.blockedBy.toLowerCase().includes(t.title.toLowerCase())&&x.status!=='done');items.unshift({title:'BLOCKING ('+deps.length+'): '+t.title,desc:'Blocks: '+deps.map(d=>d.title).join(', ').substring(0,80),icon:'B',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});}
+    if(!blocked.length&&!blocking.length)items.unshift({title:'No dependencies found',desc:'No tasks are blocked or blocking others',icon:'*',type:'info'});
   }
   // Review prefix
   if(ql && (ql.startsWith('review:') || ql==='review' || ql==='stale')){
