@@ -6369,6 +6369,32 @@ function cmdGetItems(q) {
       items.unshift({title:r.title,desc:'Recent '+r.type+' ('+timeAgo(r.time)+')',icon:sMap[r.type]||'*',type:'action',action:()=>{closeCommandPalette();if(r.type==='task')openTaskDetail(r.id);else if(r.type==='doc'){switchDoc(r.id);switchSection('writer',null);}else if(r.type==='spec'){switchSpec(r.id);switchSection('specs',null);}else if(r.type==='project')openProject(r.id);}});
     });
   }
+  // Export hub prefix
+  if(ql && (ql.startsWith('export:') || ql==='export' || ql==='exports')){
+    items.unshift({title:'Export Tasks (Markdown)',desc:'Copy filtered tasks as grouped markdown',icon:'T',type:'action',action:()=>{closeCommandPalette();exportTasks();}});
+    items.unshift({title:'Export Content (Markdown)',desc:'Copy all content as markdown',icon:'C',type:'action',action:()=>{closeCommandPalette();exportFilteredContentMD();}});
+    items.unshift({title:'Export Content (HTML)',desc:'Download content as styled HTML file',icon:'C',type:'action',action:()=>{closeCommandPalette();exportContentHTML();}});
+    items.unshift({title:'Export Links (Markdown)',desc:'Copy all links categorized as markdown',icon:'L',type:'action',action:()=>{closeCommandPalette();exportLinks();}});
+    items.unshift({title:'Export Calendar Week',desc:'Copy this week summary as markdown',icon:'D',type:'action',action:()=>{closeCommandPalette();exportWeek();}});
+    if(typeof exportCurrentSpecMD==='function')items.unshift({title:'Export Current Spec (Markdown)',desc:'Copy active living doc as markdown',icon:'S',type:'action',action:()=>{closeCommandPalette();exportCurrentSpecMD();}});
+    items.unshift({title:'Export All Data (JSON)',desc:'Download full state backup as JSON file',icon:'*',type:'action',action:()=>{closeCommandPalette();const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='astra-backup-'+new Date().toISOString().split('T')[0]+'.json';a.click();toast('Full backup exported');}});
+  }
+  // Task templates prefix
+  if(ql && (ql.startsWith('tpl:') || ql==='tpl' || ql==='templates')){
+    const templates=[
+      {title:'Daily standup review',priority:'p1',recurrence:'weekday'},
+      {title:'Weekly planning session',priority:'p1',recurrence:'weekly'},
+      {title:'Code review',priority:'p2',recurrence:''},
+      {title:'Bug fix',priority:'p0',recurrence:''},
+      {title:'Write documentation',priority:'p2',recurrence:''},
+      {title:'Brainstorm session',priority:'p3',recurrence:''},
+      {title:'Deploy to production',priority:'p0',recurrence:''},
+      {title:'User testing',priority:'p1',recurrence:''},
+    ];
+    templates.forEach(tpl=>{
+      items.unshift({title:'+ '+tpl.title,desc:tpl.priority.toUpperCase()+(tpl.recurrence?' ('+tpl.recurrence+')':''),icon:'+',type:'action',action:()=>{closeCommandPalette();S.tasks.unshift({id:Date.now(),title:tpl.title,description:'',subtasks:[],status:'todo',priority:tpl.priority,project:taskProjectFilter||'',due:new Date().toISOString().split('T')[0],recurrence:tpl.recurrence||'',created:new Date().toISOString()});save();if(currentSection==='tasks')renderTasks();toast('Created: '+tpl.title);}});
+    });
+  }
   return items.slice(0, 20);
 }
 function cmdSearch() {
