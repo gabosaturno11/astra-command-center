@@ -1064,7 +1064,7 @@ textarea{resize:vertical;line-height:1.6}
               <option value="clipboard">Copy All</option>
             </select>
           </div>
-          <div style="padding:4px 8px;display:flex;gap:4px"><input type="text" id="spec-list-search" placeholder="Search specs..." oninput="renderSpecList()" style="flex:1;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:4px 8px;font-size:10px;color:var(--text);outline:none"><select id="spec-list-sort" onchange="renderSpecList()" style="font-size:8px;padding:2px 4px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;cursor:pointer"><option value="updated">Updated</option><option value="alpha">A-Z</option><option value="words">Words</option><option value="project">Project</option></select><span id="specs-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono);white-space:nowrap"></span></div>
+          <div style="padding:4px 8px;display:flex;gap:4px"><input type="text" id="spec-list-search" placeholder="Search specs..." oninput="renderSpecList()" style="flex:1;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:4px 8px;font-size:10px;color:var(--text);outline:none"><select id="spec-list-sort" onchange="renderSpecList()" style="font-size:8px;padding:2px 4px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;cursor:pointer"><option value="updated">Updated</option><option value="alpha">A-Z</option><option value="words">Words</option><option value="project">Project</option><option value="sections">Sections</option></select><span id="specs-word-total" style="font-size:8px;color:var(--text-muted);font-family:var(--mono);white-space:nowrap"></span></div>
           <div class="specs-doc-list" id="specs-doc-list"></div>
         </div>
         <div class="specs-main" id="specs-main">
@@ -1753,6 +1753,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm" onclick="snoozeTask(1)" title="Push due date +1 day" style="color:var(--yellow)">+1d</button>
       <button class="btn btn-sm" onclick="snoozeTask(7)" title="Push due date +1 week" style="color:var(--yellow)">+1w</button>
       <button class="btn btn-sm" onclick="cloneTaskToProject()" title="Clone task to another project" style="color:var(--accent-cyan)">Clone</button>
+      <button class="btn btn-sm" onclick="splitTaskSubtasks()" title="Convert subtasks into separate tasks">Split</button>
       <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
     </div>
   </div>
@@ -2906,6 +2907,18 @@ function copyTaskAsMarkdown(){
   if(t.completedAt)md+='*Completed: '+t.completedAt+'*\n';
   navigator.clipboard.writeText(md).then(()=>toast('Task copied as markdown'));
 }
+function splitTaskSubtasks(){
+  const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
+  const subs=(t.subtasks||[]).filter(s=>!s.done);
+  if(!subs.length){toast('No incomplete subtasks to split');return;}
+  if(!confirm('Create '+subs.length+' new tasks from subtasks?'))return;
+  subs.forEach(sub=>{
+    const nt={id:Date.now()+Math.random()*1000|0,title:sub.title,description:'Split from: '+t.title,project:t.project||'',priority:t.priority||'p2',status:'todo',due:t.due||'',tags:[...(t.tags||[])],subtasks:[],created:new Date().toISOString()};
+    S.tasks.unshift(nt);
+  });
+  t.subtasks=(t.subtasks||[]).filter(s=>s.done);
+  save();renderTasks();renderSubtasksInModal(t.subtasks);toast('Split '+subs.length+' subtasks into tasks');
+}
 function cloneTaskToProject(){
   const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
   const projects=[...new Set(S.tasks.map(x=>x.project).filter(Boolean))].sort();
@@ -3445,8 +3458,10 @@ function zenExport(fmt) {
 // === LIVING DOCS ===
 function getActiveSpec(){return S.specs.find(s=>String(s.id)===String(S.activeSpec));}
 function renderSpecs(){renderSpecList();loadSpec();document.getElementById('specs-count').textContent=S.specs.length;const totalSpecW=S.specs.reduce((a,s)=>a+(s.sections||[]).reduce((b,sec)=>b+countW(sec.body),0),0);const swEl=document.getElementById('specs-word-total');if(swEl)swEl.textContent=totalSpecW.toLocaleString()+'w total';}
-function renderSpecList(){const sq=(document.getElementById('spec-list-search')?.value||'').toLowerCase();const ssort=(document.getElementById('spec-list-sort')?.value)||'updated';let specList=[...S.specs];if(sq)specList=specList.filter(s=>(s.title||'').toLowerCase().includes(sq));if(ssort==='alpha')specList.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(ssort==='words')specList.sort((a,b)=>(b.sections||[]).reduce((x,sec)=>x+countW(sec.body),0)-(a.sections||[]).reduce((x,sec)=>x+countW(sec.body),0));else if(ssort==='project'){specList.sort((a,b)=>{const pa=(S.projects||[]).find(p=>p.id===a.projectId);const pb=(S.projects||[]).find(p=>p.id===b.projectId);return(pa?pa.name:'zzz').localeCompare(pb?pb.name:'zzz');});}else specList.sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));const renderSpecItem=s=>{const sc=s.sections?s.sections.length:0;const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';const ic=s.icon||'file';const c=s.color||'#8b8b8b';const path=specSectionIcon(ic);const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;return`<div class="specs-doc-item ${String(s.id)===String(S.activeSpec)?'active':''}" onclick="switchSpec('${s.id}')"><div style="display:flex;align-items:center;gap:6px"><span style="color:${c};display:flex;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div></div><div class="specs-doc-meta"><span>${sc} sec / ${wc}w</span>${proj?`<span style="color:${proj.color||c}">${esc(proj.name)}</span>`:'<span>unassigned</span>'}<span>${dt}</span><span style="margin-left:auto;cursor:pointer;opacity:0.4;font-size:8px" onclick="event.stopPropagation();dupSpec('${s.id}')" title="Duplicate">D</span>${S.specs.length>1?`<span style="cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec('${s.id}')">x</span>`:''}</div></div>`;};
-  let specHtml='';if(ssort==='project'){let lastProj=null;specList.forEach(s=>{const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;const pName=proj?proj.name:'Unassigned';if(pName!==lastProj){const cnt=specList.filter(x=>{const xp=x.projectId?(S.projects||[]).find(p=>p.id===x.projectId):null;return(xp?xp.name:'Unassigned')===pName;}).length;specHtml+=`<div style="padding:6px 8px 3px;font-size:10px;font-weight:600;color:${proj?proj.color||'var(--accent)':'var(--text-muted)'};text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)">${esc(pName)} <span style="font-size:8px;font-weight:400;color:var(--text-muted)">${cnt}</span></div>`;lastProj=pName;}specHtml+=renderSpecItem(s);});}else{specHtml=specList.map(renderSpecItem).join('');}
+function renderSpecList(){const sq=(document.getElementById('spec-list-search')?.value||'').toLowerCase();const ssort=(document.getElementById('spec-list-sort')?.value)||'updated';let specList=[...S.specs];if(sq)specList=specList.filter(s=>(s.title||'').toLowerCase().includes(sq));if(ssort==='alpha')specList.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(ssort==='words')specList.sort((a,b)=>(b.sections||[]).reduce((x,sec)=>x+countW(sec.body),0)-(a.sections||[]).reduce((x,sec)=>x+countW(sec.body),0));else if(ssort==='sections')specList.sort((a,b)=>(b.sections||[]).length-(a.sections||[]).length);else if(ssort==='project'){specList.sort((a,b)=>{const pa=(S.projects||[]).find(p=>p.id===a.projectId);const pb=(S.projects||[]).find(p=>p.id===b.projectId);return(pa?pa.name:'zzz').localeCompare(pb?pb.name:'zzz');});}else specList.sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));const renderSpecItem=s=>{const sc=s.sections?s.sections.length:0;const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';const ic=s.icon||'file';const c=s.color||'#8b8b8b';const path=specSectionIcon(ic);const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;return`<div class="specs-doc-item ${String(s.id)===String(S.activeSpec)?'active':''}" onclick="switchSpec('${s.id}')"><div style="display:flex;align-items:center;gap:6px"><span style="color:${c};display:flex;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div></div><div class="specs-doc-meta"><span>${sc} sec / ${wc}w</span>${proj?`<span style="color:${proj.color||c}">${esc(proj.name)}</span>`:'<span>unassigned</span>'}<span>${dt}</span><span style="margin-left:auto;cursor:pointer;opacity:0.4;font-size:8px" onclick="event.stopPropagation();dupSpec('${s.id}')" title="Duplicate">D</span>${S.specs.length>1?`<span style="cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec('${s.id}')">x</span>`:''}</div></div>`;};
+  const specWcGrp=wc=>{if(wc===0)return'Empty';if(wc<100)return'Short (<100w)';if(wc<500)return'Medium (100-500w)';return'Long (500w+)';};
+  const specSecGrp=sc=>{if(sc<=1)return'1 section';if(sc<=3)return'2-3 sections';if(sc<=5)return'4-5 sections';return'6+ sections';};
+  let specHtml='';if(ssort==='project'||ssort==='alpha'||ssort==='words'||ssort==='sections'){let lastGrp=null;specList.forEach(s=>{let grp;let clr='var(--accent)';if(ssort==='project'){const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;grp=proj?proj.name:'Unassigned';clr=proj?proj.color||'var(--accent)':'var(--text-muted)';}else if(ssort==='alpha'){grp=(s.title||'U')[0].toUpperCase();clr='var(--accent)';}else if(ssort==='words'){const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);grp=specWcGrp(wc);clr='var(--accent-cyan)';}else if(ssort==='sections'){grp=specSecGrp((s.sections||[]).length);clr='#f59e0b';}if(grp!==lastGrp){const cnt=specList.filter(x=>{if(ssort==='project'){const xp=x.projectId?(S.projects||[]).find(p=>p.id===x.projectId):null;return(xp?xp.name:'Unassigned')===grp;}if(ssort==='alpha')return(x.title||'U')[0].toUpperCase()===grp;if(ssort==='words')return specWcGrp((x.sections||[]).reduce((a,sec)=>a+countW(sec.body),0))===grp;return specSecGrp((x.sections||[]).length)===grp;}).length;specHtml+=`<div style="padding:6px 8px 3px;font-size:10px;font-weight:600;color:${clr};text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border)">${esc(grp)} <span style="font-size:8px;font-weight:400;color:var(--text-muted)">${cnt}</span></div>`;lastGrp=grp;}specHtml+=renderSpecItem(s);});}else{specHtml=specList.map(renderSpecItem).join('');}
   document.getElementById('specs-doc-list').innerHTML=specHtml;}
 function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';const spa=document.getElementById('spec-project-assign');if(spa){spa.innerHTML='<option value="">No Project</option>'+(S.projects||[]).map(p=>`<option value="${p.id}" ${s.projectId===p.id?'selected':''}>${esc(p.name)}</option>`).join('');}renderSpecSections();updateSpecStatus();}
 function assignSpecProject(pid){const s=getActiveSpec();if(!s)return;s.projectId=pid||undefined;save();renderSpecList();toast(pid?'Assigned to project':'Removed project');}
@@ -5621,6 +5636,37 @@ function cmdGetItems(q) {
     items.unshift({title:'Current streak: '+streak+' day'+(streak!==1?'s':''),desc:'Best: '+longestStreak+' days | Total active days: '+totalDays,icon:'*',type:'info'});
     const last7=[];for(let i=0;i<7;i++){const dd=new Date();dd.setDate(dd.getDate()-i);const ds=dd.toISOString().split('T')[0];const cnt=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(ds)).length;if(cnt)last7.push({date:ds,count:cnt});}
     last7.forEach(d=>{items.push({title:d.date+': '+d.count+' completed',desc:'',icon:'T',type:'info'});});
+  }
+  // Timeline prefix — chronological task overview
+  if(ql && (ql.startsWith('timeline:') || ql==='timeline' || ql==='gantt')){
+    const active=S.tasks.filter(t=>t.status!=='done'&&t.due).sort((a,b)=>a.due.localeCompare(b.due));
+    const today=new Date().toISOString().split('T')[0];
+    if(!active.length){items.unshift({title:'No tasks with due dates',desc:'Add due dates to see timeline',icon:'T',type:'info'});}
+    else{
+      items.unshift({title:'Timeline: '+active.length+' scheduled tasks',desc:'Sorted by due date',icon:'T',type:'info'});
+      let lastMonth='';
+      active.slice(0,15).forEach(t=>{
+        const m=t.due.substring(0,7);const mLabel=new Date(t.due+'T12:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        const isOverdue=t.due<today;const isToday=t.due===today;
+        const prefix=isOverdue?'OVERDUE':isToday?'TODAY':t.due;
+        items.push({title:prefix+': '+t.title,desc:t.priority+' | '+(t.project||'no project')+' | '+t.status,icon:isOverdue?'!':isToday?'*':'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
+      });
+    }
+  }
+  // Rename prefix — rename projects/tags globally
+  if(ql && ql.startsWith('rename:')){
+    const rq=q.substring(7).trim();
+    if(!rq){items.unshift({title:'Usage: rename:old:new',desc:'Renames project names or tags across all sections',icon:'R',type:'info'});}
+    else{const parts=rq.split(':');if(parts.length>=2){const old=parts[0].trim(),nw=parts[1].trim();
+    if(old&&nw){
+      const projCount=S.tasks.filter(t=>t.project===old).length;
+      const tagCountT=S.tasks.filter(t=>(t.tags||[]).includes(old)).length;
+      const tagCountC=S.content.filter(c=>(c.tags||[]).includes(old)).length;
+      if(projCount)items.push({title:'Rename project "'+old+'" to "'+nw+'" ('+projCount+' tasks)',desc:'Updates all task project fields',icon:'R',type:'action',action:()=>{closeCommandPalette();S.tasks.forEach(t=>{if(t.project===old)t.project=nw;});save();renderTasks();toast('Renamed project in '+projCount+' tasks');}});
+      if(tagCountT)items.push({title:'Rename task tag "'+old+'" to "'+nw+'" ('+tagCountT+' tasks)',desc:'Updates tag across all tasks',icon:'R',type:'action',action:()=>{closeCommandPalette();S.tasks.forEach(t=>{if(t.tags){const i=t.tags.indexOf(old);if(i>=0)t.tags[i]=nw;}});save();renderTasks();toast('Renamed tag in '+tagCountT+' tasks');}});
+      if(tagCountC)items.push({title:'Rename content tag "'+old+'" to "'+nw+'" ('+tagCountC+' items)',desc:'Updates tag across all content',icon:'R',type:'action',action:()=>{closeCommandPalette();S.content.forEach(c=>{if(c.tags){const i=c.tags.indexOf(old);if(i>=0)c.tags[i]=nw;}});save();renderContent();toast('Renamed tag in '+tagCountC+' content items');}});
+      if(!projCount&&!tagCountT&&!tagCountC)items.unshift({title:'No matches for "'+old+'"',desc:'Nothing to rename',icon:'R',type:'info'});
+    }}else{items.unshift({title:'Usage: rename:old:new',desc:'Example: rename:myproject:new-name',icon:'R',type:'info'});}}
   }
   // Week prefix — upcoming week tasks breakdown
   if(ql && (ql.startsWith('week:') || ql==='week' || ql==='weekly')){
