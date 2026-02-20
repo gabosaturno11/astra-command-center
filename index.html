@@ -6071,6 +6071,12 @@ function cmdGetItems(q) {
       ['color palette','CSS color palette generator with shades'],
       ['streaks','Daily task completion streak tracker'],
       ['lorem ipsum','Lorem ipsum text generator'],
+      ['markdown preview','Live markdown editor with split preview'],
+      ['task heatmap','GitHub-style task completion heatmap'],
+      ['quick timer','Stopwatch and countdown timer widget'],
+      ['csv viewer','Paste and view CSV data as a table'],
+      ['task bubbles','Task bubble chart by project'],
+      ['habits','Daily habit tracker with streaks'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8453,6 +8459,24 @@ function cmdGetItems(q) {
   // Lorem ipsum prefix
   if(ql && (ql==='lorem ipsum' || ql==='lorem' || ql==='placeholder text' || ql==='dummy text')){
     items.unshift({title:'Lorem Generator',desc:'Lorem ipsum text generator',icon:'L',type:'action',action:()=>{closeCommandPalette();showLoremGenerator();}});
+  }
+  if(ql && (ql==='markdown preview' || ql==='markdown' || ql==='md preview' || ql==='md editor')){
+    items.unshift({title:'Markdown Preview',desc:'Live markdown editor with split preview',icon:'M',type:'action',action:()=>{closeCommandPalette();showMarkdownPreview();}});
+  }
+  if(ql && (ql==='task heatmap' || ql==='heatmap' || ql==='completion heatmap' || ql==='activity heatmap')){
+    items.unshift({title:'Task Heatmap',desc:'GitHub-style completion heatmap',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskHeatmap();}});
+  }
+  if(ql && (ql==='quick timer' || ql==='timer' || ql==='stopwatch' || ql==='countdown')){
+    items.unshift({title:'Quick Timer',desc:'Stopwatch and countdown timer',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTimer();}});
+  }
+  if(ql && (ql==='csv viewer' || ql==='csv' || ql==='csv table' || ql==='spreadsheet')){
+    items.unshift({title:'CSV Viewer',desc:'Paste and view CSV data as table',icon:'C',type:'action',action:()=>{closeCommandPalette();showCsvViewer();}});
+  }
+  if(ql && (ql==='task bubbles' || ql==='bubble chart' || ql==='bubbles' || ql==='task chart')){
+    items.unshift({title:'Task Bubble Chart',desc:'Task distribution bubble chart',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBubbleChart();}});
+  }
+  if(ql && (ql==='habits' || ql==='habit' || ql==='habit tracker' || ql==='daily habit')){
+    items.unshift({title:'Habit Tracker',desc:'Daily habit tracker with streaks',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHabit();}});
   }
   return items.slice(0, 20);
 }
@@ -18082,6 +18106,229 @@ function showLoremGenerator(){
   h+='<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span id="lorem-count" style="font-size:10px;color:var(--text-muted)"></span><button onclick="navigator.clipboard.writeText(document.getElementById(\'lorem-output\').textContent);this.textContent=\'Copied!\';var b=this;setTimeout(function(){b.textContent=\'Copy\'},800)" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px;padding:2px 8px">Copy</button></div>';
   h+='<pre id="lorem-output" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:11px;color:var(--text);white-space:pre-wrap;max-height:200px;overflow-y:auto;line-height:1.5">Click a button above to generate text.</pre>';
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showMarkdownPreview(){
+  let panel=document.getElementById('md-preview-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='md-preview-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:85vh;overflow-y:auto';
+  function mdToHtml(md){
+    var out=md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    out=out.replace(/^### (.+)$/gm,'<h3 style="color:var(--text);font-size:14px;margin:12px 0 4px">$1</h3>');
+    out=out.replace(/^## (.+)$/gm,'<h2 style="color:var(--text);font-size:16px;margin:14px 0 6px">$1</h2>');
+    out=out.replace(/^# (.+)$/gm,'<h1 style="color:var(--accent);font-size:18px;margin:16px 0 8px">$1</h1>');
+    out=out.replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--text)">$1</strong>');
+    out=out.replace(/\*(.+?)\*/g,'<em>$1</em>');
+    out=out.replace(/`(.+?)`/g,'<code style="background:var(--bg-surface);padding:1px 4px;border-radius:3px;font-size:11px">$1</code>');
+    out=out.replace(/^- (.+)$/gm,'<li style="margin-left:16px;font-size:12px">$1</li>');
+    out=out.replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:10px 0">');
+    out=out.replace(/\n\n/g,'<br><br>');
+    return out;
+  }
+  window._mdPreviewUpdate=function(){
+    var src=document.getElementById('md-src');
+    var dest=document.getElementById('md-dest');
+    if(src&&dest)dest.innerHTML=mdToHtml(src.value);
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Markdown Preview</span><button onclick="document.getElementById(\'md-preview-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;height:50vh">';
+  h+='<textarea id="md-src" oninput="window._mdPreviewUpdate()" placeholder="Type markdown here..." style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:11px;color:var(--text);font-family:var(--mono);resize:none;outline:none">## Hello World\n\nThis is **bold** and *italic* text.\n\n### Features\n- Item one\n- Item two\n- Item three\n\n`inline code` example\n\n---\n\nMore content here.</textarea>';
+  h+='<div id="md-dest" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:12px;color:var(--text-muted);overflow-y:auto;line-height:1.6"></div>';
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  window._mdPreviewUpdate();
+}
+function showTaskHeatmap(){
+  let panel=document.getElementById('task-heatmap-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-heatmap-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw';
+  var today=new Date();var days=90;var map={};var maxC=0;
+  S.tasks.forEach(function(t){
+    if(t.completedAt){var ds=t.completedAt.split('T')[0];map[ds]=(map[ds]||0)+1;if(map[ds]>maxC)maxC=map[ds];}
+  });
+  if(maxC<1)maxC=1;
+  var weeks=Math.ceil(days/7);var cellW=9;var cellH=9;var gap=2;
+  var svgW=weeks*(cellW+gap)+40;var svgH=7*(cellH+gap)+20;
+  var svg='<svg width="'+svgW+'" height="'+svgH+'" viewBox="0 0 '+svgW+' '+svgH+'">';
+  var dayLabels=['M','','W','','F','','S'];
+  for(var d=0;d<7;d++){svg+='<text x="0" y="'+(d*(cellH+gap)+cellH+8)+'" fill="#666" font-size="7" font-family="var(--mono)">'+dayLabels[d]+'</text>';}
+  for(var i=days-1;i>=0;i--){
+    var dt=new Date(today);dt.setDate(dt.getDate()-i);
+    var ds=dt.toISOString().split('T')[0];
+    var dow=dt.getDay();var adjDow=(dow+6)%7;
+    var wk=Math.floor((days-1-i)/7);
+    var count=map[ds]||0;
+    var intensity=count/maxC;
+    var color=count===0?'#161b22':intensity<0.25?'#0e4429':intensity<0.5?'#006d32':intensity<0.75?'#26a641':'#39d353';
+    svg+='<rect x="'+(wk*(cellW+gap)+20)+'" y="'+(adjDow*(cellH+gap)+8)+'" width="'+cellW+'" height="'+cellH+'" rx="2" fill="'+color+'"><title>'+ds+': '+count+' completed</title></rect>';
+  }
+  svg+='</svg>';
+  var total=0;Object.values(map).forEach(function(v){total+=v;});
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Completion Heatmap</span><button onclick="document.getElementById(\'task-heatmap-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="overflow-x:auto;margin-bottom:10px">'+svg+'</div>';
+  h+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted)"><span>'+total+' tasks completed in last '+days+' days</span><div style="display:flex;align-items:center;gap:3px"><span>Less</span>';
+  ['#161b22','#0e4429','#006d32','#26a641','#39d353'].forEach(function(c){h+='<span style="width:9px;height:9px;border-radius:2px;background:'+c+';display:inline-block"></span>';});
+  h+='<span>More</span></div></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickTimer(){
+  let panel=document.getElementById('quick-timer-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-timer-widget';
+  panel.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:220px';
+  window._qtSec=0;window._qtRunning=false;window._qtInterval=null;window._qtMode='up';
+  window._qtUpdate=function(){
+    var el=document.getElementById('qt-display');if(!el)return;
+    var s=window._qtSec;
+    var m=Math.floor(Math.abs(s)/60);var sec=Math.abs(s)%60;
+    el.textContent=(s<0?'-':'')+String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');
+    if(window._qtMode==='down'&&s<=0&&window._qtRunning){
+      clearInterval(window._qtInterval);window._qtRunning=false;
+      el.style.color='#ef4444';
+    }
+  };
+  window._qtToggle=function(){
+    if(window._qtRunning){clearInterval(window._qtInterval);window._qtRunning=false;return;}
+    window._qtRunning=true;
+    window._qtInterval=setInterval(function(){
+      if(window._qtMode==='up')window._qtSec++;else window._qtSec--;
+      window._qtUpdate();
+    },1000);
+  };
+  window._qtReset=function(){
+    clearInterval(window._qtInterval);window._qtRunning=false;window._qtSec=0;window._qtUpdate();
+    var el=document.getElementById('qt-display');if(el)el.style.color='var(--accent)';
+  };
+  window._qtSet=function(m){
+    clearInterval(window._qtInterval);window._qtRunning=false;
+    window._qtMode='down';window._qtSec=m*60;window._qtUpdate();
+    var el=document.getElementById('qt-display');if(el)el.style.color='var(--accent)';
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:11px;color:var(--text-muted)">Quick Timer</span><button onclick="document.getElementById(\'quick-timer-widget\').remove();clearInterval(window._qtInterval)" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<div id="qt-display" style="font-size:28px;font-weight:700;color:var(--accent);text-align:center;font-family:var(--mono);margin-bottom:8px">00:00</div>';
+  h+='<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px">';
+  h+='<button onclick="window._qtToggle()" style="padding:4px 12px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600">Start/Pause</button>';
+  h+='<button onclick="window._qtReset()" style="padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Reset</button>';
+  h+='</div>';
+  h+='<div style="display:flex;gap:3px;justify-content:center">';
+  [5,10,15,25].forEach(function(m){
+    h+='<button onclick="window._qtSet('+m+')" style="padding:2px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px">'+m+'m</button>';
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showCsvViewer(){
+  let panel=document.getElementById('csv-viewer-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='csv-viewer-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:85vh;overflow-y:auto';
+  window._csvParse=function(){
+    var src=document.getElementById('csv-src');
+    var dest=document.getElementById('csv-dest');
+    var info=document.getElementById('csv-info');
+    if(!src||!dest)return;
+    var text=src.value.trim();if(!text){dest.innerHTML='<div style="color:var(--text-muted);font-size:11px;padding:20px;text-align:center">Paste CSV data above</div>';return;}
+    var lines=text.split('\n').map(function(l){return l.split(',').map(function(c){return c.trim().replace(/^["']|["']$/g,'');});});
+    if(lines.length<1)return;
+    var headers=lines[0];var rows=lines.slice(1).filter(function(r){return r.length>0&&r.some(function(c){return c;});});
+    var table='<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr>';
+    headers.forEach(function(h){table+='<th style="background:var(--bg-surface);padding:6px 8px;text-align:left;border:1px solid var(--border);color:var(--accent);font-weight:600">'+esc(h)+'</th>';});
+    table+='</tr></thead><tbody>';
+    rows.forEach(function(r,ri){
+      table+='<tr>';
+      headers.forEach(function(_,ci){table+='<td style="padding:4px 8px;border:1px solid var(--border);color:var(--text)">'+(r[ci]?esc(r[ci]):'')+'</td>';});
+      table+='</tr>';
+    });
+    table+='</tbody></table>';
+    dest.innerHTML=table;
+    if(info)info.textContent=headers.length+' columns, '+rows.length+' rows';
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">CSV Viewer</span><button onclick="document.getElementById(\'csv-viewer-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="csv-src" oninput="window._csvParse()" placeholder="Paste CSV data here (comma separated)..." style="width:100%;height:80px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:10px;color:var(--text);font-family:var(--mono);resize:vertical;outline:none;margin-bottom:8px;box-sizing:border-box"></textarea>';
+  h+='<div id="csv-info" style="font-size:10px;color:var(--text-muted);margin-bottom:6px"></div>';
+  h+='<div id="csv-dest" style="overflow-x:auto"><div style="color:var(--text-muted);font-size:11px;padding:20px;text-align:center">Paste CSV data above</div></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskBubbleChart(){
+  let panel=document.getElementById('task-bubble-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-bubble-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw';
+  var projs={};
+  S.tasks.forEach(function(t){
+    var p=t.project||'No Project';
+    if(!projs[p])projs[p]={total:0,done:0,p0:0,p1:0};
+    projs[p].total++;
+    if(t.status==='done')projs[p].done++;
+    if(t.priority==='p0')projs[p].p0++;
+    if(t.priority==='p1')projs[p].p1++;
+  });
+  var entries=Object.entries(projs).sort(function(a,b){return b[1].total-a[1].total;});
+  var maxTotal=Math.max.apply(null,entries.map(function(e){return e[1].total;}));
+  if(maxTotal<1)maxTotal=1;
+  var w=500,ht=300;
+  var svg='<svg width="'+w+'" height="'+ht+'" viewBox="0 0 '+w+' '+ht+'">';
+  var colors=['#3b82f6','#8b5cf6','#f59e0b','#ef4444','#06b6d4','#ec4899','#22c55e','#f97316'];
+  entries.forEach(function(e,i){
+    var r=Math.max(15,Math.sqrt(e[1].total/maxTotal)*60);
+    var pct=e[1].total>0?Math.round(e[1].done/e[1].total*100):0;
+    var cx=60+i*(w-120)/Math.max(1,entries.length-1);
+    var cy=ht/2+(i%2===0?-20:20);
+    var col=colors[i%colors.length];
+    svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+col+'" opacity="0.3" stroke="'+col+'" stroke-width="1.5"><title>'+esc(e[0])+': '+e[1].total+' tasks ('+pct+'% done)</title></circle>';
+    svg+='<text x="'+cx+'" y="'+cy+'" fill="'+col+'" font-size="10" text-anchor="middle" dy="-2" font-weight="600">'+e[1].total+'</text>';
+    svg+='<text x="'+cx+'" y="'+cy+'" fill="#999" font-size="7" text-anchor="middle" dy="8">'+pct+'%</text>';
+    svg+='<text x="'+cx+'" y="'+(cy+r+12)+'" fill="#888" font-size="8" text-anchor="middle">'+esc(e[0].length>12?e[0].substring(0,12)+'..':e[0])+'</text>';
+  });
+  svg+='</svg>';
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Bubble Chart</span><button onclick="document.getElementById(\'task-bubble-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="text-align:center;overflow-x:auto">'+svg+'</div>';
+  h+='<div style="font-size:9px;color:var(--text-muted);text-align:center;margin-top:6px">Bubble size = task count. Number = total tasks. Percentage = completion rate.</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickHabit(){
+  let panel=document.getElementById('quick-habit-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-habit-widget';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:280px';
+  if(!S._habits)S._habits=[];
+  var today=new Date().toISOString().split('T')[0];
+  function render(){
+    var el=document.getElementById('quick-habit-widget');if(!el)return;
+    var h2='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:11px;color:var(--text-muted)">Habits Today</span><button onclick="document.getElementById(\'quick-habit-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+    if(S._habits.length===0){
+      h2+='<div style="font-size:10px;color:var(--text-muted);padding:8px 0;text-align:center">No habits yet</div>';
+    }else{
+      S._habits.forEach(function(hab,i){
+        var done=hab.log&&hab.log.indexOf(today)!==-1;
+        var streak=0;
+        if(hab.log){
+          var d=new Date();
+          for(var k=0;k<365;k++){
+            var ds=d.toISOString().split('T')[0];
+            if(hab.log.indexOf(ds)!==-1){streak++;}else break;
+            d.setDate(d.getDate()-1);
+          }
+        }
+        h2+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)">';
+        h2+='<button onclick="window._habitToggle('+i+')" style="width:18px;height:18px;border-radius:4px;border:1px solid '+(done?'var(--accent)':'var(--border)')+';background:'+(done?'var(--accent)':'transparent')+';cursor:pointer;display:flex;align-items:center;justify-content:center;color:#000;font-size:10px;font-weight:700">'+(done?'V':'')+'</button>';
+        h2+='<span style="font-size:11px;color:var(--text);flex:1">'+esc(hab.name)+'</span>';
+        h2+='<span style="font-size:9px;color:var(--accent);font-family:var(--mono)">'+streak+'d</span>';
+        h2+='<button onclick="window._habitDel('+i+')" style="background:none;border:none;color:#666;cursor:pointer;font-size:10px">x</button>';
+        h2+='</div>';
+      });
+    }
+    h2+='<div style="display:flex;gap:4px;margin-top:8px"><input id="habit-new-input" placeholder="New habit..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 8px;font-size:10px;color:var(--text);outline:none" onkeydown="if(event.key===\'Enter\')window._habitAdd()"><button onclick="window._habitAdd()" style="padding:4px 8px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600">+</button></div>';
+    el.innerHTML=h2;
+  }
+  window._habitToggle=function(i){
+    var hab=S._habits[i];if(!hab)return;
+    if(!hab.log)hab.log=[];
+    var idx=hab.log.indexOf(today);
+    if(idx!==-1)hab.log.splice(idx,1);else hab.log.push(today);
+    save();render();
+  };
+  window._habitDel=function(i){S._habits.splice(i,1);save();render();};
+  window._habitAdd=function(){
+    var inp=document.getElementById('habit-new-input');if(!inp||!inp.value.trim())return;
+    S._habits.push({name:inp.value.trim(),log:[]});save();render();
+  };
+  render();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
