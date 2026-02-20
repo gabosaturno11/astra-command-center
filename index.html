@@ -890,6 +890,7 @@ textarea{resize:vertical;line-height:1.6}
           <div id="task-bulk-actions" style="display:none;gap:4px;align-items:center">
             <select id="task-bulk-status" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Status</option><option value="todo">To Do</option><option value="progress">In Progress</option><option value="done">Done</option><option value="blocked">Blocked</option></select>
             <select id="task-bulk-priority" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"><option value="">Set Priority</option><option value="p0">P0</option><option value="p1">P1</option><option value="p2">P2</option><option value="p3">P3</option></select>
+            <input type="date" id="task-bulk-due" style="font-size:9px;padding:3px 4px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px;width:110px" title="Set due date">
             <button class="btn btn-sm btn-danger" onclick="taskBulkDelete()">Delete</button>
             <button class="btn btn-sm" onclick="taskBulkApply()">Apply</button>
             <button class="btn btn-sm" onclick="taskBulkSelectAll()">All</button>
@@ -2638,9 +2639,10 @@ function toggleTaskSelect(id){if(taskSelected.has(id))taskSelected.delete(id);el
 function taskBulkApply(){
   const status=document.getElementById('task-bulk-status').value;
   const priority=document.getElementById('task-bulk-priority').value;
-  if(!status&&!priority){toast('Select a status or priority to apply');return;}
+  const due=document.getElementById('task-bulk-due').value;
+  if(!status&&!priority&&!due){toast('Select a status, priority, or due date to apply');return;}
   let count=0;
-  taskSelected.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t){if(status)t.status=status;if(priority)t.priority=priority;count++;}});
+  taskSelected.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t){if(status)t.status=status;if(priority)t.priority=priority;if(due)t.due=due;count++;}});
   save();taskSelected.clear();taskBulkMode=false;document.getElementById('task-bulk-btn').style.display='';document.getElementById('task-bulk-actions').style.display='none';renderTasks();toast('Updated '+count+' tasks');
 }
 function taskBulkDelete(){
@@ -5129,7 +5131,7 @@ function cmdGetItems(q) {
   if(!ql || 'overdue late past due'.includes(ql)){const ot=new Date().toISOString().split('T')[0];const od=S.tasks.filter(t=>t.due&&t.due<ot&&t.status!=='done');if(od.length)items.push({title:'Overdue Tasks ('+od.length+')',desc:od.slice(0,3).map(t=>t.title).join(', '),icon:'!',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);setTaskFilter('active');document.getElementById('task-sort').value='due';renderTasks();toast(od.length+' overdue tasks');}});}
   if(!ql || 'archive archived completed old'.includes(ql)){const ac=(S.archivedTasks||[]).length;if(ac)items.push({title:'View Archived Tasks ('+ac+')',desc:'Browse and restore archived tasks',icon:'A',type:'action',action:()=>{closeCommandPalette();switchSection('tasks',null);showArchivedTasks();}});}
   if(!ql || 'shortcuts help'.includes(ql)) items.push({title:'Keyboard Shortcuts', desc:'Show all shortcuts (Cmd+/)', icon:'?', type:'action', action:()=>{closeCommandPalette();document.getElementById('shortcuts-modal').classList.add('open');}});
-  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due: status: p: recent: count: overdue: today: week: starred:', icon:'?', type:'info'});
+  if(!ql || 'help prefix commands'.includes(ql)) items.push({title:'Cmd+K Prefixes', desc:'task: note: link: doc: spec: tag: project: goto: calc: all: focus: due: status: p: recent: count: overdue: today: week: starred: random:', icon:'?', type:'info'});
   if(!ql || 'clear reset filters'.includes(ql)) items.push({title:'Clear All Filters', desc:'Reset search, filters, and sort to defaults', icon:'X', type:'action', action:()=>{closeCommandPalette();taskFilter='all';taskProjectFilter=null;contentType='all';contentTheme='all';contentTagFilter=null;contentShowAll=false;const ts=document.getElementById('task-search');if(ts)ts.value='';const cs=document.getElementById('content-search');if(cs)cs.value='';const tsort=document.getElementById('task-sort');if(tsort)tsort.value='manual';renderTasks();renderContent();renderLinks();toast('All filters cleared');}});
   if(!ql || 'zen writer'.includes(ql)) items.push({title:'Zen Writer', desc:'Distraction-free writing mode', icon:'Z', type:'action', action:()=>{closeCommandPalette();zenOpen();}});
   if(!ql || 'focus mode'.includes(ql)) items.push({title:'Toggle Focus Mode', desc:'Hide sidebar for focused work', icon:'F', type:'action', action:()=>{closeCommandPalette();const app=document.querySelector('.app');setMode(app.classList.contains('mode-focus')?'default':'focus');}});
@@ -5216,6 +5218,13 @@ function cmdGetItems(q) {
       items.unshift({title:t.title||'Untitled',desc:'Due today | '+(t.priority||'p2')+' | '+(t.project||'no project'),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});
     });
     if(!todayTasks.length)items.unshift({title:'No tasks due today',desc:'Use task: to create one',icon:'T',type:'info'});
+  }
+  // Random prefix - random content/doc for review
+  if(ql && (ql.startsWith('random:') || ql==='random' || ql==='rand')){
+    const rType=q.includes(':')?q.substring(q.indexOf(':')+1).trim().toLowerCase():'';
+    if(!rType||rType==='content'||rType==='c'){const c=S.content[Math.floor(Math.random()*S.content.length)];if(c)items.unshift({title:c.body.substring(0,60)+'...',desc:'Random content | '+c.type+(c.theme?' | '+c.theme:''),icon:'?',type:'action',action:()=>{closeCommandPalette();switchSection('content',null);navigator.clipboard.writeText(c.body);toast('Random content copied');}});}
+    if(!rType||rType==='doc'||rType==='d'){const d=S.docs[Math.floor(Math.random()*S.docs.length)];if(d)items.unshift({title:d.title||'Untitled',desc:'Random doc | '+countW(d.body)+'w',icon:'?',type:'action',action:()=>{closeCommandPalette();switchSection('writer',null);switchDoc(d.id);}});}
+    if(!rType||rType==='task'||rType==='t'){const t=S.tasks.filter(x=>x.status!=='done')[Math.floor(Math.random()*S.tasks.filter(x=>x.status!=='done').length)];if(t)items.unshift({title:t.title||'Untitled',desc:'Random task | '+(t.priority||'p2')+' | '+(t.project||''),icon:'?',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});}
   }
   // Starred prefix - all starred items
   if(ql && (ql.startsWith('starred:') || ql==='starred' || ql==='star')){
