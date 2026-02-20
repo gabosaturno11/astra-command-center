@@ -6386,6 +6386,9 @@ function cmdGetItems(q) {
       ['ansible','Ansible command reference'],
       ['abandoned','Tasks untouched for 14+ days'],
       ['flexbox','CSS flexbox layout helper'],
+      ['nginx','nginx config and command reference'],
+      ['estimate accuracy','How accurate are your time estimates'],
+      ['css grid','CSS grid layout helper'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9713,6 +9716,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='flexbox' || ql==='flex' || ql==='css flex' || ql==='flex helper')){
     items.unshift({title:'Flexbox Helper',desc:'Common flexbox layout patterns',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFlexboxHelper();}});
+  }
+  if(ql && (ql==='nginx' || ql==='nginx config' || ql==='nginx commands' || ql==='nginx ref')){
+    items.unshift({title:'nginx Reference',desc:'nginx config and management cheatsheet',icon:'N',type:'action',action:()=>{closeCommandPalette();showNginxRef();}});
+  }
+  if(ql && (ql==='estimate accuracy' || ql==='estimation' || ql==='accuracy' || ql==='time estimate')){
+    items.unshift({title:'Estimate Accuracy',desc:'How accurate are your time estimates',icon:'E',type:'action',action:()=>{closeCommandPalette();showTaskEstimateAccuracy2();}});
+  }
+  if(ql && (ql==='css grid' || ql==='grid' || ql==='grid helper' || ql==='grid layout')){
+    items.unshift({title:'CSS Grid Helper',desc:'Common CSS grid layout patterns',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGridHelper();}});
   }
   return items.slice(0, 20);
 }
@@ -29304,6 +29316,77 @@ function showQuickFlexboxHelper(){
     {label:'Reverse Row',css:'display:flex;flex-direction:row-reverse;gap:8px'}
   ];
   let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Flexbox Helper</h3><button onclick="document.getElementById(\'flexbox-helper-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  configs.forEach(c=>{
+    html+='<div onclick="navigator.clipboard.writeText(\''+c.css.replace(/'/g,"\\'")+'\');this.style.borderColor=\'#4ade80\';setTimeout(()=>this.style.borderColor=\'var(--border)\',600)" style="padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:pointer">';
+    html+='<div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:4px">'+c.label+'</div>';
+    html+='<div style="font-size:10px;color:#4ade80;font-family:monospace;word-break:break-all">'+c.css+'</div></div>';
+  });
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click any to copy CSS</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showNginxRef(){
+  const d=document.createElement('div');d.id='nginx-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Service':['sudo systemctl start nginx','sudo systemctl stop nginx','sudo systemctl restart nginx','sudo systemctl reload nginx','sudo systemctl status nginx'],
+    'Config':['nginx -t','nginx -T','nginx -s reload','nginx -s stop','nginx -V'],
+    'Common Directives':['server { listen 80; }','location / { proxy_pass http://localhost:3000; }','root /var/www/html;','index index.html;','try_files $uri $uri/ /index.html;'],
+    'SSL':['ssl_certificate /path/cert.pem;','ssl_certificate_key /path/key.pem;','listen 443 ssl;','ssl_protocols TLSv1.2 TLSv1.3;'],
+    'Locations':['location /api { proxy_pass http://backend; }','location ~* \\.(jpg|png)$ { expires 30d; }','location = /health { return 200; }'],
+    'Logs':['access_log /var/log/nginx/access.log;','error_log /var/log/nginx/error.log;','tail -f /var/log/nginx/access.log']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">nginx Reference</h3><button onclick="document.getElementById(\'nginx-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/\\/g,'\\\\').replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px;word-break:break-all" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskEstimateAccuracy2(){
+  const d=document.createElement('div');d.id='estimate-acc2-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:480px;width:90vw;max-height:75vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.estimate&&t.status==='done'&&t.timeTracked);
+  let accurate=0;let over=0;let under=0;
+  tasks.forEach(t=>{
+    const est=t.estimate.toLowerCase();let estMins=0;
+    if(est.includes('h'))estMins=parseFloat(est)*60;else estMins=parseFloat(est);
+    const actual=t.timeTracked/60;
+    if(isNaN(estMins)||estMins===0)return;
+    const ratio=actual/estMins;
+    if(ratio>=0.8&&ratio<=1.2)accurate++;
+    else if(ratio>1.2)under++;
+    else over++;
+  });
+  const total=accurate+over+under;const pct=total?Math.round(accurate/total*100):0;
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Estimate Accuracy</h3><button onclick="document.getElementById(\'estimate-acc2-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  const col=pct>=70?'#4ade80':pct>=40?'#f59e0b':'#ef4444';
+  html+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:42px;color:'+col+';font-weight:700">'+pct+'%</div><div style="font-size:12px;color:var(--text-muted)">estimates within 20% of actual</div></div>';
+  html+='<div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px">';
+  html+='<div style="text-align:center;background:var(--bg-surface);padding:10px 16px;border-radius:6px"><div style="font-size:18px;color:#4ade80;font-weight:700">'+accurate+'</div><div style="font-size:10px;color:var(--text-muted)">Accurate</div></div>';
+  html+='<div style="text-align:center;background:var(--bg-surface);padding:10px 16px;border-radius:6px"><div style="font-size:18px;color:#f59e0b;font-weight:700">'+under+'</div><div style="font-size:10px;color:var(--text-muted)">Underestimated</div></div>';
+  html+='<div style="text-align:center;background:var(--bg-surface);padding:10px 16px;border-radius:6px"><div style="font-size:18px;color:#3b82f6;font-weight:700">'+over+'</div><div style="font-size:10px;color:var(--text-muted)">Overestimated</div></div></div>';
+  if(!total)html+='<div style="text-align:center;padding:16px;color:var(--text-muted);font-size:12px">Complete tasks with both estimates and time tracking to see accuracy.</div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickGridHelper(){
+  const d=document.createElement('div');d.id='grid-helper-panel';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  const configs=[
+    {label:'2 Columns',css:'display:grid;grid-template-columns:1fr 1fr;gap:16px'},
+    {label:'3 Columns',css:'display:grid;grid-template-columns:repeat(3,1fr);gap:16px'},
+    {label:'4 Columns',css:'display:grid;grid-template-columns:repeat(4,1fr);gap:16px'},
+    {label:'Auto Fill',css:'display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px'},
+    {label:'Auto Fit',css:'display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px'},
+    {label:'Sidebar',css:'display:grid;grid-template-columns:250px 1fr;gap:16px'},
+    {label:'Holy Grail',css:'display:grid;grid-template-columns:200px 1fr 200px;grid-template-rows:auto 1fr auto;gap:16px'},
+    {label:'Masonry-ish',css:'display:grid;grid-template-columns:repeat(3,1fr);gap:16px;grid-auto-rows:minmax(100px,auto)'},
+    {label:'Centered',css:'display:grid;place-items:center;min-height:100vh'},
+    {label:'12 Col Grid',css:'display:grid;grid-template-columns:repeat(12,1fr);gap:8px'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">CSS Grid Helper</h3><button onclick="document.getElementById(\'grid-helper-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
   configs.forEach(c=>{
     html+='<div onclick="navigator.clipboard.writeText(\''+c.css.replace(/'/g,"\\'")+'\');this.style.borderColor=\'#4ade80\';setTimeout(()=>this.style.borderColor=\'var(--border)\',600)" style="padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;cursor:pointer">';
     html+='<div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:4px">'+c.label+'</div>';
