@@ -6011,6 +6011,9 @@ function cmdGetItems(q) {
       ['decisions','Decision log: record decisions with context and reasoning'],
       ['word cloud','Visual word cloud from all content and documents'],
       ['clipboard','Persistent clipboard history with copy-to-clipboard'],
+      ['quick todo','Floating quick todo list with checkboxes'],
+      ['compare content','Side-by-side content item comparison'],
+      ['scorecard','Workspace health scorecard with letter grade'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8153,6 +8156,18 @@ function cmdGetItems(q) {
   // Clipboard prefix
   if(ql && (ql==='clipboard' || ql==='clip' || ql==='clipboard history' || ql==='paste')){
     items.unshift({title:'Clipboard History',desc:'Persistent clipboard with copy',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickClipboard();}});
+  }
+  // Quick todo prefix
+  if(ql && (ql==='quick todo' || ql==='todo' || ql==='todo list' || ql==='checklist')){
+    items.unshift({title:'Quick Todo',desc:'Floating todo list with checkboxes',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTodo();}});
+  }
+  // Compare content prefix
+  if(ql && (ql==='compare content' || ql==='compare' || ql==='side by side' || ql==='content diff')){
+    items.unshift({title:'Content Compare',desc:'Side-by-side content comparison',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentCompare();}});
+  }
+  // Scorecard prefix
+  if(ql && (ql==='scorecard' || ql==='score' || ql==='grade' || ql==='workspace grade')){
+    items.unshift({title:'Workspace Scorecard',desc:'Health grade with 7 criteria',icon:'S',type:'action',action:()=>{closeCommandPalette();showWorkspaceScorecard();}});
   }
   return items.slice(0, 20);
 }
@@ -15677,6 +15692,94 @@ function showQuickClipboard(){
     h+='<div style="display:flex;gap:2px;flex-shrink:0">';
     h+='<button onclick="(function(){navigator.clipboard.writeText(S._clipboard.find(x=>x.id==='+c.id+').text);if(typeof showNotification===\'function\')showNotification(\'Copied!\');})()" style="background:none;border:1px solid var(--accent);color:var(--accent);padding:1px 5px;border-radius:3px;cursor:pointer;font-size:9px">C</button>';
     h+='<button onclick="(function(){S._clipboard=S._clipboard.filter(x=>x.id!=='+c.id+');save();showQuickClipboard();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">X</button></div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickTodo(){
+  let panel=document.getElementById('quick-todo-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-todo-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px;max-height:400px;overflow-y:auto';
+  if(!S._quickTodos)S._quickTodos=[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Quick Todo</h4><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<div style="display:flex;gap:4px;margin-bottom:10px"><input id="qt-input" placeholder="Add quick todo..." style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px" onkeydown="if(event.key===\'Enter\'){const v=this.value.trim();if(!v)return;S._quickTodos.push({id:Date.now(),text:v,done:false});this.value=\'\';save();showQuickTodo();}"><button onclick="(function(){const i=document.getElementById(\'qt-input\');const v=i.value.trim();if(!v)return;S._quickTodos.push({id:Date.now(),text:v,done:false});i.value=\'\';save();showQuickTodo();})()" style="background:var(--accent);color:#000;border:none;padding:6px 10px;border-radius:4px;cursor:pointer;font-size:10px">+</button></div>';
+  S._quickTodos.forEach(t=>{
+    h+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">';
+    h+='<button onclick="(function(){const t=S._quickTodos.find(x=>x.id==='+t.id+');if(t)t.done=!t.done;save();showQuickTodo();})()" style="width:16px;height:16px;border-radius:3px;border:1px solid '+(t.done?'var(--accent)':'var(--border)')+';background:'+(t.done?'var(--accent)':'transparent')+';cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-size:8px">'+(t.done?'V':'')+'</button>';
+    h+='<span style="font-size:11px;flex:1;'+(t.done?'text-decoration:line-through;color:var(--text-muted)':'')+'">'+esc(t.text)+'</span>';
+    h+='<button onclick="(function(){S._quickTodos=S._quickTodos.filter(x=>x.id!=='+t.id+');save();showQuickTodo();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px">X</button></div>';
+  });
+  if(S._quickTodos.length>0){
+    const done=S._quickTodos.filter(t=>t.done).length;
+    h+='<div style="font-size:9px;color:var(--text-muted);text-align:right;margin-top:8px">'+done+'/'+S._quickTodos.length+' done';
+    if(done>0)h+=' | <span onclick="S._quickTodos=S._quickTodos.filter(t=>!t.done);save();showQuickTodo();" style="cursor:pointer;color:var(--accent)">Clear done</span>';
+    h+='</div>';
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const i=document.getElementById('qt-input');if(i)i.focus();},100);
+}
+function showContentCompare(){
+  let panel=document.getElementById('content-compare-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-compare-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:85vh;overflow-y:auto';
+  const content=S.content||[];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Compare</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">';
+  h+='<div><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Item A</label><select id="cc-a" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px" onchange="(function(){const a=S.content.find(c=>c.id===document.getElementById(\'cc-a\').value);const b=S.content.find(c=>c.id===document.getElementById(\'cc-b\').value);if(!a||!b)return;const r=document.getElementById(\'cc-result\');const aw=(a.body||\'\').split(/\\s+/).filter(w=>w).length;const bw=(b.body||\'\').split(/\\s+/).filter(w=>w).length;r.innerHTML=\'<div style=display:grid;grid-template-columns:1fr\\x201fr;gap:12px><div style=padding:10px;background:var(--bg-surface);border-radius:6px><h4 style=margin:0\\x200\\x208px;font-size:12px;color:var(--accent)>\'+a.title+\'</h4><div style=font-size:10px;color:var(--text-muted);margin-bottom:6px>\'+aw+\' words | \'+(a.theme||\'none\')+\'</div><div style=font-size:11px;line-height:1.5;max-height:200px;overflow-y:auto>\'+(a.body||\'\').substring(0,500)+\'</div></div><div style=padding:10px;background:var(--bg-surface);border-radius:6px><h4 style=margin:0\\x200\\x208px;font-size:12px;color:var(--accent)>\'+b.title+\'</h4><div style=font-size:10px;color:var(--text-muted);margin-bottom:6px>\'+bw+\' words | \'+(b.theme||\'none\')+\'</div><div style=font-size:11px;line-height:1.5;max-height:200px;overflow-y:auto>\'+(b.body||\'\').substring(0,500)+\'</div></div></div>\';})()"><option value="">Select...</option>';
+  content.forEach(c=>{h+='<option value="'+c.id+'">'+esc(c.title)+'</option>';});
+  h+='</select></div>';
+  h+='<div><label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:4px">Item B</label><select id="cc-b" style="width:100%;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px" onchange="document.getElementById(\'cc-a\').onchange()"><option value="">Select...</option>';
+  content.forEach(c=>{h+='<option value="'+c.id+'">'+esc(c.title)+'</option>';});
+  h+='</select></div></div>';
+  h+='<div id="cc-result"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWorkspaceScorecard(){
+  let panel=document.getElementById('workspace-scorecard-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='workspace-scorecard-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];const docs=S.writerDocs||[];
+  let score=0;const criteria=[];
+  // Completion rate
+  const total=tasks.length;const done=tasks.filter(t=>t.status==='done').length;
+  const compRate=total>0?Math.round(done/total*100):0;
+  const compPts=compRate>=70?20:compRate>=40?10:0;
+  score+=compPts;criteria.push({name:'Task Completion Rate',value:compRate+'%',points:compPts,max:20});
+  // No overdue
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<new Date()).length;
+  const overPts=overdue===0?15:overdue<=3?10:overdue<=5?5:0;
+  score+=overPts;criteria.push({name:'Overdue Management',value:overdue+' overdue',points:overPts,max:15});
+  // Content volume
+  const totalWords=content.reduce((s,c)=>s+(c.body||'').split(/\s+/).filter(w=>w).length,0);
+  const wordPts=totalWords>5000?15:totalWords>1000?10:totalWords>100?5:0;
+  score+=wordPts;criteria.push({name:'Content Volume',value:totalWords+' words',points:wordPts,max:15});
+  // Link organization
+  const uncat=links.filter(l=>!l.category||l.category==='uncategorized').length;
+  const catPts=links.length===0?10:uncat/links.length<0.2?15:uncat/links.length<0.5?10:5;
+  score+=catPts;criteria.push({name:'Link Organization',value:uncat+' uncategorized',points:catPts,max:15});
+  // Doc activity
+  const docPts=docs.length>=5?15:docs.length>=2?10:docs.length>=1?5:0;
+  score+=docPts;criteria.push({name:'Writer Activity',value:docs.length+' docs',points:docPts,max:15});
+  // Project coverage
+  const projects=S.projects||[];
+  const projPts=projects.length>=3?10:projects.length>=1?5:0;
+  score+=projPts;criteria.push({name:'Project Coverage',value:projects.length+' projects',points:projPts,max:10});
+  // Tags usage
+  const taggedItems=tasks.filter(t=>t.tags&&t.tags.length>0).length+content.filter(c=>c.tags&&c.tags.length>0).length;
+  const tagPts=taggedItems>10?10:taggedItems>3?5:0;
+  score+=tagPts;criteria.push({name:'Tag Usage',value:taggedItems+' tagged',points:tagPts,max:10});
+  const maxScore=criteria.reduce((s,c)=>s+c.max,0);
+  const pct=Math.round(score/maxScore*100);
+  const grade=pct>=90?'A+':pct>=80?'A':pct>=70?'B':pct>=60?'C':pct>=50?'D':'F';
+  const gradeColor=pct>=80?'#4ade80':pct>=60?'#f97316':'#ef4444';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Workspace Scorecard</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="text-align:center;padding:16px;margin-bottom:16px"><div style="font-size:48px;font-weight:bold;color:'+gradeColor+'">'+grade+'</div><div style="font-size:14px;color:var(--text-muted)">'+score+' / '+maxScore+' points ('+pct+'%)</div></div>';
+  criteria.forEach(c=>{
+    const barPct=c.max>0?Math.round(c.points/c.max*100):0;
+    const col=barPct>=80?'#4ade80':barPct>=50?'#f97316':'#ef4444';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+    h+='<span style="font-size:11px;width:140px;flex-shrink:0">'+c.name+'</span>';
+    h+='<div style="flex:1;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+col+';width:'+barPct+'%"></div></div>';
+    h+='<span style="font-size:10px;color:var(--text-muted);width:60px;text-align:right">'+c.points+'/'+c.max+'</span></div>';
   });
   panel.innerHTML=h;document.body.appendChild(panel);
 }
