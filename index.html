@@ -5776,6 +5776,8 @@ function cmdGetItems(q) {
       ['gantt','Task Gantt chart (horizontal timeline)'],
       ['related','Find related/similar content'],
       ['reading','Link reading list (read-later queue)'],
+      ['habits','Daily habit tracker with streak grid'],
+      ['table','Task table/spreadsheet view'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6954,6 +6956,15 @@ function cmdGetItems(q) {
     const readLater=S.links.filter(l=>l.readLater);
     items.unshift({title:'Reading List ('+readLater.length+' links)',desc:'Show all links marked for reading later',icon:'L',type:'action',action:()=>{closeCommandPalette();showReadingList();}});
   }
+  // Habits prefix
+  if(ql && (ql==='habits' || ql==='habit' || ql==='habit tracker' || ql==='daily habits')){
+    items.unshift({title:'Habit Tracker',desc:'Daily habit check-off grid with streaks',icon:'H',type:'action',action:()=>{closeCommandPalette();showHabitTracker();}});
+    items.unshift({title:'Add New Habit',desc:'Create a new daily habit to track',icon:'H',type:'action',action:()=>{closeCommandPalette();addHabit();}});
+  }
+  // Table view prefix
+  if(ql && (ql==='table' || ql==='task table' || ql==='spreadsheet' || ql==='grid view')){
+    items.unshift({title:'Task Table View',desc:'Compact spreadsheet-like view of all tasks',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTable();}});
+  }
   return items.slice(0, 20);
 }
 function importBookmarks(){
@@ -7236,6 +7247,49 @@ function showReadingList(){
   document.body.appendChild(panel);
 }
 function markLinkRead(id){const l=S.links.find(x=>x.id===id);if(l){l.readLater=false;save();toast('Marked as read');}}
+function showHabitTracker(){
+  if(!S._habits)S._habits=[];
+  let panel=document.getElementById('habit-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='habit-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:75vh;overflow-y:auto';
+  const today=new Date();const days=[];
+  for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);days.push(d.toISOString().split('T')[0]);}
+  const dayLabels=days.map(d=>{const dt=new Date(d+'T12:00:00');return dt.toLocaleDateString('en-US',{weekday:'short'}).substring(0,2);});
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Habit Tracker</span><div style="display:flex;gap:6px"><button onclick="addHabit()" class="btn btn-sm btn-ghost" style="font-size:9px">+ Habit</button><button onclick="document.getElementById('habit-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`;
+  // Header row
+  h+=`<div style="display:grid;grid-template-columns:1fr repeat(7,32px) 40px;gap:2px;align-items:center;margin-bottom:4px"><div style="font-size:9px;color:var(--text-muted)">Habit</div>${dayLabels.map(d=>`<div style="font-size:8px;color:var(--text-muted);text-align:center">${d}</div>`).join('')}<div style="font-size:8px;color:var(--text-muted);text-align:center">Streak</div></div>`;
+  S._habits.forEach((habit,hi)=>{
+    if(!habit.checks)habit.checks={};
+    let streak=0;const checkDate=new Date(today);
+    for(let i=0;i<365;i++){const ds=checkDate.toISOString().split('T')[0];if(habit.checks[ds])streak++;else if(i>0)break;checkDate.setDate(checkDate.getDate()-1);}
+    h+=`<div style="display:grid;grid-template-columns:1fr repeat(7,32px) 40px;gap:2px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border)"><div style="font-size:10px;color:var(--text-primary);display:flex;align-items:center;gap:4px"><span>${esc(habit.name)}</span><span onclick="removeHabit(${hi})" style="cursor:pointer;font-size:8px;color:var(--red);opacity:0.4" title="Remove">x</span></div>${days.map(d=>{const checked=habit.checks[d];return`<div onclick="toggleHabitDay(${hi},'${d}')" style="width:28px;height:28px;border-radius:4px;background:${checked?'var(--accent)':'var(--bg-surface)'};border:1px solid ${checked?'var(--accent)':'var(--border)'};cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s">${checked?'<span style="color:#fff;font-size:10px;font-weight:700">v</span>':''}</div>`;}).join('')}<div style="text-align:center;font-size:11px;font-weight:600;color:${streak>=7?'var(--accent)':streak>=3?'var(--accent-cyan)':'var(--text-muted)'}">${streak}d</div></div>`;
+  });
+  if(!S._habits.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:11px">No habits yet. Click "+ Habit" to add one.</div>';
+  panel.innerHTML=h;
+  document.body.appendChild(panel);
+}
+function addHabit(){if(!S._habits)S._habits=[];const name=prompt('Habit name:');if(!name||!name.trim())return;S._habits.push({name:name.trim(),checks:{}});save();showHabitTracker();}
+function removeHabit(idx){if(!confirm('Remove this habit?'))return;S._habits.splice(idx,1);save();showHabitTracker();}
+function toggleHabitDay(idx,day){if(!S._habits||!S._habits[idx])return;if(!S._habits[idx].checks)S._habits[idx].checks={};if(S._habits[idx].checks[day])delete S._habits[idx].checks[day];else S._habits[idx].checks[day]=true;save();showHabitTracker();}
+function showTaskTable(){
+  let panel=document.getElementById('task-table-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-table-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:80vh;overflow:auto';
+  const tasks=S.tasks.filter(t=>t.status!=='done').sort((a,b)=>{const pMap={p0:0,p1:1,p2:2,p3:3};return(pMap[a.priority]||2)-(pMap[b.priority]||2);});
+  const pClr={p0:'var(--red)',p1:'var(--orange)',p2:'var(--accent-cyan)',p3:'var(--text-muted)'};
+  const sClr={todo:'#3b82f6',progress:'#f59e0b',blocked:'#ef4444'};
+  const today=new Date().toISOString().split('T')[0];
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-size:13px;font-weight:600;color:var(--text-primary)">Task Table (${tasks.length} active)</span><button onclick="document.getElementById('task-table-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<table style="width:100%;border-collapse:collapse;font-size:10px"><thead><tr style="border-bottom:2px solid var(--border)"><th style="text-align:left;padding:4px 6px;color:var(--text-muted);font-weight:600">Title</th><th style="padding:4px;color:var(--text-muted);font-weight:600;width:50px">Pri</th><th style="padding:4px;color:var(--text-muted);font-weight:600;width:60px">Status</th><th style="text-align:left;padding:4px;color:var(--text-muted);font-weight:600;width:80px">Project</th><th style="padding:4px;color:var(--text-muted);font-weight:600;width:70px">Due</th><th style="padding:4px;color:var(--text-muted);font-weight:600;width:50px">Est</th><th style="padding:4px;color:var(--text-muted);font-weight:600;width:50px">Time</th></tr></thead><tbody>`;
+  tasks.forEach(t=>{
+    const isOverdue=t.due&&t.due<today;
+    h+=`<tr onclick="document.getElementById('task-table-panel').remove();openTaskDetail(${t.id})" style="border-bottom:1px solid var(--border);cursor:pointer" onmouseenter="this.style.background='var(--bg-hover)'" onmouseleave="this.style.background='transparent'"><td style="padding:4px 6px;color:var(--text-primary);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.title||'Untitled')}</td><td style="padding:4px;text-align:center;color:${pClr[t.priority]||pClr.p2};font-weight:600">${(t.priority||'p2').toUpperCase()}</td><td style="padding:4px;text-align:center;color:${sClr[t.status]||'#888'}">${t.status}</td><td style="padding:4px;font-size:9px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.project||'')}</td><td style="padding:4px;text-align:center;font-family:var(--mono);font-size:9px;color:${isOverdue?'var(--red)':t.due===today?'var(--accent)':'var(--text-muted)'}">${t.due?t.due.substring(5):''}</td><td style="padding:4px;text-align:center;font-size:9px;color:var(--accent-cyan)">${t.estimate||''}</td><td style="padding:4px;text-align:center;font-size:9px;color:var(--text-muted)">${t.timeSpent?formatTimeSpent(t.timeSpent):''}</td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  if(!tasks.length)h+='<div style="padding:20px;text-align:center;color:var(--text-muted)">No active tasks</div>';
+  panel.innerHTML=h;
+  document.body.appendChild(panel);
+}
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
   panel=document.createElement('div');panel.id='roadmap-panel';
