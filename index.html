@@ -5854,6 +5854,12 @@ function cmdGetItems(q) {
       ['backup','Download or restore workspace backup'],
       ['burnup','Cumulative task burnup chart (12 weeks)'],
       ['content metrics','Readability, vocabulary, sentence analysis'],
+      ['markdown','Preview content as rendered markdown'],
+      ['completion heatmap','GitHub-style heatmap of task completions'],
+      ['saved searches','Save and recall frequent Cmd+K queries'],
+      ['stale','Find content items older than 30 days'],
+      ['timer:','Start countdown timer (e.g. timer: 10 for 10 min)'],
+      ['project health','Health scores for all projects'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7365,6 +7371,33 @@ function cmdGetItems(q) {
   // Content metrics prefix
   if(ql && (ql==='content metrics' || ql==='readability' || ql==='flesch' || ql==='vocabulary')){
     items.unshift({title:'Content Metrics',desc:'Readability score, vocab richness, sentence analysis',icon:'M',type:'action',action:()=>{closeCommandPalette();showContentMetrics();}});
+  }
+  // Markdown preview prefix
+  if(ql && (ql==='markdown' || ql==='markdown preview' || ql==='md preview' || ql==='preview')){
+    items.unshift({title:'Markdown Preview',desc:'Preview latest content as rendered markdown',icon:'M',type:'action',action:()=>{closeCommandPalette();showMarkdownPreview();}});
+  }
+  // Task completion heatmap prefix
+  if(ql && (ql==='completion heatmap' || ql==='task heatmap' || ql==='done heatmap' || ql==='completion heat')){
+    items.unshift({title:'Task Completion Heatmap',desc:'6-month heatmap of task completions',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskCompletionHeatmap();}});
+  }
+  // Saved searches prefix
+  if(ql && (ql==='saved searches' || ql==='saved search' || ql==='search history' || ql==='my searches')){
+    items.unshift({title:'Saved Searches',desc:'Save and recall frequent Cmd+K queries',icon:'S',type:'action',action:()=>{closeCommandPalette();showSavedSearches();}});
+  }
+  // Stale content prefix
+  if(ql && (ql==='stale' || ql==='stale content' || ql==='old content' || ql==='outdated')){
+    items.unshift({title:'Stale Content Finder',desc:'Content items older than 30 days',icon:'S',type:'action',action:()=>{closeCommandPalette();showStaleContent();}});
+  }
+  // Quick timer prefix
+  if(ql && ql.startsWith('timer:')){
+    const mins=parseInt(ql.substring(6).trim());
+    if(mins>0&&mins<=120){
+      items.unshift({title:'Start '+mins+' min Timer',desc:'Countdown timer in bottom-right corner',icon:'T',type:'action',action:()=>{closeCommandPalette();startQuickTimer(mins);}});
+    }
+  }
+  // Project health prefix
+  if(ql && (ql==='project health' || ql==='health dashboard' || ql==='project scores' || ql==='health')){
+    items.unshift({title:'Project Health Dashboard',desc:'Health scores based on tasks, content, docs, overdue',icon:'H',type:'action',action:()=>{closeCommandPalette();showProjectHealthDashboard();}});
   }
   return items.slice(0, 20);
 }
@@ -9961,6 +9994,185 @@ function showContentMetrics(){
   h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#f59e0b">${vocabRichness}%</div><div style="font-size:9px;color:var(--text-muted)">Vocab Richness</div></div>`;
   h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#ec4899">${sentences.length}</div><div style="font-size:9px;color:var(--text-muted)">Sentences</div></div>`;
   h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:18px;font-weight:700;color:#06b6d4">${content.length+docs.length}</div><div style="font-size:9px;color:var(--text-muted)">Total Items</div></div>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showMarkdownPreview(text){
+  if(!text){
+    const content=S.content||[];
+    if(!content.length){showToast('No content to preview');return;}
+    text=content[0].body||'';
+  }
+  let html=esc(text);
+  html=html.replace(/^### (.+)$/gm,'<h3 style="color:var(--text-primary);margin:12px 0 6px">$1</h3>');
+  html=html.replace(/^## (.+)$/gm,'<h2 style="color:var(--text-primary);margin:16px 0 8px;font-size:16px">$1</h2>');
+  html=html.replace(/^# (.+)$/gm,'<h1 style="color:var(--text-primary);margin:20px 0 10px;font-size:20px">$1</h1>');
+  html=html.replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--text-primary)">$1</strong>');
+  html=html.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  html=html.replace(/`(.+?)`/g,'<code style="background:var(--bg-base);padding:1px 4px;border-radius:3px;font-size:11px">$1</code>');
+  html=html.replace(/^- (.+)$/gm,'<li style="margin:2px 0;margin-left:16px">$1</li>');
+  html=html.replace(/^\d+\. (.+)$/gm,'<li style="margin:2px 0;margin-left:16px;list-style-type:decimal">$1</li>');
+  html=html.replace(/^&gt; (.+)$/gm,'<blockquote style="border-left:3px solid var(--accent);padding-left:12px;margin:8px 0;color:var(--text-muted);font-style:italic">$1</blockquote>');
+  html=html.replace(/^---$/gm,'<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">');
+  html=html.replace(/\n/g,'<br>');
+  const panel=document.createElement('div');panel.id='md-preview-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h2=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Markdown Preview</span><button onclick="document.getElementById('md-preview-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h2+=`<div style="background:var(--bg-surface);padding:16px;border-radius:8px;font-size:12px;color:var(--text-secondary);line-height:1.8">${html}</div>`;
+  panel.innerHTML=h2;document.body.appendChild(panel);
+}
+function showTaskCompletionHeatmap(){
+  const tasks=S.tasks||[];
+  const now=new Date();
+  const dayMap={};
+  tasks.forEach(t=>{
+    if(t.status==='done'&&t.created){
+      const day=t.created.split('T')[0];dayMap[day]=(dayMap[day]||0)+1;
+    }
+  });
+  const panel=document.createElement('div');panel.id='task-completion-heatmap';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:95vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Task Completion Heatmap (6 months)</span><button onclick="document.getElementById('task-completion-heatmap').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  const weeks=26;
+  h+=`<div style="display:flex;gap:2px;flex-wrap:nowrap;overflow-x:auto;padding:4px">`;
+  for(let w=weeks-1;w>=0;w--){
+    h+=`<div style="display:flex;flex-direction:column;gap:2px">`;
+    for(let d=0;d<7;d++){
+      const date=new Date(now);date.setDate(date.getDate()-(w*7+6-d));
+      const dateStr=date.toISOString().split('T')[0];
+      const count=dayMap[dateStr]||0;
+      const color=count===0?'rgba(255,255,255,0.05)':count===1?'#1a4731':count===2?'#166534':count>=3?'#4ade80':'#86efac';
+      h+=`<div title="${dateStr}: ${count} completed" style="width:10px;height:10px;border-radius:2px;background:${color}"></div>`;
+    }
+    h+=`</div>`;
+  }
+  h+=`</div>`;
+  const totalDone=Object.values(dayMap).reduce((a,b)=>a+b,0);
+  const activeDays=Object.keys(dayMap).length;
+  h+=`<div style="display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:10px;color:var(--text-muted)">`;
+  h+=`<span>Total completed: <span style="color:var(--accent)">${totalDone}</span></span>`;
+  h+=`<span>Active days: <span style="color:var(--accent)">${activeDays}</span></span>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showSavedSearches(){
+  if(!S._savedSearches)S._savedSearches=[];
+  const searches=S._savedSearches;
+  const panel=document.createElement('div');panel.id='saved-searches-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Saved Searches (${searches.length})</span><div><button onclick="addSavedSearch()" style="font-size:10px;padding:4px 10px;background:var(--accent);border:none;border-radius:4px;color:#000;cursor:pointer;font-weight:600;margin-right:8px">+ Save</button><button onclick="document.getElementById('saved-searches-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div></div>`;
+  if(!searches.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No saved searches. Click "+ Save" to add a search query.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    searches.forEach((s,i)=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'" onclick="document.getElementById('saved-searches-panel').remove();openCommandPalette();setTimeout(()=>{const inp=document.getElementById('cmd-input');if(inp){inp.value='${esc(s.query)}';inp.dispatchEvent(new Event('input'));}},100)">`;
+      h+=`<div style="flex:1"><div style="font-size:12px;color:var(--text-primary)">${esc(s.query)}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">${s.created?new Date(s.created).toLocaleDateString():''}</div></div>`;
+      h+=`<button onclick="event.stopPropagation();deleteSavedSearch(${i})" style="font-size:14px;background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function addSavedSearch(){
+  const query=prompt('Search query to save:');if(!query||!query.trim())return;
+  if(!S._savedSearches)S._savedSearches=[];
+  S._savedSearches.push({query:query.trim(),created:new Date().toISOString()});
+  save();const p=document.getElementById('saved-searches-panel');if(p)p.remove();showSavedSearches();
+}
+function deleteSavedSearch(idx){
+  S._savedSearches.splice(idx,1);save();
+  const p=document.getElementById('saved-searches-panel');if(p)p.remove();showSavedSearches();
+}
+function showStaleContent(){
+  const content=S.content||[];const now=Date.now();const threshold=30*86400000;
+  const stale=content.filter(c=>{
+    const created=c.created?new Date(c.created).getTime():0;
+    return created>0&&(now-created)>threshold;
+  }).sort((a,b)=>new Date(a.created)-new Date(b.created));
+  const panel=document.createElement('div');panel.id='stale-content-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Stale Content (${stale.length} items, 30+ days old)</span><button onclick="document.getElementById('stale-content-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  if(!stale.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No stale content found. All content is less than 30 days old.</div>`;
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    stale.slice(0,30).forEach(c=>{
+      const age=Math.round((now-new Date(c.created).getTime())/86400000);
+      const preview=(c.body||'').substring(0,60);
+      const ageColor=age>90?'#ef4444':age>60?'#f59e0b':'#f97316';
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;border-left:3px solid ${ageColor}">`;
+      h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(preview||'(empty)')}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">${c.theme||'no theme'} | ${(c.tags||[]).join(', ')||'no tags'}</div></div>`;
+      h+=`<span style="font-size:10px;font-weight:600;color:${ageColor};flex-shrink:0">${age}d</span>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+var _quickTimerInterval=null;
+function startQuickTimer(mins){
+  if(_quickTimerInterval)clearInterval(_quickTimerInterval);
+  const endTime=Date.now()+mins*60000;
+  let existing=document.getElementById('quick-timer-bar');
+  if(!existing){
+    existing=document.createElement('div');existing.id='quick-timer-bar';
+    existing.style.cssText='position:fixed;bottom:60px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;box-shadow:0 4px 16px rgba(0,0,0,0.5);display:flex;align-items:center;gap:10px';
+    document.body.appendChild(existing);
+  }
+  function update(){
+    const remaining=Math.max(0,endTime-Date.now());
+    const m=Math.floor(remaining/60000);const s=Math.floor((remaining%60000)/1000);
+    existing.innerHTML=`<span style="font-size:16px;font-weight:700;color:var(--accent);font-family:monospace">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</span><button onclick="clearInterval(_quickTimerInterval);document.getElementById('quick-timer-bar').remove()" style="font-size:12px;background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button>`;
+    if(remaining<=0){
+      clearInterval(_quickTimerInterval);
+      existing.style.borderColor='#ef4444';
+      existing.innerHTML=`<span style="font-size:14px;font-weight:700;color:#ef4444">Time's up!</span><button onclick="document.getElementById('quick-timer-bar').remove()" style="font-size:12px;background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button>`;
+      try{new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==').play();}catch(e){}
+    }
+  }
+  update();_quickTimerInterval=setInterval(update,1000);
+  showToast('Timer started: '+mins+' minutes');
+}
+function showProjectHealthDashboard(){
+  const projects=S.projects||[];const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];
+  const panel=document.createElement('div');panel.id='project-health-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Project Health Dashboard</span><button onclick="document.getElementById('project-health-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;gap:10px">`;
+  projects.forEach(p=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const pContent=content.filter(c=>(c.tags||[]).some(tag=>tag.toLowerCase()===p.name.toLowerCase()));
+    const pLinks=links.filter(l=>l.project===p.name||l.category===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const overdue=pTasks.filter(t=>t.due&&new Date(t.due)<new Date()&&t.status!=='done').length;
+    const total=pTasks.length||1;
+    const completionRate=Math.round((done/total)*100);
+    const specs=(p.specs||[]).length;
+    let healthScore=50;
+    healthScore+=Math.min(completionRate/2,25);
+    healthScore-=overdue*5;
+    healthScore+=Math.min(pContent.length*2,10);
+    healthScore+=Math.min(specs*3,15);
+    healthScore=Math.max(0,Math.min(100,healthScore));
+    const healthColor=healthScore>=75?'#4ade80':healthScore>=50?'#f59e0b':'#ef4444';
+    const healthLabel=healthScore>=75?'Healthy':healthScore>=50?'At Risk':'Critical';
+    h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;border-left:3px solid ${healthColor}">`;
+    h+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">`;
+    h+=`<span style="font-size:12px;font-weight:600;color:var(--text-primary)">${esc(p.name)}</span>`;
+    h+=`<span style="font-size:11px;font-weight:700;color:${healthColor}">${healthScore}% ${healthLabel}</span></div>`;
+    h+=`<div style="height:6px;background:var(--bg-base);border-radius:3px;margin-bottom:8px"><div style="height:100%;width:${healthScore}%;background:${healthColor};border-radius:3px;transition:width 0.3s"></div></div>`;
+    h+=`<div style="display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--text-muted)">`;
+    h+=`<span>Tasks: ${done}/${pTasks.length}</span>`;
+    if(overdue)h+=`<span style="color:#ef4444">Overdue: ${overdue}</span>`;
+    h+=`<span>Content: ${pContent.length}</span>`;
+    h+=`<span>Docs: ${specs}</span>`;
+    h+=`<span>Links: ${pLinks.length}</span>`;
+    h+=`</div></div>`;
+  });
   h+=`</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
 }
