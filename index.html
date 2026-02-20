@@ -192,6 +192,7 @@ textarea{resize:vertical;line-height:1.6}
 .task-row.priority-p1{border-left-color:#f59e0b}
 .task-row.priority-p2{border-left-color:#3b82f6}
 .task-row.priority-p3{border-left-color:var(--border)}
+.task-row:nth-child(even of .task-row){background:rgba(255,255,255,0.008)}
 .task-row:hover{background:var(--bg-hover)}
 .task-row.overdue{background:rgba(239,68,68,0.04)}
 .task-row.blocked-row{background:rgba(251,191,36,0.04);border-left-color:#fbbf24}
@@ -1052,6 +1053,7 @@ textarea{resize:vertical;line-height:1.6}
             <button class="voice-btn" id="specs-voice-btn" onclick="toggleVoice('specs')" title="Voice Input">M</button>
             <button class="btn btn-sm" onclick="addSpecSection()">+ Section</button>
             <input type="text" id="spec-search" placeholder="Search sections..." oninput="specSearch()" style="width:120px;font-size:10px;padding:4px 8px">
+            <select id="spec-project-assign" onchange="assignSpecProject(this.value)" style="font-size:9px;padding:3px 6px;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);border-radius:4px"></select>
             <button class="btn btn-sm" onclick="collapseAllSections()" title="Collapse all">Collapse</button>
             <button class="btn btn-sm" onclick="expandAllSections()" title="Expand all">Expand</button>
           </div>
@@ -3237,7 +3239,8 @@ function zenExport(fmt) {
 function getActiveSpec(){return S.specs.find(s=>String(s.id)===String(S.activeSpec));}
 function renderSpecs(){renderSpecList();loadSpec();document.getElementById('specs-count').textContent=S.specs.length;}
 function renderSpecList(){const sq=(document.getElementById('spec-list-search')?.value||'').toLowerCase();const ssort=(document.getElementById('spec-list-sort')?.value)||'updated';let specList=[...S.specs];if(sq)specList=specList.filter(s=>(s.title||'').toLowerCase().includes(sq));if(ssort==='alpha')specList.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(ssort==='words')specList.sort((a,b)=>(b.sections||[]).reduce((x,sec)=>x+countW(sec.body),0)-(a.sections||[]).reduce((x,sec)=>x+countW(sec.body),0));else specList.sort((a,b)=>(new Date(b.updated||0))-(new Date(a.updated||0)));document.getElementById('specs-doc-list').innerHTML=specList.map(s=>{const sc=s.sections?s.sections.length:0;const wc=(s.sections||[]).reduce((a,sec)=>a+countW(sec.body),0);const dt=s.updated?new Date(s.updated).toLocaleDateString('en-US',{month:'short',day:'numeric'}):'';const ic=s.icon||'file';const c=s.color||'#8b8b8b';const path=specSectionIcon(ic);const proj=s.projectId?(S.projects||[]).find(p=>p.id===s.projectId):null;return`<div class="specs-doc-item ${String(s.id)===String(S.activeSpec)?'active':''}" onclick="switchSpec('${s.id}')"><div style="display:flex;align-items:center;gap:6px"><span style="color:${c};display:flex;flex-shrink:0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${path}"/></svg></span><div class="specs-doc-title">${esc(s.title||'Untitled Spec')}</div></div><div class="specs-doc-meta"><span>${sc} sec / ${wc}w</span>${proj?`<span style="color:${proj.color||c}">${esc(proj.name)}</span>`:'<span>unassigned</span>'}<span>${dt}</span><span style="margin-left:auto;cursor:pointer;opacity:0.4;font-size:8px" onclick="event.stopPropagation();dupSpec('${s.id}')" title="Duplicate">D</span>${S.specs.length>1?`<span style="cursor:pointer;opacity:0.4" onclick="event.stopPropagation();delSpec('${s.id}')">x</span>`:''}</div></div>`;}).join('');}
-function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';renderSpecSections();updateSpecStatus();}
+function loadSpec(){const s=getActiveSpec();if(!s)return;document.getElementById('specs-title').value=s.title||'';const spa=document.getElementById('spec-project-assign');if(spa){spa.innerHTML='<option value="">No Project</option>'+(S.projects||[]).map(p=>`<option value="${p.id}" ${s.projectId===p.id?'selected':''}>${esc(p.name)}</option>`).join('');}renderSpecSections();updateSpecStatus();}
+function assignSpecProject(pid){const s=getActiveSpec();if(!s)return;s.projectId=pid||undefined;save();renderSpecList();toast(pid?'Assigned to project':'Removed project');}
 function switchSpec(id){if(String(S.activeSpec)===String(id))return;snapshotSpec();save();S.activeSpec=id;renderSpecs();const s=S.specs.find(x=>String(x.id)===String(id));if(s)trackRecent('spec',id,s.title);save();updateBreadcrumb();}
 function newSpec(){snapshotSpec();const s={id:Date.now(),title:'',sections:[{id:Date.now()+1,title:'Overview',body:'',collapsed:false}],created:new Date().toISOString(),updated:new Date().toISOString()};S.specs.unshift(s);S.activeSpec=s.id;save();renderSpecs();document.getElementById('specs-title').focus();}
 function delSpec(id){if(S.specs.length<=1){toast('Cannot delete last spec');return;}S.specs=S.specs.filter(s=>String(s.id)!==String(id));if(String(S.activeSpec)===String(id))S.activeSpec=S.specs[0].id;save();renderSpecs();toast('Deleted');}
