@@ -5860,6 +5860,12 @@ function cmdGetItems(q) {
       ['stale','Find content items older than 30 days'],
       ['timer:','Start countdown timer (e.g. timer: 10 for 10 min)'],
       ['project health','Health scores for all projects'],
+      ['matrix','4-quadrant task priority matrix'],
+      ['bookmarks','Quick-access content bookmarks'],
+      ['system status','ASTRA system stats, storage, session info'],
+      ['auto tag','Suggest tags for untagged content'],
+      ['sprint','Sprint view: tasks grouped by week'],
+      ['color legend','What all colors mean across ASTRA'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7398,6 +7404,30 @@ function cmdGetItems(q) {
   // Project health prefix
   if(ql && (ql==='project health' || ql==='health dashboard' || ql==='project scores' || ql==='health')){
     items.unshift({title:'Project Health Dashboard',desc:'Health scores based on tasks, content, docs, overdue',icon:'H',type:'action',action:()=>{closeCommandPalette();showProjectHealthDashboard();}});
+  }
+  // Task matrix prefix
+  if(ql && (ql==='matrix' || ql==='task matrix' || ql==='priority matrix' || ql==='quadrant')){
+    items.unshift({title:'Task Priority Matrix',desc:'4-quadrant urgent/important matrix',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskMatrix();}});
+  }
+  // Content bookmarks prefix
+  if(ql && (ql==='bookmarks' || ql==='content bookmarks' || ql==='my bookmarks' || ql==='saved content')){
+    items.unshift({title:'Content Bookmarks',desc:'Quick-access bookmarked content items',icon:'B',type:'action',action:()=>{closeCommandPalette();showContentBookmarks();}});
+  }
+  // System status prefix
+  if(ql && (ql==='system status' || ql==='system' || ql==='astra status' || ql==='status')){
+    items.unshift({title:'ASTRA System Status',desc:'Tasks, content, storage, session time, theme',icon:'S',type:'action',action:()=>{closeCommandPalette();showSystemStatus();}});
+  }
+  // Auto tag prefix
+  if(ql && (ql==='auto tag' || ql==='tag suggestions' || ql==='suggest tags' || ql==='auto tags')){
+    items.unshift({title:'Auto-Tag Suggestions',desc:'Suggest tags for untagged content items',icon:'T',type:'action',action:()=>{closeCommandPalette();showAutoTagSuggestions();}});
+  }
+  // Sprint view prefix
+  if(ql && (ql==='sprint' || ql==='sprint view' || ql==='sprints' || ql==='weekly sprint')){
+    items.unshift({title:'Sprint View',desc:'Tasks grouped into weekly sprints',icon:'S',type:'action',action:()=>{closeCommandPalette();showSprintView();}});
+  }
+  // Color legend prefix
+  if(ql && (ql==='color legend' || ql==='colors' || ql==='legend' || ql==='color guide')){
+    items.unshift({title:'Color Legend',desc:'What all colors mean across ASTRA',icon:'C',type:'action',action:()=>{closeCommandPalette();showColorLegend();}});
   }
   return items.slice(0, 20);
 }
@@ -10172,6 +10202,265 @@ function showProjectHealthDashboard(){
     h+=`<span>Docs: ${specs}</span>`;
     h+=`<span>Links: ${pLinks.length}</span>`;
     h+=`</div></div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskMatrix(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();const threeDays=3*86400000;
+  const quadrants={
+    doFirst:[],schedule:[],delegate:[],eliminate:[]
+  };
+  tasks.forEach(t=>{
+    const urgent=t.due&&(new Date(t.due).getTime()-now.getTime())<threeDays;
+    const important=t.priority==='p0'||t.priority==='p1';
+    if(urgent&&important)quadrants.doFirst.push(t);
+    else if(!urgent&&important)quadrants.schedule.push(t);
+    else if(urgent&&!important)quadrants.delegate.push(t);
+    else quadrants.eliminate.push(t);
+  });
+  const panel=document.createElement('div');panel.id='task-matrix-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Task Priority Matrix</span><button onclick="document.getElementById('task-matrix-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  const quads=[
+    {key:'doFirst',name:'Do First',color:'#ef4444',desc:'Urgent + Important'},
+    {key:'schedule',name:'Schedule',color:'#3b82f6',desc:'Important, Not Urgent'},
+    {key:'delegate',name:'Delegate',color:'#f59e0b',desc:'Urgent, Not Important'},
+    {key:'eliminate',name:'Eliminate',color:'#6b7280',desc:'Not Urgent, Not Important'},
+  ];
+  h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">`;
+  quads.forEach(q=>{
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;border-top:3px solid ${q.color};min-height:100px">`;
+    h+=`<div style="font-size:11px;font-weight:700;color:${q.color};margin-bottom:2px">${q.name} (${quadrants[q.key].length})</div>`;
+    h+=`<div style="font-size:8px;color:var(--text-muted);margin-bottom:8px">${q.desc}</div>`;
+    quadrants[q.key].slice(0,5).forEach(t=>{
+      h+=`<div style="font-size:10px;color:var(--text-secondary);padding:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title)}</div>`;
+    });
+    if(quadrants[q.key].length>5)h+=`<div style="font-size:9px;color:var(--text-muted)">+${quadrants[q.key].length-5} more</div>`;
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentBookmarks(){
+  if(!S._contentBookmarks)S._contentBookmarks=[];
+  const bookmarks=S._contentBookmarks;
+  const content=S.content||[];
+  const panel=document.createElement('div');panel.id='content-bookmarks-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Content Bookmarks (${bookmarks.length})</span><button onclick="document.getElementById('content-bookmarks-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  if(!bookmarks.length){
+    h+=`<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:12px">No bookmarks yet. Star or pin content items to bookmark them.</div>`;
+    const recent=content.slice(0,10);
+    if(recent.length){
+      h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin:12px 0 8px">Quick Bookmark:</div>`;
+      h+=`<div style="display:grid;gap:4px">`;
+      recent.forEach(c=>{
+        const preview=(c.body||'').substring(0,50);
+        h+=`<div style="display:flex;align-items:center;gap:8px;padding:6px;background:var(--bg-surface);border-radius:4px">`;
+        h+=`<div style="flex:1;font-size:10px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(preview)}</div>`;
+        h+=`<button onclick="addContentBookmark('${c.id}')" style="font-size:9px;padding:2px 8px;background:var(--bg-base);border:1px solid var(--border);border-radius:4px;color:var(--accent);cursor:pointer">Bookmark</button>`;
+        h+=`</div>`;
+      });
+      h+=`</div>`;
+    }
+  } else {
+    h+=`<div style="display:grid;gap:6px">`;
+    bookmarks.forEach((bId,i)=>{
+      const item=content.find(c=>c.id===bId);
+      if(!item)return;
+      const preview=(item.body||'').substring(0,60);
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;cursor:pointer;border:1px solid transparent;transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'">`;
+      h+=`<div style="flex:1;min-width:0"><div style="font-size:11px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(preview||'(empty)')}</div>`;
+      h+=`<div style="font-size:9px;color:var(--text-muted)">${item.theme||''} | ${(item.tags||[]).slice(0,3).join(', ')}</div></div>`;
+      h+=`<button onclick="removeContentBookmark(${i})" style="font-size:14px;background:none;border:none;color:var(--text-muted);cursor:pointer">&times;</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function addContentBookmark(id){
+  if(!S._contentBookmarks)S._contentBookmarks=[];
+  if(!S._contentBookmarks.includes(id)){S._contentBookmarks.push(id);save();}
+  const p=document.getElementById('content-bookmarks-panel');if(p)p.remove();showContentBookmarks();
+}
+function removeContentBookmark(idx){
+  S._contentBookmarks.splice(idx,1);save();
+  const p=document.getElementById('content-bookmarks-panel');if(p)p.remove();showContentBookmarks();
+}
+function showSystemStatus(){
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];const docs=S.writerDocs||[];const projects=S.projects||[];
+  const storageSize=new Blob([JSON.stringify(S)]).size;
+  const sizeKB=Math.round(storageSize/1024);
+  const sizeMB=(storageSize/1048576).toFixed(2);
+  const sections=['tasks','calendar','writer','livingDocs','content','links','whiteboard','repos','pipeline'];
+  const panel=document.createElement('div');panel.id='system-status-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const elapsed=Date.now()-(_sessionStart||Date.now());const sessionMins=Math.floor(elapsed/60000);
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">ASTRA System Status</span><button onclick="document.getElementById('system-status-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent)">${tasks.length}</div><div style="font-size:9px;color:var(--text-muted)">Tasks</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#3b82f6">${content.length}</div><div style="font-size:9px;color:var(--text-muted)">Content Items</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#f59e0b">${links.length}</div><div style="font-size:9px;color:var(--text-muted)">Links</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#8b5cf6">${docs.length}</div><div style="font-size:9px;color:var(--text-muted)">Writer Docs</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#ec4899">${projects.length}</div><div style="font-size:9px;color:var(--text-muted)">Projects</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#06b6d4">${sessionMins}m</div><div style="font-size:9px;color:var(--text-muted)">Session Time</div></div>`;
+  h+=`</div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;margin-bottom:12px">`;
+  h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Storage</div>`;
+  h+=`<div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text-muted)">localStorage</span><span style="color:var(--accent)">${sizeKB} KB (${sizeMB} MB)</span></div>`;
+  const maxStorage=5120;const pct=Math.min(Math.round((sizeKB/maxStorage)*100),100);
+  h+=`<div style="height:6px;background:var(--bg-base);border-radius:3px;margin-top:6px"><div style="height:100%;width:${pct}%;background:${pct>80?'#ef4444':pct>50?'#f59e0b':'var(--accent)'};border-radius:3px"></div></div>`;
+  h+=`<div style="font-size:9px;color:var(--text-muted);margin-top:4px">${pct}% of ~5MB localStorage limit</div>`;
+  h+=`</div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px">`;
+  h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Theme: ${S._theme||'Cosmic (default)'}</div>`;
+  h+=`<div style="font-size:10px;color:var(--text-muted)">Version: ASTRA Command Center v2.0</div>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showAutoTagSuggestions(){
+  const content=S.content||[];
+  const existingTags={};
+  content.forEach(c=>{(c.tags||[]).forEach(t=>{existingTags[t]=(existingTags[t]||0)+1;});});
+  const topTags=Object.entries(existingTags).sort((a,b)=>b[1]-a[1]).slice(0,20);
+  const untagged=content.filter(c=>!(c.tags&&c.tags.length));
+  const panel=document.createElement('div');panel.id='auto-tag-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Auto-Tag Suggestions</span><button onclick="document.getElementById('auto-tag-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px">`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--accent)">${Object.keys(existingTags).length}</div><div style="font-size:9px;color:var(--text-muted)">Unique Tags</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:700;color:#f59e0b">${untagged.length}</div><div style="font-size:9px;color:var(--text-muted)">Untagged Items</div></div>`;
+  h+=`</div>`;
+  if(topTags.length){
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Popular Tags</div>`;
+    h+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px">`;
+    topTags.forEach(([tag,count])=>{
+      h+=`<span style="font-size:10px;padding:3px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;color:var(--accent)">${esc(tag)} (${count})</span>`;
+    });
+    h+=`</div>`;
+  }
+  if(untagged.length){
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Untagged Items (click to suggest)</div>`;
+    h+=`<div style="display:grid;gap:4px">`;
+    untagged.slice(0,10).forEach(c=>{
+      const words=(c.body||'').toLowerCase().split(/\s+/).filter(w=>w.length>3);
+      const suggestions=[];
+      topTags.forEach(([tag])=>{if(words.some(w=>w.includes(tag.toLowerCase())))suggestions.push(tag);});
+      if(c.theme&&!suggestions.includes(c.theme))suggestions.push(c.theme);
+      const preview=(c.body||'').substring(0,50);
+      h+=`<div style="padding:6px;background:var(--bg-surface);border-radius:6px">`;
+      h+=`<div style="font-size:10px;color:var(--text-secondary);margin-bottom:4px">${esc(preview)}</div>`;
+      if(suggestions.length){
+        h+=`<div style="display:flex;gap:4px;flex-wrap:wrap">`;
+        suggestions.slice(0,3).forEach(s=>{
+          h+=`<button onclick="applyAutoTag('${c.id}','${esc(s)}')" style="font-size:9px;padding:1px 6px;background:var(--bg-base);border:1px solid var(--accent);border-radius:8px;color:var(--accent);cursor:pointer">+${esc(s)}</button>`;
+        });
+        h+=`</div>`;
+      } else {
+        h+=`<div style="font-size:9px;color:var(--text-muted)">No suggestions available</div>`;
+      }
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function applyAutoTag(id,tag){
+  const c=(S.content||[]).find(x=>x.id===id);if(!c)return;
+  if(!c.tags)c.tags=[];
+  if(!c.tags.includes(tag)){c.tags.push(tag);save();showToast('Tagged: '+tag);}
+  const p=document.getElementById('auto-tag-panel');if(p)p.remove();showAutoTagSuggestions();
+}
+function showSprintView(){
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date();
+  const sprints=[];
+  for(let i=0;i<4;i++){
+    const start=new Date(now);start.setDate(start.getDate()+i*7);
+    const end=new Date(start);end.setDate(end.getDate()+7);
+    const startStr=start.toISOString().split('T')[0];
+    const endStr=end.toISOString().split('T')[0];
+    const sprintTasks=tasks.filter(t=>{
+      if(!t.due)return i===3;
+      return t.due>=startStr&&t.due<endStr;
+    });
+    sprints.push({
+      name:i===0?'This Week':i===1?'Next Week':i===2?'Week '+3:'Backlog',
+      start:startStr,end:endStr,tasks:sprintTasks
+    });
+  }
+  const panel=document.createElement('div');panel.id='sprint-view-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:95vw;max-height:85vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Sprint View</span><button onclick="document.getElementById('sprint-view-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  const colors=['#4ade80','#3b82f6','#f59e0b','#6b7280'];
+  sprints.forEach((sp,si)=>{
+    h+=`<div style="margin-bottom:12px;background:var(--bg-surface);padding:12px;border-radius:8px;border-left:3px solid ${colors[si]}">`;
+    h+=`<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:12px;font-weight:600;color:${colors[si]}">${sp.name}</span><span style="font-size:10px;color:var(--text-muted)">${sp.tasks.length} tasks</span></div>`;
+    if(!sp.tasks.length){
+      h+=`<div style="font-size:10px;color:var(--text-muted);padding:4px 0">No tasks scheduled</div>`;
+    } else {
+      sp.tasks.slice(0,8).forEach(t=>{
+        const pColor=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f59e0b':t.priority==='p2'?'#3b82f6':'#6b7280';
+        h+=`<div style="display:flex;align-items:center;gap:6px;padding:3px 0">`;
+        h+=`<div style="width:6px;height:6px;border-radius:50%;background:${pColor};flex-shrink:0"></div>`;
+        h+=`<span style="font-size:10px;color:var(--text-secondary);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title)}</span>`;
+        if(t.due)h+=`<span style="font-size:9px;color:var(--text-muted);flex-shrink:0">${t.due.substring(5)}</span>`;
+        h+=`</div>`;
+      });
+      if(sp.tasks.length>8)h+=`<div style="font-size:9px;color:var(--text-muted);padding-top:4px">+${sp.tasks.length-8} more</div>`;
+    }
+    h+=`</div>`;
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showColorLegend(){
+  const legends=[
+    {category:'Priority',items:[
+      {color:'#ef4444',label:'P0 - Critical'},
+      {color:'#f59e0b',label:'P1 - High'},
+      {color:'#3b82f6',label:'P2 - Medium'},
+      {color:'#6b7280',label:'P3 - Low'},
+    ]},
+    {category:'Task Status',items:[
+      {color:'#f59e0b',label:'Todo'},
+      {color:'#3b82f6',label:'In Progress'},
+      {color:'#4ade80',label:'Done'},
+    ]},
+    {category:'Calendar',items:[
+      {color:'var(--accent)',label:'Today'},
+      {color:'#ef4444',label:'Overdue task'},
+      {color:'#3b82f6',label:'Future task'},
+    ]},
+    {category:'Links',items:[
+      {color:'#4ade80',label:'Pinned link'},
+      {color:'#f59e0b',label:'Read later'},
+      {color:'var(--text-muted)',label:'Regular link'},
+    ]},
+    {category:'Content',items:[
+      {color:'#f59e0b',label:'Starred item'},
+      {color:'#4ade80',label:'Pinned item'},
+      {color:'#8b5cf6',label:'Tag pill'},
+    ]},
+    {category:'Health',items:[
+      {color:'#4ade80',label:'Healthy (75%+)'},
+      {color:'#f59e0b',label:'At Risk (50-74%)'},
+      {color:'#ef4444',label:'Critical (<50%)'},
+    ]},
+  ];
+  const panel=document.createElement('div');panel.id='color-legend-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-size:14px;font-weight:600;color:var(--text-primary)">Color Legend</span><button onclick="document.getElementById('color-legend-panel').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">&times;</button></div>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">`;
+  legends.forEach(leg=>{
+    h+=`<div style="background:var(--bg-surface);padding:10px;border-radius:8px">`;
+    h+=`<div style="font-size:11px;font-weight:600;color:var(--text-primary);margin-bottom:8px">${leg.category}</div>`;
+    leg.items.forEach(item=>{
+      h+=`<div style="display:flex;align-items:center;gap:8px;padding:2px 0"><div style="width:12px;height:12px;border-radius:3px;background:${item.color};flex-shrink:0"></div><span style="font-size:10px;color:var(--text-secondary)">${item.label}</span></div>`;
+    });
+    h+=`</div>`;
   });
   h+=`</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
