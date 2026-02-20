@@ -6026,6 +6026,12 @@ function cmdGetItems(q) {
       ['data backup','Full data export/import and snapshot manager'],
       ['wall of fame','Showcase completed high-priority tasks'],
       ['content calendar','Content items on a monthly calendar grid'],
+      ['focus breakdown','Time spent breakdown by project and priority'],
+      ['link categories','Rename and manage link categories'],
+      ['task aging','Visual aging report for open tasks'],
+      ['doc outline','Table of contents from document headings'],
+      ['compare projects','Side-by-side project stats comparison'],
+      ['quick task','Floating quick task creator widget'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8228,6 +8234,30 @@ function cmdGetItems(q) {
   // Content calendar prefix
   if(ql && (ql==='content calendar' || ql==='content dates' || ql==='content grid' || ql==='when content')){
     items.unshift({title:'Content Calendar',desc:'Content on monthly grid',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentCalendar();}});
+  }
+  // Focus breakdown prefix
+  if(ql && (ql==='focus breakdown' || ql==='time breakdown' || ql==='time spent' || ql==='focus time')){
+    items.unshift({title:'Focus Breakdown',desc:'Time by project and priority',icon:'F',type:'action',action:()=>{closeCommandPalette();showFocusBreakdown();}});
+  }
+  // Link categories prefix
+  if(ql && (ql==='link categories' || ql==='manage categories' || ql==='link category' || ql==='category manager')){
+    items.unshift({title:'Link Categories',desc:'Rename and manage link categories',icon:'L',type:'action',action:()=>{closeCommandPalette();showLinkCategoryManager();}});
+  }
+  // Task aging prefix
+  if(ql && (ql==='task aging' || ql==='aging' || ql==='old tasks' || ql==='stale tasks')){
+    items.unshift({title:'Task Aging',desc:'Open task aging report',icon:'A',type:'action',action:()=>{closeCommandPalette();showTaskAging();}});
+  }
+  // Doc outline prefix
+  if(ql && (ql==='doc outline' || ql==='outline' || ql==='toc' || ql==='table of contents')){
+    items.unshift({title:'Document Outline',desc:'TOC from document headings',icon:'O',type:'action',action:()=>{closeCommandPalette();showDocOutline();}});
+  }
+  // Compare projects prefix
+  if(ql && (ql==='compare projects' || ql==='project compare' || ql==='project vs' || ql==='project comparison')){
+    items.unshift({title:'Project Comparison',desc:'Side-by-side project stats',icon:'V',type:'action',action:()=>{closeCommandPalette();showProjectComparison();}});
+  }
+  // Quick task prefix
+  if(ql && (ql==='quick task' || ql==='new task widget' || ql==='task widget' || ql==='fast task')){
+    items.unshift({title:'Quick Task',desc:'Floating task creator widget',icon:'T',type:'action',action:()=>{closeCommandPalette();showQuickTask();}});
   }
   return items.slice(0, 20);
 }
@@ -16308,6 +16338,237 @@ function showContentCalendar(){
     panel._nav=function(dir){viewMonth+=dir;if(viewMonth>11){viewMonth=0;viewYear++;}if(viewMonth<0){viewMonth=11;viewYear--;}render();};
   }
   render();document.body.appendChild(panel);
+}
+function showFocusBreakdown(){
+  let panel=document.getElementById('focus-breakdown-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='focus-breakdown-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.timeTracked&&t.timeTracked>0);
+  const totalTime=tasks.reduce((a,t)=>a+t.timeTracked,0);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Focus Time Breakdown</span><button onclick="this.closest(\'#focus-breakdown-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Total tracked: '+Math.round(totalTime/60)+' minutes across '+tasks.length+' tasks</div>';
+  if(!tasks.length){
+    h+='<div style="text-align:center;color:var(--text-muted);padding:30px;font-size:12px">No time tracked yet. Use the timer button in task detail modal.</div>';
+  } else {
+    // By project
+    const byProject={};
+    tasks.forEach(t=>{const p=t.project||'No Project';if(!byProject[p])byProject[p]=0;byProject[p]+=t.timeTracked;});
+    const projEntries=Object.entries(byProject).sort((a,b)=>b[1]-a[1]);
+    const projColors=['#4ade80','#3b82f6','#f59e0b','#ef4444','#a78bfa','#22d3ee','#f472b6','#84cc16'];
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">By Project</div>';
+    // CSS conic gradient donut
+    let gradParts=[];let cumPct=0;
+    projEntries.forEach((e,i)=>{
+      const pct=totalTime?e[1]/totalTime*100:0;
+      const col=projColors[i%projColors.length];
+      gradParts.push(col+' '+cumPct+'% '+(cumPct+pct)+'%');
+      cumPct+=pct;
+    });
+    h+='<div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">';
+    h+='<div style="width:100px;height:100px;border-radius:50%;background:conic-gradient('+gradParts.join(',')+');flex-shrink:0;position:relative"><div style="position:absolute;top:25%;left:25%;width:50%;height:50%;border-radius:50%;background:var(--bg-elevated)"></div></div>';
+    h+='<div style="flex:1">';
+    projEntries.forEach((e,i)=>{
+      const col=projColors[i%projColors.length];
+      const pct=totalTime?Math.round(e[1]/totalTime*100):0;
+      h+='<div style="display:flex;gap:6px;align-items:center;padding:2px 0"><span style="width:8px;height:8px;border-radius:2px;background:'+col+';flex-shrink:0"></span><span style="font-size:11px;color:var(--text);flex:1">'+esc(e[0])+'</span><span style="font-size:10px;color:var(--text-muted)">'+Math.round(e[1]/60)+'m ('+pct+'%)</span></div>';
+    });
+    h+='</div></div>';
+    // By priority
+    const byPri={'p0':0,'p1':0,'p2':0,'p3':0};
+    tasks.forEach(t=>{const p=t.priority||'p3';byPri[p]=(byPri[p]||0)+t.timeTracked;});
+    const priColors={'p0':'#ef4444','p1':'#f59e0b','p2':'#3b82f6','p3':'#6b7280'};
+    h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">By Priority</div>';
+    Object.entries(byPri).forEach(([p,time])=>{
+      if(!time)return;
+      const pct=totalTime?Math.round(time/totalTime*100):0;
+      h+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">';
+      h+='<span style="font-size:10px;color:'+priColors[p]+';font-weight:700;width:24px">'+p.toUpperCase()+'</span>';
+      h+='<div style="flex:1;height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+priColors[p]+';width:'+pct+'%"></div></div>';
+      h+='<span style="font-size:10px;color:var(--text-muted);width:60px;text-align:right">'+Math.round(time/60)+'m</span>';
+      h+='</div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showLinkCategoryManager(){
+  let panel=document.getElementById('link-cat-mgr-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='link-cat-mgr-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  function render(){
+    const cats={};
+    (S.links||[]).forEach(l=>{const c=l.category||'Uncategorized';cats[c]=(cats[c]||0)+1;});
+    const sorted=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Link Categories</span><button onclick="this.closest(\'#link-cat-mgr-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">'+sorted.length+' categories, '+(S.links||[]).length+' total links</div>';
+    sorted.forEach(([cat,count])=>{
+      h+='<div style="padding:8px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+      h+='<span style="flex:1;font-size:12px;color:var(--text)">'+esc(cat)+'</span>';
+      h+='<span style="font-size:10px;color:var(--text-muted)">'+count+' links</span>';
+      if(cat!=='Uncategorized'){
+        h+='<button onclick="const n=prompt(\'Rename category:\',\''+esc(cat)+'\');if(!n||n===\''+esc(cat)+'\')return;(S.links||[]).forEach(l=>{if(l.category===\''+esc(cat)+'\')l.category=n;});save();this.closest(\'#link-cat-mgr-panel\')._render()" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px;padding:2px 6px">Rename</button>';
+        h+='<button onclick="if(!confirm(\'Remove category from '+count+' links?\'))return;(S.links||[]).forEach(l=>{if(l.category===\''+esc(cat)+'\')l.category=\'\';});save();this.closest(\'#link-cat-mgr-panel\')._render()" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:#ef4444;cursor:pointer;font-size:9px;padding:2px 6px">Clear</button>';
+      }
+      h+='</div>';
+    });
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();document.body.appendChild(panel);
+}
+function showTaskAging(){
+  let panel=document.getElementById('task-aging-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-aging-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=new Date();
+  const open=(S.tasks||[]).filter(t=>t.status!=='done'&&t.created);
+  const aged=open.map(t=>{
+    const days=Math.floor((now-new Date(t.created))/86400000);
+    return {...t,ageDays:days};
+  }).sort((a,b)=>b.ageDays-a.ageDays);
+  const buckets=[
+    {label:'Fresh (0-3 days)',min:0,max:3,color:'#4ade80'},
+    {label:'Young (4-7 days)',min:4,max:7,color:'#22d3ee'},
+    {label:'Aging (8-14 days)',min:8,max:14,color:'#f59e0b'},
+    {label:'Old (15-30 days)',min:15,max:30,color:'#ef4444'},
+    {label:'Ancient (30+ days)',min:31,max:9999,color:'#dc2626'},
+  ];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Task Aging Report</span><button onclick="this.closest(\'#task-aging-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+open.length+' open tasks | Average age: '+(aged.length?Math.round(aged.reduce((a,t)=>a+t.ageDays,0)/aged.length):0)+' days</div>';
+  // Bucket bars
+  h+='<div style="margin-bottom:16px">';
+  buckets.forEach(b=>{
+    const count=aged.filter(t=>t.ageDays>=b.min&&t.ageDays<=b.max).length;
+    const pct=open.length?Math.round(count/open.length*100):0;
+    h+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">';
+    h+='<span style="font-size:10px;color:'+b.color+';width:120px;flex-shrink:0">'+b.label+'</span>';
+    h+='<div style="flex:1;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+b.color+';width:'+pct+'%"></div></div>';
+    h+='<span style="font-size:10px;color:var(--text-muted);width:40px;text-align:right">'+count+'</span>';
+    h+='</div>';
+  });
+  h+='</div>';
+  // Oldest tasks
+  h+='<div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px">Oldest Open Tasks</div>';
+  aged.slice(0,15).forEach(t=>{
+    const col=t.ageDays>30?'#dc2626':t.ageDays>14?'#ef4444':t.ageDays>7?'#f59e0b':'#4ade80';
+    h+='<div style="padding:5px 10px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center">';
+    h+='<span style="font-size:10px;color:'+col+';font-weight:700;width:35px;flex-shrink:0">'+t.ageDays+'d</span>';
+    h+='<span style="flex:1;font-size:11px;color:var(--text)">'+esc(t.title)+'</span>';
+    h+='<span style="font-size:9px;color:var(--text-muted)">'+t.status+'</span>';
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDocOutline(){
+  let panel=document.getElementById('doc-outline-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='doc-outline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const docs=(S.writerDocs||[]).filter(d=>d.body&&d.body.length>50);
+  let selDoc=docs.length?docs[0].id:'';
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Document Outline</span><button onclick="this.closest(\'#doc-outline-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<select onchange="this.closest(\'#doc-outline-panel\')._sel=this.value;this.closest(\'#doc-outline-panel\')._render()" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:10px">';
+    docs.forEach(d=>{h+='<option value="'+d.id+'"'+(selDoc===d.id?' selected':'')+'>'+esc(d.title)+'</option>';});
+    if(!docs.length)h+='<option>No documents</option>';
+    h+='</select>';
+    const doc=docs.find(d=>d.id===selDoc);
+    if(doc&&doc.body){
+      const lines=doc.body.split('\n');
+      const headings=[];
+      lines.forEach((line,i)=>{
+        const m=line.match(/^(#{1,6})\s+(.+)/);
+        if(m)headings.push({level:m[1].length,text:m[2],line:i+1});
+      });
+      if(headings.length){
+        headings.forEach(hd=>{
+          const indent=(hd.level-1)*16;
+          const sz=Math.max(10,16-hd.level*1.5);
+          h+='<div style="padding:4px 0 4px '+indent+'px;border-bottom:1px solid var(--border)">';
+          h+='<span style="font-size:'+sz+'px;color:var(--text)">'+esc(hd.text)+'</span>';
+          h+=' <span style="font-size:9px;color:var(--text-muted)">L'+hd.line+'</span>';
+          h+='</div>';
+        });
+      } else {
+        h+='<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:11px">No headings found. Use # Heading in your document.</div>';
+      }
+      const wc=doc.body.split(/\s+/).filter(Boolean).length;
+      h+='<div style="margin-top:10px;font-size:10px;color:var(--text-muted)">'+wc+' words | '+lines.length+' lines | '+headings.length+' headings</div>';
+    }
+    panel.innerHTML=h;panel._render=render;panel._sel=selDoc;
+  }
+  render();document.body.appendChild(panel);
+}
+function showProjectComparison(){
+  let panel=document.getElementById('proj-compare-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='proj-compare-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=(S.projects||[]);
+  let selA=projects.length?projects[0].id:'';
+  let selB=projects.length>1?projects[1].id:'';
+  function getStats(pid){
+    const p=projects.find(pr=>pr.id===pid);
+    if(!p)return null;
+    const tasks=(S.tasks||[]).filter(t=>t.projectId===pid||t.project===p.name);
+    const done=tasks.filter(t=>t.status==='done').length;
+    const content=(S.content||[]).filter(c=>c.project===p.name).length;
+    const links=(S.links||[]).filter(l=>l.project===p.name).length;
+    const docs=(S.writerDocs||[]).filter(d=>d.projectId===pid).length;
+    return {name:p.name,tasks:tasks.length,done,active:tasks.length-done,content,links,docs,pct:tasks.length?Math.round(done/tasks.length*100):0};
+  }
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Project Comparison</span><button onclick="this.closest(\'#proj-compare-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<div style="display:flex;gap:12px;margin-bottom:12px">';
+    h+='<select onchange="this.closest(\'#proj-compare-panel\')._selA=this.value;this.closest(\'#proj-compare-panel\')._render()" style="flex:1;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px">';
+    projects.forEach(p=>{h+='<option value="'+p.id+'"'+(selA===p.id?' selected':'')+'>'+esc(p.name)+'</option>';});
+    h+='</select>';
+    h+='<span style="color:var(--text-muted);align-self:center;font-size:12px">vs</span>';
+    h+='<select onchange="this.closest(\'#proj-compare-panel\')._selB=this.value;this.closest(\'#proj-compare-panel\')._render()" style="flex:1;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px">';
+    projects.forEach(p=>{h+='<option value="'+p.id+'"'+(selB===p.id?' selected':'')+'>'+esc(p.name)+'</option>';});
+    h+='</select></div>';
+    const a=getStats(selA),b=getStats(selB);
+    if(a&&b){
+      const metrics=[
+        {label:'Total Tasks',aVal:a.tasks,bVal:b.tasks},
+        {label:'Completed',aVal:a.done,bVal:b.done},
+        {label:'Active',aVal:a.active,bVal:b.active},
+        {label:'Completion %',aVal:a.pct,bVal:b.pct},
+        {label:'Content Items',aVal:a.content,bVal:b.content},
+        {label:'Links',aVal:a.links,bVal:b.links},
+        {label:'Documents',aVal:a.docs,bVal:b.docs},
+      ];
+      h+='<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:0">';
+      h+='<div style="text-align:center;font-size:11px;font-weight:700;color:#4ade80;padding:6px">'+esc(a.name)+'</div>';
+      h+='<div style="text-align:center;font-size:10px;color:var(--text-muted);padding:6px">Metric</div>';
+      h+='<div style="text-align:center;font-size:11px;font-weight:700;color:#3b82f6;padding:6px">'+esc(b.name)+'</div>';
+      metrics.forEach(m=>{
+        const aWin=m.aVal>m.bVal,bWin=m.bVal>m.aVal;
+        h+='<div style="text-align:center;font-size:13px;padding:6px;color:'+(aWin?'#4ade80':'var(--text)')+';font-weight:'+(aWin?'700':'400')+';border-bottom:1px solid var(--border)">'+m.aVal+'</div>';
+        h+='<div style="text-align:center;font-size:10px;padding:6px;color:var(--text-muted);border-bottom:1px solid var(--border)">'+m.label+'</div>';
+        h+='<div style="text-align:center;font-size:13px;padding:6px;color:'+(bWin?'#3b82f6':'var(--text)')+';font-weight:'+(bWin?'700':'400')+';border-bottom:1px solid var(--border)">'+m.bVal+'</div>';
+      });
+      h+='</div>';
+    }
+    panel.innerHTML=h;panel._render=render;panel._selA=selA;panel._selB=selB;
+  }
+  render();document.body.appendChild(panel);
+}
+function showQuickTask(){
+  let panel=document.getElementById('quick-task-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-task-widget';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:12px;color:var(--text)">Quick Task</span><button onclick="this.closest(\'#quick-task-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<input id="qt-title" placeholder="Task title..." style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:6px;box-sizing:border-box">';
+  h+='<div style="display:flex;gap:6px;margin-bottom:6px">';
+  h+='<select id="qt-pri" style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px">';
+  ['p0','p1','p2','p3'].forEach(p=>{h+='<option value="'+p+'"'+(p==='p2'?' selected':'')+'>'+p.toUpperCase()+'</option>';});
+  h+='</select>';
+  h+='<select id="qt-status" style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px">';
+  ['todo','in-progress','review'].forEach(s=>{h+='<option value="'+s+'">'+s+'</option>';});
+  h+='</select>';
+  h+='<input id="qt-due" type="date" style="flex:1;padding:4px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px">';
+  h+='</div>';
+  h+='<button onclick="const title=document.getElementById(\'qt-title\').value.trim();if(!title)return;if(!S.tasks)S.tasks=[];S.tasks.push({id:\'t_\'+Date.now(),title:title,description:\'\',status:document.getElementById(\'qt-status\').value,priority:document.getElementById(\'qt-pri\').value,due:document.getElementById(\'qt-due\').value||null,project:\'\',tags:[],subtasks:[],created:new Date().toISOString()});save();document.getElementById(\'qt-title\').value=\'\';if(typeof renderTasks===\'function\')renderTasks();" style="width:100%;padding:6px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Add Task</button>';
+  h+='<div style="margin-top:6px;font-size:10px;color:var(--text-muted)">'+(S.tasks||[]).filter(t=>t.status!=='done').length+' active tasks</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  document.getElementById('qt-title').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.closest('#quick-task-widget').querySelector('button:last-of-type').click();}});
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
