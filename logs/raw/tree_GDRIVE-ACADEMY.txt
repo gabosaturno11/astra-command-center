@@ -1,0 +1,284 @@
+=== GDRIVE-ACADEMY: /Users/Gabosaturno/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com ===
+
+--- Top-level folder sizes ---
+ 42M	/Users/Gabosaturno/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/
+
+--- Full tree (depth 4) ---
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.shortcut-targets-by-id
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.shortcut-targets-by-id/1pST2TIQYY4xmluDFxlO2O8kVPaDSFfA6
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.shortcut-targets-by-id/1pST2TIQYY4xmluDFxlO2O8kVPaDSFfA6/CE_FINAL PDF'S
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.shortcut-targets-by-id/1pST2TIQYY4xmluDFxlO2O8kVPaDSFfA6/CE_FINAL PDF'S/PNG
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Trash
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/.shortcut-targets-by-id
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/.shortcut-targets-by-id/1pST2TIQYY4xmluDFxlO2O8kVPaDSFfA6
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/.shortcut-targets-by-id/1pST2TIQYY4xmluDFxlO2O8kVPaDSFfA6/CE_FINAL PDF'S
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Google AI Studio
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/MONDAY
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/ARCHIVE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Music OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Learning
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Life OS 
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Finances OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/JUNE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Creative OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Book OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/00_Imbox
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Sunday
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Book Main Folder
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Check end of the week
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/• PROJECTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/➔ Personal Projects
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Documents
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/‘ AREAS ‘
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/Gabo Icloud/Taskade Templates
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/12_MERCH
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/11_Photography
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/02_TEACHABLE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/TO BE ORGANIZED - BF25 content here
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/SOCIAL MEDIA
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/03_SOCIAL MEDIA
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/00_SM ACADEMY CONTENT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/01_GENERAL BUSINESS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/000_SM APP THUMBNAILS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/04_CUSTOMER SERVICE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/10_SM IDEAS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/13_Motion Graphics Master Projects
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/09_MOVE LIST CONTENT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/06_#SMFAM
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/FREE PDF @saturnomovement
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/RESOURCES RECURSOS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/08_EVENTS (WSWCF, FitExpo Info...)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/07_BRANDING ELEMENTS (LOGOS, MUSIC, FONT, SOUND FX)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/Gabo's Folder
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/05_WEB
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/.Encrypted/My Drive/📹 SM Content/TEACHABLE BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Google AI Studio
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/MONDAY
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/MONDAY/Evernote
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/MONDAY/HTML (in progress)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/MONDAY/Solar System
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/ARCHIVE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/ARCHIVE/APPLE NOTES
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Music OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Music OS/New Music 🪐
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Learning
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Life OS 
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Finances OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Finances OS/Bussiness Trips - 2025
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Finances OS/Bank_Statatements_GaboSaturnoLLC_2024
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Finances OS/01_SaturnMovementCorp
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Finances OS/00_GaboSaturnoLLC
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Finances OS/Credict card options conv_jpeg
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/JUNE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/JUNE/SM Lab_files
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/JUNE/Google Gemini_files
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/JUNE/Square Frame - SM Instagram - IG format for quotes
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/Infographics Design
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/01_Audio Imbox
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/02_SMLab
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/02_Writings 
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/Wallpapers & Icons
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/AppIcon
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/App & Web Desings🪐
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Creative OS/00_Learning Resources
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/Youtube Transcripts
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/🧱TOC Structures
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/Book Content
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/Learning
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/🎤
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/📄Drafts 
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/Vertical roadmap milestones on black background Timeline infographic template for business presentation Vector illustration _ Premium Vector_files
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/00_PHASE 1 - 🫡📝📕
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/SM PDfs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/Guide & Workflows
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book OS/Writting Styles
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/00_Imbox
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/00_Imbox/focus-timer-endel
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/00_Imbox/FlyingForeverTogether_FULL_FINAL
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Sunday
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/Transcripts_Breakdown - Claude
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/Book OS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/Drafts - Almost Final
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/Transcript_Deconstruction_Chat GPT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/MONDAY copy
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/My Voice
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/My Notes
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/Downloads
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Book Main Folder/Calisthenics Scripts
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/TEARS OF JOY PIANO ALS Project
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/ADD.app
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/MoonJournalA4pdf_ conv_png
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/ADD 2.app
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/MoonJournalA5pdf_ conv_png
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/LifeVision_Print conv_png
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/MoonJournal-USLETTERpdf_ conv_png
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Check end of the week/DESPTOP ::
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/untitled folder
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/📑 NOTION
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/Prompt Vault
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/Bussiness Agent
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/🫡 High Ticket Outreach
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/🪙 Finances
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/• PROJECTS/Writting Hub - Features Only
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects/exported-assets
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects/Private & Shared 2
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects/Private & Shared 3
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects/Private & Shared
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects/Recetas de papa
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/➔ Personal Projects/exported-assets 2
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/untitled folder
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/Quotes
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/📱 App Features & Layouts
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/🤳 Wallpapers
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/💰Finances 
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/Library
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/00_Imbox
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/📚Book Wish List
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/🪐 Business
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/Loader
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/📲 App Desings
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/❤️‍🔥 Book
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/PDFs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/🎶Music
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/:: SORT - 10:10
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/🔯 Workflows
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/🛜 Websites
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Documents/🎤 Promps
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/‘ AREAS ‘
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/Gabo Icloud/Taskade Templates
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/12_MERCH
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/12_MERCH/Designs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/12_MERCH/Logos
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/11_Photography
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/11_Photography/Gym Gabo's Pictures
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/11_Photography/Japanese Garden
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/02_TEACHABLE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/02_TEACHABLE/*TEACHABLE CONTENT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TO BE ORGANIZED - BF25 content here
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/SOCIAL MEDIA
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/SOCIAL MEDIA/INSTAGRAM-HIGHLIGHT COVERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/VIDEOS WITH FITNESSFAQS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/Twitter
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/PROMOTIONAL CONTENT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/INSTAGRAM POSTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/PHOTOGRAPHY
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/YOUTUBE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/IG TEMPLATES
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/FitnessFAQ'S Time-Stamps
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/03_SOCIAL MEDIA/GABO QUOTES
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/03_HOME PROGRAMS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/18_Moves List
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/03_HANDBALANCING SYSTEM
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/20_APP Content List
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/06_WARM UPS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/VIDEO EDITING ELEMEST
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/00_ULTIMATE HYBRID SYSTEM
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/12_INJURY PREVENTION
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/02_YOGA SYSTEM
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/FAQs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/05_HIIT WORKOUTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/19_MEDICAL DISCLAIMER
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/08_RESOURCES LECTURES (Anatomy, Energy Systems...)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/Move List (Per Program)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/09_SM JOURNALS (Time Management)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/16_MOTION GRAPHICS PROJECTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/10_PUBLISHED ACADEMY CONTENT LIST
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/14_HOME WORKOUTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/17_Mobility and Flexibility
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/03_RINGS PROGRAMS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/01_CALISTHENICS SYSTEM
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/***TEACHABLE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/13_SMMUSIC
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/11_IDEAS (PLANET FACTS, THEMES...)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/15_COSMIC FLOWS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/00_SM ACADEMY CONTENT/21_SKILL Programs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/01_GENERAL BUSINESS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/01_GENERAL BUSINESS/Gabo AI Script Feed
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/01_GENERAL BUSINESS/CONTENT CALENDAR
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/PROMO Banners
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Calisthenics Programs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Social Media App Promo
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Web Page Images
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Playground
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Mobility & Flexibility
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Primal Elements
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/App Store Images
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/HIIT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Mindfulness
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/SM App Loading GIF
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Calisthenics Skills
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Movement Flows
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/0_Main Programs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Workout Sections
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Yoga Programs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Rings Programs
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/000_SM APP THUMBNAILS/Lecture Sections
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/04_CUSTOMER SERVICE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/10_SM IDEAS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/13_Motion Graphics Master Projects
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/13_Motion Graphics Master Projects/COUNTDOWN
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/13_Motion Graphics Master Projects/CF_PH2_INTRO PROJECT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/13_Motion Graphics Master Projects/YT_LOWER THIRDS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/13_Motion Graphics Master Projects/WARM UP INTROS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/09_MOVE LIST CONTENT
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/09_MOVE LIST CONTENT/02_FINAL MOVES
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/09_MOVE LIST CONTENT/00_Old Resources
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/09_MOVE LIST CONTENT/03_MOVE LIST ASSETS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/09_MOVE LIST CONTENT/01_FOOTAGE
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/06_#SMFAM
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/06_#SMFAM/SMFAM RESPONSES
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/06_#SMFAM/SMFAM_HBQUESTIONS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/06_#SMFAM/SM Fam Benefits 
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/06_#SMFAM/SMFAM FAQs Special Responses
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/FREE PDF @saturnomovement
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/RESOURCES RECURSOS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/RESOURCES RECURSOS/Meteor Background Graphics HIIT Banner
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/08_EVENTS (WSWCF, FitExpo Info...)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/07_BRANDING ELEMENTS (LOGOS, MUSIC, FONT, SOUND FX)
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/07_BRANDING ELEMENTS (LOGOS, MUSIC, FONT, SOUND FX)/BRANDING MATERIAL
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/07_BRANDING ELEMENTS (LOGOS, MUSIC, FONT, SOUND FX)/01_YOUTUBE ASSETTS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/Gabo's Folder
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/Gabo's Folder/CF PDFS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/Gabo's Folder/Gabo's Training
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/05_WEB
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/05_WEB/WEB CORRECTIONS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/05_WEB/Web Updates September 2024
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/YOGA FOUNDATION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/CALISTHENICS SKILLS_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/YOGA_TRANSFORMATION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/CALISTHENICS TRANSFORMATION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/SM LECTURES_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/TOTAL INITIATION PHASE_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/YOGA EXPANSION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/DRAFTS_PROPUESTAS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/CALISTHENICS FOUNDATION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/CALISTHENICS EXPANSION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/HIIT WORKOUT_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/YOGA INITIATION PHASE_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/UHS_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/MOBILITY_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/NUTRITION_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/START HERE_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/CALISTHENICS INITIATION PHASE_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/HAND-BALANCING SYSTEM_BANNERS
+~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/📹 SM Content/TEACHABLE BANNERS/HAND-BALANCING INITIATION PHASE_BANNERS
+

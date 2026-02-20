@@ -1,0 +1,34 @@
+# ALL VERCEL PROJECT CONFIGS
+
+VERCEL|~/dev/de-aqui-a-saturno|prj_FVdThu9wyg1WexGh4DOCdpPh62hx|gabriele-saturnos-projects
+VERCEL|~/dev/astra-command-center|prj_RNqqPqOJIqdPnMvDQLPxhllEp7rn|gabriele-saturnos-projects
+VERCEL|~/dev/titan-forge|prj_xFaPWvmTrzJrBguqNktmVAVNVO6Z|gabriele-saturnos-projects
+VERCEL|~/dev/saturno-bonus|prj_A8ykWIxLUame5Bt7It8nuGytjcyL|gabriele-saturnos-projects
+VERCEL|~/Desktop/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT|prj_211Yrxwi2W23d51Il3LgAkhjoVFD|saturno-os-OLD
+VERCEL|~/Projects/saturno-vault|prj_211Yrxwi2W23d51Il3LgAkhjoVFD|saturno-os-OLD
+VERCEL|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT|prj_211Yrxwi2W23d51Il3LgAkhjoVFD|saturno-os-OLD
+VERCEL|/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge|prj_211Yrxwi2W23d51Il3LgAkhjoVFD|saturno-os-OLD
+VERCEL|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /00_TRAVELING OS/TRAVELING-OS-V1|?|UNKNOWN
+VERCEL|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/saturno-os/andy-strength-guide|?|UNKNOWN
+VERCEL|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/saturno-os/andy-guide-public|?|UNKNOWN
+VERCEL|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS|?|UNKNOWN
+VERCEL|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/andy-deploy_1|?|UNKNOWN
+VERCEL|/Volumes/SSK Drive/Organize/andy-deploy_1|prj_WJnA7FXqsWPpfEjIllxIKpWqJDD3|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy_1|prj_WJnA7FXqsWPpfEjIllxIKpWqJDD3|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT|prj_211Yrxwi2W23d51Il3LgAkhjoVFD|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy_1|prj_WJnA7FXqsWPpfEjIllxIKpWqJDD3|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS|prj_HbqAZAetsOTF8WeaKrciLanahfx0|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/andy-guide-public|prj_odTd8OeZII8M9GT6RAErtFyXUKDb|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/andy-strength-guide|prj_mTClNFrJFcP2un5TUJROdwYAxeTc|saturno-os-OLD
+VERCEL|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy_1|prj_WJnA7FXqsWPpfEjIllxIKpWqJDD3|saturno-os-OLD
+VERCEL|/Volumes/T7/_ORGANIZED/03_PROJECTS/muscle-up-deploy|prj_oq4q9RjS2jugq0hw5MeVqTeStN76|gabriele-saturnos-projects
+VERCEL|/Volumes/T7/_ORGANIZED/03_PROJECTS/saturno-muscle-up|prj_oq4q9RjS2jugq0hw5MeVqTeStN76|gabriele-saturnos-projects
+VERCEL|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/andy-strength-guide|prj_mTClNFrJFcP2un5TUJROdwYAxeTc|saturno-os-OLD
+VERCEL|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/andy-guide-public|prj_odTd8OeZII8M9GT6RAErtFyXUKDb|saturno-os-OLD
+VERCEL|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/FINAL PDFS (TBV)/_MONDAY_BONUS|prj_HbqAZAetsOTF8WeaKrciLanahfx0|saturno-os-OLD
+VERCEL|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1|prj_yZzg8IbWMuMxWnPe8kyD5kJNZs0W|gabriele-saturnos-projects
+VERCEL|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/saturno-os/andy-strength-guide|prj_mTClNFrJFcP2un5TUJROdwYAxeTc|saturno-os-OLD
+VERCEL|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/saturno-os/andy-guide-public|prj_odTd8OeZII8M9GT6RAErtFyXUKDb|saturno-os-OLD
+VERCEL|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/FINAL PDFS (TBV)/_MONDAY_BONUS|prj_HbqAZAetsOTF8WeaKrciLanahfx0|saturno-os-OLD
+VERCEL|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/andy-deploy_1|prj_WJnA7FXqsWPpfEjIllxIKpWqJDD3|saturno-os-OLD
+VERCEL|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge|prj_211Yrxwi2W23d51Il3LgAkhjoVFD|saturno-os-OLD

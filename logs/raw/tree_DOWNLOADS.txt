@@ -1,0 +1,395 @@
+=== DOWNLOADS: /Users/Gabosaturno/Downloads ===
+
+--- Top-level folder sizes ---
+964K	/Users/Gabosaturno/Downloads/🎨 ⇢ 03_Infographics-DNA-skills-drafts-PX/
+128K	/Users/Gabosaturno/Downloads/🚀_CURRENT_DEPLOYMENT/
+ 26G	/Users/Gabosaturno/Downloads/_ORGANIZED/
+  0B	/Users/Gabosaturno/Downloads/ALL DEPLOYMENTS FROM MAC-BOOK PRO/
+120K	/Users/Gabosaturno/Downloads/CLaude-ORGANIZE-NEW/
+3.0M	/Users/Gabosaturno/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC/
+1.5M	/Users/Gabosaturno/Downloads/exported-assets/
+172K	/Users/Gabosaturno/Downloads/files (2)/
+474M	/Users/Gabosaturno/Downloads/FROM IMAC DONWLOADS/
+188K	/Users/Gabosaturno/Downloads/GPT CONVO __SCLAUDE-SCALFOLD/
+1.4G	/Users/Gabosaturno/Downloads/karina-media/
+120K	/Users/Gabosaturno/Downloads/MONSTER ZIP FOLDER - URGENT/
+556K	/Users/Gabosaturno/Downloads/MORE DEPLYMENT FILES/
+3.1M	/Users/Gabosaturno/Downloads/Perplexity-space-set-up/
+ 96K	/Users/Gabosaturno/Downloads/Private & Shared/
+ 13M	/Users/Gabosaturno/Downloads/SATURNO_MONSTER/
+ 48K	/Users/Gabosaturno/Downloads/Submissions v1/
+1.0M	/Users/Gabosaturno/Downloads/titan-forge-upgrade/
+
+--- Full tree (depth 4) ---
+~/Downloads
+~/Downloads/FROM IMAC DONWLOADS
+~/Downloads/FROM IMAC DONWLOADS/files (1)
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/tools
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/tools/writing-hub-functional
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/tools/writing-hub-v2
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/chrome-extension
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.github
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.github/workflows
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/pdfs
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.git
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.git/objects
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.git/info
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.git/logs
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.git/hooks
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/.git/refs
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/assets
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/saturno-command
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/saturno-hub-starter
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/writing-hub-kortex
+~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/calisthenics-ecosystem
+~/Downloads/FROM IMAC DONWLOADS/files
+~/Downloads/FROM IMAC DONWLOADS/files/meta-prompt-transformer
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/queue-microtask
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-docker
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/reusify
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/on-headers
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/shebang-regex
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-wsl
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/.bin
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/path-type
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/make-dir
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/mimic-fn
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/strip-ansi
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/pkg-dir
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ms
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/strip-final-newline
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/content-disposition
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/filenamify
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/escape-string-regexp
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/strip-json-comments
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/type-fest
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/commander
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/punycode
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/range-parser
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/deep-extend
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/balanced-match
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/path-exists
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/bytes
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/trim-repeated
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/@nodelib
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/signal-exit
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/wrap-ansi
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ignore
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/picomatch
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/safe-buffer
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/serve-handler
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-glob
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/npm-run-path
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-fullwidth-code-point
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/jsonfile
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/dir-glob
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/color-name
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/async
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/p-locate
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/email-addresses
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/arg
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/commondir
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/gh-pages
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/cli-boxes
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/@zeit
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/path-to-regexp
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/run-parallel
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/p-limit
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/mime-types
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/json-schema-traverse
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/minimist
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-stream
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/universalify
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/onetime
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/find-up
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/path-is-inside
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/chalk
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ansi-regex
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/has-flag
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/supports-color
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/vary
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/fs-extra
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/color-convert
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/path-key
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/merge-stream
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/brace-expansion
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/fill-range
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/registry-auth-token
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/slash
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/eastasianwidth
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/semver
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ini
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-port-reachable
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/minimatch
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/widest-line
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ansi-styles
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/find-cache-dir
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ansi-align
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/negotiator
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/filename-reserved-regex
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-number
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/arch
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/concat-map
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/compression
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/get-stream
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/registry-url
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/uri-js
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/cross-spawn
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/to-regex-range
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/array-union
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/serve
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/string-width
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/execa
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/strip-outer
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/p-try
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/camelcase
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/micromatch
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/fast-glob
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/update-check
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/is-extglob
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/fastq
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/.cache
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/rc
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/boxen
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/clipboardy
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/merge2
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/braces
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/compressible
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/which
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/ajv
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/emoji-regex
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/locate-path
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/graceful-fs
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/human-signals
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/globby
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/fast-deep-equal
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/shebang-command
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/chalk-template
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/require-from-string
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/debug
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/glob-parent
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/mime-db
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/node_modules/isexe
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/htmls
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/icons
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/.git
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/.git/objects
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/.git/info
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/.git/logs
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/.git/hooks
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/.git/refs
+~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check/data
+~/Downloads/_ORGANIZED
+~/Downloads/_ORGANIZED/Images
+~/Downloads/_ORGANIZED/scripts-code
+~/Downloads/_ORGANIZED/Projects
+~/Downloads/_ORGANIZED/Projects/Workout Creator
+~/Downloads/_ORGANIZED/Projects/Workout Creator/Workout CReator V2
+~/Downloads/_ORGANIZED/Projects/notion-export-v1-saturno-os
+~/Downloads/_ORGANIZED/Projects/Claude Projects
+~/Downloads/_ORGANIZED/Projects/Drafts - Almost Final
+~/Downloads/_ORGANIZED/Projects/hbs-promotion
+~/Downloads/_ORGANIZED/Projects/sm-website-app
+~/Downloads/_ORGANIZED/Projects/sm-website-app/app
+~/Downloads/_ORGANIZED/Projects/Black Friday PROMO
+~/Downloads/_ORGANIZED/Projects/claude-comands-organization
+~/Downloads/_ORGANIZED/Projects/claude-comands-organization/Private & Shared
+~/Downloads/_ORGANIZED/Projects/claude-comands-organization/extracted
+~/Downloads/_ORGANIZED/Projects/Transcrips Bodybuilding Callisthenics
+~/Downloads/_ORGANIZED/Projects/Claude_files
+~/Downloads/_ORGANIZED/Other
+~/Downloads/_ORGANIZED/Other/pdfjs-library
+~/Downloads/_ORGANIZED/Other/pdfjs-library/web
+~/Downloads/_ORGANIZED/Other/pdfjs-library/build
+~/Downloads/_ORGANIZED/Other/nordpass-logs
+~/Downloads/_ORGANIZED/Other/TITAN
+~/Downloads/_ORGANIZED/Code_Projects
+~/Downloads/_ORGANIZED/Code_Projects/Python
+~/Downloads/_ORGANIZED/Code_Projects/Shell
+~/Downloads/_ORGANIZED/Code_Projects/exported-assets-folder-v2
+~/Downloads/_ORGANIZED/Code_Projects/aoc-super-app
+~/Downloads/_ORGANIZED/Code_Projects/exported-assets-folder-v1
+~/Downloads/_ORGANIZED/Archives
+~/Downloads/_ORGANIZED/aoc-book
+~/Downloads/_ORGANIZED/aoc-book/aoc-submission-package-folder
+~/Downloads/_ORGANIZED/aoc-book/Emails
+~/Downloads/_ORGANIZED/aoc-book/FINAL SUBMISSION AOC (migrate to one drive to writters materials or to where it belongs)
+~/Downloads/_ORGANIZED/Videos
+~/Downloads/_ORGANIZED/Audio
+~/Downloads/_ORGANIZED/saturno-os-kernels
+~/Downloads/_ORGANIZED/saturno-os-kernels/Craft exported saturno-os-docs
+~/Downloads/_ORGANIZED/saturno-os-kernels/Craft exported saturno-os-docs/01_WRITTING OS
+~/Downloads/_ORGANIZED/saturno-os-kernels/Craft exported saturno-os-docs/Saturno OS
+~/Downloads/_ORGANIZED/PDFs
+~/Downloads/_ORGANIZED/Documents
+~/Downloads/_ORGANIZED/Documents/Markdown
+~/Downloads/_ORGANIZED/Documents/screenshots-main-phone-roi10
+~/Downloads/_ORGANIZED/Documents/Spreadsheets
+~/Downloads/_ORGANIZED/Documents/HTML
+~/Downloads/_ORGANIZED/Documents/JSON
+~/Downloads/_ORGANIZED/Documents/Word
+~/Downloads/_ORGANIZED/Documents/Text
+~/Downloads/_ORGANIZED/claude-conversations
+~/Downloads/_ORGANIZED/perplexity-artifacts
+~/Downloads/_ORGANIZED/Zips
+~/Downloads/_ORGANIZED/Zips/Claude-agent-app
+~/Downloads/_ORGANIZED/Zips/claude-desktop-saturno-os-html-10:10
+~/Downloads/_ORGANIZED/Zips/hbs-road-map-notion
+~/Downloads/_ORGANIZED/Zips/han-balancing-system-meta-data
+~/Downloads/_ORGANIZED/Zips/archive projects
+~/Downloads/_ORGANIZED/Zips/Solar-sistem-app-V2
+~/Downloads/_ORGANIZED/Zips/Solar-sistem-app-V2/Solar-system-app
+~/Downloads/_ORGANIZED/Zips/PendulumCampaign-needs-fixing
+~/Downloads/_ORGANIZED/Zips/Claude scripts
+~/Downloads/_ORGANIZED/Zips/Zips
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT/Clients
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT/The Art of Calisthenics HD
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT/Gabo's Notion HQ
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT/Saturno Movement HQ
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT/Private & Shared
+~/Downloads/_ORGANIZED/Zips/NOTION-EXPORT/⟪ Saturno Movement HQ ⟫
+~/Downloads/_ORGANIZED/data-exports
+~/Downloads/_ORGANIZED/data-exports/claude-Kernel-Prompts-10:10
+~/Downloads/_ORGANIZED/Installers
+~/Downloads/titan-forge-upgrade
+~/Downloads/titan-forge-upgrade/extension
+~/Downloads/titan-forge-upgrade/js
+~/Downloads/titan-forge-upgrade/saturno-capture-extension
+~/Downloads/titan-forge-upgrade/saturno-capture-extension/icons
+~/Downloads/titan-forge-upgrade/.git
+~/Downloads/titan-forge-upgrade/.git/objects
+~/Downloads/titan-forge-upgrade/.git/objects/0d
+~/Downloads/titan-forge-upgrade/.git/objects/95
+~/Downloads/titan-forge-upgrade/.git/objects/92
+~/Downloads/titan-forge-upgrade/.git/objects/68
+~/Downloads/titan-forge-upgrade/.git/objects/04
+~/Downloads/titan-forge-upgrade/.git/objects/35
+~/Downloads/titan-forge-upgrade/.git/objects/3c
+~/Downloads/titan-forge-upgrade/.git/objects/67
+~/Downloads/titan-forge-upgrade/.git/objects/0b
+~/Downloads/titan-forge-upgrade/.git/objects/94
+~/Downloads/titan-forge-upgrade/.git/objects/05
+~/Downloads/titan-forge-upgrade/.git/objects/a3
+~/Downloads/titan-forge-upgrade/.git/objects/b2
+~/Downloads/titan-forge-upgrade/.git/objects/ad
+~/Downloads/titan-forge-upgrade/.git/objects/df
+~/Downloads/titan-forge-upgrade/.git/objects/a5
+~/Downloads/titan-forge-upgrade/.git/objects/d1
+~/Downloads/titan-forge-upgrade/.git/objects/d6
+~/Downloads/titan-forge-upgrade/.git/objects/bc
+~/Downloads/titan-forge-upgrade/.git/objects/c0
+~/Downloads/titan-forge-upgrade/.git/objects/ca
+~/Downloads/titan-forge-upgrade/.git/objects/c8
+~/Downloads/titan-forge-upgrade/.git/objects/pack
+~/Downloads/titan-forge-upgrade/.git/objects/7e
+~/Downloads/titan-forge-upgrade/.git/objects/26
+~/Downloads/titan-forge-upgrade/.git/objects/4d
+~/Downloads/titan-forge-upgrade/.git/objects/75
+~/Downloads/titan-forge-upgrade/.git/objects/44
+~/Downloads/titan-forge-upgrade/.git/objects/9f
+~/Downloads/titan-forge-upgrade/.git/objects/info
+~/Downloads/titan-forge-upgrade/.git/objects/91
+~/Downloads/titan-forge-upgrade/.git/objects/96
+~/Downloads/titan-forge-upgrade/.git/objects/54
+~/Downloads/titan-forge-upgrade/.git/objects/08
+~/Downloads/titan-forge-upgrade/.git/objects/6d
+~/Downloads/titan-forge-upgrade/.git/objects/39
+~/Downloads/titan-forge-upgrade/.git/objects/99
+~/Downloads/titan-forge-upgrade/.git/objects/0f
+~/Downloads/titan-forge-upgrade/.git/objects/a7
+~/Downloads/titan-forge-upgrade/.git/objects/b8
+~/Downloads/titan-forge-upgrade/.git/objects/b1
+~/Downloads/titan-forge-upgrade/.git/objects/b6
+~/Downloads/titan-forge-upgrade/.git/objects/a8
+~/Downloads/titan-forge-upgrade/.git/objects/a1
+~/Downloads/titan-forge-upgrade/.git/objects/c3
+~/Downloads/titan-forge-upgrade/.git/objects/c4
+~/Downloads/titan-forge-upgrade/.git/objects/ea
+~/Downloads/titan-forge-upgrade/.git/objects/f0
+~/Downloads/titan-forge-upgrade/.git/objects/ff
+~/Downloads/titan-forge-upgrade/.git/objects/f6
+~/Downloads/titan-forge-upgrade/.git/objects/46
+~/Downloads/titan-forge-upgrade/.git/objects/41
+~/Downloads/titan-forge-upgrade/.git/objects/48
+~/Downloads/titan-forge-upgrade/.git/objects/15
+~/Downloads/titan-forge-upgrade/.git/objects/8c
+~/Downloads/titan-forge-upgrade/.git/objects/85
+~/Downloads/titan-forge-upgrade/.git/objects/1d
+~/Downloads/titan-forge-upgrade/.git/objects/1c
+~/Downloads/titan-forge-upgrade/.git/objects/47
+~/Downloads/titan-forge-upgrade/.git/objects/7a
+~/Downloads/titan-forge-upgrade/.git/objects/14
+~/Downloads/titan-forge-upgrade/.git/info
+~/Downloads/titan-forge-upgrade/.git/logs
+~/Downloads/titan-forge-upgrade/.git/logs/refs
+~/Downloads/titan-forge-upgrade/.git/hooks
+~/Downloads/titan-forge-upgrade/.git/refs
+~/Downloads/titan-forge-upgrade/.git/refs/heads
+~/Downloads/titan-forge-upgrade/.git/refs/tags
+~/Downloads/titan-forge-upgrade/.git/refs/remotes
+~/Downloads/exported-assets
+~/Downloads/files (2)
+~/Downloads/files (2)/🚀_CURRENT_DEPLOYMENT
+~/Downloads/files (2)/🚀_CURRENT_DEPLOYMENT/saturno-forge
+~/Downloads/Perplexity-space-set-up
+~/Downloads/SATURNO_MONSTER
+~/Downloads/SATURNO_MONSTER/CANONICAL
+~/Downloads/SATURNO_MONSTER/CANONICAL/FRONTENDS
+~/Downloads/SATURNO_MONSTER/CANONICAL/CONVERSATIONS
+~/Downloads/SATURNO_MONSTER/CANONICAL/PROMPTS
+~/Downloads/SATURNO_MONSTER/CANONICAL/SYSTEMS
+~/Downloads/SATURNO_MONSTER/CANONICAL/ASSETS
+~/Downloads/SATURNO_MONSTER/CURSOR
+~/Downloads/SATURNO_MONSTER/CLAUDE
+~/Downloads/SATURNO_MONSTER/CLAUDE/PATCHES
+~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER
+~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER/.git
+~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER/.git/objects
+~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER/.git/info
+~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER/.git/hooks
+~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER/.git/refs
+~/Downloads/SATURNO_MONSTER/.venv
+~/Downloads/SATURNO_MONSTER/.venv/bin
+~/Downloads/SATURNO_MONSTER/.venv/include
+~/Downloads/SATURNO_MONSTER/.venv/include/python3.13
+~/Downloads/SATURNO_MONSTER/.venv/lib
+~/Downloads/SATURNO_MONSTER/.venv/lib/python3.13
+~/Downloads/SATURNO_MONSTER/SCRIPTS
+~/Downloads/SATURNO_MONSTER/INDEX
+~/Downloads/SATURNO_MONSTER/WATCH_INBOX
+~/Downloads/SATURNO_MONSTER/WATCH_INBOX/transcripts
+~/Downloads/SATURNO_MONSTER/WATCH_INBOX/markdown
+~/Downloads/SATURNO_MONSTER/WATCH_INBOX/pdf
+~/Downloads/SATURNO_MONSTER/WATCH_INBOX/html
+~/Downloads/SATURNO_MONSTER/WATCH_INBOX/raw
+~/Downloads/MORE DEPLYMENT FILES
+~/Downloads/MORE DEPLYMENT FILES/mnt
+~/Downloads/MORE DEPLYMENT FILES/mnt/user-data
+~/Downloads/MORE DEPLYMENT FILES/mnt/user-data/outputs
+~/Downloads/MORE DEPLYMENT FILES/🚀_CURRENT_DEPLOYMENT
+~/Downloads/MORE DEPLYMENT FILES/🚀_CURRENT_DEPLOYMENT/saturno-forge
+~/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC
+~/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC/HTMLs AOC MAIN FOLDER
+~/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC/HTMLs AOC MAIN FOLDER/MORE HTMLS  2
+~/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC/HTMLs AOC MAIN FOLDER/MORE HTMLS 
+~/Downloads/MONSTER ZIP FOLDER - URGENT
+~/Downloads/.evernote
+~/Downloads/.evernote/139404163
+~/Downloads/.evernote/139404163/external-edits
+~/Downloads/.evernote/139404163/external-edits/158a3816-5ef3-59d1-9d3e-7552c3c66d57
+~/Downloads/.evernote/139404163/external-edits/240c4467-94a2-fa82-0733-9c13c095edb3
+~/Downloads/ALL DEPLOYMENTS FROM MAC-BOOK PRO
+~/Downloads/CLaude-ORGANIZE-NEW
+~/Downloads/🚀_CURRENT_DEPLOYMENT
+~/Downloads/🚀_CURRENT_DEPLOYMENT/saturno-forge
+~/Downloads/Submissions v1
+~/Downloads/Private & Shared
+~/Downloads/karina-media
+~/Downloads/🎨 ⇢ 03_Infographics-DNA-skills-drafts-PX
+~/Downloads/GPT CONVO __SCLAUDE-SCALFOLD
+

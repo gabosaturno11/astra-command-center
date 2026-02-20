@@ -1,0 +1,185 @@
+# FOLDER SIZES (sorted by size)
+
+=== DEV-CANONICAL ===
+3.1G	~/dev/titan-forge/
+1.8G	~/dev/saturno-bonus/
+166M	~/dev/de-aqui-a-saturno/
+ 14M	~/dev/astra-command-center/
+456K	~/dev/nexus-capture/
+
+=== DESKTOP ===
+6.3G	~/Desktop/CLAUDE NOT HERE/
+4.0K	~/Desktop/CLAUDE HELP/
+
+=== DOWNLOADS ===
+ 26G	~/Downloads/_ORGANIZED/
+1.4G	~/Downloads/karina-media/
+474M	~/Downloads/FROM IMAC DONWLOADS/
+ 13M	~/Downloads/SATURNO_MONSTER/
+3.1M	~/Downloads/Perplexity-space-set-up/
+3.0M	~/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC/
+1.5M	~/Downloads/exported-assets/
+1.0M	~/Downloads/titan-forge-upgrade/
+964K	~/Downloads/🎨 ⇢ 03_Infographics-DNA-skills-drafts-PX/
+556K	~/Downloads/MORE DEPLYMENT FILES/
+188K	~/Downloads/GPT CONVO __SCLAUDE-SCALFOLD/
+172K	~/Downloads/files (2)/
+128K	~/Downloads/🚀_CURRENT_DEPLOYMENT/
+120K	~/Downloads/MONSTER ZIP FOLDER - URGENT/
+120K	~/Downloads/CLaude-ORGANIZE-NEW/
+ 96K	~/Downloads/Private & Shared/
+ 48K	~/Downloads/Submissions v1/
+  0B	~/Downloads/ALL DEPLOYMENTS FROM MAC-BOOK PRO/
+
+=== PROJECTS ===
+ 46G	~/Projects/Quick-Access/
+3.1G	~/Projects/saturno-vault/
+255M	~/Projects/ULTIMATE_WRITING_HUB_MANUStar/
+ 11M	~/Projects/saturno-newsletter/
+3.9M	~/Projects/AI-Hub/
+352K	~/Projects/Claude/
+276K	~/Projects/toc-editor-deploy/
+ 92K	~/Projects/scripts/
+ 48K	~/Projects/prompts/
+ 24K	~/Projects/toc-editor-pro/
+
+=== DOCUMENTS ===
+170M	~/Documents/Whisper/
+150M	~/Documents/ADD/
+6.9M	~/Documents/FabFilter/
+2.0M	~/Documents/Adobe/
+ 24K	~/Documents/AI-HUB/
+ 16K	~/Documents/Playlists/
+8.0K	~/Documents/Library/
+4.0K	~/Documents/SynthMaster/
+  0B	~/Documents/Zoom/
+  0B	~/Documents/Projects/
+  0B	~/Documents/Presets/
+  0B	~/Documents/Cuesheets/
+  0B	~/Documents/Auto Save/
+
+=== GDRIVE-ARMOR ===
+1.5T	/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/
+229G	/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/
+191G	/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/
+ 54G	/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /
+ 40G	/Volumes/G-DRIVE ArmorATD/03_BUSINESS/
+1.7G	/Volumes/G-DRIVE ArmorATD/05_BRANDING/
+1.1G	/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/
+1.1G	/Volumes/G-DRIVE ArmorATD/00_AI_HUB/
+290M	/Volumes/G-DRIVE ArmorATD/04_HANDBALANCING/
+4.0K	/Volumes/G-DRIVE ArmorATD/saturno-solar-system/
+
+=== SSK-DRIVE ===
+ 73G	/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/
+ 48G	/Volumes/SSK Drive/Desktop/
+ 39G	/Volumes/SSK Drive/00-sm-academy-content/
+ 33G	/Volumes/SSK Drive/00-start/
+ 27G	/Volumes/SSK Drive/Organize/
+ 22G	/Volumes/SSK Drive/instagram-posts/
+7.9G	/Volumes/SSK Drive/CLAUDE NOT HERE/
+4.0G	/Volumes/SSK Drive/TapRecord/
+1.7G	/Volumes/SSK Drive/downloads-i-mac/
+287M	/Volumes/SSK Drive/marketing/
+230M	/Volumes/SSK Drive/00-black-friday/
+226M	/Volumes/SSK Drive/_ORGANIZED/
+8.8M	/Volumes/SSK Drive/AOC_MASTER/
+6.4M	/Volumes/SSK Drive/TV/
+4.9M	/Volumes/SSK Drive/🎯_aoc-book-project/
+3.0M	/Volumes/SSK Drive/SSOT_ESSENTIALS/
+384K	/Volumes/SSK Drive/System Volume Information/
+
+=== T7-DRIVE ===
+467G	/Volumes/T7/CF3/
+199G	/Volumes/T7/CI (Michael)/
+127G	/Volumes/T7/CF2/
+120G	/Volumes/T7/CE1/
+ 99G	/Volumes/T7/00_Gabo's Folder/
+ 98G	/Volumes/T7/Gabo CF1-2 Raw/
+ 82G	/Volumes/T7/CF1 PH1/
+ 77G	/Volumes/T7/01_Youtube Projects/
+ 76G	/Volumes/T7/CF1 (Michael)/
+ 71G	/Volumes/T7/CF2 Footage/
+ 59G	/Volumes/T7/CF2 (Michael)/
+ 48G	/Volumes/T7/Michael Insta/
+ 41G	/Volumes/T7/CE1 FOOTAGE/
+ 38G	/Volumes/T7/CF 1 LECTURES/
+ 26G	/Volumes/T7/Back Up Raw CF2/
+ 24G	/Volumes/T7/00_Instagram/
+ 22G	/Volumes/T7/CF1 PP PROJECT/
+ 16G	/Volumes/T7/Memories SM/
+9.4G	/Volumes/T7/MOVES 2023-2024/
+8.4G	/Volumes/T7/MUSIC/
+5.8G	/Volumes/T7/CI TEST/
+5.6G	/Volumes/T7/_ORGANIZED/
+4.0G	/Volumes/T7/Academy Intro Graphics/
+3.5G	/Volumes/T7/Transitions Clips/
+3.2G	/Volumes/T7/Vegas-footage-2025/
+2.2G	/Volumes/T7/CF2 PP PROJECT/
+1.5G	/Volumes/T7/New Folder With Items 2/
+688M	/Volumes/T7/SM APP Ads Moves/
+669M	/Volumes/T7/Academy Promo/
+656M	/Volumes/T7/APP PROMO/
+123M	/Volumes/T7/Book OS/
+ 92M	/Volumes/T7/color test/
+ 87M	/Volumes/T7/CF1 Transitions Done/
+ 31M	/Volumes/T7/Install/
+ 30M	/Volumes/T7/CF3 PP PROJECT/
+ 14M	/Volumes/T7/CE1 PP PROJECT/
+9.8M	/Volumes/T7/Private & Shared/
+4.6M	/Volumes/T7/Framework-2-UNITY-POF/
+2.3M	/Volumes/T7/Victory Belt Submission Package/
+1.8M	/Volumes/T7/REST & RECOVERY - POF/
+1.8M	/Volumes/T7/Framework-1-POF/
+640K	/Volumes/T7/System Volume Information/
+384K	/Volumes/T7/projects/
+256K	/Volumes/T7/$RECYCLE.BIN/
+
+=== GDRIVE-GABO ===
+258G	~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/
+150M	~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Other computers/
+  0B	~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Shared drives/
+
+=== GDRIVE-REACH ===
+2.1T	~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/My Drive/
+  0B	~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/Shared drives/
+
+=== GDRIVE-ACADEMY ===
+ 42M	~/Library/CloudStorage/GoogleDrive-smacademycontent@gmail.com/My Drive/
+
+=== ONEDRIVE ===
+2.4G	~/Library/CloudStorage/OneDrive-Personal/z_OLD_USER_ARCHIVE/
+1.1G	~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/
+646M	~/Library/CloudStorage/OneDrive-Personal/_NOT_BOOK_FROM_VB/
+ 12M	~/Library/CloudStorage/OneDrive-Personal/Documents/
+4.6M	~/Library/CloudStorage/OneDrive-Personal/BOOK_OS/
+2.1M	~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/
+1.1M	~/Library/CloudStorage/OneDrive-Personal/Microsoft Copilot Chat Files/
+220K	~/Library/CloudStorage/OneDrive-Personal/01_Projects/
+ 44K	~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/
+ 12K	~/Library/CloudStorage/OneDrive-Personal/GABO_OS/
+8.0K	~/Library/CloudStorage/OneDrive-Personal/Pictures/
+4.0K	~/Library/CloudStorage/OneDrive-Personal/Scans/
+4.0K	~/Library/CloudStorage/OneDrive-Personal/00_NOTES_CONSOLIDATED/
+  0B	~/Library/CloudStorage/OneDrive-Personal/Attachments/
+  0B	~/Library/CloudStorage/OneDrive-Personal/02_Downloads/
+  0B	~/Library/CloudStorage/OneDrive-Personal/_DESKTOP_BACKUP_20251130/
+
+=== ICLOUD ===
+ 62G	~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/
+ 57G	~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/
+ 37G	~/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE/
+ 12G	~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/
+ 12G	~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/
+6.4G	~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/
+1.9G	~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/
+648M	~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/
+477M	~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/
+4.3M	~/Library/Mobile Documents/com~apple~CloudDocs/Desktop/
+2.3M	~/Library/Mobile Documents/com~apple~CloudDocs/05_NOTES/
+1.6M	~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/
+824K	~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/
+ 16K	~/Library/Mobile Documents/com~apple~CloudDocs/https:/
+  0B	~/Library/Mobile Documents/com~apple~CloudDocs/Documents/
+  0B	~/Library/Mobile Documents/com~apple~CloudDocs/04_Prototypes/
+

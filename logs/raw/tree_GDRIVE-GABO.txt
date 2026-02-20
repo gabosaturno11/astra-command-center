@@ -1,0 +1,321 @@
+=== GDRIVE-GABO: /Users/Gabosaturno/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com ===
+
+--- Top-level folder sizes ---
+258G	/Users/Gabosaturno/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/
+150M	/Users/Gabosaturno/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Other computers/
+  0B	/Users/Gabosaturno/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Shared drives/
+
+--- Full tree (depth 4) ---
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Other computers
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Other computers/USB and External Devices
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Other computers/USB and External Devices/Saturno’s IPhone 
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/Shared drives
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.shortcut-targets-by-id
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.Trash
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/44312
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/46248
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/46215
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/51370
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/42570
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/44307
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/199297
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/199297/Costumer_Service
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/51424
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/1223
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/1224
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/217017
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/131777
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/101
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/51343
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/199337
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/199337/01_AOC_BOOK
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/199337/01_AOC_BOOK/book-os
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/199337/01_AOC_BOOK/10-book-main
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/42535
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/690
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/42581
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/42588
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/46325
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/42573
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/51500
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/920
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/.tmp/711
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/preferences
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/your_instagram_activity
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/personal_information
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/connections
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/security_and_login_information
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/ads_information
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/logged_information
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/apps_and_websites_off_of_instagram
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/meta-2026-Feb-13-18-51-48/instagram-gabosaturno-2026-02-13-uTyDYaYM/media
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/08_visual_assets
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/08_visual_assets/02_finals
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/08_visual_assets/01_by_source
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/08_visual_assets/00_by_theme
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/05_research
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/07_transcripts
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/02_manuscript
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/02_manuscript/03_archive
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/02_manuscript/00_full_manuscript
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/02_manuscript/01_tocs_expanded
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/02_manuscript/02_work_in_progress
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix/02_by_pattern
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix/01_by_discipline
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix/04_gates
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix/03_functional_core
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix/05_relationships
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/06_movement_matrix/00_master
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/04_chapters
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/00_inbox
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/00_inbox/THE_ART_OF_CALISTHENICS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/00_inbox/THE ART OF CALISTHENICS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/11_deliverables
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/01_command_center
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/01_command_center/data
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/03_toc
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/10_writers_material
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/10_writers_material/00_creation-tools
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_THE_ART_OF_CALISTHENICS/09_workflows
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/04_CLAUDE_DOCS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/04_CLAUDE_DOCS/sync
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/04_CLAUDE_DOCS/kernel
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/04_CLAUDE_DOCS/kernel/Weekly Summery Claude 
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/04_CLAUDE_DOCS/kernel/SESSION_CARDS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/04_CLAUDE_DOCS/kernel/scripts
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/Gemini Gems
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/AOC_Book_Assets
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/02_SATURNO_MOVEMENT
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/2026-02-02_APSIS_MATRIX
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/README.md
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/2026-02-01_AOC_YOUTUBE
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/2026-02-01_AOC_YOUTUBE/design_assets
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/2026-02-01_AOC_YOUTUBE/youtube_research
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/2026-02-01_AOC_YOUTUBE/book_strategy
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/MANUS_SESSIONS/2026-02-01_AOC_YOUTUBE/folder_structures
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/personal
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/personal/01_Immigration Documents
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/personal/02_Photography
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/personal/03_Finances
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/management
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances-imbox
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances-imbox/Bank_Statatements_GaboSaturnoLLC_2024
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances-imbox/IRS May 2025
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances-imbox/01_SaturnMovementCorp
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances-imbox/00_GaboSaturnoLLC
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances-imbox/Receips 2025
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Z_🔏Clients Archive
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Franz J
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Sam
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/NAT - July 12th 05
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Bogdana
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Z_Resources
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Guillermo
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/online-training/Jack
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/05_BUSINESS/finances
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/social-media
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/social-media/00_SMFAM
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/social-media/✈️ Travels
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/social-media/City Cave Recovery Video
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/social-media/🛸South-beach-night-sesh
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os/01_Branding Elements
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os/SM Academty App
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os/01_PDfs
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os/🚀➔ ⟪The World Of Beautiful Chaos! ⟫
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os/Quotes Vault
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/creative-os/00_Company Structure
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/art-of-creation
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/graphic-design
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/graphic-design/elements-space-nebula-backgrounds-3EP75B-2019-05-20
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/graphic-design/elements-outer-space-planetary-template-4G3UMY-2019-03-15
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/03_CONTENT_PRODUCTION/graphic-design/Solar system mat 2.0
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/htmls
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/htmls/02_archive
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/htmls/00_deployed
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/htmls/01_pending_toc_update
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Nov-15-16-05-25
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Nov-15-16-05-25/instagram-gabosaturno-2025-11-15-O2Jo7F4C
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Personal
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Clients
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Learning
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Business
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Fitness
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Creative
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Systems
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/screenshots/Travel
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/loose-gdocs
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-8e5ycC63
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-nO5E098V
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-WUCYjwwH
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-tSBcFir5
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-10-16-STQPES4Q
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-Xp7IuNNd
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-bi6c3SIp
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-GGKqiVo8
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-pyqnfxeq
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-uHvBnVLE
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-algnPaej
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-lovY7hes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-16-13-53-02/instagram-gabosaturno-2025-09-17-20qKmrBi
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/audio-imbox
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/Gabo_Writing_Package-1
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/vectorstock_45633027
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/Converted - Note 2025-05-14 20-46-56 (Merged)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/00501-5-YearCareerPathPlan
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/Gabo Writting Style & Voice Vault (All Docs)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/IRS Mini Voog
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/Gabo_Writing_PDFs
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/vectorstock_55311839
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/Private & Shared
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-2/Gabo_Writing_Package
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/saved-google-app
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/💫→ CLIENT OS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/🎱 HBF SPRINT
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/SOLAR SYSTEM APP V1
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/🧩 Linguistic Matrix
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/Project Management
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/🧪 → SM Lab
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/🖤 Organization.
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/📒 The Art of Calisthenics | AOC
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/🪐SM App
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/👽🪐💍
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/⭐️AI-HUB
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/00_Linguistic Synthetizer 
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/projects/🫡 Hormozi
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-17-70Ln5nM1
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-25-VNEqCelJ
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-17-bKBI5kVn
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-17-jHDGafva
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-17-wAYeaIn7
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-25-bDtAhoUd
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-25-1T0mmrXC
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-17-yKdI2kBd
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-25-UWqZTAc5
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Sep-17-12-32-28/instagram-gabosaturno-2025-09-17-TRqdgZHt
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/saved-chrome-1
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/to-be-organized
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/to-be-organized/Gabo's Workout
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/to-be-organized/From L-Sit to V-Sit. (SM CH)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/03_Music
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/05_Videos
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/02_Images
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/04_SFX
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/07_PS Actions
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/01_Branding
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/elements/06_AE Templates
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/index-microtimes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meet-recordings
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-10-10
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-10-10/🪐 03 - SATURNO MOVEMENT CORP - Financial OS
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/sort-10-10/Claude Code
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Dec-15-18-15-06
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Dec-15-18-15-06/instagram-gabosaturno-2025-12-15-KXD7WlDG
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/meta-2025-Dec-15-18-15-06/instagram-gabosaturno-2026-01-14-qzLJqbpI
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/building-blocks
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/07_ARCHIVE/saved-chrome
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_SUBMISSION_PACKAGE
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_SUBMISSION_PACKAGE/00_TOC Expanded FrameWorks 🖼️ 
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Youtube Scripts - Book Gabo 
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Youtube Scripts - Book Gabo /Book Workflow
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/#$%
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/#$%/Take Out
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/SM Lab_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Defining a Holistic Business and Life Structure -2_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/:Archive
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Organizing Conversation into Prompt - Claude_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Dump
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Dump/AI Disruptor
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Dump/exported-assets (3)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/iCloud Notes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/iCloud Notes/iCloud Notes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/iCloud Notes/Notes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/iCloud Notes/SM APP
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Desktop 1.1
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Desktop 1.1/#$%
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Desktop 1.1/00_DESING
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Desktop 1.1/IRS Payment Plan Gabo_otter_ai
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Desktop 1.1/REVISIT END OF WEEK - May 12-18
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Desktop 1.1/Check
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Book - TOC - Drafts
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Book Content
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/🧱Entire Converdsations
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/🧱Entire Converdsations/Ideas Relationships (1)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/🧱Entire Converdsations/Ideas Relationships
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Evernote
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Evernote/Failed Uploads
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/My Notes files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Learning
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/- LLM DOCS FROM DRIVE
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Google Gemini_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/00_DESING
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/00_DESING/Icons & Ihpne Minimalistic
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/00_IMBOX
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/00_IMBOX/Descript Installer v2.2.0.app
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/00_IMBOX/FabFilter
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/00_IMBOX/ADD
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Flow chart test.agflowchart5
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Stream With All My Heart (Cedric Gervais Remix) by ILLENIUM _ Listen online for free on SoundCloud_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Stream With All My Heart (Cedric Gervais Remix) by ILLENIUM _ Listen online for free on SoundCloud_files/I dont know lol
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/REVISIT END OF WEEK - May 12-18
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/REVISIT END OF WEEK - May 12-18/Friday
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/REVISIT END OF WEEK - May 12-18/Reciepts to move
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/HTMLs - Claude - Roadmaps
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Vertical roadmap milestones on black background Timeline infographic template for business presentation Vector illustration _ Premium Vector_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Square Frame - SM Instagram - IG format for quotes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Defining a Holistic Business and Life Structure.pdf_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/My Notes files (1)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/📝 Writting Hub
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/SM PDfs
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Transcrips Bodybuilding Callisthenics
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Defining a Holistic Business and Life Structure - Claude_files
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Writting Styles
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/SATURNO MOVEMENT (Internal)/Markdowns
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/06_HANDBALANCING
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/06_HANDBALANCING/training
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/06_HANDBALANCING/training/01_Dip Pull Up Check (King of Weighted)
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/06_HANDBALANCING/training/02_Cinematic Training Clips
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/kernels
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/VAULT_SHIP
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Archive
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Content_Library
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Programs
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Brand_Assets
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/00_KERNEL
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Claude_Help
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/agents
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/gabo-os
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/gabo-os/Personal
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/gabo-os/Screenshots
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/gabo-os/GOLD
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/gabo-os/Notes
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/knowledge-base
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/prompts
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/google-ai-studio
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/ai-llm-documents
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/ai-llm-documents/03_BF25_SSOT_V1
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/ai-llm-documents/01_Prompts
+~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/AOC_CONVERSATION_DOCUMENTS
+

@@ -1,0 +1,362 @@
+# ALL PACKAGE.JSON FILES
+
+PKG|~/dev/astra-command-center|astra-command-center|2.0.0
+PKG|~/dev/titan-forge|?|?
+PKG|~/dev/saturno-bonus|?|?
+PKG|~/Desktop/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT|?|?
+PKG|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO|saturno-hub|0.1.0
+PKG|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc|saturno-command-center|1.0.0
+PKG|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor|interactive-toc-editor|2.0.0
+PKG|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system|saturno-solar-system|0.0.0
+PKG|~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check|saturno-command-center|1.0.0
+PKG|~/Downloads/_ORGANIZED/Code_Projects/aoc-super-app|saturno-writing-hub|1.0.0
+PKG|~/Downloads/_ORGANIZED/Zips/Solar-sistem-app-V2/Solar-system-app/Additional-files|saturno-writing-hub|1.0.0
+PKG|~/Projects/ULTIMATE_WRITING_HUB_MANUStar|ultimate-writing-hub|0.0.0
+PKG|~/Projects/saturno-vault|?|?
+PKG|~/Projects/AI-Hub|ai-hub|1.0.0
+PKG|~/Projects/toc-editor-deploy/interactive-toc-editor|interactive-toc-editor|2.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/saturno-hub|saturno-hub|0.1.0
+PKG|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/victory-belt-cc|saturno-command-center|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/interactive-toc-editor|interactive-toc-editor|2.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/saturno-solar-system|saturno-solar-system|0.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Development/WebProjects|saturno-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2|saturno-command-center|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE_CONTINUITY_BACKUP_JAN2/AI-Hub|ai-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/prompt-basics|prompt|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/terminal-suggest|terminal-suggest|1.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/merge-conflict|merge-conflict|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/media-preview|media-preview|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/razor|razor|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/shaderlab|shaderlab|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/ms-vscode.js-debug-companion|js-debug-companion|1.1.3
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-seti|vscode-theme-seti|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/html-language-features/server|vscode-html-languageserver|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/html-language-features|html-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/docker|docker|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/go|go|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/simple-browser|simple-browser|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-monokai|theme-monokai|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/json-language-features/server|vscode-json-languageserver|1.3.4
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/json-language-features|json-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/references-view|references-view|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/gulp|gulp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/configuration-editing|configuration-editing|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/python|python|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/css|css|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/clojure|clojure|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/less|less|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/css-language-features/server|vscode-css-languageserver|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/css-language-features|css-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-red|theme-red|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/dart|dart|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/latex|latex|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/typescript-language-features|typescript-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/grunt|grunt|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/microsoft-authentication|microsoft-authentication|0.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-abyss|theme-abyss|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/scss|scss|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/jake|jake|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/perl|perl|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/rust|rust|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/pug|pug|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/fsharp|fsharp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/r|r|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/ipynb|ipynb|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/notebook-renderers|builtin-notebook-renderers|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/java|java|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/diff|diff|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/html|html|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/php|php|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/ms-vscode.js-debug|js-debug|1.100.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/lua|lua|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/emmet|emmet|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/xml|xml|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-quietlight|theme-quietlight|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/vb|vb|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-solarized-dark|theme-solarized-dark|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/powershell|powershell|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/typescript-basics|typescript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/debug-auto-launch|debug-auto-launch|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/debug-server-ready|debug-server-ready|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/ini|ini|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/json|json|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-tomorrow-night-blue|theme-tomorrow-night-blue|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/github|github|0.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/markdown-language-features|markdown-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/git-base|git-base|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-solarized-light|theme-solarized-light|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/handlebars|handlebars|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/cpp|cpp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/swift|swift|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/make|make|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/shellscript|shellscript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/markdown-basics|markdown|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/markdown-math|markdown-math|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/yaml|yaml|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/log|log|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/github-authentication|github-authentication|0.0.2
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-defaults|theme-defaults|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/csharp|csharp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/julia|julia|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-monokai-dimmed|theme-monokai-dimmed|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/bat|bat|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/groovy|groovy|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/coffeescript|coffeescript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/javascript|javascript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/ms-vscode.vscode-js-profile-table|vscode-js-profile-table|1.0.10
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/php-language-features|php-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/tunnel-forwarding|tunnel-forwarding|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/extension-editing|extension-editing|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/hlsl|hlsl|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/restructuredtext|restructuredtext|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/theme-kimbie-dark|theme-kimbie-dark|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/objective-c|objective-c|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/npm|npm|1.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/ruby|ruby|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/git|git|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/search-result|search-result|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app/extensions/sql|sql|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/MONDAY/Visual Studio Code.app/Contents/Resources/app|Code|1.101.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/prompt-basics|prompt|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/terminal-suggest|terminal-suggest|1.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/merge-conflict|merge-conflict|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/media-preview|media-preview|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/razor|razor|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/shaderlab|shaderlab|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/ms-vscode.js-debug-companion|js-debug-companion|1.1.3
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-seti|vscode-theme-seti|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/html-language-features/server|vscode-html-languageserver|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/html-language-features|html-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/docker|docker|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/go|go|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/simple-browser|simple-browser|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-monokai|theme-monokai|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/json-language-features/server|vscode-json-languageserver|1.3.4
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/json-language-features|json-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/references-view|references-view|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/gulp|gulp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/configuration-editing|configuration-editing|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/python|python|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/css|css|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/clojure|clojure|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/less|less|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/css-language-features/server|vscode-css-languageserver|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/css-language-features|css-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-red|theme-red|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/dart|dart|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/latex|latex|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/typescript-language-features|typescript-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/grunt|grunt|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/microsoft-authentication|microsoft-authentication|0.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-abyss|theme-abyss|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/scss|scss|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/jake|jake|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/perl|perl|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/rust|rust|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/pug|pug|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/fsharp|fsharp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/r|r|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/ipynb|ipynb|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/notebook-renderers|builtin-notebook-renderers|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/java|java|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/diff|diff|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/html|html|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/php|php|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/ms-vscode.js-debug|js-debug|1.100.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/lua|lua|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/emmet|emmet|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/xml|xml|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-quietlight|theme-quietlight|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/vb|vb|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-solarized-dark|theme-solarized-dark|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/powershell|powershell|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/typescript-basics|typescript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/debug-auto-launch|debug-auto-launch|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/debug-server-ready|debug-server-ready|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/ini|ini|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/json|json|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-tomorrow-night-blue|theme-tomorrow-night-blue|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/github|github|0.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/markdown-language-features|markdown-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/git-base|git-base|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-solarized-light|theme-solarized-light|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/handlebars|handlebars|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/cpp|cpp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/swift|swift|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/make|make|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/shellscript|shellscript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/markdown-basics|markdown|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/markdown-math|markdown-math|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/yaml|yaml|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/log|log|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/github-authentication|github-authentication|0.0.2
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-defaults|theme-defaults|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/csharp|csharp|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/julia|julia|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-monokai-dimmed|theme-monokai-dimmed|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/bat|bat|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/groovy|groovy|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/coffeescript|coffeescript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/javascript|javascript|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/ms-vscode.vscode-js-profile-table|vscode-js-profile-table|1.0.10
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/php-language-features|php-language-features|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/tunnel-forwarding|tunnel-forwarding|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/extension-editing|extension-editing|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/hlsl|hlsl|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/restructuredtext|restructuredtext|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/theme-kimbie-dark|theme-kimbie-dark|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/objective-c|objective-c|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/npm|npm|1.0.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/ruby|ruby|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/git|git|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/search-result|search-result|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app/extensions/sql|sql|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE/Book Main Folder/MONDAY copy/Visual Studio Code.app/Contents/Resources/app|Code|1.101.1
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/DEPLOY_READY_HUB|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/GITHUB_ROOT_READY|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_V3_KORTEX|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_EXPERIMENTS/Hub 6|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/shared|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/apps/electron-app|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/apps/browser-extension|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/apps/vue-app|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS/apps/saturno-hub-starter|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124/overnight-audit-20251123/GOLD_FOLDERS/manuscript|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/andy-deploy|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs/SaturnoMaster/app/saturno-hub-starter|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs/saturno-hub-starter|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics 2|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/BF-Comand-Center V2|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/andy-deploy_1|andy-strength-guide|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/sm-website-app|?|?
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS/HUB_V3_KORTEX|kortex-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment/Writting Hub 3 - V2 (More assets included)|kortex-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment|kortex-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Hub 6|saturno-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/TAGGED_FILES/RED_TAG/Writting Hub 3 - Complete Deployment|kortex-writing-hub|1.0.0
+PKG|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/TAGGED_FILES/RED_TAG/sm-website-app|sm-web-app|0.1.0
+PKG|/Volumes/G-DRIVE ArmorATD/saturno-solar-system/.vite/deps_temp_c646402e|?|?
+PKG|/Volumes/SSK Drive/Organize/andy-deploy|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/Organize/andy-deploy_1|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/Organize/BF-Comand-Center V2|saturno-content-command-center|1.0.0
+PKG|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/WRITING_HUBS/HUB_V3_KORTEX|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Hub 6|saturno-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs/SaturnoMaster/app/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics 2|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/BF-Comand-Center V2|saturno-content-command-center|1.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy_1|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app|sm-web-app|0.1.0
+PKG|/Volumes/SSK Drive/Organize/sm-website-app|sm-web-app|0.1.0
+PKG|/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT|?|?
+PKG|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc|saturno-command-center|1.0.0
+PKG|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor|interactive-toc-editor|2.0.0
+PKG|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system|saturno-solar-system|0.0.0
+PKG|/Volumes/SSK Drive/marketing/05_archive_temp/SaturnoMaster/app/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/SaturnoMaster/app/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics 2|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/BF-Comand-Center V2|saturno-content-command-center|1.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy_1|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/downloads-i-mac/sm-website-app|sm-web-app|0.1.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/EXPORTED_ASSETS_STAGING/project_zips/private-prompts-prototype-main/apps/browser-extension|private-prompts-browser-extension|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/EXPORTED_ASSETS_STAGING/project_zips/private-prompts-prototype-main/apps/electron-app|private-prompts-electron-app|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/EXPORTED_ASSETS_STAGING/project_zips/private-prompts-prototype-main/apps/vue-app|private-prompts-vue-app|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/EXPORTED_ASSETS_STAGING/project_zips/private-prompts-prototype-main|private-prompts-monorepo|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/EXPORTED_ASSETS_STAGING/project_zips/private-prompts-prototype-main/shared|@private-prompts/shared|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/apps/browser-extension|private-prompts-browser-extension|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/apps/electron-app|private-prompts-electron-app|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/apps/vue-app|private-prompts-vue-app|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main/shared|@private-prompts/shared|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES/private-prompts-prototype-main|private-prompts-monorepo|0.0.5-beta
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS/apps/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124/overnight-audit-20251123/GOLD_FOLDERS/manuscript|ultimate-writing-hub|0.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/BF-Comand-Center V2|saturno-content-command-center|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy_1|andy-strength-guide|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app|sm-web-app|0.1.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs/SaturnoMaster/app/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs/saturno-hub-starter|saturno-hub|0.1.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics 2|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_EXPERIMENTS/Hub 6|saturno-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment|kortex-writing-hub|1.0.0
+PKG|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_V3_KORTEX|kortex-writing-hub|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/andy-strength-guide|andy-strength-guide|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/📍PRODUCT/💻 Working_MVPs/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/📍PRODUCT/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/📍PRODUCT/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/00_📍BLACK_FRIDAY/🎁 Bonuses/00_Workflows/Deployment protocol pipeline v1|andy-strength-guide|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/Andy PDF|andy-strength-guide|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/andy-guide-public|andy-strength-guide|1.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/FINAL PDFS (TBV)/_MONDAY_BONUS/apps/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Archive/_ARCHIVE_OLD_ORGS_20251124/overnight-audit-20251123/GOLD_FOLDERS/manuscript|ultimate-writing-hub|0.0.0
+PKG|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/google-ai-studio|universal-visual-timeline-framework|1.0.0
+PKG|~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/00_inbox/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main|private-prompts-monorepo|0.0.5-beta
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/deploy-ready-hub|kortex-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/github-root-ready|kortex-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_V3_KORTEX|kortex-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment|kortex-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_EXPERIMENTS/Hub 6|saturno-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/FINAL PDFS (TBV)/_MONDAY_BONUS/apps/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/_ARCHIVE_OLD_ORGS_20251124/overnight-audit-20251123/GOLD_FOLDERS/manuscript|ultimate-writing-hub|0.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/andy-deploy|andy-strength-guide|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/💻 Working_MVPs/SaturnoMaster/app/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/💻 Working_MVPs/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/DEPLOY_READY_HUB|kortex-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/GITHUB_ROOT_READY|kortex-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/🤖 AI_Projects/GPT-CONVOS/saturno-movement-_-the-art-of-calisthenics 2|saturno-movement-|-the-art-of-calisthenics|0.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/BF-Comand-Center V2|saturno-content-command-center|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/andy-deploy_1|andy-strength-guide|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/sm-website-app|sm-web-app|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/victory-belt-cc-check|saturno-command-center|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Code_Projects/aoc-super-app|saturno-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Zips/Solar-sistem-app-V2/Solar-system-app/Additional-files|saturno-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault/apps/saturno-hub-starter|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check|saturno-command-center|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/_ORGANIZED/Code_Projects/aoc-super-app|saturno-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/_ORGANIZED/Zips/Solar-sistem-app-V2/Solar-system-app/Additional-files|saturno-writing-hub|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc|saturno-command-center|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge|?|?
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/interactive-toc-editor|interactive-toc-editor|2.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system|saturno-solar-system|0.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main/shared|@private-prompts/shared|0.0.5-beta
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main|private-prompts-monorepo|0.0.5-beta
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main/apps/electron-app|private-prompts-electron-app|0.0.5-beta
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main/apps/browser-extension|private-prompts-browser-extension|0.0.5-beta
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main/apps/vue-app|private-prompts-vue-app|0.0.5-beta
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub|saturno-hub|0.1.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc|saturno-command-center|1.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge|?|?
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/interactive-toc-editor|interactive-toc-editor|2.0.0
+PKG|~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-solar-system|saturno-solar-system|0.0.0

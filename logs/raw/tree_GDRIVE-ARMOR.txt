@@ -1,0 +1,737 @@
+=== GDRIVE-ARMOR: /Volumes/G-DRIVE ArmorATD ===
+
+--- Top-level folder sizes ---
+ 54G	/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /
+1.1G	/Volumes/G-DRIVE ArmorATD/00_AI_HUB/
+229G	/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/
+191G	/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/
+ 40G	/Volumes/G-DRIVE ArmorATD/03_BUSINESS/
+290M	/Volumes/G-DRIVE ArmorATD/04_HANDBALANCING/
+1.7G	/Volumes/G-DRIVE ArmorATD/05_BRANDING/
+1.5T	/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/
+1.1G	/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/
+4.0K	/Volumes/G-DRIVE ArmorATD/saturno-solar-system/
+
+--- Full tree (depth 4) ---
+/Volumes/G-DRIVE ArmorATD
+/Volumes/G-DRIVE ArmorATD/05_BRANDING
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/music
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/music/3 tracks
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/elements
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/elements/Sound FX
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/elements/Sound FX/Clicks_Clanks
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/elements/SM Logos
+/Volumes/G-DRIVE ArmorATD/05_BRANDING/elements/SM MUSIC
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.health_check
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.migration_secondchance
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.assisted_import_pre
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/Cache
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.corespotlight
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.live_system
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.scan
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.assisted_import_post
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.live_user
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.live
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.migration
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.repair
+/Volumes/G-DRIVE ArmorATD/.Spotlight-V100/Store-V2/D42DCFD4-13C4-4DCF-AE51-DC00FEF038C4/journals.live_priority
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/testimonials
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/testimonials/Bruno Carmo 
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/testimonials/Bruno Carmo /Pictures
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/testimonials/Bruno Carmo /Videos
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/HUMAN RESOURCES
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/HUMAN RESOURCES/Internship Candidates
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/HUMAN RESOURCES/COMPANY STRUCTURE
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/HUMAN RESOURCES/Customer Service
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Accounting
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Accounting/Statement Folders
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/PLANETS & MEANINGS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/COMPETITION INFO
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/VIDEO TUTORIALS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Gabi AI Scripts Feed
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Gabi AI Scripts Feed/Calisthenics Scripts
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/SM PASSWORDS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/ACCOUNTS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/ACCOUNTS/PASSWORDS (07 23 19)
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/AUDIENCE DATA
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/AUDIENCE DATA/VIMEO MOST VIEWED VIDEOS DATA
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/AUDIENCE DATA/SOCIAL MEDIA POLLS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/SM ACADEMY DOCUMENTS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/SM ACADEMY DOCUMENTS/Calisthenics & Yoga Hybrid System
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/SM ACADEMY DOCUMENTS/CALISTHENICS & YOGA HYBRID TRAINING SYSTEM
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/SM ACADEMY DOCUMENTS/HANDBALANCING
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Music
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/SM Transition Elements
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/RING PROMO
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/HIIT TIMER
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Last YT Video Project (Example Purposes)
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Easier:Harder Variation Template
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/YOUTUBE VIDEO FOOTAGE
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/IG Name Tags
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Intros & Outros
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Giveaway Templates
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Lower Thirds Elements
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/Suscribe Template
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/LUT (Color Correction)
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/Video Editing Elements for YT/FXS SOUND
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/general/CONTENT PRODUCTION TIMELINES
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Edited Products
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Edited Products/Yoga
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Edited Products/Calisthenics
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Edited Products/Apparel
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/LINKS TO WEB VIDEOS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/TEACHABLE
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/TEACHABLE/Teachable - Banners for Ali
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Web Pictures Final
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Web Pictures Final/STUDIO
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Web Pictures Final/ACADEMY
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Web Pictures Final/TEAM
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/Web Pictures Final/STORE
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/WEB SECTIONS INFO
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/WEB SECTIONS INFO/HOME
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/WEB SECTIONS INFO/ACADEMY
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/WEB SECTIONS INFO/TEAM
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/WEB SECTIONS INFO/STORE
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/App Mock Up
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web/WORD PRESS TASKS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/smfam
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web-2
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/web-2/New Landing Page Draft
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Solar System Yoga Mat 2.0
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES/SM YOGA PANTS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES/SM HOODIE
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES/SM BAG
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES/SM BLACK JOGGERS
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES/SM BLUE T-SHIRT
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/MERCH PICTURES/SM BLACK T-SHIRT
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Merch Design Elements
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Hoodie
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/SM Rope Mini-Bag
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Rings of Saturn
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Weigth Belt
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Weigth Belt/Weightbelt Pictures
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Wrist Wraps
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/SM Parallettes 2.0
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Hat
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/SM Yoga Blocks
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/merch/Premium Yoga Mat
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/events
+/Volumes/G-DRIVE ArmorATD/03_BUSINESS/events/FitExpo2020
+/Volumes/G-DRIVE ArmorATD/04_HANDBALANCING
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/Final Clips
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/Final Clips/Fabian's Folder LOOP
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/Final Clips/Lower Body Moves
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/Pending Pictures
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/For Editors Only
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/For Editors Only/Music
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/For Editors Only/APremiere - Guide Project
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/For Editors Only/Color Correction  LUT
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/For Editors Only/IG Name Tags
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/For Editors Only/APremiere - Transition Templates
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/RAW Clips
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/RAW Clips/Moves FEB 28
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/RAW Clips/Fabian's Folder
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/move-list/RAW Clips/READY 2 GO
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS/October 17th
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS/Calisthenics Foundation 1
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS/Calisthenics Initiation
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS/Extra Pictures
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS/PROMOs
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/APP THUMBNAILS/Calisthenics Foundation 2
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/app/SM App Banners
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service/00_CANCELLATION_FOLLOWUP_TEMPLATES
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service/00_CANCELLATION_FOLLOWUP_TEMPLATES/DANNY'S RESPONSES
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service/00_CANCELLATION_FOLLOWUP_TEMPLATES/GABO'S RESPONSES
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service/00_CANCELLATION_FOLLOWUP_TEMPLATES/ALAN'S RESPONSES
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service/00_CANCELLATION_FOLLOWUP_TEMPLATES/FABIAN'S RESPONES
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/customer-service/00_CANCELLATION_FOLLOWUP_TEMPLATES/ANDREW'S RESPONSES
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start/South Endel
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start/South Endel/South Eden - Day 1
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start/South Endel/Eden - Day 2:3
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start/South Endel/Endel Day 2:3 - Phone 2 - Footage
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start/Social Media
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/start/Social Media/Researchs & Frameworks
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/SKILLS PDFs - SM ACADEMY
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/14_INITIATION WEEK ALL
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_HANDBALANCING SYSTEM
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_HANDBALANCING SYSTEM/HBE
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_HANDBALANCING SYSTEM/#SMHBCHECK
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_HANDBALANCING SYSTEM/Hand-Balancing Foundation
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_HANDBALANCING SYSTEM/Hand-Balancing Initation
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/06_WARM UPS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/06_WARM UPS/WARM UPS - UPDATED
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/12_DAILY EXPLORATION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/12_DAILY EXPLORATION/DAY ONE
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/12_DAILY EXPLORATION/DAY TWHO
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/12_DAILY EXPLORATION/HEAD SHOTS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/13_ACADEMY PDFS & CALENDARS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/TEACHABLE BANNERS FINAL
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/TEACHABLE BANNERS FINAL/Banners to be edited
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/TEACHABLE BANNERS FINAL/teachable banners
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/04_CALISTHENICS SKILLS PROGRAM
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/00_ULTIMATE HYBRID SYSTEM
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/00_ULTIMATE HYBRID SYSTEM/INITIATION WEEK
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/02_YOGA SYSTEM
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/02_YOGA SYSTEM/04_YOGA PDFs
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/02_YOGA SYSTEM/03_YOGA EXPANSION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/02_YOGA SYSTEM/00_YOGA SYSTEM INTRO
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/02_YOGA SYSTEM/01_YOGA INITIATION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/02_YOGA SYSTEM/02_YOGA FOUNDATION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/15_HHWE
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/15_HHWE/Descriptions
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/15_HHWE/Video Editing Assets
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/08_RESOURCES LECTURES (Anatomy, Energy Systems...)
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/08_RESOURCES LECTURES (Anatomy, Energy Systems...)/Thomas’ Articles
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/09_SM JOURNALS (Time Management)
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/10_PUBLISHED ACADEMY CONTENT LIST
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/05_HIIT WORKOUT
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/07_MOBILITY FLEXIBILITY PROTOCOLS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/07_MOBILITY FLEXIBILITY PROTOCOLS/DORSIFLEXION ROUTINE
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/07_MOBILITY FLEXIBILITY PROTOCOLS/MOBILITY & FLEXIBILITY SECTION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_Rings Programs
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_Rings Programs/Classic Rings 1
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/03_Rings Programs/Classic Rings 2
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/01_CALISTHENICS SYSTEM
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/01_CALISTHENICS SYSTEM/01_CALISTHENICS INITIATION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/01_CALISTHENICS SYSTEM/03_CALISTHENICS EXPANSION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/01_CALISTHENICS SYSTEM/02_CALISTHENICS FOUNDATION
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/01_CALISTHENICS SYSTEM/00_CALISTHENICS SYSTEM INTRO
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/11_IDEAS (PLANET FACTS, THEMES...)
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/11_IDEAS (PLANET FACTS, THEMES...)/SOLAR SYSTEM PLANETS FACTS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/YASSIR'S DESIGNS
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/YASSIR'S DESIGNS/SM Web Design
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/YASSIR'S DESIGNS/The Calisthenics Skills Bundle
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/content/YASSIR'S DESIGNS/App Banners
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/teachable
+/Volumes/G-DRIVE ArmorATD/01_SM_ACADEMY/ideas
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- 
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/music
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/.vercel
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/video
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/tools
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/css
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/js
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/audio
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/saturno-capture-extension
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/api
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/pdfs
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/.git
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/frameworks
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/ORGANIZED
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT/apps
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_EXPERIENCE
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/CLAUDE HELP
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/CLAUDE HELP/imac-claude-scripts
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/titan-forge
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/saturno-hub
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/ARCHIVE
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/_CLAUDE_SCRIPTS
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/victory-belt-cc
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/CLAUDE HELP
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/interactive-toc-editor
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/writing-hub-v2
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/titan-forge-v1
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/karina-gabo-story
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/Editting Tutorials
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/saturno-solar-system
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/ICLOUD_BACKUP_2025-12-31
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /02_CREATOR OS
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /02_CREATOR OS/Screenrecords
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/EOS_DIGITAL
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/EOS_DIGITAL/DCIM
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/EOS_DIGITAL/.fseventsd
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Gabo
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/SM Editing Tutorials
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Lyli's Content
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Lyli's Content/Lyli Unedited Photos
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Lyli's Content/Lyli Banners Info
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Motion Graphics - Fathers Day
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Motion Graphics - Fathers Day/Adobe After Effects Auto-Save
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Adobe Premiere Pro Auto-Save
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Recovery Picts
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Recovery Picts/icons
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Recovery Picts/78
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Adobe Premiere Pro Audio Previews
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Adobe Premiere Pro Audio Previews/S2 002 - Full Podcast Video.PRV
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Adobe Premiere Pro Audio Previews/Father's Day Chest Workout.PRV
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Adobe Premiere Pro Audio Previews/Adobe After Effects Auto-Save
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /00_IMBOX/Adobe Premiere Pro Audio Previews/Adobe Premiere Pro Auto-Save
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /01_PROJECTS
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /03_SATURNO_BF25_BONUSES
+/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /03_SATURNO_BF25_BONUSES/01_PROJECTS
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/06_BBEDIT_NOTES
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/02_AOC_BOOK_CANONICAL
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/02_AOC_BOOK_CANONICAL/aoc-book
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/02_AOC_BOOK_CANONICAL/aoc-book/aoc-submission-package-folder
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/02_AOC_BOOK_CANONICAL/aoc-book/Emails
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/02_AOC_BOOK_CANONICAL/aoc-book/FINAL SUBMISSION AOC (migrate to one drive to writters materials or to where it belongs)
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/05_CLAUDE_MD_ALL
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/03_BB_EDITS
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/07_MAPS
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/04_CLAUDE_SCRIPTS_DIFF
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/.vercel
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/video
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/tools
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/css
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/js
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/node_modules
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/audio
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/saturno-capture-extension
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/api
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/pdfs
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/.git
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/frameworks
+/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge/apps
+/Volumes/G-DRIVE ArmorATD/.Trashes
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/ANDRY FOOTAGE
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/ANDRY FOOTAGE/new faiils
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/QUOTE GRAPHICS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PROMOTIONAL CONTENT
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PROMOTIONAL CONTENT/#SMShareYour10
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/SM Mini Origins Pictures
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/Arm Balance Gabo
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/COLLABORATIONS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/CHALLENGES
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/CHALLENGES/GET YOUR 10
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PDF
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PDF/The Perfect Series PDFs
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PDF/How to V-SIT Guide
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PDF/Overhead Press
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/QUOTES AFTER EFFECTS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/MICRO_CONTENT_(ALREADY UPLOADED)
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/VLOG UPDATES
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/YT COVER RAW PICTURES
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/2020 New Outro
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/COFLOW_Full Moon_YT
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/10min. Abs Workout You Can Do Anywhere Thumbnail
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/2020 Exercise Titles
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/Thumbnail for 300K Special
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/Yoga Routine to Fix Posture
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/HIIT to Burn Fat
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/From L-Sit to V-Sit (Ft. FitnessFAQs)
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/Dragon Flag Tutorial
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/YOUTUBE/Planche Tips (Yohan)
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/EDITING ELEMENTS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/EDITING ELEMENTS/Sound FX
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/EDITING ELEMENTS/IG Templates
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/EDITING ELEMENTS/Intros & Outros
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/03_COLLABS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/03_COLLABS/COLLAB_FITNESS FAQS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/Social Media stories
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/LAST UPLOADS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/MICRO CLIPS DROP OFF (NEEDS COPY)
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/IG STORIES
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/IG STORIES/Video Test #1
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PROMO CAMPAIGNS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/PROMO CAMPAIGNS/HBS Launch
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/MICRO CLIPS (APPROVED)
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/Yass IG Reels
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/social-media/LUTS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/nyc-footage-2025
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Hi_Hats
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/BBA_Drum_Loops
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/FX
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Drum_Loops
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/SJ_Ambiences_CT
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Adobe Premiere Pro Video Previews
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/ARCDRUMS_-_Drum_Beats_-_Audio
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Vocal
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/KIS_CLL_Full
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/90
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Claps
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/FASHION_MODEL_89bpm
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Reverse_Vocal_Reverbs
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Cartoon Land
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Adobe Premiere Pro Auto-Save
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/HiHat_Loops
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/KICKS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Adobe Premiere Pro Audio Previews
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Soft_Vocal_Swells
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/sm-content/Copied_IG_Gabo Planche Motivational Speech/Melodic_Loops
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/short-form
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/raw-phone-footage
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/raw-phone-footage/Day-2-All-Clips
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM TIME LAPSE
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM TIME LAPSE/JULY 5th
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM UPDATE
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM UPDATE/JUNE 2, 2019
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM MEETINGS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM ZOOM CALLS
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting/SM California Audios
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/reel-elements
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting-2025
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting-2025/Accounting
+/Volumes/G-DRIVE ArmorATD/02_CONTENT_PRODUCTION/documenting-2025/SM Rescue
+/Volumes/G-DRIVE ArmorATD/.fseventsd
+/Volumes/G-DRIVE ArmorATD/.DocumentRevisions-V100
+/Volumes/G-DRIVE ArmorATD/.TemporaryItems
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/CLAUDE_SCRIPTS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Development
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/AOC_MASTER
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Projects
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Archives
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Documents
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Assets
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/archive/Workspace/Backups
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21/archive
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21/claude-md
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21/configs
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21/scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21/prompts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/ORGANIZED_JAN21/reports
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/SESSION_LOGS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/CLAUDE_HELP_DEC12_AUDIT
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/claude-scripts/CLAUDE_HELP_DEC12_AUDIT/imac-claude-scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/colab-notebooks
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/00_IMBOX
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-writing-hub
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/FRONTEND_MERGE
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2/.tmp.driveupload
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2/node_modules
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2/htmls
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2/icons
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2/.git
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2/data
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-forge-CURRENT
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/_SCRIPTS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE HELP
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE HELP/imac-claude-scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/transcript-to-pdf-FINAL
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/_DOCS_AND_REFS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/_DOCS_AND_REFS/saturno-forge-CURRENT
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/_SCREENSHOTS_JAN
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE_CONTINUITY_BACKUP_JAN2
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE_CONTINUITY_BACKUP_JAN2/CLAUDE_SCRIPTS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE_CONTINUITY_BACKUP_JAN2/DIGITAL_ARCHAEOLOGY_20260102
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE_CONTINUITY_BACKUP_JAN2/AI-Hub
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/APSIS_ORBIT_1
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/APSIS_ORBIT_1/APSIS :: ORBIT 1
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/HTMLs (INSPIRATION)
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/google-ai-studio
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/ultimate-book-backend.zip
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/04_RESEARCH
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/03_MOVEMENT-DNA
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/00_ADMIN
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/02_MANUSCRIPT
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/08_VOICE-&-STYLE
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/12_DELIVERABLES
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/10_TOOLING
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/05_ASSETS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/09_AGENTS-&-PROMPTS
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/The-Art-of-Calisthenics__MASTER-VAULT/01_TOC
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/perplexity-migration
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/perplexity-migration/core-projects
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/perplexity-migration/legendary-thread-archive
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/perplexity-migration/book-project
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/perplexity-migration/migration-tools
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/frontend
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/AOC_FRONTEND
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/config
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/Chrome extentions
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/AOC_MASTER
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/projects
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/projects/active
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/cortex-control-center.zip
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/setup
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/shared
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/docs
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/docs/guides
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/docs/reference
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/daily
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/daily/tasks
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/logs
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/deployment
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/deployment/frontend
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/deployment/scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/scripts
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/.github
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/.github/workflows
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/main/templates
+/Volumes/G-DRIVE ArmorATD/00_AI_HUB/gpt-convos
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Copied_Tricep (Long Head vs Lateral Head)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Copied_Tricep (Long Head vs Lateral Head)/old Footage
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Copied_Tricep (Long Head vs Lateral Head)/Open VS Close LSIT
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Copied_Tricep (Long Head vs Lateral Head)/Adobe Premiere Pro Auto-Save
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Copied_Tricep (Long Head vs Lateral Head)/Assets
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Current Projects
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Current Projects/Endel Project 2025
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Current Projects/Endel Project 2025/01_Research-Docs
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Current Projects/Endel Project 2025/00_CapCut-Projects
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Current Projects/Endel Project 2025/03_Back-Up
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/CE_FINAL PDF'S
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/CE_FINAL PDF'S/PNG
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/CLAUDE_SCRIPTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/drive-download-20230317T195346Z-001
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/you know. that folder.
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/مجلد بلا عنوان
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/vegas-dashboard
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/ALL-ENDEL-CLIPS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/loose-files
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder.
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/you know. that folder./HERE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/04_Documents
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/04_Documents/Claude
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/04_Documents/Perplexity
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/04_Documents/Manus
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/PROJECTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/PROJECTS/exported-assets(1)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Gabo Important Folder/PROJECTS/Content Creation Machine - Perplexity
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/INTROS FOR FABIAN
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/GAS_Email_Exports
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/vegas-dashboard-deploy
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/New Folder With Items
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/New Folder With Items/📍MOST IMPORTANT DOCUMENTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/New Folder With Items/Most RECENTL_Consolidating Knowledge Base Insights into Core Principles
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/New Folder With Items/instagram-carousel
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/I dont know lol
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/Motion Graphics Core Video
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/YOUTUBE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/YOUTUBE/NIGHT YOGA
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/YOUTUBE/SANTA MONICA DE NOCHE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/YOUTUBE/Intro + Outro Youtube
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/Motion Graphics
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/Motion Graphics/01_Renders
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Google Drive/Motion Graphics/03_References
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Karina Immigration 2025
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Prompting
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Prompting/:Archive
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Prompting/- LLM DOCS FROM DRIVE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Flow chart test.agflowchart5
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Flow chart test.agflowchart5/images
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/NYC Footage (2025 Gabo)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/My Notes
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/My Notes/My Notes files
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Max 8
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/Max 8/Collections
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/VAULT
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents ID3 - I Cloud/VAULT/KG:1
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/PRIVATE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/PRIVATE/DOCUMENTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/PRIVATE/KG - kari + iphone 13 pro 1st row
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/PRIVATE/KG - iphone 13 por max
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Music
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/.cursor
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/04_Branding
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/AI-Sync-Status
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/AudioMaster
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/AI-Status
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS 
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/AI-Shared-Resources
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/03_Prompts PDFs
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Desktop
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/04_Prototypes
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Archive-2025
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/01_Transcrips
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_AOC_MAIN_RESOURCES
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/WRITING_HUBS_BACKUP
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/i-cloud-MAIN-ALL-FOLDERS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_Writings
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/🤖_AI-HUB_UNIFIED_CONTROL_CENTER
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/🔑→CLAUDE_DOCS_ORGANIZED
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Documents
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/05_Saturno Movement APP
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Private & Shared
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/00_NOTES_CONSOLIDATED
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/GPT-CONVOS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Numbers
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Desktop
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/COVID TESTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Rings Pull Workout Shot List
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Shortcuts
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Documents
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Documents by Readdle
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Downloads
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/Documents Gabo (TBD)/iCloud Drive (Archive)/Pages
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_CLEAN
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_CLEAN/research
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_CLEAN/content
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_CLEAN/exports
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_CLEAN/AI-Hub-OS-2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/DIGITAL_ARCHAEOLOGY_20260102
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/03_PROJECTS_LIBRARY
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/z_OLD_USER_ARCHIVE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/DEPLOY_READY_HUB
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/04_Documents
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/GITHUB_ROOT_READY
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/01_CLAUDE_ARTIFACTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/z_MOVE IT
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/02_VB_BOOK_PROJECT
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/HUB_3_KORTEX
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/Archive-Old-Downloads-Mac
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/Archive-Old-Downloads-Mac/New Folder With Items
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/iCloud Photos 4
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/iCloud Photos - AID2  - Last 1000
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/iCloud Photos - NY Videos Phone3
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/iCloud Photos
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/I cloud
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/iCloud Photos - AID2  
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD ARCHIVE/iCloud Photos - AID3 - April 19 - Feb 5 2025
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17/screenshots
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17/11_BOOK
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17/Desktop August-July 2025
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17/exported-assets
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17/WRITING_HUBS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ARCHIVE_2025_01_17/exported-assets 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Music
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Pictures
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Desktop
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Library
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Public
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Movies
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Documents
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_OLD_USER_FOLDER_DEC2024/Downloads
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-EMERGENCY-BACKUP
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-EMERGENCY-BACKUP/0727
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-EMERGENCY-BACKUP/User Data
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/EMERGENCY-BACKUP-FROM-ICLOUD
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/CLAUDE_FILES_ORGANIZED
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/TAGGED_FILES
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/EMOJI_FILES
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/AOC_V1_FILES
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/INVENTORY
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/SCREENSHOTS_ORGANIZED
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/FULL_AUDIT_USERS_20251231
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD_AUDIT_20251231
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD_AUDIT_20251231/CSV_REPORTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD_AUDIT_20251231/AI_THINKING_EXTRACTED
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/ICLOUD_AUDIT_20251231/SCREENSHOTS_ORGANIZED
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_Downloads_BigFiles
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_Downloads_BigFiles/notion-export-v1-saturno-os
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_Downloads_BigFiles/short-form-content-master-folder
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Music
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/.adobe
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Pictures
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Desktop
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Library
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/.cups
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/.bash_sessions
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Public
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Movies
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Applications
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/.zoomus
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Splice
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Documents
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACKUP_User_Folder_20251212_000038/Downloads
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-FULL-BACKUP
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-FULL-BACKUP/0727
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-FULL-BACKUP/User Data
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/CapCut-FULL-BACKUP/Endel clip 1
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_ARCHIVE_20251222
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_ARCHIVE_20251222/ARCHIVE_ONEDRIVE_CHAOS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_ARCHIVE_20251222/07_LEGACY_BF25
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_ARCHIVE_20251222/06_VISUAL_ASSETS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_ARCHIVE_20251222/08_HTML_LEGACY
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BOOK_ARCHIVE_20251222/04_GPT_CONVOS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/DIGITAL_ARCHAEOLOGY_20251231
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Install Spotify 2.app
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Gabo background check_files
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Film Impact Premium Video Transitions V4.4.10 macOS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/IG_Front Lever (Gala)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/simple-lower-thirds-2021-08-30-20-51-00-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/energy-elements-premiere-pro-mogrt-2021-09-23-17-45-29-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/CF Phase 2 Venus - Part 1
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/swishes-elements-fcpx-2022-02-21-15-52-14-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/muscles-2022-03-02-20-15-14-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Routines_CF1_Week 1
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/neon-arrow-pack-2021-09-04-07-36-38-utc (1)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/titles-lower-thirds-2021-12-03-08-50-07-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Recibos de pago de Internet
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Mountain Audio - Zipper 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/quantum-hud-and-hitech-elements-for-premiere-pro-2021-09-03-18-21-54-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/hud-infographic-2021-08-29-04-18-25-utc
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/CF Phase 2 Venus - Part 1 3
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Film Impact Premium Video Transitions V4.5.4 macOS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/SM YT Cover 2021
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/CF Phase 2 Venus - Part 1 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/LOWERS 18
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Neon Arrows Pack
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/boing
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Seguro de salud Gabo
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Routines_CF1_Week 3
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/logioptionsplus_installer.app
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/iCloud Photos
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Mountain Audio - Zipper
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Audio
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/CF Phase 2 Venus - Part 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Recibos de pagos (LUZ)
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/swishes-elements-fcpx-2022-02-21-15-52-14-utc 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Routines_CF1_Week 1 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Routines_CF1_Week 1 5
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Motion Graphics Template Media
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Routines_CF1_Week 1 4
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Routines_CF1_Week 1 3
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/cash-machine-HYKQWJZ
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Estados de cuenta Gabo
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Mountain Audio - Rubber Stretching
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/OVERSHOTS
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Graphics
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Copied_Gabo IG Clips
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/Mountain Audio - Rubber Stretching 2
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/bone-breaks-YEZMBVG
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/I-Mac Pro Archive - 2021-2022/swing-squeak
+/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/My Drive
+/Volumes/G-DRIVE ArmorATD/saturno-solar-system
+/Volumes/G-DRIVE ArmorATD/saturno-solar-system/.vite
+/Volumes/G-DRIVE ArmorATD/saturno-solar-system/.vite/deps_temp_c646402e
+

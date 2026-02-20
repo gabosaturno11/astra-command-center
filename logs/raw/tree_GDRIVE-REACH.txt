@@ -1,0 +1,22 @@
+=== GDRIVE-REACH: /Users/Gabosaturno/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com ===
+
+--- Top-level folder sizes ---
+2.1T	/Users/Gabosaturno/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/My Drive/
+  0B	/Users/Gabosaturno/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/Shared drives/
+
+--- Full tree (depth 4) ---
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/Shared drives
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/02_CALISTHENICS EXPANSION
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/06_WARM UPs
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/Calisthenics Skills
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/00_CALISTHENICS INITIATION WEEK
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/05_CALISTHENICS DOCUMENTS RESOURCES
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/01_CALISTHENICS FOUNDATION
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.shortcut-targets-by-id/1jlm3pTch50Yxa7yCHQ3omwlVsh-xBmYg/01_CALISTHENICS SYSTEM/00_CALISTHENICS SYSTEM INTRO
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.Trash
+~/Library/CloudStorage/GoogleDrive-reach@saturnomovement.com/.mirror-symlink
+

@@ -1,0 +1,136 @@
+# ALL GIT REPOSITORIES FOUND ON SYSTEM
+# Scanned: Wed Feb 18 01:44:23 EST 2026
+
+=== DEV-CANONICAL ===
+REPO|~/dev/nexus-capture|gabosaturno11/nexus-capture|main|2026-02-17 22:45:29 -0500|fix: create-sound.sh now reads selected text from stdin (mac|9|0|no||456K|no|
+REPO|~/dev/de-aqui-a-saturno|gabosaturno11/de-aqui-a-saturno|main|2026-02-17 22:40:43 -0500|feat: add ASTRA connector — pings ASTRA backend on page lo|13|0|yes|CURRENT|166M|no|
+REPO|~/dev/astra-command-center|gabosaturno11/astra-command-center|main|2026-02-18 01:40:37 -0500|feat: full system audit script + overnight deep audit (15 ph|76|7|yes|CURRENT|9.7M|yes|2.2M
+REPO|~/dev/titan-forge|gabosaturno11/titan-forge|main|2026-02-17 22:40:41 -0500|feat: add ASTRA connector — pings ASTRA backend on page lo|88|2|yes|CURRENT|3.1G|yes|268M
+REPO|~/dev/saturno-bonus|gabosaturno11/saturno-bonus|main|2026-02-18 01:30:45 -0500|Add messages 36-43: full system audit session (Feb 18)|77|4|yes|CURRENT|1.8G|no|
+
+=== DESKTOP ===
+REPO|~/Desktop/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT|gabosaturno11/titan-forge|main|2026-02-10 08:58:02 -0500|Add saturno-movement-logo to gate and bonus nav|54|48|yes|OLD|3.5G|no|
+REPO|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO|gabosaturno11/saturno-hub|main|2026-02-01 03:33:06 -0500|Add Clear All button to Content Calendar|13|11|no|| 82M|yes| 27M
+REPO|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc|gabosaturno11/victory-belt-cc|main|2026-02-06 01:31:21 -0500|Fix: Decisions   list ID, ensure arrays init|23|16|no|| 43M|yes| 26M
+REPO|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|2026-02-02 20:27:05 -0500|Fix: Update link to victory-belt-cc|6|3|no||1.2M|no|
+REPO|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor|gabosaturno11/interactive-toc-editor|main|2026-02-02 20:29:13 -0500|Fix: Update link to victory-belt-cc|6|0|no||396K|no|
+REPO|~/Desktop/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system|gabosaturno11/saturno-solar-system|main|2026-02-02 20:29:14 -0500|Fix: Update link to victory-belt-cc|5|11|no|| 52M|yes| 49M
+
+=== DOWNLOADS ===
+REPO|~/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault|gabosaturno11/saturno-bonus-vault|main|2026-02-04 07:06:13 -0500|Add vault feature to COMMAND task manager|10|111|no||460M|no|
+REPO|~/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check|gabosaturno11/victory-belt-cc|main|2026-02-03 00:11:30 -0500|Fix: Vault Edit in Writer now loads content properly|21|2|no|| 14M|yes| 11M
+REPO|~/Downloads/titan-forge-upgrade|gabosaturno11/titan-forge|main|2026-02-04 07:06:00 -0500|Update README with full arsenal documentation|16|6|no||1.0M|no|
+REPO|~/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|NONE|NONE|0|1|no|| 96K|no|
+
+=== PROJECTS ===
+REPO|~/Projects/ULTIMATE_WRITING_HUB_MANUStar/writing-hub-backend|NO_REMOTE|DETACHED|NONE|NONE|0|0|no|| 53M|no|
+REPO|~/Projects/Claude/saturno-writting-hub|gabosaturno03/saturno-writting-hub|chore/deploy-setup|2025-09-26 04:14:04 -0400|ui: add 'Back to Hub' button in writing hub header|8|10|no||332K|no|
+REPO|~/Projects/saturno-vault|gabosaturno11/titan-forge|main|2026-02-13 18:50:39 -0500|Add ASTRA Command Center to nexus deploy cards and session l|68|2|yes|OLD|3.1G|yes|266M
+REPO|~/Projects/AI-Hub|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||3.9M|no|
+REPO|~/Projects/saturno-newsletter|NO_REMOTE|DETACHED|NONE|NONE|0|0|no|| 11M|no|
+REPO|~/Projects/toc-editor-deploy/interactive-toc-editor|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||120K|no|
+
+=== DOCUMENTS ===
+
+=== GDRIVE-ARMOR ===
+REPO|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/SATURNO_VAULT_DEPLOYMENT|gabosaturno11/titan-forge|main|2026-02-10 08:58:02 -0500|Add saturno-movement-logo to gate and bonus nav|54|45|yes|OLD|3.5G|no|
+REPO|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/saturno-hub|gabosaturno11/saturno-hub|main|2026-02-01 03:33:06 -0500|Add Clear All button to Content Calendar|13|11|no|| 91M|yes| 37M
+REPO|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/victory-belt-cc|gabosaturno11/victory-belt-cc|main|2026-02-06 01:31:21 -0500|Fix: Decisions   list ID, ensure arrays init|23|15|no|| 43M|yes| 26M
+REPO|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|2026-02-02 20:27:05 -0500|Fix: Update link to victory-belt-cc|6|3|no||1.2M|no|
+REPO|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/interactive-toc-editor|gabosaturno11/interactive-toc-editor|main|2026-02-02 20:29:13 -0500|Fix: Update link to victory-belt-cc|6|0|no||396K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/-- Gabo Space -- /DESKT0P-IMAC COPY-Feb-12/NOT A DEPLOYMENT ZONE/saturno-solar-system|gabosaturno11/saturno-solar-system|main|2026-02-02 20:29:14 -0500|Fix: Update link to victory-belt-cc|5|11|no|| 63M|yes| 60M
+REPO|/Volumes/G-DRIVE ArmorATD/CONSOLIDATION_FEB10/01_TITAN_FORGE_CANONICAL/titan-forge|gabosaturno11/titan-forge|main|2026-02-10 07:48:34 -0500|CF4: expand all sections before print for full PDF|51|8|yes|OLD|1.1G|yes|266M
+REPO|/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/saturno-command-center 2|gabosaturno11/saturno-command-center|main|2026-01-29 08:10:22 -0500|PASS6: VB brand lock + TOC hierarchy + design polish|9|9|no|| 49M|yes| 33M
+REPO|/Volumes/G-DRIVE ArmorATD/00_AI_HUB/DESKTOP_ARCHIVE_FEB2/CLAUDE_CONTINUITY_BACKUP_JAN2/AI-Hub|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||4.1M|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/DEPLOY_READY_HUB|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||188K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/GITHUB_ROOT_READY|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||156K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_V1_FOLDERS/Writting Hub 1 - (Folders)/enhanced-toc-hub|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||116K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment/writing-hub-kortex|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||136K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Life OS /00_TRAVELING OS/TRAVELING-OS-V1|gabosaturno11/traveling-os|main|NONE|NONE|0|0|yes|UNKNOWN|344K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/saturno-os/📍PRODUCT/DEPLOY_READY_HUB|NO_REMOTE|DETACHED|NONE|NONE|0|0|no|| 76K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/saturno-os/📍PRODUCT/GITHUB_ROOT_READY|NO_REMOTE|DETACHED|NONE|NONE|0|0|no|| 52K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS|NO_REMOTE|DETACHED|NONE|NONE|0|0|yes|UNKNOWN|113M|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||188K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||156K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/YASSIR_ACCOUNT_BACKUP/iCloud_Content/Downloads I-Mac/sm-website-app|NO_REMOTE|DETACHED|NONE|NONE|0|0|no|| 86M|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|0|no||348K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|0|no||320K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS/HUB_V1_FOLDERS/Writting Hub 1 - (Folders)/enhanced-toc-hub|Gabosaturno/hub1-v2-enhanced|main|2025-07-22 02:08:36 -0400|🔧 Fix [whatever breaks]|3|1|no||292K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment/writing-hub-kortex|Gabosaturno/kortex-writing-hub|main|2025-07-22 02:37:42 -0400|📱 Add full app as app.html - Complete Hub 1 V.2!|4|0|no||288K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/TAGGED_FILES/RED_TAG/Writting Hub 3 - Complete Deployment/writing-hub-kortex|Gabosaturno/kortex-writing-hub|main|2025-07-22 02:37:42 -0400|📱 Add full app as app.html - Complete Hub 1 V.2!|4|0|no||288K|no|
+REPO|/Volumes/G-DRIVE ArmorATD/06_ARCHIVE/backups/MEGA_OVERNIGHT_20251231/TAGGED_FILES/RED_TAG/sm-website-app|gabosaturno11/sm-app-copy-v1|develop|2025-08-28 20:47:47 +0500|content updated|193|1|no||159M|no|
+
+=== SSK-DRIVE ===
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|26|no|| 13M|no|
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|22|no|| 11M|no|
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/WRITING_HUBS/HUB_V1_FOLDERS/Writting Hub 1 - (Folders)/enhanced-toc-hub|Gabosaturno/hub1-v2-enhanced|main|2025-07-22 02:08:36 -0400|🔧 Fix [whatever breaks]|3|6|no||7.6M|no|
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment/writing-hub-kortex|Gabosaturno/kortex-writing-hub|main|2025-07-22 02:37:42 -0400|📱 Add full app as app.html - Complete Hub 1 V.2!|4|10|no||9.3M|no|
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/netlify-deploy/AI-Hub_ARCHIVED|gabosaturno11/AI-Hub|main|2025-09-26 02:26:05 -0400|🔧 Fix GitHub Pages build error permanently|23|76|no|| 28M|no|
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/Workspace/AI-Hub_ARCHIVED|gabosaturno11/AI-Hub|main|2025-09-19 02:49:57 -0400|🚀 Deploy AI Hub: 2025-09-19 02:49:57|19|66|no|| 22M|no|
+REPO|/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/com~apple~CloudDocs/AI-Hub_ARCHIVED|https://gabosaturno03:REDACTED_PAT@github.com/gabosaturno03/AI-Hub|master|2025-09-15 13:30:33 -0400|Initial AI Hub deployment - Team workspace setup|1|18|no|| 72M|no|
+REPO|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|27|no|| 14M|no|
+REPO|/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|22|no|| 11M|no|
+REPO|/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app|gabosaturno11/sm-app-copy-v1|develop|2025-08-28 20:47:47 +0500|content updated|193|285|no||214M|no|
+REPO|/Volumes/SSK Drive/Organize/saturno-writing-hub|gabosaturno03/saturno-writting-hub|main|2025-08-21 17:03:05 -0400|Deploy Saturno Writing Hub|1|5|no||6.9M|no|
+REPO|/Volumes/SSK Drive/Organize/sm-website-app|gabosaturno11/sm-app-copy-v1|develop|2025-08-28 20:47:47 +0500|content updated|193|285|no||214M|no|
+REPO|/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT|gabosaturno11/titan-forge|main|2026-02-10 08:58:02 -0500|Add saturno-movement-logo to gate and bonus nav|54|598|yes|OLD|3.7G|no|
+REPO|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO|gabosaturno11/saturno-hub|main|2026-02-01 03:33:06 -0500|Add Clear All button to Content Calendar|13|44|no||310M|yes|222M
+REPO|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc|gabosaturno11/victory-belt-cc|main|2026-02-06 01:31:21 -0500|Fix: Decisions   list ID, ensure arrays init|23|1680|no||809M|yes|510M
+REPO|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|2026-02-02 20:27:05 -0500|Fix: Update link to victory-belt-cc|6|11|no|| 13M|no|
+REPO|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor|gabosaturno11/interactive-toc-editor|main|2026-02-02 20:29:13 -0500|Fix: Update link to victory-belt-cc|6|10|no|| 10M|no|
+REPO|/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system|gabosaturno11/saturno-solar-system|main|2026-02-02 20:29:14 -0500|Fix: Update link to victory-belt-cc|5|24|no||407M|yes|383M
+REPO|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|27|no|| 14M|no|
+REPO|/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|22|no|| 11M|no|
+REPO|/Volumes/SSK Drive/downloads-i-mac/sm-website-app|gabosaturno11/sm-app-copy-v1|develop|2025-08-28 20:47:47 +0500|content updated|193|285|no||214M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS|gabosaturno11/saturno-bonus-vault|main|2025-11-29 00:44:26 -0500|Fix webinar date and remove duplicate PDF|9|173|yes|OLD|585M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/📍PRODUCT/DEPLOY_READY_HUB|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||7.3M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/📍PRODUCT/GITHUB_ROOT_READY|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||5.6M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app|gabosaturno11/sm-app-copy-v1|develop|2025-08-28 20:47:47 +0500|content updated|193|235|no||208M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|14|no|| 12M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|11|no||9.9M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|13|no|| 12M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|11|no||9.8M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment/writing-hub-kortex|Gabosaturno/kortex-writing-hub|main|2025-07-22 02:37:42 -0400|📱 Add full app as app.html - Complete Hub 1 V.2!|4|5|no||8.6M|no|
+REPO|/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/WRITING_HUBS/HUB_V1_FOLDERS/Writting Hub 1 - (Folders)/enhanced-toc-hub|Gabosaturno/hub1-v2-enhanced|main|2025-07-22 02:08:36 -0400|🔧 Fix [whatever breaks]|3|3|no||7.3M|no|
+
+=== T7-DRIVE ===
+REPO|/Volumes/T7/_ORGANIZED/03_PROJECTS/saturno-muscle-up|gabosaturno11/saturno-muscle-up|main|2025-11-25 17:29:43 -0500|Initial commit: Slow vs Fast Muscle-Up page|1|12|yes|CURRENT| 15M|no|
+
+=== GDRIVE-GABO ===
+REPO|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/📍PRODUCT/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|1|no||356K|no|
+REPO|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/saturno-os/📍PRODUCT/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|0|no||320K|no|
+REPO|~/Library/CloudStorage/GoogleDrive-gabo@saturnomovement.com/My Drive/00_AI_HUB/saturno-os/Active_Projects/FINAL PDFS (TBV)/_MONDAY_BONUS|gabosaturno11/saturno-bonus-vault|main|2025-11-29 00:44:26 -0500|Fix webinar date and remove duplicate PDF|9|7|yes|OLD|501M|no|
+
+=== GDRIVE-REACH ===
+
+=== GDRIVE-ACADEMY ===
+
+=== ONEDRIVE ===
+
+=== ICLOUD ===
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/deploy-ready-hub|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|1|no||348K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/github-root-ready|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|0|no||312K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_V1_FOLDERS/Writting Hub 1 - (Folders)/enhanced-toc-hub|Gabosaturno/hub1-v2-enhanced|main|2025-07-22 02:08:36 -0400|🔧 Fix [whatever breaks]|3|1|no||292K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_EXPERIMENTS/Writting Hub 3 - Complete Deployment/writing-hub-kortex|Gabosaturno/kortex-writing-hub|main|2025-07-22 02:37:42 -0400|📱 Add full app as app.html - Complete Hub 1 V.2!|4|0|no||288K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1|gabosaturno11/traveling-os|main|2026-01-11 19:34:24 -0500|Add direct booking links for all flights|5|0|yes|CURRENT|416K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/saturno-os/📍PRODUCT/DEPLOY_READY_HUB|NO_REMOTE|DETACHED|NONE|NONE|0|0|no||128K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/saturno-os/📍PRODUCT/GITHUB_ROOT_READY|NO_REMOTE|DETACHED|NONE|NONE|0|0|no|| 96K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/FINAL PDFS (TBV)/_MONDAY_BONUS|gabosaturno11/saturno-bonus-vault|main|2025-11-29 00:44:26 -0500|Fix webinar date and remove duplicate PDF|9|7|yes|OLD|501M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/DEPLOY_READY_HUB|gabosaturno03/saturno-writting-hub|master|2025-07-24 02:55:32 -0400|🚀 PERPLEXITY OPTIMIZATION: React/Vite deployment config +|3|1|no||356K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT/GITHUB_ROOT_READY|Gabosaturno/kortex-hub-live|master|2025-07-23 20:25:16 -0400|🔧 Fix export documents and delete functionality - WORKING|2|0|no||320K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/sm-website-app|gabosaturno11/sm-app-copy-v1|develop|2025-08-28 20:47:47 +0500|content updated|193|1|no||159M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/saturno-bonus-vault|gabosaturno11/saturno-bonus-vault|main|2026-02-04 07:06:13 -0500|Add vault feature to COMMAND task manager|10|111|no||460M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/victory-belt-cc-check|gabosaturno11/victory-belt-cc|main|2026-02-03 00:11:30 -0500|Fix: Vault Edit in Writer now loads content properly|21|2|no|| 14M|yes| 11M
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/titan-forge-upgrade|gabosaturno11/titan-forge|main|2026-02-04 07:06:00 -0500|Update README with full arsenal documentation|16|6|no||1.0M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|NONE|NONE|0|1|no|| 96K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/FROM IMAC DONWLOADS/saturno-bonus-vault|gabosaturno11/saturno-bonus-vault|main|2026-02-04 07:06:13 -0500|Add vault feature to COMMAND task manager|10|111|no||460M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/FROM IMAC DONWLOADS/victory-belt-cc-check|gabosaturno11/victory-belt-cc|main|2026-02-03 00:11:30 -0500|Fix: Vault Edit in Writer now loads content properly|21|2|no|| 14M|yes| 11M
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/titan-forge-upgrade|gabosaturno11/titan-forge|main|2026-02-04 07:06:00 -0500|Update README with full arsenal documentation|16|6|no||1.0M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/SATURNO_MONSTER/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|NONE|NONE|0|1|no|| 96K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub|gabosaturno11/saturno-hub|main|2026-02-01 03:33:06 -0500|Add Clear All button to Content Calendar|13|10|no|| 91M|yes| 37M
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc|gabosaturno11/victory-belt-cc|main|2026-02-06 01:31:21 -0500|Fix: Decisions   list ID, ensure arrays init|23|17|no|| 43M|yes| 26M
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge|gabosaturno11/titan-forge|main|2026-02-10 18:50:56 -0500|Refactor: Improve code structure and optimize performance in|47|8|yes|OLD|4.5G|yes|266M
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/VB-COMMAND-CENTER|gabosaturno11/VB-COMMAND-CENTER|main|2026-02-02 20:27:05 -0500|Fix: Update link to victory-belt-cc|6|3|no||1.2M|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/interactive-toc-editor|gabosaturno11/interactive-toc-editor|main|2026-02-02 20:29:13 -0500|Fix: Update link to victory-belt-cc|6|0|no||396K|no|
+REPO|~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system|gabosaturno11/saturno-solar-system|main|2026-02-02 20:29:14 -0500|Fix: Update link to victory-belt-cc|5|11|no|| 62M|yes| 60M
+

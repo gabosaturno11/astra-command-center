@@ -1,0 +1,696 @@
+=== T7-DRIVE: /Volumes/T7 ===
+
+--- Top-level folder sizes ---
+5.6G	/Volumes/T7/_ORGANIZED/
+256K	/Volumes/T7/$RECYCLE.BIN/
+ 99G	/Volumes/T7/00_Gabo's Folder/
+ 24G	/Volumes/T7/00_Instagram/
+ 77G	/Volumes/T7/01_Youtube Projects/
+4.0G	/Volumes/T7/Academy Intro Graphics/
+669M	/Volumes/T7/Academy Promo/
+656M	/Volumes/T7/APP PROMO/
+ 26G	/Volumes/T7/Back Up Raw CF2/
+123M	/Volumes/T7/Book OS/
+ 41G	/Volumes/T7/CE1 FOOTAGE/
+ 14M	/Volumes/T7/CE1 PP PROJECT/
+120G	/Volumes/T7/CE1/
+ 38G	/Volumes/T7/CF 1 LECTURES/
+ 76G	/Volumes/T7/CF1 (Michael)/
+ 82G	/Volumes/T7/CF1 PH1/
+ 22G	/Volumes/T7/CF1 PP PROJECT/
+ 87M	/Volumes/T7/CF1 Transitions Done/
+ 59G	/Volumes/T7/CF2 (Michael)/
+ 71G	/Volumes/T7/CF2 Footage/
+2.2G	/Volumes/T7/CF2 PP PROJECT/
+127G	/Volumes/T7/CF2/
+ 30M	/Volumes/T7/CF3 PP PROJECT/
+467G	/Volumes/T7/CF3/
+199G	/Volumes/T7/CI (Michael)/
+5.8G	/Volumes/T7/CI TEST/
+ 92M	/Volumes/T7/color test/
+1.8M	/Volumes/T7/Framework-1-POF/
+4.6M	/Volumes/T7/Framework-2-UNITY-POF/
+ 98G	/Volumes/T7/Gabo CF1-2 Raw/
+ 31M	/Volumes/T7/Install/
+ 16G	/Volumes/T7/Memories SM/
+ 48G	/Volumes/T7/Michael Insta/
+9.4G	/Volumes/T7/MOVES 2023-2024/
+8.4G	/Volumes/T7/MUSIC/
+1.5G	/Volumes/T7/New Folder With Items 2/
+9.8M	/Volumes/T7/Private & Shared/
+384K	/Volumes/T7/projects/
+1.8M	/Volumes/T7/REST & RECOVERY - POF/
+688M	/Volumes/T7/SM APP Ads Moves/
+640K	/Volumes/T7/System Volume Information/
+3.5G	/Volumes/T7/Transitions Clips/
+3.2G	/Volumes/T7/Vegas-footage-2025/
+2.3M	/Volumes/T7/Victory Belt Submission Package/
+
+--- Full tree (depth 4) ---
+/Volumes/T7
+/Volumes/T7/.Spotlight-V100
+/Volumes/T7/.Spotlight-V100/Store-V2
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.corespotlight
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.live
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.live_system
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.live_user
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.live_priority
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.assisted_import_pre
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.assisted_import_post
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.health_check
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.migration
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.migration_secondchance
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.scan
+/Volumes/T7/.Spotlight-V100/Store-V2/5BEF2DCB-7D6B-464D-AF7D-18239D4C867B/journals.repair
+/Volumes/T7/.Trashes
+/Volumes/T7/.Trashes/501
+/Volumes/T7/.Trashes/503
+/Volumes/T7/.Trashes/503/FUK UP
+/Volumes/T7/.Trashes/503/MOVES - AUG 21ST
+/Volumes/T7/.Trashes/503/MOVES - AUGUST 22ND
+/Volumes/T7/.Trashes/503/MOVES - DECEMBER 21ST
+/Volumes/T7/.Trashes/503/MOVES - FEB 6TH
+/Volumes/T7/.Trashes/503/MOVES - FEB 26TH
+/Volumes/T7/.Trashes/503/MOVES - MARCH 4TH
+/Volumes/T7/.Trashes/503/MOVES - MARCH 5TH
+/Volumes/T7/.Trashes/503/MOVES - NOV 28TH
+/Volumes/T7/.Trashes/503/MOVES - OCT 16TH
+/Volumes/T7/.Trashes/503/MOVES - AUG 14TH
+/Volumes/T7/.Trashes/503/MOVES - AUG 16TH
+/Volumes/T7/.Trashes/503/MOVES - AUGUST 22ND 12.26.47 PM
+/Volumes/T7/.Trashes/503/MOVES - AUG 21ST 12.26.49 PM
+/Volumes/T7/.Trashes/503/MOVES - AUG 14TH 12.26.53 PM
+/Volumes/T7/.Trashes/503/MOVES - AUG 16TH 12.26.54 PM
+/Volumes/T7/.Trashes/503/SECOND SHOT
+/Volumes/T7/.Trashes/503/untitled folder 2
+/Volumes/T7/.Trashes/503/untitled folder
+/Volumes/T7/.Trashes/503/untitled folder 8.22.07 PM
+/Volumes/T7/.Trashes/502
+/Volumes/T7/01_Youtube Projects
+/Volumes/T7/01_Youtube Projects/YT_THE HARDEST CORE WORKOUT
+/Volumes/T7/01_Youtube Projects/YT_THE HARDEST CORE WORKOUT/Copied_YT_THE HARDEST CORE WORKOUT
+/Volumes/T7/01_Youtube Projects/YT_THE HARDEST CORE WORKOUT/Copied_YT_THE HARDEST CORE WORKOUT/Adobe Premiere Pro Audio Previews
+/Volumes/T7/01_Youtube Projects/YT_THE HARDEST CORE WORKOUT/Copied_YT_THE HARDEST CORE WORKOUT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/01_Youtube Projects/Music
+/Volumes/T7/01_Youtube Projects/Music/2021 RELEASES
+/Volumes/T7/01_Youtube Projects/Music/ALVERA
+/Volumes/T7/01_Youtube Projects/Music/AMBIENCE
+/Volumes/T7/01_Youtube Projects/Music/BLACK UNIVERSE EP
+/Volumes/T7/01_Youtube Projects/Music/BLACK UNIVERSE INTRO TRACKS
+/Volumes/T7/01_Youtube Projects/Music/Black Universe main track
+/Volumes/T7/01_Youtube Projects/Music/CHILL
+/Volumes/T7/01_Youtube Projects/Music/Drops of growth EP
+/Volumes/T7/01_Youtube Projects/Music/Drum & Bass
+/Volumes/T7/01_Youtube Projects/Music/Drum & Bass/ENDLESS TRIP
+/Volumes/T7/01_Youtube Projects/Music/DUBSTEP
+/Volumes/T7/01_Youtube Projects/Music/EPIC SPACE MUSIC
+/Volumes/T7/01_Youtube Projects/Music/Future Bass
+/Volumes/T7/01_Youtube Projects/Music/Heavy
+/Volumes/T7/01_Youtube Projects/Music/Hip Hop
+/Volumes/T7/01_Youtube Projects/Music/Intro Audio Renders
+/Volumes/T7/01_Youtube Projects/Music/LIL FISH MUSIC
+/Volumes/T7/01_Youtube Projects/Music/LIL FISH MUSIC/LIL FISH-DISCO
+/Volumes/T7/01_Youtube Projects/Music/Logo Stingers
+/Volumes/T7/01_Youtube Projects/Music/LONG MIXES
+/Volumes/T7/01_Youtube Projects/Music/MAX. COMB. MUSIC
+/Volumes/T7/01_Youtube Projects/Music/MEDITATION MUSIC
+/Volumes/T7/01_Youtube Projects/Music/REMIXES
+/Volumes/T7/01_Youtube Projects/Music/SM INTRO TRACKS
+/Volumes/T7/01_Youtube Projects/Music/SM MUSIC
+/Volumes/T7/01_Youtube Projects/Music/SM MUSIC/Drops of growth EP
+/Volumes/T7/01_Youtube Projects/Music/Sound Effects
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/FULL OSCH STEMS
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/FULL OSCHESTRA
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/OSCH FROM BAR 32
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/Osch intro
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/Piano 1
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/PIANO MELODY
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/Strings sections
+/Volumes/T7/01_Youtube Projects/Music/TEARS OF JOY FILES/tears of  joy PIANO STEMS
+/Volumes/T7/01_Youtube Projects/Music/Tears of joy VERSIONS
+/Volumes/T7/01_Youtube Projects/Music/Tears of joy VERSIONS/1 min versions
+/Volumes/T7/01_Youtube Projects/Music/Trancy Trap
+/Volumes/T7/01_Youtube Projects/Music/TRAP
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music/Venus Music (10min)
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music/Venus Music (15min)
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music/Venus Music (20min)
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music/Venus Music (25min)
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music/Venus Music (30min)
+/Volumes/T7/01_Youtube Projects/Music/VENUS TRACKS - Music/Venus Music (5min)
+/Volumes/T7/01_Youtube Projects/Music/WHITE UNIVERSE EP
+/Volumes/T7/01_Youtube Projects/SM Transition
+/Volumes/T7/01_Youtube Projects/SM Transition/Adobe Premiere Pro Auto-Save
+/Volumes/T7/01_Youtube Projects/SM Transition/Adobe Premiere Pro Captured Video
+/Volumes/T7/01_Youtube Projects/SM Transition/Adobe Premiere Pro Captured Video/SM TRANSITION
+/Volumes/T7/01_Youtube Projects/SM Transition/Copied_SM TRANSITION
+/Volumes/T7/01_Youtube Projects/SM Transition/Copied_SM TRANSITION/Adobe Premiere Pro Audio Previews
+/Volumes/T7/01_Youtube Projects/SM Transition/Copied_SM TRANSITION/Adobe Premiere Pro Auto-Save
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/2021 RELEASES
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/AMBIENCE
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/BLACK UNIVERSE EP
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/BLACK UNIVERSE INTRO TRACKS
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Black Universe main track
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/CHILL
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Drops of growth EP
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Drum & Bass
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/DUBSTEP
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/EPIC SPACE MUSIC
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Future Bass
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Heavy
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Hip Hop
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Intro Audio Renders
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/LIL FISH MUSIC
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Logo Stingers
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/LONG MIXES
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/MAX. COMB. MUSIC
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/MEDITATION MUSIC
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/REMIXES
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/SM INTRO TRACKS
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/SM MUSIC
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Sound Effects
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/TEARS OF JOY FILES
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Tears of joy VERSIONS
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/Trancy Trap
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/TRAP
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/VENUS TRACKS - Music
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/WHITE UNIVERSE EP
+/Volumes/T7/01_Youtube Projects/SM Transition/SATURNO_Music_complete_collection/ALVERA (2017)
+/Volumes/T7/01_Youtube Projects/YT_The problem with calistheenics
+/Volumes/T7/.fseventsd
+/Volumes/T7/Memories SM
+/Volumes/T7/Memories SM/iCloud Photos 4
+/Volumes/T7/Memories SM/iCloud Photos 3
+/Volumes/T7/Memories SM/iCloud Photos 2
+/Volumes/T7/Memories SM/iCloud Photos 5
+/Volumes/T7/Memories SM/iCloud Photos 7
+/Volumes/T7/Memories SM/iCloud Photos 9
+/Volumes/T7/Memories SM/iCloud Photos 8
+/Volumes/T7/Memories SM/iCloud Photos 6
+/Volumes/T7/Memories SM/iCloud Photos 10
+/Volumes/T7/Memories SM/iCloud Photos 11
+/Volumes/T7/Memories SM/Sadness
+/Volumes/T7/MUSIC
+/Volumes/T7/MUSIC/2021 RELEASES
+/Volumes/T7/MUSIC/Drops of growth EP
+/Volumes/T7/MUSIC/EPIC SPACE MUSIC
+/Volumes/T7/MUSIC/Future Bass
+/Volumes/T7/MUSIC/Hip Hop
+/Volumes/T7/MUSIC/Trancy Trap
+/Volumes/T7/MUSIC/PROJECTS
+/Volumes/T7/MUSIC/PROJECTS/Blue Pheonix (MIX : MASTERED)
+/Volumes/T7/MUSIC/PROJECTS/Blue Pheonix (MIX : MASTERED)/blue phoenix Project
+/Volumes/T7/MUSIC/PROJECTS/Veil Of Truth (Project File)
+/Volumes/T7/MUSIC/PROJECTS/Veil Of Truth (Project File)/Ableton Project Info
+/Volumes/T7/MUSIC/PROJECTS/Veil Of Truth (Project File)/Samples
+/Volumes/T7/MUSIC/PROJECTS/Veil Of Truth (Project File)/Backup
+/Volumes/T7/MUSIC/PROJECTS/Celestial Reverie (project File)
+/Volumes/T7/MUSIC/PROJECTS/Celestial Reverie (project File)/Ableton Project Info
+/Volumes/T7/MUSIC/PROJECTS/Celestial Reverie (project File)/Samples
+/Volumes/T7/MUSIC/PROJECTS/Celestial Reverie (project File)/Backup
+/Volumes/T7/MUSIC/PROJECTS/z_OTHERS (in progress)
+/Volumes/T7/MUSIC/PROJECTS/z_OTHERS (in progress)/Tes 1
+/Volumes/T7/MUSIC/PROJECTS/z_OTHERS (in progress)/test 2
+/Volumes/T7/MUSIC/PROJECTS/z_OTHERS (in progress)/Test 3
+/Volumes/T7/MUSIC/PROJECTS/z_OTHERS (in progress)/test 4
+/Volumes/T7/MUSIC/PROJECTS/z_OTHERS (in progress)/test 5
+/Volumes/T7/MUSIC/PROJECTS/Veil Of Truth Project (MIX : MASTERED)
+/Volumes/T7/MUSIC/PROJECTS/Veil Of Truth Project (MIX : MASTERED)/veil of truth Project
+/Volumes/T7/MUSIC/PROJECTS/Blue Pheonix (project File)
+/Volumes/T7/MUSIC/PROJECTS/Blue Pheonix (project File)/Ableton Project Info
+/Volumes/T7/MUSIC/PROJECTS/Blue Pheonix (project File)/Samples
+/Volumes/T7/MUSIC/PROJECTS/Blue Pheonix (project File)/Backup
+/Volumes/T7/MUSIC/PROJECTS/Celestial Reverie (MIX : MASTERED)
+/Volumes/T7/MUSIC/PROJECTS/Celestial Reverie (MIX : MASTERED)/Celestial Reverie Project
+/Volumes/T7/MUSIC/Plug Ins
+/Volumes/T7/MUSIC/Celestial Reverie EP 2024
+/Volumes/T7/Install
+/Volumes/T7/CF1 Transitions Done
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Audio Previews
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Audio Previews/CF1 Transitions-2023-05-24_12-25-05.PRV
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Audio Previews
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Audio Previews
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Audio Previews/CF1 Transitions.PRV
+/Volumes/T7/CF1 Transitions Done/Adobe Premiere Pro Audio Previews/CF1 Transitions.PRV/Peak Files
+/Volumes/T7/CF1 (Michael)
+/Volumes/T7/CF1 (Michael)/CF_PH1_MOVEMENT EFFICIENCY 2
+/Volumes/T7/CF1 (Michael)/CF_PH1_MOVEMENT EFFICIENCY 2/MAIN CAMERA
+/Volumes/T7/CF1 (Michael)/CF_PH1_MOVEMENT EFFICIENCY 2/PROJECT
+/Volumes/T7/CF1 (Michael)/CF_PH1_MOVEMENT EFFICIENCY 2/PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 (Michael)/CF_PH1_MOVEMENT EFFICIENCY 2/SECOND CAMERA
+/Volumes/T7/CF1 (Michael)/ MICROCYCLES
+/Volumes/T7/CF1 (Michael)/ MICROCYCLES/EXPLANATIONS
+/Volumes/T7/CF1 (Michael)/ MICROCYCLES/EXPLANATIONS/L SIT & PISTOL SQUAT
+/Volumes/T7/CF1 (Michael)/ MICROCYCLES/EXPLANATIONS/PULLING
+/Volumes/T7/CF1 (Michael)/ MICROCYCLES/EXPLANATIONS/PUSHING
+/Volumes/T7/CF1 (Michael)/ MICROCYCLES/INTRO
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 1)
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 1)/Project
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 1)/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 (Michael)/DELOAD
+/Volumes/T7/CF1 (Michael)/DELOAD/Project
+/Volumes/T7/CF1 (Michael)/DELOAD/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 2)
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 2)/MAIN SHOT
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 2)/SECOND SHOT
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 2)/Project
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 2)/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 3)
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 3)/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 (Michael)/CF_PH1_FINAL ASSESMENT (Part 3)/Project
+/Volumes/T7/CF2 (Michael)
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Explanation)
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Explanation)/PROJECT
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Explanation)/PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Explanation)/PROJECT/Adobe Premiere Pro Audio Previews
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Explanation)/MAIN CAMERA
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Explanation)/SECONDARY
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Follow Along)
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Follow Along)/Project 2
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Follow Along)/Project 2/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Follow Along)/MAIN CAMERA
+/Volumes/T7/CF2 (Michael)/CF_PH1_VENUS FINAL ASSESMENT (Follow Along)/SECONDARY
+/Volumes/T7/CI (Michael)
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 1 (Explanation)
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 1 (Explanation)/Main Camera
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 1 (Explanation)/Second Camera
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 1 (Explanation)/Project
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 2 (Follow Along)
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 2 (Follow Along)/MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 2 (Follow Along)/SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - CALISTHENICS FUNDAMENTALS 8 (Test day)/CI - CALISTHENICS FUNDAMENTALS 8 - Part 2 (Follow Along)/Project
+/Volumes/T7/CI (Michael)/CI - LECTURES
+/Volumes/T7/CI (Michael)/CI - LECTURES/FORM CHECK
+/Volumes/T7/CI (Michael)/CI - LECTURES/FORM CHECK/MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/FORM CHECK/SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/FORM CHECK/Project
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO READ A WORKOUT
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO READ A WORKOUT/MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO READ A WORKOUT/SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO READ A WORKOUT/Project
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO WARM UP
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO WARM UP/MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO WARM UP/SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/HOW TO WARM UP/Project
+/Volumes/T7/CI (Michael)/CI - LECTURES/INJURY PREVENTION
+/Volumes/T7/CI (Michael)/CI - LECTURES/INJURY PREVENTION/MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/INJURY PREVENTION/SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/LOGGING RESULTS
+/Volumes/T7/CI (Michael)/CI - LECTURES/LOGGING RESULTS/MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/LOGGING RESULTS/SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/TRACKING 
+/Volumes/T7/CI (Michael)/CI - LECTURES/TRACKING /MAIN CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/TRACKING /SECOND CAMERA
+/Volumes/T7/CI (Michael)/CI - LECTURES/TRACKING /Project
+/Volumes/T7/00_Instagram
+/Volumes/T7/00_Instagram/01_Footage IG
+/Volumes/T7/00_Instagram/00_IG Clips - Master Project
+/Volumes/T7/00_Instagram/00_IG Clips - Master Project/Adobe Premiere Pro Audio Previews
+/Volumes/T7/00_Instagram/00_IG Clips - Master Project/Adobe Premiere Pro Audio Previews/Copy of IG Clips - Master Project.PRV
+/Volumes/T7/00_Instagram/00_IG Clips - Master Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/00_Instagram/00_IG Clips - Master Project/Adobe Premiere Pro Video Previews
+/Volumes/T7/00_Instagram/00_IG Clips - Master Project/Adobe Premiere Pro Video Previews/Copy of IG Clips - Master Project.PRV
+/Volumes/T7/00_Instagram/02_Final Exports
+/Volumes/T7/System Volume Information
+/Volumes/T7/System Volume Information/EDP
+/Volumes/T7/System Volume Information/EDP/Recovery
+/Volumes/T7/$RECYCLE.BIN
+/Volumes/T7/CF 1 LECTURES
+/Volumes/T7/CF 1 LECTURES/COMPLETING THE PROGRAM
+/Volumes/T7/CF 1 LECTURES/COMPLETING THE PROGRAM/PROJECT
+/Volumes/T7/CF 1 LECTURES/COMPLETING THE PROGRAM/PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF 1 LECTURES/TRAINING WITH WEIGHTS
+/Volumes/T7/CF 1 LECTURES/DELOAD EXTRA
+/Volumes/T7/CF 1 LECTURES/MISSING A DAY
+/Volumes/T7/CF 1 LECTURES/MISSING A DAY/Project
+/Volumes/T7/CF 1 LECTURES/MISSING A DAY/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF 1 LECTURES/PROGRAM COMBINATION
+/Volumes/T7/CF 1 LECTURES/PROGRAM COMBINATION/Project
+/Volumes/T7/CF 1 LECTURES/PROGRAM COMBINATION/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF 1 LECTURES/SCHEDULE & CUSTOMIZATION
+/Volumes/T7/CF 1 LECTURES/SCHEDULE & CUSTOMIZATION/PROJECT copy
+/Volumes/T7/CF 1 LECTURES/SCHEDULE & CUSTOMIZATION/PROJECT copy/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF 1 LECTURES/PROGRESSION REPS AND SETS
+/Volumes/T7/CF 1 LECTURES/PROGRESSION REPS AND SETS/Project
+/Volumes/T7/CF 1 LECTURES/PROGRESSION REPS AND SETS/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Transitions Clips
+/Volumes/T7/Transitions Clips/Final Export
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves/Media Cache
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves/Adobe Premiere Pro Audio Previews
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves/Adobe Premiere Pro Audio Previews/CF PH 1 Moves.PRV
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves/Adobe Premiere Pro Video Previews
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves/Adobe Premiere Pro Video Previews/CF PH 1 Moves.PRV
+/Volumes/T7/Transitions Clips/Copied_CF PH 1 Moves/Adobe Premiere Pro Auto-Save
+/Volumes/T7/color test
+/Volumes/T7/CF1 PH1
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics 3 (Legs)
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics 3 (Legs)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics 3 (Legs)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics 2 (Core)
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics 2 (Core)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics 2 (Core)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Efficiency 1 (Scapula Stability)
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Efficiency 1 (Scapula Stability)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Efficiency 1 (Scapula Stability)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Efficiency 2 (Scapula Stability)
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Efficiency 2 (Scapula Stability)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Efficiency 2 (Scapula Stability)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Endurance Workout 1 (Upper Body)
+/Volumes/T7/CF1 PH1/CF1 PH1 Endurance Workout 1 (Upper Body)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Endurance Workout 1 (Upper Body)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Strength 1 (Push-Pull)
+/Volumes/T7/CF1 PH1/CF1 PH1 Strength 1 (Push-Pull)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Strength 1 (Push-Pull)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics (Push-Pull)
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics (Push-Pull)/RAW FOOTAGE
+/Volumes/T7/CF1 PH1/CF1 PH1 Bodyweight Basics (Push-Pull)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Strength Workout 2 (Lower Body)
+/Volumes/T7/CF1 PH1/CF1 PH1 Strength Workout 2 (Lower Body)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Strength Workout 2 (Lower Body)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Fundamentals (The L-Sit)
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Fundamentals (The L-Sit)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 Movement Fundamentals (The L-Sit)/Raw
+/Volumes/T7/CF1 PH1/CF1 PH1 Active Rest
+/Volumes/T7/CF1 PH1/CF1 Microcycle
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Pull Microcycle
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Pull Microcycle/Raw
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Pull Microcycle/Exported
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Pull Supplemental
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Push Microcycle
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Push Microcycle/Exported
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Push Supplemental
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 Push Supplemental/Exported
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 L-Sit & Pistol Squat Microcycle
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 L-Sit & Pistol Squat Microcycle/Exported
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 L-Sit & Pistol Squat Supplemental
+/Volumes/T7/CF1 PH1/CF1 Microcycle/CF1 PH1 L-Sit & Pistol Squat Supplemental/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 The 88 Orbit Burnout (Mercury Challenge)
+/Volumes/T7/CF1 PH1/CF1 PH1 The 88 Orbit Burnout (Mercury Challenge)/Exported
+/Volumes/T7/CF1 PH1/CF1 PH1 The 88 Orbit Burnout (Mercury Challenge)/Raw
+/Volumes/T7/CF1 PH1/CF1 Final Assessment
+/Volumes/T7/CF1 PH1/CF1 Final Assessment/Vids
+/Volumes/T7/Gabo CF1-2 Raw
+/Volumes/T7/Gabo CF1-2 Raw/CF2
+/Volumes/T7/APP PROMO
+/Volumes/T7/APP PROMO/Copied_Loading Logo APP_001
+/Volumes/T7/APP PROMO/APP PROMO
+/Volumes/T7/Academy Promo
+/Volumes/T7/CF2
+/Volumes/T7/CF2/Endurance 3 (Lower Body)
+/Volumes/T7/CF2/Endurance 3 (Lower Body)/Raw
+/Volumes/T7/CF2/Endurance 3 (Lower Body)/Exported
+/Volumes/T7/CF2/Endurance 1 (Full Body)
+/Volumes/T7/CF2/Endurance 1 (Full Body)/Raw
+/Volumes/T7/CF2/Endurance 1 (Full Body)/Exported
+/Volumes/T7/CF2/S&C 2
+/Volumes/T7/CF2/S&C 2/Raw
+/Volumes/T7/CF2/S&C 2/Exported
+/Volumes/T7/CF2/Active Rest CF2
+/Volumes/T7/CF2/Endurance 2 (Full Body)
+/Volumes/T7/CF2/Endurance 2 (Full Body)/Raw
+/Volumes/T7/CF2/Endurance 2 (Full Body)/Exported
+/Volumes/T7/CF2/S&C 1
+/Volumes/T7/CF2/S&C 1/Exported
+/Volumes/T7/CF2/S&C 1/Raw
+/Volumes/T7/CF2/S&C 3
+/Volumes/T7/CF2/S&C 3/Raw
+/Volumes/T7/CF2/S&C 3/Exported
+/Volumes/T7/CF2/Endurance 4 (Upper Body)
+/Volumes/T7/CF2/Endurance 4 (Upper Body)/Exported
+/Volumes/T7/CF2/Endurance 4 (Upper Body)/Raw
+/Volumes/T7/CF2/225 Reps of Hell
+/Volumes/T7/CF2/225 Reps of Hell/Exported
+/Volumes/T7/CF2/225 Reps of Hell/Raw
+/Volumes/T7/CF2/Resistance Deload
+/Volumes/T7/CF2/Resistance Deload/Exported
+/Volumes/T7/CF2/Resistance Deload/Raw
+/Volumes/T7/CF2/Final Assessment
+/Volumes/T7/CF2/Final Assessment/Exported
+/Volumes/T7/CF2/Initial Assessment
+/Volumes/T7/CF2/Initial Assessment/Exported
+/Volumes/T7/CF2/Initial Assessment/Raw
+/Volumes/T7/CF2/HIIT Deload
+/Volumes/T7/CF2/HIIT Deload/Exported
+/Volumes/T7/CF2/HIIT Deload/Raw
+/Volumes/T7/CF1 PP PROJECT
+/Volumes/T7/CF1 PP PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF1 PP PROJECT/Adobe Premiere Pro Captured Video
+/Volumes/T7/CF1 PP PROJECT/Adobe Premiere Pro Captured Video/CF PH 1 Moves
+/Volumes/T7/CF1 PP PROJECT/CF PH1 Bodyweight Basics 1 (PushPull)
+/Volumes/T7/CF1 PP PROJECT/CF PH1 Bodyweight Basics 1 (PushPull)/Exported Footage
+/Volumes/T7/CF1 PP PROJECT/CF PH1 Bodyweight Basics 1 (PushPull)/RAW FOOTAGE
+/Volumes/T7/CF1 PP PROJECT/CF PH1 Bodyweight Basics 2 (Core)
+/Volumes/T7/CF1 PP PROJECT/CF PH1 Bodyweight Basics 2 (Core)/Exported
+/Volumes/T7/CF1 PP PROJECT/CF PH1 Bodyweight Basics 2 (Core)/Raw
+/Volumes/T7/CF2 PP PROJECT
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Captured Video
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Captured Video/CF2 Moves-2023-08-15_12-00-51
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Captured Audio
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Captured Audio/CF2 Moves-2023-08-15_12-00-51
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Video Previews
+/Volumes/T7/CF2 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Video Previews/CF2 Moves-2023-08-15_12-00-51.PRV
+/Volumes/T7/Back Up Raw CF2
+/Volumes/T7/CF2 Footage
+/Volumes/T7/CF2 Footage/Extra Footage
+/Volumes/T7/CI TEST
+/Volumes/T7/CI TEST/raw
+/Volumes/T7/CI TEST/exported
+/Volumes/T7/CE1 FOOTAGE
+/Volumes/T7/CE1 PP PROJECT
+/Volumes/T7/CE1 PP PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CE1 PP PROJECT/Adobe Premiere Pro Auto-Save/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CE1
+/Volumes/T7/CE1/Strength Workout 3
+/Volumes/T7/CE1/Strength Workout 3/Raw
+/Volumes/T7/CE1/Strength Workout 3/Exported
+/Volumes/T7/CE1/Strength Workout 2
+/Volumes/T7/CE1/Strength Workout 2/Raw
+/Volumes/T7/CE1/Strength Workout 2/Exported
+/Volumes/T7/CE1/Strength Workout 1
+/Volumes/T7/CE1/Strength Workout 1/Raw
+/Volumes/T7/CE1/Strength Workout 1/Exported
+/Volumes/T7/CE1/Strength Workout 4
+/Volumes/T7/CE1/Strength Workout 4/Raw
+/Volumes/T7/CE1/Strength Workout 4/Exported
+/Volumes/T7/CE1/33 Minute Max. Combustion
+/Volumes/T7/CE1/33 Minute Max. Combustion/Raw
+/Volumes/T7/CE1/33 Minute Max. Combustion/Exported
+/Volumes/T7/CE1/Circuit Training
+/Volumes/T7/CE1/Circuit Training/Raw
+/Volumes/T7/CE1/Circuit Training/Exported
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/EXPLANATION
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/EXPLANATION/MAIN CAMERA
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/EXPLANATION/PROJECT
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/EXPLANATION/SECOND CAMERA
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/FOLLOW ALONG
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/FOLLOW ALONG/MAIN CAMERA
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/FOLLOW ALONG/PROJECT
+/Volumes/T7/CE1/CE1_FINAL ASSESMENT/FOLLOW ALONG/SECOND CAMERA
+/Volumes/T7/CE1/Final Assessment
+/Volumes/T7/CE1/Ali moves
+/Volumes/T7/CE1/Ali moves/project
+/Volumes/T7/CE1/Ali moves/project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/.TemporaryItems
+/Volumes/T7/.TemporaryItems/folders.501
+/Volumes/T7/.TemporaryItems/folders.501/TemporaryItems
+/Volumes/T7/.TemporaryItems/folders.503
+/Volumes/T7/.TemporaryItems/folders.502
+/Volumes/T7/.TemporaryItems/folders.502/TemporaryItems
+/Volumes/T7/MOVES 2023-2024
+/Volumes/T7/MOVES 2023-2024/MOVES - AUG 14TH
+/Volumes/T7/Book OS
+/Volumes/T7/Book OS/Book Content
+/Volumes/T7/Book OS/Learning
+/Volumes/T7/Book OS/🧱Structure_TOC
+/Volumes/T7/Book OS/Vertical roadmap milestones on black background Timeline infographic template for business presentation Vector illustration _ Premium Vector_files
+/Volumes/T7/Book OS/Writting Styles
+/Volumes/T7/SM APP Ads Moves
+/Volumes/T7/SM APP Ads Moves/project
+/Volumes/T7/SM APP Ads Moves/project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/SM APP Ads Moves/project/Adobe Premiere Pro Audio Previews
+/Volumes/T7/SM APP Ads Moves/project/Adobe Premiere Pro Audio Previews/SM APP Insta Moves.PRV
+/Volumes/T7/SM APP Ads Moves/vids
+/Volumes/T7/Michael Insta
+/Volumes/T7/Michael Insta/Project Plank
+/Volumes/T7/Michael Insta/Project Plank/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Michael Insta/Project Plank/Adobe Premiere Pro Audio Previews
+/Volumes/T7/Michael Insta/Project Plank/Adobe Premiere Pro Audio Previews/Plank.PRV
+/Volumes/T7/Michael Insta/Project Plank/Adobe Premiere Pro Captured Video
+/Volumes/T7/Michael Insta/Project Plank/Adobe Premiere Pro Captured Video/Plank
+/Volumes/T7/Michael Insta/Project Plank/Adobe After Effects Auto-Save
+/Volumes/T7/Michael Insta/Project Dragon Squat
+/Volumes/T7/Michael Insta/Project Dragon Squat/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Michael Insta/Project Dragon Squat/Adobe Premiere Pro Audio Previews
+/Volumes/T7/Michael Insta/Project Dragon Squat/Adobe Premiere Pro Audio Previews/Dragon Squat_1.PRV
+/Volumes/T7/Michael Insta/Vids Plank
+/Volumes/T7/Michael Insta/EFFECTS
+/Volumes/T7/Michael Insta/EFFECTS/MAX PULL-UPS FABIAN
+/Volumes/T7/Michael Insta/EFFECTS/MAX PULL-UPS FABIAN/PROJCET
+/Volumes/T7/Michael Insta/EFFECTS/Swoosh
+/Volumes/T7/Michael Insta/EFFECTS/ui-line-animated-icon-pack-2022-08-16-06-26-20-utc
+/Volumes/T7/Michael Insta/EFFECTS/ui-line-animated-icon-pack-2022-08-16-06-26-20-utc/After Effects
+/Volumes/T7/Michael Insta/EFFECTS/ui-line-animated-icon-pack-2022-08-16-06-26-20-utc/JSON
+/Volumes/T7/Michael Insta/EFFECTS/ui-line-animated-icon-pack-2022-08-16-06-26-20-utc/Preview
+/Volumes/T7/Michael Insta/EFFECTS/ui-line-animated-icon-pack-2022-08-16-06-26-20-utc/Help
+/Volumes/T7/Michael Insta/EFFECTS/1000+ Transitions Pack
+/Volumes/T7/Michael Insta/EFFECTS/1000+ Transitions Pack/Footage
+/Volumes/T7/Michael Insta/EFFECTS/1000+ Transitions Pack/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Michael Insta/DEEP DIPS
+/Volumes/T7/Michael Insta/DEEP DIPS/PROJECT
+/Volumes/T7/Michael Insta/DEEP DIPS/PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Michael Insta/DEEP DIPS/FOOTGAE
+/Volumes/T7/Michael Insta/FABIAN SCREENSHOTS
+/Volumes/T7/Michael Insta/Miscellaneous 
+/Volumes/T7/Michael Insta/Template
+/Volumes/T7/Michael Insta/Planche Vid
+/Volumes/T7/Michael Insta/Planche Vid/AUDIO
+/Volumes/T7/Michael Insta/Planche Vid/VIDEO
+/Volumes/T7/Michael Insta/Planche Vid/Project
+/Volumes/T7/Michael Insta/Planche Vid/Project/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Michael Insta/Planche Vid/Project/Adobe Premiere Pro Audio Previews
+/Volumes/T7/Michael Insta/Planche Tutorial
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge/PROJECT
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge/PROJECT/Motion Graphics Template Media
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge/PROJECT/Premiere Composer Files
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge/PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge/PROJECT/Adobe Premiere Pro Captured Audio
+/Volumes/T7/Michael Insta/Shoulder Mobility Challenge/FOOTAGE
+/Volumes/T7/Academy Intro Graphics
+/Volumes/T7/Academy Intro Graphics/LAST CHANCE GRAPHICS
+/Volumes/T7/Academy Intro Graphics/LAST CHANCE GRAPHICS/Last Chance Graphics (converted) folder
+/Volumes/T7/Academy Intro Graphics/LAST CHANCE GRAPHICS/Last Chance Graphics (converted) folder/(Footage)
+/Volumes/T7/Academy Intro Graphics/LAST CHANCE GRAPHICS/Last Chance Graphics (converted) folder/Adobe After Effects Auto-Save
+/Volumes/T7/Academy Intro Graphics/Academy Graphics (Orignial)aep (converted) folder
+/Volumes/T7/Academy Intro Graphics/Academy Graphics (Orignial)aep (converted) folder/(Footage)
+/Volumes/T7/Academy Intro Graphics/Academy Graphics (Orignial)aep (converted) folder/(Footage)/03_Images
+/Volumes/T7/Academy Intro Graphics/Academy Graphics (Orignial)aep (converted) folder/(Footage)/02_Audio
+/Volumes/T7/CF3
+/Volumes/T7/CF3/Push 2
+/Volumes/T7/CF3/Push 2/VIDS
+/Volumes/T7/CF3/Push 2/VIDS/Raw Footage
+/Volumes/T7/CF3/Push 2/VIDS/Exported
+/Volumes/T7/CF3/Push 1
+/Volumes/T7/CF3/Push 1/VIDS
+/Volumes/T7/CF3/Push 1/Exported
+/Volumes/T7/CF3/Pull 2
+/Volumes/T7/CF3/Pull 2/Raw
+/Volumes/T7/CF3/Pull 2/Exported
+/Volumes/T7/CF3/Pull 1
+/Volumes/T7/CF3/Pull 1/Raw
+/Volumes/T7/CF3/Pull 1/Exported
+/Volumes/T7/CF3/Lower 1
+/Volumes/T7/CF3/Lower 1/Exported
+/Volumes/T7/CF3/Lower 1/Raw
+/Volumes/T7/CF3/Lower 2
+/Volumes/T7/CF3/Lower 2/Raw
+/Volumes/T7/CF3/Lower 2/Exported
+/Volumes/T7/CF3/Challenge
+/Volumes/T7/CF3/Challenge/Raw
+/Volumes/T7/CF3/Challenge/Exported
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/CF3 STORIES
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Core of Iron (Challenge)
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Core of Iron (Challenge)/FOLLOW ALONG
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Core of Iron (Challenge)/OVERVIEW
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Final Assesment
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Final Assesment/FOLLOW ALONG
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Final Assesment/OVERVIEW
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Intoduction
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Intoduction/MAIN SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Intoduction/SECOND SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/Deload Week
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/Ideal Tempo
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/Rest for hypertrophy
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/Schedule Customization
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/RIR Mesocycle Progression
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/RIR
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/LECTURE_Exercise Progressions (Overhead Pushing)
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/Weights + Calisthenics
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/How to Progress
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/LECTURES/The Effective Reps
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 1
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 1/MAIN CAMERA
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 1/SECOND CAMERA
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 1/PROJECT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 2
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 2/MAIN SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 2/SECOND SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Lower Body 2/PROJECT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #1
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #1/MAIN SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #1/PROJECT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #1/SECOND CAMERA
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #2
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #2/MAIN SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #2/SECOND SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Pull #2/PROJECT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #1
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #1/MAIN SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #1/PROJECT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #1/SECOND SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #2
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #2/MAIN SHOT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #2/SECOND WORK
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Push #2/PROJECT
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Warm-Ups
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Warm-Ups/PUSH
+/Volumes/T7/CF3/CALISTHENICS FOUNDATION 3/Warm-Ups/PULL
+/Volumes/T7/CF3/GYM MOVES
+/Volumes/T7/CF3/GYM MOVES/Raw
+/Volumes/T7/CF3/GYM MOVES/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF3/GYM MOVES/Adobe Premiere Pro Audio Previews
+/Volumes/T7/CF3/GYM MOVES/Adobe Premiere Pro Audio Previews/Gym Moves.PRV
+/Volumes/T7/CF3/STUDIO GYM MOVES
+/Volumes/T7/CF3/STUDIO GYM MOVES/Raw
+/Volumes/T7/CF3/STUDIO GYM MOVES/PROJECT
+/Volumes/T7/CF3/STUDIO GYM MOVES/PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/CF3 PP PROJECT
+/Volumes/T7/CF3 PP PROJECT/Adobe Premiere Pro Auto-Save
+/Volumes/T7/00_Gabo's Folder
+/Volumes/T7/00_Gabo's Folder/Rebuild
+/Volumes/T7/00_Gabo's Folder/Rebuild/Full Page _ Cali Move_files
+/Volumes/T7/00_Gabo's Folder/2022:2023 Iphone 3
+/Volumes/T7/00_Gabo's Folder/2022:2023 Iphone 1
+/Volumes/T7/00_Gabo's Folder/2022:2023 Iphone 2
+/Volumes/T7/Framework-1-POF
+/Volumes/T7/Framework-2-UNITY-POF
+/Volumes/T7/_ORGANIZED
+/Volumes/T7/_ORGANIZED/01_COURSES_INDEX
+/Volumes/T7/_ORGANIZED/02_LOOSE_FILES
+/Volumes/T7/_ORGANIZED/03_PROJECTS
+/Volumes/T7/_ORGANIZED/03_PROJECTS/Claude-Prompt-Importer
+/Volumes/T7/_ORGANIZED/03_PROJECTS/muscle-up-deploy
+/Volumes/T7/_ORGANIZED/03_PROJECTS/muscle-up-deploy/.vercel
+/Volumes/T7/_ORGANIZED/03_PROJECTS/saturno-muscle-up
+/Volumes/T7/_ORGANIZED/03_PROJECTS/saturno-muscle-up/.vercel
+/Volumes/T7/_ORGANIZED/03_PROJECTS/saturno-muscle-up/.git
+/Volumes/T7/_ORGANIZED/03_PROJECTS/performance-optimization-dashboard
+/Volumes/T7/_ORGANIZED/03_PROJECTS/vegas-hormozi-framework-screenshot
+/Volumes/T7/_ORGANIZED/03_PROJECTS/Understanding and Organizing Interconnected Documents and Zip Files
+/Volumes/T7/_ORGANIZED/03_PROJECTS/Understanding and Organizing Interconnected Documents and Zip Files/Claude_Recursive_Prompt_Engine_FULL(2)
+/Volumes/T7/_ORGANIZED/03_PROJECTS/Understanding and Organizing Interconnected Documents and Zip Files/SATURNOS_DEPLOYMENT_PACKAGE
+/Volumes/T7/_ORGANIZED/03_PROJECTS/Understanding and Organizing Interconnected Documents and Zip Files 2
+/Volumes/T7/_ORGANIZED/04_EXPORTS
+/Volumes/T7/_ORGANIZED/04_EXPORTS/exported-assets(4)
+/Volumes/T7/_ORGANIZED/04_EXPORTS/exported-assets(4) 2
+/Volumes/T7/New Folder With Items 2
+/Volumes/T7/Private & Shared
+/Volumes/T7/Private & Shared/Business Subscriptions 20ec7df3d51880b6bea5e3e9e7ba2d99
+/Volumes/T7/projects
+/Volumes/T7/REST & RECOVERY - POF
+/Volumes/T7/Vegas-footage-2025
+/Volumes/T7/Victory Belt Submission Package
+

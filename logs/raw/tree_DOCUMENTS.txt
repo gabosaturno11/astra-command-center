@@ -1,0 +1,173 @@
+=== DOCUMENTS: /Users/Gabosaturno/Documents ===
+
+--- Top-level folder sizes ---
+150M	/Users/Gabosaturno/Documents/ADD/
+2.0M	/Users/Gabosaturno/Documents/Adobe/
+ 24K	/Users/Gabosaturno/Documents/AI-HUB/
+  0B	/Users/Gabosaturno/Documents/Auto Save/
+  0B	/Users/Gabosaturno/Documents/Cuesheets/
+6.9M	/Users/Gabosaturno/Documents/FabFilter/
+8.0K	/Users/Gabosaturno/Documents/Library/
+ 16K	/Users/Gabosaturno/Documents/Playlists/
+  0B	/Users/Gabosaturno/Documents/Presets/
+  0B	/Users/Gabosaturno/Documents/Projects/
+4.0K	/Users/Gabosaturno/Documents/SynthMaster/
+170M	/Users/Gabosaturno/Documents/Whisper/
+  0B	/Users/Gabosaturno/Documents/Zoom/
+
+--- Full tree (depth 4) ---
+~/Documents
+~/Documents/Auto Save
+~/Documents/Playlists
+~/Documents/Playlists/System
+~/Documents/Projects
+~/Documents/Library
+~/Documents/Adobe
+~/Documents/Adobe/Audition
+~/Documents/Adobe/Audition/25.0
+~/Documents/Adobe/Audition/25.0/Session Templates
+~/Documents/Adobe/Adobe Media Encoder
+~/Documents/Adobe/Adobe Media Encoder/25.0
+~/Documents/Adobe/Adobe Media Encoder/25.0/Presets
+~/Documents/Adobe/Common
+~/Documents/Adobe/Common/Assets
+~/Documents/Adobe/Common/Assets/Label Color Presets
+~/Documents/Adobe/Common/Assets/Text Styles
+~/Documents/Adobe/Common/Assets/Project Templates
+~/Documents/Adobe/Photoshop Cloud Associates
+~/Documents/Adobe/Premiere Pro
+~/Documents/Adobe/Premiere Pro/25.0
+~/Documents/Adobe/Premiere Pro/25.0/Profile-Gabosaturno
+~/Documents/FabFilter
+~/Documents/FabFilter/Presets
+~/Documents/FabFilter/Presets/Micro
+~/Documents/FabFilter/Presets/Simplon
+~/Documents/FabFilter/Presets/Pro-C 2
+~/Documents/FabFilter/Presets/Pro-C 2/Piano
+~/Documents/FabFilter/Presets/Pro-C 2/Drums
+~/Documents/FabFilter/Presets/Pro-C 2/Vocals
+~/Documents/FabFilter/Presets/Pro-C 2/Mastering
+~/Documents/FabFilter/Presets/Pro-C 2/Guitar
+~/Documents/FabFilter/Presets/Pro-C 2/Bass
+~/Documents/FabFilter/Presets/Pro-C 2/Special
+~/Documents/FabFilter/Presets/Pro-C 2/Mixbus
+~/Documents/FabFilter/Presets/Pro-Q 3
+~/Documents/FabFilter/Presets/Pro-Q 3/Dynamic
+~/Documents/FabFilter/Presets/Pro-Q 3/Stereo
+~/Documents/FabFilter/Presets/Pro-Q 3/Surround
+~/Documents/FabFilter/Presets/Pro-MB
+~/Documents/FabFilter/Presets/Pro-MB/Mix Bus
+~/Documents/FabFilter/Presets/Pro-MB/Drums
+~/Documents/FabFilter/Presets/Pro-MB/Vocals
+~/Documents/FabFilter/Presets/Pro-MB/Keyboards
+~/Documents/FabFilter/Presets/Pro-MB/Mastering
+~/Documents/FabFilter/Presets/Pro-MB/Basic
+~/Documents/FabFilter/Presets/Pro-MB/Guitar
+~/Documents/FabFilter/Presets/Pro-MB/Bass
+~/Documents/FabFilter/Presets/Pro-MB/Gate & Expansion
+~/Documents/FabFilter/Presets/Pro-MB/Sound Mangling
+~/Documents/FabFilter/Presets/Saturn 2
+~/Documents/FabFilter/Presets/Saturn 2/_05 FX
+~/Documents/FabFilter/Presets/Saturn 2/_03 Guitar
+~/Documents/FabFilter/Presets/Saturn 2/_01 Color
+~/Documents/FabFilter/Presets/Saturn 2/_02 Drive
+~/Documents/FabFilter/Presets/Saturn 2/_04 Lo-fi
+~/Documents/FabFilter/Presets/Volcano 3
+~/Documents/FabFilter/Presets/Volcano 3/_06 MIDI Triggered
+~/Documents/FabFilter/Presets/Volcano 3/_05 FX
+~/Documents/FabFilter/Presets/Volcano 3/_01 Basic
+~/Documents/FabFilter/Presets/Volcano 3/_02 Complex
+~/Documents/FabFilter/Presets/Volcano 3/_04 Sequenced
+~/Documents/FabFilter/Presets/Volcano 3/_03 Modulation
+~/Documents/FabFilter/Presets/Pro-R 2
+~/Documents/FabFilter/Presets/Pro-R 2/_3 Medium
+~/Documents/FabFilter/Presets/Pro-R 2/_6 Gated
+~/Documents/FabFilter/Presets/Pro-R 2/Tempo Synced
+~/Documents/FabFilter/Presets/Pro-R 2/_1 Ambience
+~/Documents/FabFilter/Presets/Pro-R 2/_5 Very Large
+~/Documents/FabFilter/Presets/Pro-R 2/_4 Large
+~/Documents/FabFilter/Presets/Pro-R 2/_2 Small
+~/Documents/FabFilter/Presets/One
+~/Documents/FabFilter/Presets/One/Drums
+~/Documents/FabFilter/Presets/One/Basic
+~/Documents/FabFilter/Presets/One/Orchestral
+~/Documents/FabFilter/Presets/One/Bass
+~/Documents/FabFilter/Presets/One/Pads
+~/Documents/FabFilter/Presets/One/Lead
+~/Documents/FabFilter/Presets/One/Keys
+~/Documents/FabFilter/Presets/One/Effects
+~/Documents/FabFilter/Presets/One/Techno
+~/Documents/FabFilter/Presets/Pro-DS
+~/Documents/FabFilter/Presets/Pro-DS/Single Vocal
+~/Documents/FabFilter/Presets/Pro-DS/Mastering
+~/Documents/FabFilter/Presets/Pro-L 2
+~/Documents/FabFilter/Presets/Pro-L 2/_Basic
+~/Documents/FabFilter/Presets/Pro-L 2/_Safe
+~/Documents/FabFilter/Presets/Pro-L 2/_Moderate
+~/Documents/FabFilter/Presets/Pro-L 2/Mixing
+~/Documents/FabFilter/Presets/Pro-L 2/_Loud
+~/Documents/FabFilter/Presets/Pro-G
+~/Documents/FabFilter/Presets/Pro-G/FX
+~/Documents/FabFilter/Presets/Pro-G/Drums
+~/Documents/FabFilter/Presets/Pro-G/Guitar
+~/Documents/FabFilter/Presets/Pro-G/Bus
+~/Documents/FabFilter/Presets/Pro-G/Bass
+~/Documents/FabFilter/Presets/Pro-G/Vocal
+~/Documents/FabFilter/Presets/Timeless 3
+~/Documents/FabFilter/Presets/Timeless 3/_05 Modulation
+~/Documents/FabFilter/Presets/Timeless 3/_07 Mono
+~/Documents/FabFilter/Presets/Timeless 3/_04 Reverb
+~/Documents/FabFilter/Presets/Timeless 3/_01 Medium
+~/Documents/FabFilter/Presets/Timeless 3/_06 Special FX
+~/Documents/FabFilter/Presets/Timeless 3/_03 Long
+~/Documents/FabFilter/Presets/Timeless 3/_02 Slapback
+~/Documents/FabFilter/Presets/Twin 3
+~/Documents/FabFilter/Presets/Twin 3/_080 Pluck
+~/Documents/FabFilter/Presets/Twin 3/_020 Bass
+~/Documents/FabFilter/Presets/Twin 3/_010 Arp
+~/Documents/FabFilter/Presets/Twin 3/_040 FX
+~/Documents/FabFilter/Presets/Twin 3/_110 Sidechain
+~/Documents/FabFilter/Presets/Twin 3/_090 Synth
+~/Documents/FabFilter/Presets/Twin 3/_100 Best of Twin 2
+~/Documents/FabFilter/Presets/Twin 3/_070 Pad
+~/Documents/FabFilter/Presets/Twin 3/_060 Lead
+~/Documents/FabFilter/Presets/Twin 3/_050 Keys
+~/Documents/FabFilter/Presets/Twin 3/_030 Drums
+~/Documents/AI-HUB
+~/Documents/AI-HUB/02_knowledge_dna
+~/Documents/AI-HUB/04_intelligence_vault
+~/Documents/AI-HUB/04_intelligence_vault/prompts
+~/Documents/AI-HUB/01_book_system
+~/Documents/AI-HUB/01_book_system/manuscript
+~/Documents/ADD
+~/Documents/ADD/Sound Packs
+~/Documents/ADD/Media
+~/Documents/ADD/Media/Render Files
+~/Documents/ADD/Media/Video
+~/Documents/ADD/Media/Stacks
+~/Documents/ADD/Media/Recordings
+~/Documents/ADD/Media/Clips
+~/Documents/ADD/Media/._MAF_rHqPBRJgFD.addLibrary
+~/Documents/ADD/Media/Bounces
+~/Documents/ADD/Media/Exports
+~/Documents/ADD/Media/Converted Files
+~/Documents/ADD/Media/Downloads
+~/Documents/ADD/Media/Downloads/Stock Media
+~/Documents/ADD/Media/Downloads/Cache
+~/Documents/ADD/Media/Freeze Files
+~/Documents/Zoom
+~/Documents/Presets
+~/Documents/Presets/Triggers
+~/Documents/Presets/Auto Gain
+~/Documents/Presets/Workspaces
+~/Documents/Presets/Replace
+~/Documents/Cuesheets
+~/Documents/Whisper
+~/Documents/SynthMaster
+~/Documents/SynthMaster/Config
+~/Documents/SynthMaster/Partial Presets
+~/Documents/SynthMaster/Waveforms
+~/Documents/SynthMaster/Scales
+~/Documents/SynthMaster/Samples
+~/Documents/SynthMaster/Presets
+

@@ -1,0 +1,1330 @@
+=== SSK-DRIVE: /Volumes/SSK Drive ===
+
+--- Top-level folder sizes ---
+4.9M	/Volumes/SSK Drive/🎯_aoc-book-project/
+226M	/Volumes/SSK Drive/_ORGANIZED/
+230M	/Volumes/SSK Drive/00-black-friday/
+ 39G	/Volumes/SSK Drive/00-sm-academy-content/
+ 33G	/Volumes/SSK Drive/00-start/
+8.8M	/Volumes/SSK Drive/AOC_MASTER/
+7.9G	/Volumes/SSK Drive/CLAUDE NOT HERE/
+ 48G	/Volumes/SSK Drive/Desktop/
+1.7G	/Volumes/SSK Drive/downloads-i-mac/
+ 73G	/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/
+ 22G	/Volumes/SSK Drive/instagram-posts/
+287M	/Volumes/SSK Drive/marketing/
+ 27G	/Volumes/SSK Drive/Organize/
+3.0M	/Volumes/SSK Drive/SSOT_ESSENTIALS/
+384K	/Volumes/SSK Drive/System Volume Information/
+4.0G	/Volumes/SSK Drive/TapRecord/
+6.4M	/Volumes/SSK Drive/TV/
+
+--- Full tree (depth 4) ---
+/Volumes/SSK Drive
+/Volumes/SSK Drive/System Volume Information
+/Volumes/SSK Drive/.Spotlight-V100
+/Volumes/SSK Drive/.Spotlight-V100/Store-V2
+/Volumes/SSK Drive/.Spotlight-V100/Store-V2/44456AA8-0885-4765-89BA-C45D1BEEEF62
+/Volumes/SSK Drive/.TemporaryItems
+/Volumes/SSK Drive/.TemporaryItems/folders.502
+/Volumes/SSK Drive/.TemporaryItems/folders.502/TemporaryItems
+/Volumes/SSK Drive/Organize
+/Volumes/SSK Drive/Organize/andy-deploy
+/Volumes/SSK Drive/Organize/andy-deploy/public
+/Volumes/SSK Drive/Organize/andy-deploy_1
+/Volumes/SSK Drive/Organize/andy-deploy_1/.vercel
+/Volumes/SSK Drive/Organize/andy-deploy_1/public
+/Volumes/SSK Drive/Organize/APPLE IDs Back Up
+/Volumes/SSK Drive/Organize/APPLE IDs Back Up/ID1_Saturnogabriele_Iphone7
+/Volumes/SSK Drive/Organize/BF-Comand-Center V2
+/Volumes/SSK Drive/Organize/BF25-firday-threat-perplexity
+/Volumes/SSK Drive/Organize/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/Organize/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/Organize/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL/modules
+/Volumes/SSK Drive/Organize/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL/outputs
+/Volumes/SSK Drive/Organize/Claude_Recursive_Prompt_Engine_FULL/modules
+/Volumes/SSK Drive/Organize/Claude_Recursive_Prompt_Engine_FULL/outputs
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/vector-map-visualizer
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/notion-auditor
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/prompt-optimizer
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/vault-sync
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/recursive-agent-builder
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/saturno-os-monitor
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/black-friday-strategist
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/rag-agent-deployer
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/prompt-vault-auditor
+/Volumes/SSK Drive/Organize/Claude_Skills_Pack/chain-orchestrator
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BOOK_CLEAN
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BOOK_CLEAN/research
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BOOK_CLEAN/content
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BOOK_CLEAN/exports
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/03_PROJECTS_LIBRARY
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/z_OLD_USER_ARCHIVE
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/DEPLOY_READY_HUB
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/04_Documents
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/GITHUB_ROOT_READY
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/01_CLAUDE_ARTIFACTS
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/z_MOVE IT
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/02_VB_BOOK_PROJECT
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/HUB_3_KORTEX
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/WRITING_HUBS
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/BACK UP IMAC/Book-New-September
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/BOOK_CLEAN
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/netlify-deploy
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/Workspace
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/iCloud Drive
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/OneDrive - Personal
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/com~apple~CloudDocs
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/05_STRATEGIC_ASSETS
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/Downloads
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/WRITING_HUBS
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/AIHUB_UNIFICATION_ARCHIVE_2025-10-01_16-04-09/GPT-CONVOS
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/Screen records | Organization AI
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/Screen records | Organization AI/Organization Documents : Projects
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/Descript Installer v2.2.0.app
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/Descript Installer v2.2.0.app/Contents
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/11_BOOK NOTES
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/screenshots
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/fitnessos 2
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/Desktop August-July 2025
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/exported-assets
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/Screenshots 2
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/fitnessos
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/WRITING_HUBS
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/screenshots-main-phone-2025:10:12
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/exported-assets 2
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/ARCHIVE_2025_01_17/gabo-financial-dashboard
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/New Folder With Items
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/VB_SUBMIT_TOMORROW
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/VB_SUBMIT_TOMORROW/Manuscript
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/VB_SUBMIT_TOMORROW/Supporting_Documents
+/Volumes/SSK Drive/Organize/DESKTOP_ARCHIVE_20251014/VB_SUBMIT_TOMORROW/Infographics
+/Volumes/SSK Drive/Organize/Dev_Meeting_Summary_Pack
+/Volumes/SSK Drive/Organize/Downloads I-Mac
+/Volumes/SSK Drive/Organize/Downloads I-Mac/BF25-firday-threat-perplexity
+/Volumes/SSK Drive/Organize/Downloads I-Mac/HB Shapes
+/Volumes/SSK Drive/Organize/Downloads I-Mac/HB Shapes/resources
+/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy
+/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy/public
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/Calisthenics-hub-DRAFT
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/saturno-notebooklm-integration
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/00_Saturno MOvement OS
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/AOC_MASTER
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/interactive-toc-editor.zip
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/z_MOVE IT
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/📖 Book
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/solar-system-framework (1)
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/ENTIRE SATURNO MOVEMENT ROAD MAP_files
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/00_SaturnoOS-Command Center
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/📖 Book_Assets
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍PRODUCT/MVPs
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Notion-Prompt-Registry-Page
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Notion-Prompt-Registry-Page/Prompt Vault — Registry 32750cf740134b6298f913f058ada78f
+/Volumes/SSK Drive/Organize/Downloads I-Mac/BF-Comand-Center V2
+/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy_1
+/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy_1/.vercel
+/Volumes/SSK Drive/Organize/Downloads I-Mac/andy-deploy_1/public
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Ultimate-movement-ecosystem-master-zip-MVP
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/Email_Campaigns
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/Monetization-via-automations-analisis-TBR
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/📧 Email
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/📊 Data
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/📝 Content_Prod
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/calai-growth-dashboard
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/Consolidate Key Insights into Core Principles for Knowledge System
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/Content
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/03_continuous
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/📹 Content
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/02_content_os
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/05_archive_temp
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/Content-Scripts-Plan-V1
+/Volumes/SSK Drive/Organize/Downloads I-Mac/📍MARKETING/📧 Email_Marketing_Brevo
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/vector-map-visualizer
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/notion-auditor
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/prompt-optimizer
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/vault-sync
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/recursive-agent-builder
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/saturno-os-monitor
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/black-friday-strategist
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/rag-agent-deployer
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/prompt-vault-auditor
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Skills_Pack/chain-orchestrator
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Dev_Meeting_Summary_Pack
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/types
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/app
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/utils
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/components
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/public
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/.git
+/Volumes/SSK Drive/Organize/Downloads I-Mac/sm-website-app/redux
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL/modules
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL/outputs
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/🚀 Landing_Page
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/BLACK FRIDAY V2
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/📧 Email_Sequence
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/Programs
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/BF Command Center
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/Bonuses
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/Landing_Page
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/🎬 Launch_Materials
+/Volumes/SSK Drive/Organize/Downloads I-Mac/00_📍BLACK_FRIDAY/🎁 Bonuses
+/Volumes/SSK Drive/Organize/Downloads I-Mac/000_BF25_COMAND CENTER
+/Volumes/SSK Drive/Organize/Downloads I-Mac/000_BF25_COMAND CENTER/saturno-ultimate-hub
+/Volumes/SSK Drive/Organize/Downloads I-Mac/000_BF25_COMAND CENTER/saturno-command-pro
+/Volumes/SSK Drive/Organize/Downloads I-Mac/Saturno_Notion_CSV_Pack
+/Volumes/SSK Drive/Organize/HB Shapes
+/Volumes/SSK Drive/Organize/HB Shapes/resources
+/Volumes/SSK Drive/Organize/IMAC Screen Records
+/Volumes/SSK Drive/Organize/New Folder With Items
+/Volumes/SSK Drive/Organize/New Folder With Items/Weekly Review and Strategy for Maximizing Revenue Opportunities
+/Volumes/SSK Drive/Organize/New Folder With Items/Most RECENTL_Consolidating Knowledge Base Insights into Core Principles
+/Volumes/SSK Drive/Organize/New Folder With Items/instagram-carousel
+/Volumes/SSK Drive/Organize/New Folder With Items/instagram-carousel 2
+/Volumes/SSK Drive/Organize/Notion-Prompt-Registry-Page
+/Volumes/SSK Drive/Organize/Notion-Prompt-Registry-Page/Prompt Vault — Registry 32750cf740134b6298f913f058ada78f
+/Volumes/SSK Drive/Organize/Saturno_Notion_CSV_Pack
+/Volumes/SSK Drive/Organize/saturno-writing-hub
+/Volumes/SSK Drive/Organize/saturno-writing-hub/scripts
+/Volumes/SSK Drive/Organize/saturno-writing-hub/.git
+/Volumes/SSK Drive/Organize/saturno-writing-hub/.git/objects
+/Volumes/SSK Drive/Organize/saturno-writing-hub/.git/info
+/Volumes/SSK Drive/Organize/saturno-writing-hub/.git/logs
+/Volumes/SSK Drive/Organize/saturno-writing-hub/.git/hooks
+/Volumes/SSK Drive/Organize/saturno-writing-hub/.git/refs
+/Volumes/SSK Drive/Organize/saturno-writing-hub/assets
+/Volumes/SSK Drive/Organize/saturno-writing-hub/assets/images
+/Volumes/SSK Drive/Organize/saturno-writing-hub/assets/code-snippets
+/Volumes/SSK Drive/Organize/sm-website-app
+/Volumes/SSK Drive/Organize/sm-website-app/types
+/Volumes/SSK Drive/Organize/sm-website-app/app
+/Volumes/SSK Drive/Organize/sm-website-app/app/lecture
+/Volumes/SSK Drive/Organize/sm-website-app/app/sign-up
+/Volumes/SSK Drive/Organize/sm-website-app/app/success-loading
+/Volumes/SSK Drive/Organize/sm-website-app/app/lecture-category
+/Volumes/SSK Drive/Organize/sm-website-app/app/workout-category
+/Volumes/SSK Drive/Organize/sm-website-app/app/privacy-policy
+/Volumes/SSK Drive/Organize/sm-website-app/app/workouts
+/Volumes/SSK Drive/Organize/sm-website-app/app/workout-subcategory
+/Volumes/SSK Drive/Organize/sm-website-app/app/otp-verification
+/Volumes/SSK Drive/Organize/sm-website-app/app/calisthenics-bonus
+/Volumes/SSK Drive/Organize/sm-website-app/app/programs
+/Volumes/SSK Drive/Organize/sm-website-app/app/profile
+/Volumes/SSK Drive/Organize/sm-website-app/app/forgot-password
+/Volumes/SSK Drive/Organize/sm-website-app/app/contact-us
+/Volumes/SSK Drive/Organize/sm-website-app/app/payment-success
+/Volumes/SSK Drive/Organize/sm-website-app/app/terms-of-service
+/Volumes/SSK Drive/Organize/sm-website-app/app/api
+/Volumes/SSK Drive/Organize/sm-website-app/app/reset-password
+/Volumes/SSK Drive/Organize/sm-website-app/app/buy-membership-mobile
+/Volumes/SSK Drive/Organize/sm-website-app/app/payment-webview
+/Volumes/SSK Drive/Organize/sm-website-app/app/lectures
+/Volumes/SSK Drive/Organize/sm-website-app/app/fonts
+/Volumes/SSK Drive/Organize/sm-website-app/app/workout
+/Volumes/SSK Drive/Organize/sm-website-app/app/login
+/Volumes/SSK Drive/Organize/sm-website-app/app/buy-membership
+/Volumes/SSK Drive/Organize/sm-website-app/utils
+/Volumes/SSK Drive/Organize/sm-website-app/components
+/Volumes/SSK Drive/Organize/sm-website-app/components/home
+/Volumes/SSK Drive/Organize/sm-website-app/components/auth
+/Volumes/SSK Drive/Organize/sm-website-app/components/providers
+/Volumes/SSK Drive/Organize/sm-website-app/components/shared
+/Volumes/SSK Drive/Organize/sm-website-app/components/faqs
+/Volumes/SSK Drive/Organize/sm-website-app/components/programs
+/Volumes/SSK Drive/Organize/sm-website-app/components/common
+/Volumes/SSK Drive/Organize/sm-website-app/components/profile
+/Volumes/SSK Drive/Organize/sm-website-app/components/icons
+/Volumes/SSK Drive/Organize/sm-website-app/public
+/Volumes/SSK Drive/Organize/sm-website-app/public/payment-success-page
+/Volumes/SSK Drive/Organize/sm-website-app/public/img
+/Volumes/SSK Drive/Organize/sm-website-app/public/scripts
+/Volumes/SSK Drive/Organize/sm-website-app/.git
+/Volumes/SSK Drive/Organize/sm-website-app/.git/objects
+/Volumes/SSK Drive/Organize/sm-website-app/.git/info
+/Volumes/SSK Drive/Organize/sm-website-app/.git/logs
+/Volumes/SSK Drive/Organize/sm-website-app/.git/hooks
+/Volumes/SSK Drive/Organize/sm-website-app/.git/refs
+/Volumes/SSK Drive/Organize/sm-website-app/redux
+/Volumes/SSK Drive/Organize/sm-website-app/redux/slices
+/Volumes/SSK Drive/Organize/sm-website-app/redux/services
+/Volumes/SSK Drive/Organize/Ultimate-movement-ecosystem-master-zip-MVP
+/Volumes/SSK Drive/Organize/WRITING_HUBS
+/Volumes/SSK Drive/Organize/WRITING_HUBS/saturno-writing-hub-collaboration-addon
+/Volumes/SSK Drive/Organize/WRITING_HUBS/toc-editor-netlify-ready
+/Volumes/SSK Drive/Organize/WRITING_HUBS/HUB_V3_KORTEX
+/Volumes/SSK Drive/Organize/WRITING_HUBS/HUB_V3_KORTEX/frontend
+/Volumes/SSK Drive/Organize/WRITING_HUBS/HUB_V3_KORTEX/scripts
+/Volumes/SSK Drive/🎯_aoc-book-project
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/09_part-vii-transcendence-mastery-beyond
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/10_appendices-and-resources
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/03_part-i-begin-start-here
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/02_the-spark-introduction
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/08_part-vi-journey-continuous-growth
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/01_front-matter
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/04_part-ii-craft-the-art-of-calisthenics
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/06_part-iv-integration-building-programs
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/07_part-v-teaching-sharing-knowledge
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📝_manuscript/05_part-iii-mastery-advanced-techniques
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🏆_submissions-victory-belt
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🚀_final-exports
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🚀_final-exports/02_digital-ebook-formats
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🚀_final-exports/01_print-ready-pdfs
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🔄_duplicates-and-archive
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🔄_duplicates-and-archive/01_duplicates
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🔄_duplicates-and-archive/02_old-book-5-parts-archive
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🎨_visual-assets
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🎨_visual-assets/01_raw-photoshoot
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🎨_visual-assets/04_templates-and-branding
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🎨_visual-assets/02_edited-for-layout
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/🎨_visual-assets/03_diagrams-and-infographics
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📋_project-management
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📋_project-management/01_outlines-and-structure
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📋_project-management/02_publisher-communications
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📋_project-management/03_ai-synthesis-archive
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📚_research-and-inspiration
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📚_research-and-inspiration/03_scientific-papers-and-sources
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📚_research-and-inspiration/02_raw-notes-and-transcripts
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📚_research-and-inspiration/01_competitor-book-analysis
+/Volumes/SSK Drive/🎯_aoc-book-project/🎯_ART_OF_CALISTHENICS_BOOK_PROJECT/📚_research-and-inspiration/04_exercise-taxonomy
+/Volumes/SSK Drive/🎯_aoc-book-project/02_TEMPLATES
+/Volumes/SSK Drive/🎯_aoc-book-project/01_MANUSCRIPT
+/Volumes/SSK Drive/🎯_aoc-book-project/03_VICTORY_BELT_FORMATTING
+/Volumes/SSK Drive/AOC_MASTER
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/GABO_VOICE_DNA
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/GABO_VOICE_DNA/authentic_voice_samples
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/GABO_VOICE_DNA/philosophical_frameworks
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/GABO_VOICE_DNA/teaching_patterns
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/GABO_VOICE_DNA/signature_phrases
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/BOOK_ARCHITECTURE
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/BOOK_ARCHITECTURE/progression_frameworks
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/BOOK_ARCHITECTURE/cross_reference_system
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/BOOK_ARCHITECTURE/chapter_templates
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/BOOK_ARCHITECTURE/complete_TOC_with_abstracts
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY/biomechanics_principles
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY/training_philosophies
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY/common_mistakes_fixes
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY/progression_pathways
+/Volumes/SSK Drive/AOC_MASTER/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY/exercise_encyclopedia
+/Volumes/SSK Drive/AOC_MASTER/01_COMMAND_CENTER
+/Volumes/SSK Drive/AOC_MASTER/01_COMMAND_CENTER/Daily_Workflows
+/Volumes/SSK Drive/AOC_MASTER/01_COMMAND_CENTER/Progress_Tracking
+/Volumes/SSK Drive/AOC_MASTER/01_COMMAND_CENTER/Project_Dashboard
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Drafts
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Drafts/Chapter_Work
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Drafts/Submission_Drafts
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Drafts/Current_Active
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Ideas_Incubation
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Ideas_Incubation/Quick_Captures
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Ideas_Incubation/Raw_Concepts
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Ideas_Incubation/Voice_Notes
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Experimental_Content
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Experimental_Content/Testing_Ground
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Experimental_Content/Future_Concepts
+/Volumes/SSK Drive/AOC_MASTER/03_PRODUCTION_LINE/Experimental_Content/New_Approaches
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/CLAUDE_PROJECT_FRAMEWORKS
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/CLAUDE_PROJECT_FRAMEWORKS/Automation_Tools
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/CLAUDE_PROJECT_FRAMEWORKS/Organization_Systems
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/CLAUDE_PROJECT_FRAMEWORKS/AI_Workflows
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/Business_Context
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/Business_Context/Contracts_Agreements
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/Business_Context/Victory_Belt_Publisher
+/Volumes/SSK Drive/AOC_MASTER/05_STRATEGIC_ASSETS/AI_HUB_INTEGRATION
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Reference_Material
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Reference_Material/Competitor_Analysis
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Reference_Material/Inspiration_Sources
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Reference_Material/Research_Papers
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Old_Drafts
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Old_Drafts/Version_History
+/Volumes/SSK Drive/AOC_MASTER/06_ARCHIVE/Old_Drafts/Abandoned_Approaches
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Design_Assets
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Design_Assets/Exercise_Images
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Design_Assets/Diagrams
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Design_Assets/Infographics
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/HTML_Interfaces
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/HTML_Interfaces/Interactive_Maps
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/HTML_Interfaces/Presentation_Tools
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/HTML_Interfaces/Exercise_Demos
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Video_Scripts_Storyboards
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Video_Scripts_Storyboards/Social_Content
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Video_Scripts_Storyboards/Demo_Scripts
+/Volumes/SSK Drive/AOC_MASTER/04_VISUAL_ARSENAL/Video_Scripts_Storyboards/Explanation_Videos
+/Volumes/SSK Drive/00-sm-academy-content
+/Volumes/SSK Drive/00-sm-academy-content/SKILLS PDFs - SM ACADEMY
+/Volumes/SSK Drive/00-sm-academy-content/14_INITIATION WEEK ALL
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/HBE
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/HBE/PDFs
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/HBE/Intros (Folder To be arranged)
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK EP.13
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.7
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.9
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.8
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.6
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.12
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.1
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK FOR FEBRUARY 06TH
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.10
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.4
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.3
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.2
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.5
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/#SMHBCHECK/#SMHBCHECK Ep.11
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/Hand-Balancing Foundation
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/Hand-Balancing Foundation/Clips
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/Hand-Balancing Foundation/PDFs
+/Volumes/SSK Drive/00-sm-academy-content/03_HANDBALANCING SYSTEM/Hand-Balancing Initation
+/Volumes/SSK Drive/00-sm-academy-content/06_WARM UPS
+/Volumes/SSK Drive/00-sm-academy-content/06_WARM UPS/WARM UPS - UPDATED
+/Volumes/SSK Drive/00-sm-academy-content/06_WARM UPS/WARM UPS - UPDATED/Warm Ups PDFs   PSDs
+/Volumes/SSK Drive/00-sm-academy-content/12_DAILY EXPLORATION
+/Volumes/SSK Drive/00-sm-academy-content/12_DAILY EXPLORATION/DAY ONE
+/Volumes/SSK Drive/00-sm-academy-content/12_DAILY EXPLORATION/DAY TWHO
+/Volumes/SSK Drive/00-sm-academy-content/12_DAILY EXPLORATION/HEAD SHOTS
+/Volumes/SSK Drive/00-sm-academy-content/13_ACADEMY PDFS & CALENDARS
+/Volumes/SSK Drive/00-sm-academy-content/TEACHABLE BANNERS FINAL
+/Volumes/SSK Drive/00-sm-academy-content/TEACHABLE BANNERS FINAL/Banners to be edited
+/Volumes/SSK Drive/00-sm-academy-content/TEACHABLE BANNERS FINAL/teachable banners
+/Volumes/SSK Drive/00-sm-academy-content/TEACHABLE BANNERS FINAL/teachable banners/Transformation
+/Volumes/SSK Drive/00-sm-academy-content/TEACHABLE BANNERS FINAL/teachable banners/Foundation
+/Volumes/SSK Drive/00-sm-academy-content/TEACHABLE BANNERS FINAL/teachable banners/Expansion
+/Volumes/SSK Drive/00-sm-academy-content/04_CALISTHENICS SKILLS PROGRAM
+/Volumes/SSK Drive/00-sm-academy-content/00_ULTIMATE HYBRID SYSTEM
+/Volumes/SSK Drive/00-sm-academy-content/00_ULTIMATE HYBRID SYSTEM/INITIATION WEEK
+/Volumes/SSK Drive/00-sm-academy-content/00_ULTIMATE HYBRID SYSTEM/INITIATION WEEK/Initiation_Yoga
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/04_YOGA PDFs
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/03_YOGA EXPANSION
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/03_YOGA EXPANSION/YE_PH1_JUPITER
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/03_YOGA EXPANSION/YOGA EXPANSION
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/00_YOGA SYSTEM INTRO
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/01_YOGA INITIATION
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/02_YOGA FOUNDATION
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/02_YOGA FOUNDATION/YF_PH1_MERCURY
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/02_YOGA FOUNDATION/YOGA FOUNDATION
+/Volumes/SSK Drive/00-sm-academy-content/02_YOGA SYSTEM/02_YOGA FOUNDATION/YF_PH2_VENUS
+/Volumes/SSK Drive/00-sm-academy-content/15_HHWE
+/Volumes/SSK Drive/00-sm-academy-content/15_HHWE/Descriptions
+/Volumes/SSK Drive/00-sm-academy-content/15_HHWE/Video Editing Assets
+/Volumes/SSK Drive/00-sm-academy-content/15_HHWE/Video Editing Assets/Lower Thirds
+/Volumes/SSK Drive/00-sm-academy-content/08_RESOURCES LECTURES (Anatomy, Energy Systems...)
+/Volumes/SSK Drive/00-sm-academy-content/08_RESOURCES LECTURES (Anatomy, Energy Systems...)/Thomas’ Articles
+/Volumes/SSK Drive/00-sm-academy-content/09_SM JOURNALS (Time Management)
+/Volumes/SSK Drive/00-sm-academy-content/10_PUBLISHED ACADEMY CONTENT LIST
+/Volumes/SSK Drive/00-sm-academy-content/05_HIIT WORKOUT
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/DORSIFLEXION ROUTINE
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS/MIDDLE SPLIT ADD-ON #3
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS/SHOULDER ADD-ON #2
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS/SHOULDER FLEXION ADD-ON #4
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS/PANCAKE ADD-ON #1
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/TO BE EDITED BY EDITORS/STICK MOBILITY 1
+/Volumes/SSK Drive/00-sm-academy-content/07_MOBILITY FLEXIBILITY PROTOCOLS/MOBILITY & FLEXIBILITY SECTION
+/Volumes/SSK Drive/00-sm-academy-content/03_Rings Programs
+/Volumes/SSK Drive/00-sm-academy-content/03_Rings Programs/Classic Rings 1
+/Volumes/SSK Drive/00-sm-academy-content/03_Rings Programs/Classic Rings 2
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/01_CALISTHENICS INITIATION
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/03_CALISTHENICS EXPANSION
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/03_CALISTHENICS EXPANSION/CALISTHENICS EXPANSION
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/03_CALISTHENICS EXPANSION/Strength Workout 2 (CE)
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/03_CALISTHENICS EXPANSION/Strength Workout I (CE)
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/02_CALISTHENICS FOUNDATION
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/02_CALISTHENICS FOUNDATION/CALISTHENICS FOUNDATION
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/02_CALISTHENICS FOUNDATION/Routines PDFs   PSDs
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/02_CALISTHENICS FOUNDATION/BODYWEIGHT BASICS
+/Volumes/SSK Drive/00-sm-academy-content/01_CALISTHENICS SYSTEM/00_CALISTHENICS SYSTEM INTRO
+/Volumes/SSK Drive/00-sm-academy-content/11_IDEAS (PLANET FACTS, THEMES...)
+/Volumes/SSK Drive/00-sm-academy-content/11_IDEAS (PLANET FACTS, THEMES...)/SOLAR SYSTEM PLANETS FACTS
+/Volumes/SSK Drive/00-sm-academy-content/11_IDEAS (PLANET FACTS, THEMES...)/SOLAR SYSTEM PLANETS FACTS/01_VENUS
+/Volumes/SSK Drive/00-sm-academy-content/11_IDEAS (PLANET FACTS, THEMES...)/SOLAR SYSTEM PLANETS FACTS/00_MERCURY
+/Volumes/SSK Drive/00-sm-academy-content/11_IDEAS (PLANET FACTS, THEMES...)/SOLAR SYSTEM PLANETS FACTS/04_MARS
+/Volumes/SSK Drive/00-sm-academy-content/11_IDEAS (PLANET FACTS, THEMES...)/SOLAR SYSTEM PLANETS FACTS/03_EARTH
+/Volumes/SSK Drive/00-sm-academy-content/YASSIR'S DESIGNS
+/Volumes/SSK Drive/00-sm-academy-content/YASSIR'S DESIGNS/SM Web Design
+/Volumes/SSK Drive/00-sm-academy-content/YASSIR'S DESIGNS/The Calisthenics Skills Bundle
+/Volumes/SSK Drive/00-sm-academy-content/YASSIR'S DESIGNS/The Calisthenics Skills Bundle/Final PDFS
+/Volumes/SSK Drive/00-sm-academy-content/YASSIR'S DESIGNS/The Calisthenics Skills Bundle/Calisthenics Skills Guide ebook
+/Volumes/SSK Drive/00-start
+/Volumes/SSK Drive/00-start/South Endel
+/Volumes/SSK Drive/00-start/South Endel/South Eden - Day 1
+/Volumes/SSK Drive/00-start/South Endel/South Eden - Day 1/Endel Clips
+/Volumes/SSK Drive/00-start/South Endel/South Eden - Day 1/Footage
+/Volumes/SSK Drive/00-start/South Endel/South Eden - Day 1/TBA
+/Volumes/SSK Drive/00-start/South Endel/Eden - Day 2:3
+/Volumes/SSK Drive/00-start/South Endel/Endel Day 2:3 - Phone 2 - Footage
+/Volumes/SSK Drive/00-start/Social Media
+/Volumes/SSK Drive/00-start/Social Media/Researchs & Frameworks
+/Volumes/SSK Drive/00-start/Personal Projects
+/Volumes/SSK Drive/00-start/Personal Projects/sis-birthda-2025
+/Volumes/SSK Drive/00-start/AI-User-Content
+/Volumes/SSK Drive/00-start/AI-User-Content/Manus
+/Volumes/SSK Drive/00-start/AI-User-Content/Manus/AI-Memory-Manus
+/Volumes/SSK Drive/00-start/AI-User-Content/Assets (NOT BONUSES YET)
+/Volumes/SSK Drive/00-start/AI-User-Content/Rescued BBEdit Documents
+/Volumes/SSK Drive/00-start/AI-User-Content/Rescued BBEdit Documents 00-23-32-718
+/Volumes/SSK Drive/00-start/AI-User-Content/Saturno Movement
+/Volumes/SSK Drive/CLAUDE NOT HERE
+/Volumes/SSK Drive/CLAUDE NOT HERE/DESKT0P-IMAC COPY-Feb-12
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/music
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.vercel
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/video
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/tools
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/tools/writing-hub-functional
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/tools/cf4-full-program-bonus
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/tools/Training-progress-roadmap
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/css
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/js
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/audio
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/audio/sfx
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/saturno-capture-extension
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/saturno-capture-extension/icons
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/api
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/pdfs
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.git
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.git/objects
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.git/info
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.git/logs
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.git/hooks
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/.git/refs
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/frameworks
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/ORGANIZED
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/apps
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/apps/saturno-command
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/apps/saturno-hub-starter
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/apps/writing-hub-kortex
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_VAULT_DEPLOYMENT/apps/calisthenics-ecosystem
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_EXPERIENCE
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_V3_THE EXPERIENCE
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_V3_THE EXPERIENCE/SATURNO_EXPERIENCE
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_V3_THE EXPERIENCE/sessions
+/Volumes/SSK Drive/CLAUDE NOT HERE/SATURNO_V3_THE EXPERIENCE/logs
+/Volumes/SSK Drive/CLAUDE NOT HERE/screenshots
+/Volumes/SSK Drive/CLAUDE NOT HERE/CLAUDE HELP
+/Volumes/SSK Drive/CLAUDE NOT HERE/CLAUDE HELP/imac-claude-scripts
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/echo
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/Folders created at: 
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/sessions
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/logs
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/-p
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/mkdir
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/ls
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/-la
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/~
+/Volumes/SSK Drive/CLAUDE NOT HERE/titan-forge/~/Library
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/music
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/tools
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/dist
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/node_modules
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/legacy
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/public
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/scripts
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/.git
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/data
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_MOVEMENT_STUDIO/assets
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/ARCHIVE
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/ARCHIVE/DESKTOP_SCREENSHOTS_FEB6
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/ARCHIVE/GABO PERSONAL
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/ARCHIVE/IF I SEE THESE PDF AGAIN AS BONUSES I AM GONNA BREAK THE SCREEN HAHAHA
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/ARCHIVE/GABO MAIN DOCS
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/_CLAUDE_SCRIPTS
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/.tmp.driveupload
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/node_modules
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/.tmp.drivedownload
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/htmls
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/icons
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/.git
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/victory-belt-cc/data
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/CLAUDE HELP
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/CLAUDE HELP/imac-claude-scripts
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER/VB_SUBMISSION_PACKAGE
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/VB-COMMAND-CENTER/.git
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor/.github
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/interactive-toc-editor/.git
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/writing-hub-v2
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/titan-forge-v1
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/karina-gabo-story
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER/music
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER/archive
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER/pdfs
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER/bonuses
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/SATURNO_BONUS_MASTER/assets
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/Editting Tutorials
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system/dist
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system/node_modules
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system/public
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system/.git
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system/.vscode
+/Volumes/SSK Drive/CLAUDE NOT HERE/NOT A DEPLOYMENT ZONE/saturno-solar-system/src
+/Volumes/SSK Drive/CLAUDE NOT HERE/ICLOUD_BACKUP_2025-12-31
+/Volumes/SSK Drive/instagram-posts
+/Volumes/SSK Drive/instagram-posts/Archive
+/Volumes/SSK Drive/instagram-posts/IG Post Templates
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Beginner & Intermediate
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Muscle Ups on Rings - Yassir 
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Gabo IG_5 Attempts
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Yassir IG_6 Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/15 Minute Planche Routine - Fabian
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Gabo IG_5 Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Gabo IG_8 Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Dragon Flag Guidance - Gabo
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Gabo IG_3 Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Scapula Pulls - Gabo (IG)
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/15 MINUTE MIDDLE SPLIT ROUTINE (YT)
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Gabo IG_6 Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/15 Minute Planche Routine - Gabo
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Yassir IG_8 Exercises
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Individual Exercises/Ring Rows - Gabo 
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Easier vs Harder
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Easier vs Harder/Front Lever Clip - Fabian
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Easier vs Harder/HSPU Clip - Gabo
+/Volumes/SSK Drive/instagram-posts/IG Post Templates/Easier vs Harder/15 Minute Full Front Lever Workout - Gabo & Fabian
+/Volumes/SSK Drive/instagram-posts/Final Exports
+/Volumes/SSK Drive/instagram-posts/Final Exports/Routines w  Individual Exercises
+/Volumes/SSK Drive/instagram-posts/Final Exports/Routines w  Individual Exercises/15 MINUTE MIDDLE SPLIT ROUTINE (YT)
+/Volumes/SSK Drive/instagram-posts/Final Exports/Routines w  Individual Exercises/Muscle Up on Bars
+/Volumes/SSK Drive/instagram-posts/Final Exports/Routines w  Individual Exercises/Max Pushups - Gabo 
+/Volumes/SSK Drive/instagram-posts/Final Exports/Routines w  Individual Exercises/15 Minute Planche Routine - SM
+/Volumes/SSK Drive/instagram-posts/Final Exports/Routines w  Beginner & Intermediate
+/Volumes/SSK Drive/instagram-posts/00_Footage
+/Volumes/SSK Drive/instagram-posts/00_Footage/🧖 Recovery City Cave - Gabo Lifestyle - Short Form 
+/Volumes/SSK Drive/instagram-posts/00_Footage/🧖 Recovery City Cave - Gabo Lifestyle - Short Form /Shot 2
+/Volumes/SSK Drive/instagram-posts/00_Footage/🧖 Recovery City Cave - Gabo Lifestyle - Short Form /Shot 3
+/Volumes/SSK Drive/instagram-posts/00_Footage/🧖 Recovery City Cave - Gabo Lifestyle - Short Form /Shot 1
+/Volumes/SSK Drive/instagram-posts/00_Footage/WhatPeopleThinkVsWhatWeDo_InstagramPost
+/Volumes/SSK Drive/instagram-posts/00_Footage/Gabo New York
+/Volumes/SSK Drive/.Trashes
+/Volumes/SSK Drive/.Trashes/502
+/Volumes/SSK Drive/SSOT_ESSENTIALS
+/Volumes/SSK Drive/00-black-friday
+/Volumes/SSK Drive/00-black-friday/🚀 Landing_Page
+/Volumes/SSK Drive/00-black-friday/🚀 Landing_Page/00_Meetings_Tasks
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2/BF25_MASTER_PACKAGE
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2/BF25_MASTER_PACKAGE/05_REFERENCE
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2/BF25_MASTER_PACKAGE/01_NOTION_SETUP
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2/BF25_MASTER_PACKAGE/03_VISUAL_COMMAND_CENTER
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2/BF25_MASTER_PACKAGE/04_ROI_MAXIMIZATION
+/Volumes/SSK Drive/00-black-friday/BLACK FRIDAY V2/BF25_MASTER_PACKAGE/02_AGENT_ECOSYSTEM
+/Volumes/SSK Drive/00-black-friday/📧 Email_Sequence
+/Volumes/SSK Drive/00-black-friday/Programs
+/Volumes/SSK Drive/00-black-friday/BF Command Center
+/Volumes/SSK Drive/00-black-friday/BF Command Center/BF25_MISSION_PACKAGE_FINAL_V1
+/Volumes/SSK Drive/00-black-friday/BF Command Center/BF25_MISSION_PACKAGE_FINAL_V1/notion_import_csvs
+/Volumes/SSK Drive/00-black-friday/BF Command Center/BF25_MISSION_PACKAGE_Manus
+/Volumes/SSK Drive/00-black-friday/BF Command Center/BF25_MISSION_PACKAGE_Manus/notion_import_csvs
+/Volumes/SSK Drive/00-black-friday/BF Command Center/BF25_Launch_Plan_Package_2025-11-01_0657
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SSOT-KPI-Evolving
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SSOT-KPI-Evolving/GPT-full-convos
+/Volumes/SSK Drive/00-black-friday/BF Command Center/Prompts FInal
+/Volumes/SSK Drive/00-black-friday/BF Command Center/00_Front Ends
+/Volumes/SSK Drive/00-black-friday/BF Command Center/Transcripts with team
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/03_CONTENT_ENGINE
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/01_CORE_OPS
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/05_INTELLIGENCE
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/08_MASTER_DOCS
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/07_PIPELINES
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/09_NOTION_SYNC
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/04_PRODUCT_OPS
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/02_REVENUE_SYSTEMS
+/Volumes/SSK Drive/00-black-friday/BF Command Center/SATURNO_BF25_COMMAND_CENTER/06_ASSETS_ARCHIVES
+/Volumes/SSK Drive/00-black-friday/BF Command Center/🎱_CSV_Pack
+/Volumes/SSK Drive/00-black-friday/BF Command Center/Saturno_Notion_CSV_Pack
+/Volumes/SSK Drive/00-black-friday/Bonuses
+/Volumes/SSK Drive/00-black-friday/Landing_Page
+/Volumes/SSK Drive/00-black-friday/Landing_Page/📲 Developer Call - Ali - App features BF
+/Volumes/SSK Drive/00-black-friday/🎬 Launch_Materials
+/Volumes/SSK Drive/00-black-friday/🎁 Bonuses
+/Volumes/SSK Drive/00-black-friday/🎁 Bonuses/00_Workflows
+/Volumes/SSK Drive/00-black-friday/🎁 Bonuses/00_Workflows/Deployment pipelinev1
+/Volumes/SSK Drive/00-black-friday/Rosurces
+/Volumes/SSK Drive/marketing
+/Volumes/SSK Drive/marketing/Email_Campaigns
+/Volumes/SSK Drive/marketing/Monetization-via-automations-analisis-TBR
+/Volumes/SSK Drive/marketing/📧 Email
+/Volumes/SSK Drive/marketing/📊 Data
+/Volumes/SSK Drive/marketing/📝 Content_Prod
+/Volumes/SSK Drive/marketing/📝 Content_Prod/01_content_production
+/Volumes/SSK Drive/marketing/📝 Content_Prod/01_content_production/🎯_content_generation_dashboard_v3
+/Volumes/SSK Drive/marketing/📝 Content_Prod/01_content_production/💪_movement_ecosystem_mvp
+/Volumes/SSK Drive/marketing/📝 Content_Prod/01_content_production/🎛️_saturno_command_center_v3
+/Volumes/SSK Drive/marketing/📝 Content_Prod/01_content_production/🎬_content_generation_machine_mvp
+/Volumes/SSK Drive/marketing/📝 Content_Prod/04_business_operations
+/Volumes/SSK Drive/marketing/📝 Content_Prod/04_business_operations/🤖_voice_automation_master_pack
+/Volumes/SSK Drive/marketing/calai-growth-dashboard
+/Volumes/SSK Drive/marketing/Consolidate Key Insights into Core Principles for Knowledge System
+/Volumes/SSK Drive/marketing/Content
+/Volumes/SSK Drive/marketing/03_continuous
+/Volumes/SSK Drive/marketing/📹 Content
+/Volumes/SSK Drive/marketing/📹 Content/Welcome Email Campaign
+/Volumes/SSK Drive/marketing/02_content_os
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/vector-map-visualizer
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/notion-auditor
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/prompt-optimizer
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/vault-sync
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/recursive-agent-builder
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/saturno-os-monitor
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/black-friday-strategist
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/rag-agent-deployer
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/prompt-vault-auditor
+/Volumes/SSK Drive/marketing/02_content_os/Claude_Skills_Pack/chain-orchestrator
+/Volumes/SSK Drive/marketing/05_archive_temp
+/Volumes/SSK Drive/marketing/05_archive_temp/exported_assets_collection
+/Volumes/SSK Drive/marketing/05_archive_temp/SaturnoMaster
+/Volumes/SSK Drive/marketing/05_archive_temp/SaturnoMaster/app
+/Volumes/SSK Drive/marketing/05_archive_temp/SaturnoMaster/addons
+/Volumes/SSK Drive/marketing/05_archive_temp/SaturnoMaster/prompts
+/Volumes/SSK Drive/marketing/05_archive_temp/SaturnoMaster/schemas
+/Volumes/SSK Drive/marketing/Content-Scripts-Plan-V1
+/Volumes/SSK Drive/marketing/📧 Email_Marketing_Brevo
+/Volumes/SSK Drive/.fseventsd
+/Volumes/SSK Drive/downloads-i-mac
+/Volumes/SSK Drive/downloads-i-mac/🗃️05→ ORGANIZE
+/Volumes/SSK Drive/downloads-i-mac/⚙️04→ OPERATIONS
+/Volumes/SSK Drive/downloads-i-mac/BF25-firday-threat-perplexity
+/Volumes/SSK Drive/downloads-i-mac/HB Shapes
+/Volumes/SSK Drive/downloads-i-mac/HB Shapes/resources
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/🚀 Landing_Page
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/🚀 Landing_Page/00_Meetings_Tasks
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BLACK FRIDAY V2
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BLACK FRIDAY V2/BF25_MASTER_PACKAGE
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/📧 Email_Sequence
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/Programs
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/BF25_MISSION_PACKAGE_FINAL_V1
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/BF25_MISSION_PACKAGE_Manus
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/BF25_Launch_Plan_Package_2025-11-01_0657
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/SSOT-KPI-Evolving
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/Prompts FInal
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/00_Front Ends
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/Transcripts with team
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/SATURNO_BF25_COMMAND_CENTER
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/🎱_CSV_Pack
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/BF Command Center/Saturno_Notion_CSV_Pack
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/Bonuses
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/Landing_Page
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/Landing_Page/📲 Developer Call - Ali - App features BF
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/🎬 Launch_Materials
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/🎁 Bonuses
+/Volumes/SSK Drive/downloads-i-mac/🥊00_BLACK_FRIDAY/🎁 Bonuses/00_Workflows
+/Volumes/SSK Drive/downloads-i-mac/🥊000_BF25_COMAND CENTER
+/Volumes/SSK Drive/downloads-i-mac/🥊000_BF25_COMAND CENTER/saturno-ultimate-hub
+/Volumes/SSK Drive/downloads-i-mac/🥊000_BF25_COMAND CENTER/saturno-command-pro
+/Volumes/SSK Drive/downloads-i-mac/HB Shapes 2
+/Volumes/SSK Drive/downloads-i-mac/HB Shapes 2/resources
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/Calisthenics-hub-DRAFT
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/saturno-notebooklm-integration
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/SaturnoMaster
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/saturno-command
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/saturno-hub-starter
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/writing-hub-kortex
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/💻 Working_MVPs/calisthenics-ecosystem
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/DEPLOY_READY_HUB
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/DEPLOY_READY_HUB/.git
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/00_Saturno MOvement OS
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER/02_KNOWLEDGE_VAULT
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER/01_COMMAND_CENTER
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER/03_PRODUCTION_LINE
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER/05_STRATEGIC_ASSETS
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER/06_ARCHIVE
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/AOC_MASTER/04_VISUAL_ARSENAL
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/GITHUB_ROOT_READY
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/GITHUB_ROOT_READY/.git
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/interactive-toc-editor.zip
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/exported-assets(3)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/exported-assets (2)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/exported-assets
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/exported-assets (1)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/exported-assets(5)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/exported-assets (7)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/z_MOVE IT/saturno-command-refined
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects/AI Agency Yeye
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects/HUB_3_KORTEX
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects/00_Prompt Vault
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/🤖 AI_Projects/GPT-CONVOS
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/solar-system-framework (1)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/ENTIRE SATURNO MOVEMENT ROAD MAP_files
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/00_SaturnoOS-Command Center
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/00_SaturnoOS-Command Center/saturno-ultimate-hub
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/00_SaturnoOS-Command Center/saturno-mega-lab
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/00_SaturnoOS-Command Center/saturno-command-pro
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets/exported-assets(4)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets/INFOGRAPHICS_10:10
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets/exported-assets(7)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets/exported-assets(8)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets/exported-assets(5)
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/📖 Book_Assets/Infographics-TOC-v1
+/Volumes/SSK Drive/downloads-i-mac/🖥️ 02→ PRODUCT/MVPs
+/Volumes/SSK Drive/downloads-i-mac/saturno-ultimate-hub
+/Volumes/SSK Drive/downloads-i-mac/Notion-Prompt-Registry-Page
+/Volumes/SSK Drive/downloads-i-mac/Notion-Prompt-Registry-Page/Prompt Vault — Registry 32750cf740134b6298f913f058ada78f
+/Volumes/SSK Drive/downloads-i-mac/BF-Comand-Center V2
+/Volumes/SSK Drive/downloads-i-mac/Ultimate-movement-ecosystem-master-zip-MVP
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/vector-map-visualizer
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/notion-auditor
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/prompt-optimizer
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/vault-sync
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/recursive-agent-builder
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/saturno-os-monitor
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/black-friday-strategist
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/rag-agent-deployer
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/prompt-vault-auditor
+/Volumes/SSK Drive/downloads-i-mac/Claude_Skills_Pack/chain-orchestrator
+/Volumes/SSK Drive/downloads-i-mac/Dev_Meeting_Summary_Pack
+/Volumes/SSK Drive/downloads-i-mac/Andy PDFS
+/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy
+/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy/public
+/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy_1
+/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy_1/.vercel
+/Volumes/SSK Drive/downloads-i-mac/Andy PDFS/andy-deploy_1/public
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/types
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/lecture
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/sign-up
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/success-loading
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/lecture-category
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/workout-category
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/privacy-policy
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/workouts
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/workout-subcategory
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/otp-verification
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/calisthenics-bonus
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/programs
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/profile
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/forgot-password
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/contact-us
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/payment-success
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/terms-of-service
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/api
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/reset-password
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/buy-membership-mobile
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/payment-webview
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/lectures
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/fonts
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/workout
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/login
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/app/buy-membership
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/utils
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/home
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/auth
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/providers
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/shared
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/faqs
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/programs
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/common
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/profile
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/components/icons
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/public
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/public/payment-success-page
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/public/img
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/public/scripts
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/.git
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/.git/objects
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/.git/info
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/.git/logs
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/.git/hooks
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/.git/refs
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/redux
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/redux/slices
+/Volumes/SSK Drive/downloads-i-mac/sm-website-app/redux/services
+/Volumes/SSK Drive/downloads-i-mac/Ultimate-movement-ecosystem-master-zip-MVP 2
+/Volumes/SSK Drive/downloads-i-mac/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/downloads-i-mac/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/downloads-i-mac/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL/modules
+/Volumes/SSK Drive/downloads-i-mac/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL/outputs
+/Volumes/SSK Drive/downloads-i-mac/Claude_Recursive_Prompt_Engine_FULL/modules
+/Volumes/SSK Drive/downloads-i-mac/Claude_Recursive_Prompt_Engine_FULL/outputs
+/Volumes/SSK Drive/downloads-i-mac/Private & Shared
+/Volumes/SSK Drive/downloads-i-mac/Private & Shared/SM CONTENT
+/Volumes/SSK Drive/downloads-i-mac/Private & Shared/SM CONTENT/New data source
+/Volumes/SSK Drive/downloads-i-mac/Private & Shared/SM CONTENT/Saturno Movement Space
+/Volumes/SSK Drive/downloads-i-mac/Saturno_Notion_CSV_Pack
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/Email_Campaigns
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/Monetization-via-automations-analisis-TBR
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📧 Email
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📊 Data
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📝 Content_Prod
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📝 Content_Prod/01_content_production
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📝 Content_Prod/04_business_operations
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/calai-growth-dashboard
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/Consolidate Key Insights into Core Principles for Knowledge System
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/Content
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/03_continuous
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📹 Content
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📹 Content/Welcome Email Campaign
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/02_content_os
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/02_content_os/Claude_Skills_Pack
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/05_archive_temp
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/05_archive_temp/exported_assets_collection
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/Content-Scripts-Plan-V1
+/Volumes/SSK Drive/downloads-i-mac/📣03→ MARKETING/📧 Email_Marketing_Brevo
+/Volumes/SSK Drive/TapRecord
+/Volumes/SSK Drive/TapRecord/Video
+/Volumes/SSK Drive/TapRecord/Audio
+/Volumes/SSK Drive/TV
+/Volumes/SSK Drive/TV/Media.localized
+/Volumes/SSK Drive/TV/Media.localized/.localized
+/Volumes/SSK Drive/TV/TV Library.tvlibrary
+/Volumes/SSK Drive/Desktop
+/Volumes/SSK Drive/Desktop/SM TUTORIALS - By Yassir
+/Volumes/SSK Drive/Desktop/EOS_DIGITAL
+/Volumes/SSK Drive/Desktop/EOS_DIGITAL/MISC
+/Volumes/SSK Drive/Desktop/EOS_DIGITAL/DCIM
+/Volumes/SSK Drive/Desktop/EOS_DIGITAL/DCIM/EOSMISC
+/Volumes/SSK Drive/Desktop/EOS_DIGITAL/DCIM/100EOS5D
+/Volumes/SSK Drive/Desktop/EOS_DIGITAL/.fseventsd
+/Volumes/SSK Drive/Desktop/Gabo
+/Volumes/SSK Drive/Desktop/Lyli's Content
+/Volumes/SSK Drive/Desktop/Lyli's Content/Lyli Unedited Photos
+/Volumes/SSK Drive/Desktop/Lyli's Content/Lyli Banners Info
+/Volumes/SSK Drive/Desktop/Motion Graphics - Fathers Day
+/Volumes/SSK Drive/Desktop/Motion Graphics - Fathers Day/Adobe After Effects Auto-Save
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Auto-Save
+/Volumes/SSK Drive/Desktop/Recovery Picts
+/Volumes/SSK Drive/Desktop/Recovery Picts/icons
+/Volumes/SSK Drive/Desktop/Recovery Picts/icons/scalable
+/Volumes/SSK Drive/Desktop/Recovery Picts/icons/48x48
+/Volumes/SSK Drive/Desktop/Recovery Picts/78
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews/S2 002 - Full Podcast Video.PRV
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews/S2 002 - Full Podcast Video.PRV/Peak Files
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews/Father's Day Chest Workout.PRV
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews/Father's Day Chest Workout.PRV/Peak Files
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews/Adobe After Effects Auto-Save
+/Volumes/SSK Drive/Desktop/Adobe Premiere Pro Audio Previews/Adobe Premiere Pro Auto-Save
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/.cursor
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/.cursor/commands
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/.tmp.driveupload
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/01_COMMAND_CENTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/01_COMMAND_CENTER/00_Ahi-Hub-Gabo-Comand
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/01_COMMAND_CENTER/Daily_Workflows
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/01_COMMAND_CENTER/Progress_Tracking
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/01_COMMAND_CENTER/Project_Dashboard
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/02_KNOWLEDGE_VAULT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/02_KNOWLEDGE_VAULT/BOOK_ARCHITECTURE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/02_KNOWLEDGE_VAULT/CALISTHENICS_MASTERY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/02_KNOWLEDGE_VAULT/GABO_VOICE_DNA
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/03_PRODUCTION_LINE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/03_PRODUCTION_LINE/Drafts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/03_PRODUCTION_LINE/Experimental_Content
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/03_PRODUCTION_LINE/Ideas_Incubation
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/04_VISUAL_ARSENAL
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/04_VISUAL_ARSENAL/Design_Assets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/04_VISUAL_ARSENAL/HTML_Interfaces
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/05_STRATEGIC_ASSETS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/05_STRATEGIC_ASSETS/Business_Context
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/05_STRATEGIC_ASSETS/CLAUDE_PROJECT_FRAMEWORKS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/05_STRATEGIC_ASSETS/GPT_CONVERSATION_LOGS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/05_STRATEGIC_ASSETS/KORTEX_SYSTEMS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/EXPORTED_ASSETS_STAGING
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/PROTOTYPES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/06_DEPLOYMENT_ZONE/READY_TO_DEPLOY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/07_SOCIAL_MEDIA
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS/00_BOOKOS_RESCUE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS/01_CLAUDE_ARTIFACTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS/02_VB_BOOK_PROJECT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS/03_PROJECTS_LIBRARY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS/04_Documents
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/08_EXISTING_PROJECTS/05_SOCIAL_MEDIA
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/09_ARCHIVE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/09_ARCHIVE/Old_Drafts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/09_ARCHIVE/Reference_Material
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_AOC_MAIN_RESOURCES/09_ARCHIVE/z_LEGACY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/00_Writings
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/01_Transcrips
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/01_Transcrips/BF25_App development 
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/03_Prompts PDFs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/03_Prompts PDFs/00_Prompt Bussiness
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/03_Prompts PDFs/AI Conversations
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/03_Prompts PDFs/Layers of prompt optimization #Prompt #Critique #AIFeed
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/03_Prompts PDFs/📦
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Branding
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Branding/00_SOUND
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Branding/00_SOUND/00_Albums
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Branding/00_SOUND/02_Sound_FXs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Prototypes
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Prototypes/saturno-molecular-graph 2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Prototypes/saturno-molecular-graph
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Prototypes/saturno-ultimate-hub
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Prototypes/🎶 Music 
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/04_Prototypes/saturno-molecular-graph 3
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/05_Saturno Movement APP
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/05_Saturno Movement APP/Hand-Balancing-HBS-HBF-2025
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/05_Saturno Movement APP/Hand-Balancing-HBS-HBF-2025/00_Old Hand-balacing
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/05_Saturno Movement APP/Resources
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AI-Shared-Resources
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AI-Shared-Resources/BF25_MISSION_PACKAGE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AI-Shared-Resources/BF25_MISSION_PACKAGE/notion_import_csvs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AI-Shared-Resources/🚨SM App  Rescue
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AI-Status
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AI-Sync-Status
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Archive-2025
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Archive-2025/Music OS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Archive-2025/Music OS/New Music 🪐
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Archive-2025/NYC
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Archive-2025/intro book - Delete 
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/AudioMaster
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/00_Last_30_Days_Files_Dec-28
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/BF25-Resources
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/CLAUDE HELP
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/CLAUDE HELP/C1-mack-book-pro-16
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/CLAUDE HELP/imac-claude-scripts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/DESKTOP I-MAC
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/DUPLICATE_REPORTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/FINAL PDFS (TBV)/_MONDAY_BONUS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/BRAND_ASSETS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/TUTORIALS_PDF
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/🎯_BF25_CAMPAIGN
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/📋_NOTES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/📚_BOOK_CONTENT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/📜_SCRIPTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/📝_CAPTIONS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/📢_MARKETING
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/🤖_PROMPTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/GABO_ORGANIZED/🤸_HBF_CONTENT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/HBS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/01_TRAINING
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/02_HANDSTANDS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/03_FLEXIBILITY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/04_MOBILITY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/05_CAPTIONS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/06_SCRIPTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/07_QUOTES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/08_PERSONAL
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/09_BUSINESS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/10_IDEAS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/11_NUTRITION
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/12_CLIENTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/99_UNCATEGORIZED
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/NOTES_ORGANIZED_20251124_051919/SMART_FOLDERS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/APPLE_NOTES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/BF25_CAMPAIGN
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/BONUS_PDFS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/BOOK_CONTENT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/CAPTIONS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/DUPLICATES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/EXERCISES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/HBF_CONTENT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/ONEDRIVE_GOLD
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/PROMPTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/PROOF_CONTENT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/SCREENSHOTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/OVERNIGHT_ORG_20251124_051229/SCRIPTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/AI_CONVOS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/CLIENT_FILES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/COMBINED_PDFS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/HANDSTAND_CAPTIONS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/HBF_MASTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/LARGE_MEDIA_LOG
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/LOOSE_FILES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/MOBILITY_MASTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/PROMO_CONTENT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/SATURNO_UNIFIED_20251124_061805/SESSION_SUMMARIES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/Screenshots
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/TOOLS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_LOOSE_FILES_20251124
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_LOOSE_FILES_20251124/TEMP_WORD
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124/HBS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124/NOTES_ORGANIZED_20251124_051816
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124/icloud-notes-2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ARCHIVE_OLD_ORGS_20251124/overnight-audit-20251123
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Archives
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Audio
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Code
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Documents
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Images
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Other
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/PDFs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Presentations
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Spreadsheets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/_ORGANIZED/Videos
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/gpt-convo-sclaude-scalfold
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/gpt-convo-sclaude-scalfold/AI Full Convos
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/00_Passwords
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/01_Training
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/02_Captions
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/03_Collabs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/04_Scripts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/05_Ideas To Develop
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/06_Reels Scripts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/09_Clients
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/10_K&W
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/11_BOOK
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/12_Finances
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/8_Digital Organization
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/AUDIO PRODUCTION | MUSIC
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/Affiliates
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/FAVORITES
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/Hand-balancing
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/Interviews
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/Notes
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/Recently Deleted
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/SM APP
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/iCloud Notes 2/Untitled
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os-organized
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os-organized/00_Strategy
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os-organized/01_Operations
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os-organized/02_Marketing
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os-organized/03_Product
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/000_BF25_COMAND CENTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/00_📍BLACK_FRIDAY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/01_PRODUCT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/AI_HUB_UNIFIED
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/Andy PDF
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/BF25_MISSION_PACKAGE_FINAL_V1
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/Prompts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/_ARCHIVE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/andy-guide-public
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/andy-strength-guide
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/📍MARKETING
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Dektop Mackbook C2 - Dec-28:25/saturno-os/📍PRODUCT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Desktop
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Desktop/.claude
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Desktop/.tmp.drivedownload
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Desktop/.tmp.driveupload
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/ADD
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/ADD/Media
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/ADD/Sound Packs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Adobe
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Adobe/Photoshop Cloud Associates
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Auto Save
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Auto Save/Audio Files
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Auto Save/Auto Save
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Auto Save/Bounces
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Auto Save/Exports
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Auto Save/Render Files
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Cuesheets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/FabFilter
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/FabFilter/Presets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Hormozi-scaling-workshop-vegas
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Library
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Lock
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Playlists
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Playlists/System
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Presets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Presets/Auto Gain
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Presets/Replace
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Presets/Search
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Presets/Triggers
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Presets/Workspaces
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/Projects
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster/Config
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster/Partial Presets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster/Presets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster/Samples
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster/Scales
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/SynthMaster/Waveforms
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/saturno-writting-hub
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Documents/saturno-writting-hub/assets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/000_BF25_COMAND CENTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/000_BF25_COMAND CENTER/saturno-command-pro
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/000_BF25_COMAND CENTER/saturno-ultimate-hub
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/BF Command Center
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/BLACK FRIDAY V2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/Bonuses
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/Landing_Page
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/Programs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/🎁 Bonuses
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/🎬 Launch_Materials
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/📧 Email_Sequence
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/00_📍BLACK_FRIDAY/🚀 Landing_Page
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/AI-brand-transcript-2-plan-of-action
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/BF-Comand-Center V2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/BF25-firday-threat-perplexity
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL/Claude_Recursive_Prompt_Engine_FULL
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL/modules
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Recursive_Prompt_Engine_FULL/outputs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/black-friday-strategist
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/chain-orchestrator
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/notion-auditor
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/prompt-optimizer
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/prompt-vault-auditor
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/rag-agent-deployer
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/recursive-agent-builder
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/saturno-os-monitor
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/vault-sync
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Claude_Skills_Pack/vector-map-visualizer
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Dev_Meeting_Summary_Pack
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/HB Shapes
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/HB Shapes/resources
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Notion-Prompt-Registry-Page
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Notion-Prompt-Registry-Page/Prompt Vault — Registry 32750cf740134b6298f913f058ada78f
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Saturno_Notion_CSV_Pack
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/Ultimate-movement-ecosystem-master-zip-MVP
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy/public
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy_1
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy_1/.vercel
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/andy-deploy_1/public
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/.git
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/app
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/components
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/public
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/redux
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/types
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/sm-website-app/utils
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/02_content_os
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/03_continuous
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/05_archive_temp
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/Consolidate Key Insights into Core Principles for Knowledge System
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/Content-Scripts-Plan-V1
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/Content
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/Email_Campaigns
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/Monetization-via-automations-analisis-TBR
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/calai-growth-dashboard
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/📊 Data
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/📝 Content_Prod
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/📧 Email
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/📧 Email_Marketing_Brevo
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍MARKETING/📹 Content
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/00_Saturno MOvement OS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/00_SaturnoOS-Command Center
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/AOC_MASTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/Calisthenics-hub-DRAFT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/DEPLOY_READY_HUB
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/ENTIRE SATURNO MOVEMENT ROAD MAP_files
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/GITHUB_ROOT_READY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/MVPs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/interactive-toc-editor.zip
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/saturno-notebooklm-integration
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/solar-system-framework (1)
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/z_MOVE IT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/💻 Working_MVPs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/📖 Book
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/📖 Book_Assets
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Downloads I-Mac/📍PRODUCT/🤖 AI_Projects
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/.github
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/AOC_FRONTEND
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/AOC_MASTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/Chrome extentions
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/The-Art-of-Calisthenics__MASTER-VAULT__migrated_2025-09-22
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/config
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/cortex-control-center.zip
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/daily
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/deployment
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/docs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/frontend
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/logs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/perplexity-migration
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/projects
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/scripts
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/setup
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/shared
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/templates
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/GPT-CONVOS/AI-Hub-main/ultimate-book-backend.zip
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS 
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /"SM_TRANSLATOR_INTRO_AND_TRANSLATION
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /00_Legal Docs
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /Archive
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/01_CLAUDE_ARTIFACTS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/02_VB_BOOK_PROJECT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/03_PROJECTS_LIBRARY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/04_Documents
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/DEPLOY_READY_HUB
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/GITHUB_ROOT_READY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/HUB_3_KORTEX
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/WRITING_HUBS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/vercel-deploy
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/z_MOVE IT
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /BACK UP IMAC 2/z_OLD_USER_ARCHIVE
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /Experiment 🧪 
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Life OS /Experiment 🧪 /🕸️ Psychology  
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Music
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/Music/Experiments
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/WRITING_HUBS_BACKUP
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/i-cloud-MAIN-ALL-FOLDERS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/AI SCREEN-RECORDS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25/Archive 2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25/Archive 3
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25/Archive
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25/TODAY
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25/VISUAL_COMMAND_CENTER 2
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/BF-MASTER-BF25/VISUAL_COMMAND_CENTER
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/🤖_AI-HUB_UNIFIED_CONTROL_CENTER/PROGRAMS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/HBS
+/Volumes/SSK Drive/ICLOUD_BACKUP_2025-12-31/HBS/Biomechanics of a HS e-book
+/Volumes/SSK Drive/_ORGANIZED
+/Volumes/SSK Drive/_ORGANIZED/01_VIDEOS
+/Volumes/SSK Drive/_ORGANIZED/02_IMAGES
+/Volumes/SSK Drive/_ORGANIZED/03_DOCUMENTS
+/Volumes/SSK Drive/_ORGANIZED/04_DESIGN_FILES
+/Volumes/SSK Drive/_ORGANIZED/05_CODE_SCRIPTS
+/Volumes/SSK Drive/_ORGANIZED/06_ARCHIVES
+/Volumes/SSK Drive/_ORGANIZED/06_ARCHIVES/SSOT_ESSENTIALS
+

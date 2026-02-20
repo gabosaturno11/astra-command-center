@@ -1,0 +1,269 @@
+=== ONEDRIVE: /Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal ===
+
+--- Top-level folder sizes ---
+  0B	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/_DESKTOP_BACKUP_20251130/
+646M	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/_NOT_BOOK_FROM_VB/
+4.0K	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/00_NOTES_CONSOLIDATED/
+1.1G	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/
+220K	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/01_Projects/
+  0B	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/02_Downloads/
+  0B	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/Attachments/
+4.6M	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/BOOK_OS/
+ 12M	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/Documents/
+ 12K	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/GABO_OS/
+2.1M	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/
+1.1M	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/Microsoft Copilot Chat Files/
+8.0K	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/Pictures/
+ 44K	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/
+4.0K	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/Scans/
+2.4G	/Users/Gabosaturno/Library/CloudStorage/OneDrive-Personal/z_OLD_USER_ARCHIVE/
+
+--- Full tree (depth 4) ---
+~/Library/CloudStorage/OneDrive-Personal
+~/Library/CloudStorage/OneDrive-Personal/_NOT_BOOK_FROM_VB
+~/Library/CloudStorage/OneDrive-Personal/z_OLD_USER_ARCHIVE
+~/Library/CloudStorage/OneDrive-Personal/z_OLD_USER_ARCHIVE/IMPORTANT_FILES
+~/Library/CloudStorage/OneDrive-Personal/02_Downloads
+~/Library/CloudStorage/OneDrive-Personal/Scans
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/06_Assets_To_Edit
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/04_Asteroid_Belt
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/09_Frameworks
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/10_Exercises_Database
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/05_Intro_Videos
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/01_HBF_Foundation
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/01_HBF_Foundation/01_Assets : PDfs
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/01_HBF_Foundation/00_OLD HBF
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/03_HBT_Transformation
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/02_HBE_Expansion
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/07_Planets_Roadmap
+~/Library/CloudStorage/OneDrive-Personal/HBS_MASTER/08_Promo_Content
+~/Library/CloudStorage/OneDrive-Personal/Pictures
+~/Library/CloudStorage/OneDrive-Personal/Pictures/Uploads
+~/Library/CloudStorage/OneDrive-Personal/Microsoft Copilot Chat Files
+~/Library/CloudStorage/OneDrive-Personal/01_Projects
+~/Library/CloudStorage/OneDrive-Personal/01_Projects/Master Prompt Library
+~/Library/CloudStorage/OneDrive-Personal/01_Projects/Master Prompt Library/🎤→-Master-Prompt-Library-7062ea88-09fe-4e92-84ad-d8aa0548fbda
+~/Library/CloudStorage/OneDrive-Personal/01_Projects/Master Prompt Library/🎤→-Master-Prompt-Library-7062ea88-09fe-4e92-84ad-d8aa0548fbda/'Apex,'-PDF-MAKER--fce16397-2692-4efa-9a84-54b7dc64418e
+~/Library/CloudStorage/OneDrive-Personal/01_Projects/AGENT1_prompt_architect_package
+~/Library/CloudStorage/OneDrive-Personal/GABO_OS
+~/Library/CloudStorage/OneDrive-Personal/GABO_OS/Personal
+~/Library/CloudStorage/OneDrive-Personal/GABO_OS/Screenshots
+~/Library/CloudStorage/OneDrive-Personal/GABO_OS/Archive
+~/Library/CloudStorage/OneDrive-Personal/GABO_OS/Notes
+~/Library/CloudStorage/OneDrive-Personal/_DESKTOP_BACKUP_20251130
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_WRITTER'S MATERIALS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_WRITTER'S MATERIALS/link-to-research-perplexity-project
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_WRITTER'S MATERIALS/link-to-research-perplexity-project/00_important-drafts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_WRITTER'S MATERIALS/VB-standards-material
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_WRITTER'S MATERIALS/RED_TAG_PRIORITY_AOC
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_WRITTER'S MATERIALS/_AOC_V1_COLLECTION
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_research
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_research/web_snapshots
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_research/note_summaries
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_research/pdf_excerpts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_MOVEMENT_DNA
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_MOVEMENT_DNA/02_Cards_Samples
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_MOVEMENT_DNA/01_Data
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_MOVEMENT_DNA/04_Programs_Seeds
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/04_MOVEMENT_DNA/03_Taxonomy_Glossary
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_movement_dna
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_movement_dna/gates
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_movement_dna/exercises
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_movement_dna/relationships
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/MONDAY
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/ARCHIVE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/Book-Submission
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/JUNE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/Sunday
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/Book Main Folder
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/Check end of the week
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/GOLDEN MINE/Book-Submission 2
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/Hormosis-Live-Workshop
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/Hormosis-Live-Workshop/Screenshots30
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/TO_BACKUP_TO_HARD_DRIVE/Hormosis-Live-Workshop/Screenshots15
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_06_endure
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_01_spark
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_04_choose
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_02_build
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_06_become
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_07_legacy
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_05_design
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_chapters/part_03_deepen
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_PROGRAMS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_PROGRAMS/Workout Creator
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_PROGRAMS/Workout Creator/2025-9-23
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_PROGRAMS/Routines
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_PROGRAMS/Templates
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/test
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets/diagrams
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets/infographics
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets/infographics/finals
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets/infographics/perplexity
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets/infographics/manus
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/07_assets/photos
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT/FROM_DESKTOP
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT/FROM_PROJECTS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT/FROM ONE DRIVE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT/FROM_GDRIVE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT/FROM_DOCUMENTS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_TO_REVISIT/FROM_DOWNLOADS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/02_Diagrams_Final
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/03_Photos_Refs
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/01_Concepts_Wireframes
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/01_Concepts_Wireframes/INFOGRAPHIC_🖼️_Book_Collection
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/01_Concepts_Wireframes/🎨 ⇢ 1:2 Infographics-ecosystem-drafts-PX
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/01_Concepts_Wireframes/🎨 ⇢ 2:2 Infographics-ecosystem-drafts-PX
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/01_Concepts_Wireframes/🎨 ⇢ 03_Infographics-DNA-skills-drafts-PX
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/05_VISUALS/04_Rights
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_PUBLISHING
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_PUBLISHING/VB_Pack_2025-10-01
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_PUBLISHING/VB_Pack_2025-10-01/05_Visuals_Thumbnails
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_inbox
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE/01_PeerReviewed_PDFs
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE/Saturno Movement OS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE/02_Books_Excerpts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE/04_Notes_Summaries
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE/03_Web_Snapshots
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/03_RESEARCH_EVIDENCE/05_Claims_Matrix
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/AOC-INTERACTIVE-ASSETS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/09_writers_material
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/09_writers_material/reference_library
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/09_writers_material/_v3_to_arrange
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots/Receipts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots/Personal
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots/To Process
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots/Business
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots/Ideas
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/Screenshots/Travel
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/📸Screenshots
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/VB-Guidelines
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/00_IMBOX/🔻To be sorted
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_Projects
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/bodybuilding
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/follow_alongs
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/Talks
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/qa
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/YouTube
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/synthesis
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/by_chapter
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/tutorials
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/06_TRANSCRIPTS/raw
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_EXPANDED_TOC_AND_CHAPTERS
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_EXPANDED_TOC_AND_CHAPTERS/Ch_Samples
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/09_ADMIN
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/09_ADMIN/{Contracts}
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_deliverables
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_deliverables/archive
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/10_deliverables/victory_belt_submission
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_workflows
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_workflows/scripts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_workflows/prompts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/08_workflows/templates
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/Z_ARCHIVE
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_toc
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK/Part-01
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK/Part-01/Ch01
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK/Part-01/Ch02
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK/Introduction
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK/Part-02
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/02_MANUSCRIPT_WORK/Part-02/Ch03
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_manuscript
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_manuscript/archive
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_manuscript/drafts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_manuscript/finals
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/01_manuscript/notes
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/04_research
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/04_research/web_snapshots
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/04_research/note_summaries
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/04_research/pdf_excerpts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/05_movement_dna
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/05_movement_dna/gates
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/05_movement_dna/EXERCISE-MATRIX-IMPORTANT-AOC
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/05_movement_dna/exercises
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/05_movement_dna/relationships
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_01_spark
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_04_choose
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_02_build
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_06_become
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_07_legacy
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_05_design
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/03_chapters/part_03_deepen
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/07_assets
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/07_assets/diagrams
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/07_assets/infographics
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/07_assets/photos
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/00_inbox
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/00_inbox/02_Saturno Movement
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/00_inbox/02_VB_BOOK_PROJECT
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/00_inbox/BOOK_STAGING
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/00_inbox/01_AOC_BOOK
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/09_writers_material
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/09_writers_material/reference_library
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/bodybuilding
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/follow_alongs
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/qa
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/synthesis
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/by_chapter
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/tutorials
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/06_transcripts/raw
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/10_deliverables
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/10_deliverables/archive
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/10_deliverables/victory_belt_submission
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/08_workflows
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/08_workflows/scripts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/08_workflows/prompts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/08_workflows/templates
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/02_toc
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/01_manuscript
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/01_manuscript/archive
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/01_manuscript/drafts
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/01_manuscript/finals
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/01_manuscript/notes
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/INTERNAL_COMMAND_CENTER/🥊→ READ ME'
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_DUPLICATES
+~/Library/CloudStorage/OneDrive-Personal/00_The Art of Calisthenics — VB Update/_DUPLICATES/INFOGRAPHIC_🖼️_Book_Collection 2
+~/Library/CloudStorage/OneDrive-Personal/Documents
+~/Library/CloudStorage/OneDrive-Personal/Documents/01_AI DOCUMENTS
+~/Library/CloudStorage/OneDrive-Personal/Documents/01_AI DOCUMENTS/untitled folder
+~/Library/CloudStorage/OneDrive-Personal/Documents/01_AI DOCUMENTS/AI Thinking 2 prompt
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Active_Projects
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Archive
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Content_Library
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Content_Library/Transcripts
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Content_Library/HTMLs
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Content_Library/PDFs
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Programs
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Programs/HBS
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Programs/HBF
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Brand_Assets
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Brand_Assets/Logos
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Brand_Assets/Templates
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Claude_Help
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Claude_Help/Context
+~/Library/CloudStorage/OneDrive-Personal/SATURNO_OS/Claude_Help/Scripts
+~/Library/CloudStorage/OneDrive-Personal/BOOK_OS
+~/Library/CloudStorage/OneDrive-Personal/BOOK_OS/AOC_Research
+~/Library/CloudStorage/OneDrive-Personal/BOOK_OS/AOC_Assets
+~/Library/CloudStorage/OneDrive-Personal/BOOK_OS/Archive
+~/Library/CloudStorage/OneDrive-Personal/BOOK_OS/Victory_Belt
+~/Library/CloudStorage/OneDrive-Personal/BOOK_OS/AOC_Chapters
+~/Library/CloudStorage/OneDrive-Personal/Attachments
+~/Library/CloudStorage/OneDrive-Personal/00_NOTES_CONSOLIDATED
+

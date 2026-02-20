@@ -1,0 +1,635 @@
+=== ICLOUD: /Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs ===
+
+--- Top-level folder sizes ---
+ 37G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE/
+ 12G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/
+6.4G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/
+648M	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/
+ 12G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/
+824K	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/
+  0B	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/04_Prototypes/
+2.3M	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/05_NOTES/
+1.6M	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/
+1.9G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/
+477M	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/
+ 57G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/
+ 62G	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/
+4.3M	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/Desktop/
+  0B	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/Documents/
+ 16K	/Users/Gabosaturno/Library/Mobile Documents/com~apple~CloudDocs/https:/
+
+--- Full tree (depth 4) ---
+~/Library/Mobile Documents/com~apple~CloudDocs
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/misc
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/deploy-ready-hub
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/deploy-ready-hub/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/03_PROJECTS_LIBRARY
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/03_PROJECTS_LIBRARY/LOGOS_BRANDING
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/03_PROJECTS_LIBRARY/WORKOUT_PROGRAMS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/03_PROJECTS_LIBRARY/EXPORT_PACKAGES
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/github-root-ready
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/github-root-ready/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/04_Documents
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/04_Documents/Claude
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/04_Documents/Perplexity
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/z-move-it
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/z-move-it/exported-assets
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/z-move-it/exported-assets(1)
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/02_DRAFTS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/05_PROPOSALS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/01_VISUAL_HTML
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/04_SUBMISSION_LETTERS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/06_IDEAS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/07_OTHERS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/01_CLAUDE_ARTIFACTS/03_FINAL_SYNTHESIS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/02_VB_BOOK_PROJECT
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/02_VB_BOOK_PROJECT/02_SUBMISSION_PACKAGE
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/02_VB_BOOK_PROJECT/01_CHAPTERS_DRAFTS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/02_VB_BOOK_PROJECT/05_ViSUALS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_V2_BACKEND
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_V3_KORTEX
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_V1_FOLDERS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/writing-hubs/HUB_EXPERIMENTS
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/hub-3-kortex
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/vercel-deploy
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/z-old-user-archive
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/backup-imac-2/z-old-user-archive/IMPORTANT_FILES
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/legal-docs
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/archive
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/experiments
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/experiments/🕸️ Psychology  
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/sm-translator
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/writing-os
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/writing-os/📝 WRITTING OS.assets
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/writing-os/📝 WRITTING OS.assets/The Collision Dials Package
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1/.vercel
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1/docs
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1/scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/07_LIFE_OS/traveling-os/TRAVELING-OS-V1/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/https:
+~/Library/Mobile Documents/com~apple~CloudDocs/https:/gabosaturno11.github.io
+~/Library/Mobile Documents/com~apple~CloudDocs/https:/gabosaturno11.github.io/titan-forge
+~/Library/Mobile Documents/com~apple~CloudDocs/.cursor
+~/Library/Mobile Documents/com~apple~CloudDocs/.cursor/commands
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Playlists
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Playlists/System
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Projects
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Lock
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Library
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Adobe
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Adobe/photoshop-cloud-associates
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Micro
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Simplon
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-C 2
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-Q 3
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-MB
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Saturn 2
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Volcano 3
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-R 2
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/One
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-DS
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-L 2
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Pro-G
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Timeless 3
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/FabFilter/Presets/Twin 3
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/sound-packs
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Render Files
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Video
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Stacks
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Recordings
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Clips
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Bounces
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/._MAF_QfQRPHR6MN.addLibrary
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Exports
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/._MAF_GBhqTrTH7J.addLibrary
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Converted Files
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Downloads
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/ADD/Media/Freeze Files
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Hormozi-scaling-workshop-vegas
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Presets
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Presets/Triggers
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Presets/Workspaces
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Presets/Search
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Presets/auto-gain
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Presets/Replace
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/Cuesheets
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/auto-save
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/auto-save/Auto Save
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/auto-save/Render Files
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/auto-save/Audio Files
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/auto-save/Bounces
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/auto-save/Exports
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster/Config
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster/Waveforms
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster/Scales
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster/Samples
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster/partial-presets
+~/Library/Mobile Documents/com~apple~CloudDocs/08_DOCUMENTS/SynthMaster/Presets
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/05_session-logs
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/03_prompts-workflows
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/03_prompts-workflows/New Folder With Items
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/04_deployment-scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/02_project-blueprints
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/06_archive
+~/Library/Mobile Documents/com~apple~CloudDocs/04_CLAUDE_DOCS/01_setup-guides
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/music
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/music/music-visual-lab
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/loose-files
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/loose-files/saturno-mega-lab-2
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/loose-files/saturno-ultimate-hub
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/loose-files/saturno-command-pro
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/saturno-ultimate-hub
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/saturno-molecular-graph-2
+~/Library/Mobile Documents/com~apple~CloudDocs/06_PROTOTYPES/saturno-molecular-graph
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/social-media
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/branding
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/branding/00_SOUND
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/branding/00_SOUND/02_Sound_FXs
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/branding/00_SOUND/00_Albums
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/resources
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/hand-balancing-hbs
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/hand-balancing-hbs/01_HANDSTAND DATA
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/hand-balancing-hbs/01_HANDSTAND DATA/01_WORKFLOWS
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/hand-balancing-hbs/01_HANDSTAND DATA/00_Handstand FACTORY
+~/Library/Mobile Documents/com~apple~CloudDocs/02_SATURNO_MOVEMENT/hand-balancing-hbs/00_Old Hand-balacing
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/music
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/music/Experiments
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/loose-files
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/audio-master
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/archive-2025
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/archive-2025/music-os
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/archive-2025/music-os/New Music 🪐
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/archive-2025/intro book - Delete 
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/archive-2025/NYC
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/GABO_ORGANIZED
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/TOOLS
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/Screenshots
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/_ORGANIZED
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/DUPLICATE_REPORTS
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/saturno-os
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/iCloud Notes 2
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/NOTES_ORGANIZED_20251124_051919
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/CLAUDE HELP
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/gpt-convo-sclaude-scalfold
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/BF25-Resources
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/FINAL PDFS (TBV)
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/00_Last_30_Days_Files_Dec-28
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/HBS
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/saturno-os-organized
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/OVERNIGHT_ORG_20251124_051229
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/SATURNO_UNIFIED_20251124_061805
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/DESKTOP I-MAC
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/_ARCHIVE_LOOSE_FILES_20251124
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/macbook-dec28/_ARCHIVE_OLD_ORGS_20251124
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/dektop-mackbook-c2---dec-28:25
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/dektop-mackbook-c2---dec-28:25/OVERNIGHT_ORG_20251124_051229
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/dektop-mackbook-c2---dec-28:25/SATURNO_UNIFIED_20251124_061805
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/dektop-mackbook-c2---dec-28:25/_ARCHIVE_LOOSE_FILES_20251124
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/desktop-icloud
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/desktop-backups/desktop-icloud/Claude Code EVERYTHING C2
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/AI-brand-transcript-2-plan-of-action
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/BF25-firday-threat-perplexity
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/HB Shapes
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/andy-deploy
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍PRODUCT
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/Notion-Prompt-Registry-Page
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/BF-Comand-Center V2
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/andy-deploy_1
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/Ultimate-movement-ecosystem-master-zip-MVP
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/📍MARKETING
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/Claude_Skills_Pack
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/Dev_Meeting_Summary_Pack
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/sm-website-app
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/Claude_Recursive_Prompt_Engine_FULL
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/00_📍BLACK_FRIDAY
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/000_BF25_COMAND CENTER
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/downloads-backup/imac-downloads/Saturno_Notion_CSV_Pack
+~/Library/Mobile Documents/com~apple~CloudDocs/09_ARCHIVE/writing-hubs-backup
+~/Library/Mobile Documents/com~apple~CloudDocs/Desktop
+~/Library/Mobile Documents/com~apple~CloudDocs/04_Prototypes
+~/Library/Mobile Documents/com~apple~CloudDocs/04_Prototypes/🎶 Music 
+~/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE
+~/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE/Private & Shared
+~/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE/Private & Shared/📘 Victory Belt – Visual Tracker
+~/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE/Private & Shared/📘 Victory Belt – Visual Tracker/@November 29, 2025 1 07 AM
+~/Library/Mobile Documents/com~apple~CloudDocs/_PRIVATE/KG - kari + iphone 13 pro 1st row
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/transcripts
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/transcripts/BF25_App development 
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/✏️-Captions-content-output
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/🪐-saturno-movement-2026
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/🪐-saturno-movement-2026/Craft Writing OS Export
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/🪐-saturno-movement-2026/claude-max-kernel-copilation
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/🪐-saturno-movement-2026/🚀_CURRENT_DEPLOYMENT
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/📝-linguistics-frameworks-1
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/🌟 WRITE OS
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/Claude-artifacts
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/writings/Claude-artifacts/E1 - Gabocalisthenics@gmail.com
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/videos
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/prompts
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/prompts/layers-of-prompt-optimization-#prompt-#critique-#aifeed
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/prompts/ai-conversations
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/prompts/📦
+~/Library/Mobile Documents/com~apple~CloudDocs/03_CONTENT_PRODUCTION/prompts/00_Prompt Bussiness
+~/Library/Mobile Documents/com~apple~CloudDocs/05_NOTES
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/files (1)
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/saturno-bonus-vault
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/files
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/FROM IMAC DONWLOADS/victory-belt-cc-check
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Images
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/scripts-code
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Projects
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Other
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Code_Projects
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Archives
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/aoc-book
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Videos
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Audio
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/saturno-os-kernels
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/PDFs
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Documents
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/claude-conversations
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/perplexity-artifacts
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Zips
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/data-exports
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/_ORGANIZED/Installers
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/titan-forge-upgrade
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/titan-forge-upgrade/extension
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/titan-forge-upgrade/js
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/titan-forge-upgrade/saturno-capture-extension
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/titan-forge-upgrade/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/files (2)
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/files (2)/🚀_CURRENT_DEPLOYMENT
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/CANONICAL
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/CURSOR
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/CLAUDE
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/VB-COMMAND-CENTER
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/.venv
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/SCRIPTS
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/INDEX
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/SATURNO_MONSTER/WATCH_INBOX
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/MORE DEPLYMENT FILES
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/MORE DEPLYMENT FILES/mnt
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/MORE DEPLYMENT FILES/🚀_CURRENT_DEPLOYMENT
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/MONSTER ZIP FOLDER - URGENT
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/ALL DEPLOYMENTS FROM MAC-BOOK PRO
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/CLaude-ORGANIZE-NEW
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Submissions v1
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Private & Shared
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/FROM IMAC DONWLOADS
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/_ORGANIZED
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/titan-forge-upgrade
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/exported-assets
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/files (2)
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/Perplexity-space-set-up
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/SATURNO_MONSTER
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/MORE DEPLYMENT FILES
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/EXERCISE-MATRIX-IMPORTANT-AOC
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/MONSTER ZIP FOLDER - URGENT
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/.evernote
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/ALL DEPLOYMENTS FROM MAC-BOOK PRO
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/CLaude-ORGANIZE-NEW
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/🚀_CURRENT_DEPLOYMENT
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/Submissions v1
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/Private & Shared
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/🎨 ⇢ 03_Infographics-DNA-skills-drafts-PX
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Downloads_Recent/Downloads/GPT CONVO __SCLAUDE-SCALFOLD
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/music
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/tools
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/dist
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/node_modules
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/legacy
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/public
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/data
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-hub/assets
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/ARCHIVE
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/ARCHIVE/DESKTOP_SCREENSHOTS_FEB6
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/ARCHIVE/GABO PERSONAL
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/ARCHIVE/IF I SEE THESE PDF AGAIN AS BONUSES I AM GONNA BREAK THE SCREEN HAHAHA
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/ARCHIVE/GABO MAIN DOCS
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/_CLAUDE_SCRIPTS
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/.tmp.driveupload
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/node_modules
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/.tmp.drivedownload
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/htmls
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/icons
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/victory-belt-cc/data
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/CLAUDE HELP
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/CLAUDE HELP/imac-claude-scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/music
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/.vercel
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/tools
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/css
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/js
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/node_modules
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/audio
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/saturno-capture-extension
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/api
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/pdfs
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/frameworks
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge/apps
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/VB-COMMAND-CENTER
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/VB-COMMAND-CENTER/VB_SUBMISSION_PACKAGE
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/VB-COMMAND-CENTER/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/interactive-toc-editor
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/interactive-toc-editor/.github
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/interactive-toc-editor/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/writing-hub-v2
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/titan-forge-v1
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/karina-gabo-story
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/SATURNO_BONUS_MASTER
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/SATURNO_BONUS_MASTER/music
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/SATURNO_BONUS_MASTER/archive
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/SATURNO_BONUS_MASTER/pdfs
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/SATURNO_BONUS_MASTER/bonuses
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/SATURNO_BONUS_MASTER/assets
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system/dist
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system/node_modules
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system/public
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system/.git
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system/.vscode
+~/Library/Mobile Documents/com~apple~CloudDocs/BACKUP_FEB7_2026/Desktop/saturno-solar-system/src
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/misc
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/z-legacy
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/old-drafts
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/old-drafts/Version_History
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/old-drafts/Abandoned_Approaches
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/reference-material
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/reference-material/Competitor_Analysis
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/reference-material/Inspiration_Sources
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/09_archive/reference-material/Research_Papers
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/gpt-conversation-logs
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/claude-project-frameworks
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/claude-project-frameworks/Automation_Tools
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/claude-project-frameworks/Project_Blueprints
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/claude-project-frameworks/Organization_Systems
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/claude-project-frameworks/AI_Workflows
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/kortex-systems
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/kortex-systems/KORTEX_Documentation
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/kortex-systems/KORTEX_Deployments
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/kortex-systems/HUB_3_KORTEX
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/business-context
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/business-context/Contracts_Agreements
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/05_strategic-assets/business-context/Victory_Belt_Publisher
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/01_command-center
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/01_command-center/progress-tracking
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/01_command-center/daily-workflows
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/01_command-center/00_Ahi-Hub-Gabo-Comand
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/01_command-center/project-dashboard
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/gabo-voice-dna
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/gabo-voice-dna/authentic_voice_samples
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/gabo-voice-dna/philosophical_frameworks
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/gabo-voice-dna/teaching_patterns
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/gabo-voice-dna/signature_phrases
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/book-architecture
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/book-architecture/progression_frameworks
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/book-architecture/cross_reference_system
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/book-architecture/chapter_templates
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/book-architecture/complete_TOC_with_abstracts
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/calisthenics-mastery
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/calisthenics-mastery/biomechanics_principles
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/calisthenics-mastery/training_philosophies
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/calisthenics-mastery/common_mistakes_fixes
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/calisthenics-mastery/progression_pathways
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/02_knowledge-vault/calisthenics-mastery/exercise_encyclopedia
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/html-interfaces
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/html-interfaces/Interactive_Maps
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/html-interfaces/Presentation_Tools
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/html-interfaces/Exercise_Demos
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/html-interfaces/WRITING_HUBS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/design-assets
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/design-assets/Exercise_Images
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/design-assets/Diagrams
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/design-assets/Infographics
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/04_visual-arsenal/design-assets/Mind_Maps
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY/LOGOS_BRANDING
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY/WORKOUT_PROGRAMS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY/EXPORT_PACKAGES
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY/01_MVPs
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY/06_Automations
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/03_PROJECTS_LIBRARY/00_DEPLOYMENT READY
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/GABO DOWNLOADS for AOC 
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/GABO DOWNLOADS for AOC /BOOK_STAGING
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/GABO DOWNLOADS for AOC /AOC Content (organize)
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/GABO DOWNLOADS for AOC /Movement-Matrix-CVS-10:10
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/02_Phone Media
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/Gemini
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/03_Saturno Movement
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/Claude
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/00_Content Creation
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/05_AI SSOT
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/Perplexity
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/Manus
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/04_Documents/01_Branding
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/05_SOCIAL_MEDIA
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/05_SOCIAL_MEDIA/Email Marketing
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/05_SOCIAL_MEDIA/Stories-gabo-inner-child
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/05_SOCIAL_MEDIA/Footage-vegas-2025
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/02_DRAFTS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/05_PROPOSALS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/01_VISUAL_HTML
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/04_SUBMISSION_LETTERS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/06_IDEAS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/07_OTHERS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/08_COMPANY DATA
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/01_CLAUDE_ARTIFACTS/03_FINAL_SYNTHESIS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/Claude-Project-Frameworks
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/02_SUBMISSION_PACKAGE
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/04_WORKING_HUB
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/07_BOOK PROMPTS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/01_CHAPTERS_DRAFTS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/05_ViSUALS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/Power-Free-infographics
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/Absurd Overdelivery Protocol
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/- WRITTTING HUB0 -
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/06_FRAMEWORKS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/The Art of Calisthenics - Final Package
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/02_VB_BOOK_PROJECT/03_MARKETING_MATERIALS
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/00_BOOKOS_RESCUE
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/00_BOOKOS_RESCUE/BOOKS_ORGANIZED
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/00_BOOKOS_RESCUE/DUPLICATES_TO_DELETE
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/00_BOOKOS_RESCUE/PDFs_SORTED
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/08_existing-projects/00_BOOKOS_RESCUE/SCREENSHOTS_TO_NUKE
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/Drafts
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/Drafts/Chapter_Work
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/Drafts/Submission_Drafts
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/Drafts/Current_Active
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/experimental-content
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/experimental-content/Testing_Ground
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/experimental-content/Future_Concepts
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/experimental-content/New_Approaches
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/ideas-incubation
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/ideas-incubation/Quick_Captures
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/ideas-incubation/Raw_Concepts
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/03_production-line/ideas-incubation/Voice_Notes
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/🔱 VB SPRINT!
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/07_social-media
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/ready-to-deploy
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/ready-to-deploy/saturno-command 2
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/ready-to-deploy/saturno-command
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/ready-to-deploy/DEPLOY_READY_HUB
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/ready-to-deploy/GITHUB_ROOT_READY
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/exported-assets-staging
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/exported-assets-staging/claude_exports
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/exported-assets-staging/perplexity_exports
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/exported-assets-staging/project_zips
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/califlow-project
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/saturno-notebooklm-integration
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts-prototype-main
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/calai-growth-dashboard
+~/Library/Mobile Documents/com~apple~CloudDocs/01_AOC_BOOK/06_deployment-zone/PROTOTYPES/private-prompts
+~/Library/Mobile Documents/com~apple~CloudDocs/Documents
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/kernels
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/visual-command-center-2
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/Archive
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/TODAY
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/TODAY/TODAY.assets
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/archive-2
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/archive-3
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-master/visual-command-center
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/music
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/tools
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/dist
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/legacy
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/public
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/data
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-hub/assets
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/_CLAUDE_SCRIPTS
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc/.tmp.driveupload
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc/.tmp.drivedownload
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc/htmls
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc/icons
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/victory-belt-cc/data
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/music
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/tools
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/css
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/js
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/saturno-capture-extension
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/pdfs
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/frameworks
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/titan-forge/apps
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/VB-COMMAND-CENTER
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/VB-COMMAND-CENTER/VB_SUBMISSION_PACKAGE
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/interactive-toc-editor
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/interactive-toc-editor/.github
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-solar-system
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-solar-system/dist
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-solar-system/public
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-solar-system/.vscode
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/TRAVEL_BACKUP_FEB6/saturno-solar-system/src
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/ai-sync-status
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/agent_cards
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/agent_cards/cards
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/ai-status
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/🚨sm-app--rescue
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/loose-files
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/agents
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/FULL UNIFICATION
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/programs
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-mission-package
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/bf25-mission-package/notion-import-csvs
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/screen-records
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/scripts/monster_pipeline
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/scripts/monster_pipeline/__pycache__
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/scripts/monster_pipeline/.venv
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/scripts/monster_pipeline/saturno_pipeline
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/_ORGANIZED
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/_ORGANIZED/02_IMAGES
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/_ORGANIZED/05_FOLDERS
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/_ORGANIZED/01_VIDEOS
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/_ORGANIZED/03_PDFS
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/_ORGANIZED/04_PSDs
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Biomechanics of a HS e-book
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Handstand Scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Handstand Scripts/HBTips
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Handstand Scripts/Hand Balancing Initiation
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Handstand Scripts/Hand Balancing Foundation
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Handstand Scripts/Hand Balancing Expansion 
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/HBS/Handstand Scripts/Youtube Tutorials
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/ideas
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/ideas/organize
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/ideas/organize/00_Workflows
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/ideas/organize/CLAUDE HELP
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/SATURNO_BONUS_MASTER
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/SATURNO_BRANDING_ASSETS
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/SATURNO_BRANDING_ASSETS/scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/ultimate-book-backend.zip
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/perplexity-migration
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/frontend
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/The-Art-of-Calisthenics__MASTER-VAULT__migrated_2025-09-22
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/AOC_FRONTEND
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/config
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/Chrome extentions
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/AOC_MASTER
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/projects
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/cortex-control-center.zip
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/setup
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/shared
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/docs
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/daily
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/logs
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/deployment
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/scripts
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/.github
+~/Library/Mobile Documents/com~apple~CloudDocs/00_AI_HUB/gpt-convos/AI-Hub-main/templates
+

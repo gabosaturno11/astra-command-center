@@ -1,0 +1,10 @@
+# GITHUB PAGES LIVE STATUS CHECK
+
+LIVE|gabosaturno11|AI-Hub|https://gabosaturno11.github.io/AI-Hub/|200|35544|🚀 AI Hub - Unified Control Center
+LIVE|gabosaturno11|interactive-toc-editor|https://gabosaturno11.github.io/interactive-toc-editor/|200|149685|The Art of Calisthenics - Master TOC Editor
+LIVE|gabosaturno11|saturno-hub|https://gabosaturno11.github.io/saturno-hub/|200|67023|Saturno Movement Studio
+LIVE|gabosaturno11|saturno-newsletter|https://gabosaturno11.github.io/saturno-newsletter/|200|5121|Saturno Newsletter
+LIVE|gabosaturno11|saturno-solar-system|https://gabosaturno11.github.io/saturno-solar-system/|200|1088|🪐 Saturno Solar System | Victory Belt MVP
+LIVE|gabosaturno11|victory-belt-cc|https://gabosaturno11.github.io/victory-belt-cc/|200|322072|THE ART OF CALISTHENICS | Victory Belt Command Center
+LIVE|gabosaturno03|Saturno-Writing-hub|https://gabosaturno03.github.io/Saturno-Writing-hub/|200|2222|Saturno-Writing-hub | Personal use to write a Calisthenics book!
+LIVE|gabosaturno03|saturno-writting-hub|https://gabosaturno03.github.io/saturno-writting-hub/|200|12762|Kortex Writing Hub
