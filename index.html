@@ -5960,6 +5960,12 @@ function cmdGetItems(q) {
       ['sprint','Sprint planner for weekly task planning'],
       ['content templates','Pre-built templates for blog posts, notes, reviews'],
       ['workspace timeline','Chronological timeline of all workspace activity'],
+      ['tag manager','Rename and delete tags across all sections'],
+      ['task matrix','Project x Status matrix view of all tasks'],
+      ['bookmarks','Organize bookmarks by category with expandable groups'],
+      ['weekly goals','Set and track goals for the current week'],
+      ['content analytics','Deep analytics on content: themes, tags, trends'],
+      ['quick bookmark','Floating bookmark saver with category picker'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7898,6 +7904,30 @@ function cmdGetItems(q) {
   // Workspace timeline prefix
   if(ql && (ql==='workspace timeline' || ql==='timeline' || ql==='activity timeline' || ql==='history')){
     items.unshift({title:'Workspace Timeline',desc:'Chronological timeline of all activity',icon:'T',type:'action',action:()=>{closeCommandPalette();showWorkspaceTimeline();}});
+  }
+  // Tag manager prefix
+  if(ql && (ql==='tag manager' || ql==='manage tags' || ql==='rename tags' || ql==='tags manager')){
+    items.unshift({title:'Tag Manager',desc:'Rename and delete tags across all sections',icon:'#',type:'action',action:()=>{closeCommandPalette();showTagManager();}});
+  }
+  // Task matrix prefix
+  if(ql && (ql==='task matrix' || ql==='matrix' || ql==='project status matrix' || ql==='cross table')){
+    items.unshift({title:'Task Matrix',desc:'Project x Status cross-reference table',icon:'M',type:'action',action:()=>{closeCommandPalette();showTaskMatrix();}});
+  }
+  // Bookmarks prefix
+  if(ql && (ql==='bookmarks' || ql==='bookmark organizer' || ql==='organize bookmarks' || ql==='link categories')){
+    items.unshift({title:'Bookmark Organizer',desc:'Browse links organized by category',icon:'B',type:'action',action:()=>{closeCommandPalette();showBookmarkOrganizer();}});
+  }
+  // Weekly goals prefix
+  if(ql && (ql==='weekly goals' || ql==='goals' || ql==='week goals' || ql==='set goals')){
+    items.unshift({title:'Weekly Goals',desc:'Set and track goals for this week',icon:'G',type:'action',action:()=>{closeCommandPalette();showWeeklyGoals();}});
+  }
+  // Content analytics prefix
+  if(ql && (ql==='content analytics' || ql==='analytics' || ql==='content stats' || ql==='content report')){
+    items.unshift({title:'Content Analytics',desc:'Deep analytics on themes, tags, and trends',icon:'A',type:'action',action:()=>{closeCommandPalette();showContentAnalytics();}});
+  }
+  // Quick bookmark prefix
+  if(ql && (ql==='quick bookmark' || ql==='bookmark' || ql==='save link' || ql==='add bookmark')){
+    items.unshift({title:'Quick Bookmark',desc:'Floating bookmark saver with categories',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBookmark();}});
   }
   return items.slice(0, 20);
 }
@@ -14036,6 +14066,177 @@ function showWorkspaceTimeline(){
   if(events.length>50)h+='<div style="color:var(--text-muted);font-size:10px;text-align:center;padding:12px 0">Showing 50 of '+events.length+' events</div>';
   if(events.length===0)h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No events yet. Start creating tasks, content, and docs.</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTagManager(){
+  let panel=document.getElementById('tag-manager-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='tag-manager-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tagMap={};
+  (S.tasks||[]).forEach(t=>{(t.tags||[]).forEach(tag=>{if(!tagMap[tag])tagMap[tag]={count:0,sections:new Set()};tagMap[tag].count++;tagMap[tag].sections.add('tasks');});});
+  (S.content||[]).forEach(c=>{(c.tags||[]).forEach(tag=>{if(!tagMap[tag])tagMap[tag]={count:0,sections:new Set()};tagMap[tag].count++;tagMap[tag].sections.add('content');});});
+  (S.links||[]).forEach(l=>{(l.tags||[]).forEach(tag=>{if(!tagMap[tag])tagMap[tag]={count:0,sections:new Set()};tagMap[tag].count++;tagMap[tag].sections.add('links');});});
+  const sorted=Object.entries(tagMap).sort((a,b)=>b[1].count-a[1].count);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Tag Manager</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+sorted.length+' unique tags across your workspace. Click rename to update everywhere.</div>';
+  if(sorted.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No tags found. Start tagging your items.</div>';}
+  sorted.forEach(([tag,info])=>{
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid var(--border)">';
+    h+='<div><span style="font-size:12px;font-weight:600">'+esc(tag)+'</span><span style="font-size:10px;color:var(--text-muted);margin-left:8px">'+info.count+' items in '+Array.from(info.sections).join(', ')+'</span></div>';
+    h+='<div style="display:flex;gap:4px">';
+    h+='<button onclick="(function(){const nw=prompt(\'Rename tag \\\''+esc(tag).replace(/'/g,"\\'")+'\\\' to:\');if(!nw||nw===\''+esc(tag).replace(/'/g,"\\'")+'\')return;(S.tasks||[]).forEach(t=>{if(t.tags)t.tags=t.tags.map(x=>x===\''+esc(tag).replace(/'/g,"\\'")+'\' ?nw:x)});(S.content||[]).forEach(c=>{if(c.tags)c.tags=c.tags.map(x=>x===\''+esc(tag).replace(/'/g,"\\'")+'\' ?nw:x)});(S.links||[]).forEach(l=>{if(l.tags)l.tags=l.tags.map(x=>x===\''+esc(tag).replace(/'/g,"\\'")+'\' ?nw:x)});save();showTagManager();})()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:2px 8px;border-radius:3px;cursor:pointer;font-size:10px">Rename</button>';
+    h+='<button onclick="(function(){if(!confirm(\'Delete tag \\\''+esc(tag).replace(/'/g,"\\'")+'\\\' from all '+info.count+' items?\'))return;(S.tasks||[]).forEach(t=>{if(t.tags)t.tags=t.tags.filter(x=>x!==\''+esc(tag).replace(/'/g,"\\'")+'\')});(S.content||[]).forEach(c=>{if(c.tags)c.tags=c.tags.filter(x=>x!==\''+esc(tag).replace(/'/g,"\\'")+'\')});(S.links||[]).forEach(l=>{if(l.tags)l.tags=l.tags.filter(x=>x!==\''+esc(tag).replace(/'/g,"\\'")+'\')});save();showTagManager();})()" style="background:none;border:1px solid #ef4444;color:#ef4444;padding:2px 8px;border-radius:3px;cursor:pointer;font-size:10px">Delete</button></div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskMatrix(){
+  let panel=document.getElementById('task-matrix-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-matrix-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:85vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const projects=S.projects||[];
+  const statuses=['todo','in-progress','review','blocked'];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Matrix (Project x Status)</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:8px;font-size:11px;color:var(--text-muted);border-bottom:1px solid var(--border)">Project</th>';
+  statuses.forEach(s=>{h+='<th style="padding:8px;font-size:11px;color:var(--text-muted);text-align:center;border-bottom:1px solid var(--border)">'+esc(s)+'</th>';});
+  h+='<th style="padding:8px;font-size:11px;color:var(--text-muted);text-align:center;border-bottom:1px solid var(--border)">Total</th></tr></thead><tbody>';
+  const projList=[...projects,{id:null,name:'No Project'}];
+  projList.forEach(p=>{
+    const pTasks=tasks.filter(t=>p.id?(t.projectId===p.id):(! t.projectId));
+    if(pTasks.length===0)return;
+    h+='<tr><td style="padding:8px;font-size:12px;font-weight:600;border-bottom:1px solid var(--border)">'+esc(p.name)+'</td>';
+    statuses.forEach(s=>{
+      const c=pTasks.filter(t=>t.status===s).length;
+      const bg=c>0?(s==='blocked'?'rgba(239,68,68,0.15)':s==='in-progress'?'rgba(74,222,128,0.15)':'transparent'):'transparent';
+      h+='<td style="padding:8px;text-align:center;font-size:12px;border-bottom:1px solid var(--border);background:'+bg+'">'+(c||'-')+'</td>';
+    });
+    h+='<td style="padding:8px;text-align:center;font-size:12px;font-weight:600;border-bottom:1px solid var(--border);color:var(--accent)">'+pTasks.length+'</td></tr>';
+  });
+  const totals=statuses.map(s=>tasks.filter(t=>t.status===s).length);
+  h+='<tr style="background:var(--bg-surface)"><td style="padding:8px;font-size:11px;font-weight:600">TOTAL</td>';
+  totals.forEach(t=>{h+='<td style="padding:8px;text-align:center;font-size:12px;font-weight:600">'+t+'</td>';});
+  h+='<td style="padding:8px;text-align:center;font-size:12px;font-weight:bold;color:var(--accent)">'+tasks.length+'</td></tr>';
+  h+='</tbody></table>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showBookmarkOrganizer(){
+  let panel=document.getElementById('bookmark-organizer-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='bookmark-organizer-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const links=S.links||[];
+  const categories={};
+  links.forEach(l=>{const c=l.category||'uncategorized';if(!categories[c])categories[c]=[];categories[c].push(l);});
+  const sorted=Object.entries(categories).sort((a,b)=>b[1].length-a[1].length);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Bookmark Organizer</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+links.length+' bookmarks in '+sorted.length+' categories. Click category to expand.</div>';
+  sorted.forEach(([cat,items])=>{
+    const id='bm-cat-'+cat.replace(/\W/g,'');
+    h+='<div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden">';
+    h+='<div onclick="const c=document.getElementById(\''+id+'\');c.style.display=c.style.display===\'none\'?\'block\':\'none\'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;cursor:pointer;background:var(--bg-surface)">';
+    h+='<span style="font-size:12px;font-weight:600">'+esc(cat)+'</span><span style="font-size:10px;color:var(--text-muted)">'+items.length+' links</span></div>';
+    h+='<div id="'+id+'" style="display:none;padding:8px 12px">';
+    items.forEach(l=>{
+      let domain='';try{domain=new URL(l.url).hostname.replace('www.','');}catch(e){}
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px">';
+      h+='<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%"><a href="'+esc(l.url)+'" target="_blank" style="color:var(--accent);text-decoration:none">'+esc(l.title||domain||l.url)+'</a></div>';
+      h+='<span style="color:var(--text-muted);font-size:9px">'+esc(domain)+'</span></div>';
+    });
+    h+='</div></div>';
+  });
+  if(links.length===0)h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No bookmarks saved yet.</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWeeklyGoals(){
+  let panel=document.getElementById('weekly-goals-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='weekly-goals-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._weeklyGoals)S._weeklyGoals=[];
+  const now=new Date();const weekStart=new Date(now);weekStart.setDate(now.getDate()-now.getDay());
+  const weekKey=weekStart.toISOString().split('T')[0];
+  let current=S._weeklyGoals.find(w=>w.week===weekKey);
+  if(!current){current={week:weekKey,goals:[]};S._weeklyGoals.push(current);}
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Weekly Goals</h3><div><button onclick="(function(){const g=prompt(\'New goal:\');if(!g)return;const w=S._weeklyGoals.find(x=>x.week===\''+weekKey+'\');if(w)w.goals.push({id:Date.now(),text:g,done:false});save();showWeeklyGoals();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">+ Goal</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Week of '+weekKey+'</div>';
+  const done=current.goals.filter(g=>g.done).length;
+  const pct=current.goals.length>0?Math.round(done/current.goals.length*100):0;
+  if(current.goals.length>0){
+    h+='<div style="height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden;margin-bottom:16px"><div style="height:100%;background:var(--accent);width:'+pct+'%;border-radius:3px;transition:width 0.3s"></div></div>';
+    h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px;text-align:right">'+done+'/'+current.goals.length+' completed ('+pct+'%)</div>';
+  }
+  current.goals.forEach(g=>{
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px'+(g.done?';opacity:0.6':'')+'">';
+    h+='<button onclick="(function(){const w=S._weeklyGoals.find(x=>x.week===\''+weekKey+'\');if(w){const g=w.goals.find(x=>x.id==='+g.id+');if(g)g.done=!g.done;}save();showWeeklyGoals();})()" style="width:22px;height:22px;border-radius:50%;border:2px solid '+(g.done?'var(--accent)':'var(--border)')+';background:'+(g.done?'var(--accent)':'transparent')+';cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#000;font-size:10px">'+(g.done?'V':'')+'</button>';
+    h+='<span style="font-size:12px;flex:1;'+(g.done?'text-decoration:line-through;color:var(--text-muted)':'')+'">'+esc(g.text)+'</span>';
+    h+='<button onclick="(function(){const w=S._weeklyGoals.find(x=>x.week===\''+weekKey+'\');if(w)w.goals=w.goals.filter(x=>x.id!=='+g.id+');save();showWeeklyGoals();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">X</button></div>';
+  });
+  if(current.goals.length===0)h+='<div style="color:var(--text-muted);text-align:center;padding:30px 0">No goals set for this week. Add some!</div>';
+  // Past weeks
+  const past=S._weeklyGoals.filter(w=>w.week!==weekKey&&w.goals.length>0).sort((a,b)=>b.week.localeCompare(a.week)).slice(0,4);
+  if(past.length>0){
+    h+='<h4 style="margin:20px 0 8px;font-size:12px;color:var(--text-muted)">Previous Weeks</h4>';
+    past.forEach(w=>{const d=w.goals.filter(g=>g.done).length;h+='<div style="padding:8px;border:1px solid var(--border);border-radius:6px;margin-bottom:4px;font-size:11px;display:flex;justify-content:space-between"><span>'+w.week+'</span><span style="color:var(--accent)">'+d+'/'+w.goals.length+'</span></div>';});
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentAnalytics(){
+  let panel=document.getElementById('content-analytics-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-analytics-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=S.content||[];
+  const totalWords=content.reduce((s,c)=>{return s+(c.body||'').split(/\s+/).filter(w=>w).length;},0);
+  const totalItems=content.length;
+  const avgWords=totalItems>0?Math.round(totalWords/totalItems):0;
+  const themes={};content.forEach(c=>{const t=c.theme||'general';themes[t]=(themes[t]||0)+1;});
+  const tags={};content.forEach(c=>{(c.tags||[]).forEach(t=>{tags[t]=(tags[t]||0)+1;});});
+  const monthMap={};content.forEach(c=>{const d=(c.created||'').substring(0,7);if(d)monthMap[d]=(monthMap[d]||0)+1;});
+  const months=Object.entries(monthMap).sort((a,b)=>a[0].localeCompare(b[0]));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Analytics</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+totalItems+'</div><div style="font-size:10px;color:var(--text-muted)">Total Items</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+totalWords.toLocaleString()+'</div><div style="font-size:10px;color:var(--text-muted)">Total Words</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+avgWords+'</div><div style="font-size:10px;color:var(--text-muted)">Avg Words/Item</div></div></div>';
+  // Theme breakdown
+  const thSorted=Object.entries(themes).sort((a,b)=>b[1]-a[1]);
+  if(thSorted.length>0){
+    h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">By Theme</h4>';
+    const maxTh=thSorted[0][1];
+    thSorted.forEach(([t,c])=>{
+      const pct=Math.round(c/maxTh*100);
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="font-size:11px;width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t)+'</span><div style="flex:1;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--accent);width:'+pct+'%;border-radius:3px"></div></div><span style="font-size:10px;color:var(--text-muted);width:30px;text-align:right">'+c+'</span></div>';
+    });
+  }
+  // Top tags
+  const tagSorted=Object.entries(tags).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(tagSorted.length>0){
+    h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Top Tags</h4>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    tagSorted.forEach(([t,c])=>{h+='<span style="padding:3px 8px;background:var(--bg-surface);border-radius:12px;font-size:10px;color:var(--accent)">'+esc(t)+' ('+c+')</span>';});
+    h+='</div>';
+  }
+  // Monthly trend
+  if(months.length>0){
+    h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Monthly Creation</h4>';
+    const maxM=Math.max(...months.map(m=>m[1]));
+    months.slice(-12).forEach(([m,c])=>{
+      const pct=Math.round(c/maxM*100);
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="font-size:10px;width:60px;color:var(--text-muted)">'+m+'</span><div style="flex:1;height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--accent);width:'+pct+'%"></div></div><span style="font-size:10px;color:var(--text-muted);width:25px;text-align:right">'+c+'</span></div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickBookmark(){
+  let panel=document.getElementById('quick-bookmark-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-bookmark-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Quick Bookmark</h4><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<input id="qb-url" placeholder="URL" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px;box-sizing:border-box">';
+  h+='<input id="qb-title" placeholder="Title (optional)" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px;box-sizing:border-box">';
+  h+='<select id="qb-cat" style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;margin-bottom:8px">';
+  const cats=[...new Set((S.links||[]).map(l=>l.category||'uncategorized'))];
+  cats.forEach(c=>{h+='<option value="'+esc(c)+'">'+esc(c)+'</option>';});
+  h+='<option value="__new">+ New Category</option></select>';
+  h+='<button onclick="(function(){const url=document.getElementById(\'qb-url\').value.trim();if(!url)return;let title=document.getElementById(\'qb-title\').value.trim();const sel=document.getElementById(\'qb-cat\');let cat=sel.value;if(cat===\'__new\'){cat=prompt(\'Category name:\');if(!cat)return;}if(!title){try{title=new URL(url).hostname.replace(\'www.\',\'\');}catch(e){title=url;}}if(!S.links)S.links=[];S.links.unshift({id:\'l_\'+Date.now(),url:url,title:title,category:cat,tags:[],created:new Date().toISOString()});save();document.getElementById(\'quick-bookmark-panel\').remove();if(typeof showNotification===\'function\')showNotification(\'Bookmark saved!\');})()" style="width:100%;padding:8px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px">Save Bookmark</button>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const u=document.getElementById('qb-url');if(u)u.focus();},100);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
