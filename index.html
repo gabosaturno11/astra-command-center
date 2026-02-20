@@ -6605,6 +6605,12 @@ function cmdGetItems(q) {
       ['vite','Vite build tool reference'],
       ['weekday','Task creation/completion by weekday'],
       ['word frequency','Word frequency analyzer'],
+      ['typescript','TypeScript types and config reference'],
+      ['stale','Detect stale tasks by age'],
+      ['json formatter','JSON format and minify tool'],
+      ['nextjs','Next.js app router reference'],
+      ['forecast','Task completion forecast'],
+      ['hash','SHA hash generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10589,6 +10595,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='word frequency' || ql==='word count' || ql==='word freq' || ql==='frequent words')){
     items.unshift({title:'Word Frequency',desc:'Word frequency analyzer',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWordFrequency();}});
+  }
+  if(ql && (ql==='typescript' || ql==='ts ref' || ql==='ts types' || ql==='typescript reference')){
+    items.unshift({title:'TypeScript Reference',desc:'Types, generics, config',icon:'T',type:'action',action:()=>{closeCommandPalette();showTypeScriptRef();}});
+  }
+  if(ql && (ql==='stale' || ql==='stale tasks' || ql==='old tasks' || ql==='stale detector')){
+    items.unshift({title:'Stale Detector',desc:'Find old unfinished tasks',icon:'S',type:'action',action:()=>{closeCommandPalette();showTaskStaleDetector();}});
+  }
+  if(ql && (ql==='json formatter' || ql==='json format' || ql==='json pretty' || ql==='json minify')){
+    items.unshift({title:'JSON Formatter',desc:'Format, minify, validate JSON',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJsonFormatter();}});
+  }
+  if(ql && (ql==='nextjs' || ql==='next js' || ql==='next ref' || ql==='next.js')){
+    items.unshift({title:'Next.js Reference',desc:'App router, data fetching, config',icon:'N',type:'action',action:()=>{closeCommandPalette();showNextJSRef();}});
+  }
+  if(ql && (ql==='forecast' || ql==='completion forecast' || ql==='task forecast' || ql==='eta')){
+    items.unshift({title:'Completion Forecast',desc:'When will all tasks be done',icon:'F',type:'action',action:()=>{closeCommandPalette();showTaskCompletionForecast();}});
+  }
+  if(ql && (ql==='hash' || ql==='sha' || ql==='hash generator' || ql==='sha256')){
+    items.unshift({title:'Hash Generator',desc:'SHA-256/384/512 hash tool',icon:'H',type:'action',action:()=>{closeCommandPalette();showQuickHashGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -36615,6 +36639,144 @@ function showQuickWordFrequency(){
       r+='<div style="display:flex;align-items:center;gap:6px;margin:2px 0;font-size:11px"><span style="width:60px;text-align:right;font-family:monospace;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+word+'</span><div style="flex:1;height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:3px"></div></div><span style="color:var(--text-muted);width:20px;text-align:right">'+count+'</span></div>';
     });
     out.innerHTML=r;
+  };
+}
+function showTypeScriptRef(){
+  let d=document.getElementById('ts-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='ts-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Basic Types':['let x: string = "hello"','let n: number = 42','let b: boolean = true','let a: string[] = ["a", "b"]','let t: [string, number] = ["a", 1]','let u: string | number = "hello"','type ID = string | number'],
+    'Interfaces':['interface User { name: string; age: number; }','interface Config { readonly id: string; optional?: boolean; }','interface Fn { (x: number): string; }','interface Extended extends Base { extra: string; }'],
+    'Generics':['function id<T>(x: T): T { return x; }','type Box<T> = { value: T; }','interface Repo<T> { find(id: string): T; save(item: T): void; }','type Partial<T> = { [P in keyof T]?: T[P]; }'],
+    'Utility Types':['Partial<Type>','Required<Type>','Readonly<Type>','Record<Keys, Type>','Pick<Type, Keys>','Omit<Type, Keys>','Exclude<Union, Excluded>','ReturnType<Fn>','Parameters<Fn>'],
+    'Advanced':['keyof typeof obj','as const','satisfies Type','type Guard = (x: unknown) => x is User','enum Status { Active, Inactive }','declare module "lib" { ... }','/// <reference types="..." />'],
+    'tsconfig':['tsc --init','tsc --noEmit','strict: true','target: "ES2022"','module: "ESNext"','moduleResolution: "bundler"','paths: { "@/*": ["./src/*"] }']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">TypeScript Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskStaleDetector(){
+  let d=document.getElementById('stale-detector-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='stale-detector-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=Date.now();
+  const stale=tasks.map(t=>{
+    const created=t.createdAt?new Date(t.createdAt).getTime():now;
+    const age=Math.floor((now-created)/(1000*60*60*24));
+    return{...t,age};
+  }).filter(t=>t.age>3).sort((a,b)=>b.age-a.age);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Stale Task Detector</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">'+stale.length+' tasks older than 3 days without completion</div>';
+  const buckets={'3-7 days':[],'1-2 weeks':[],'2-4 weeks':[],'1+ month':[]};
+  stale.forEach(t=>{
+    if(t.age<=7)buckets['3-7 days'].push(t);
+    else if(t.age<=14)buckets['1-2 weeks'].push(t);
+    else if(t.age<=30)buckets['2-4 weeks'].push(t);
+    else buckets['1+ month'].push(t);
+  });
+  const bColors={'3-7 days':'#fbbf24','1-2 weeks':'#fb923c','2-4 weeks':'#f87171','1+ month':'#dc2626'};
+  Object.entries(buckets).forEach(([label,items])=>{
+    if(items.length===0)return;
+    h+='<div style="font-size:11px;color:'+bColors[label]+';margin:12px 0 6px;font-weight:600">'+label+' ('+items.length+')</div>';
+    items.slice(0,8).forEach(t=>{
+      h+='<div style="display:flex;justify-content:space-between;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;font-size:12px"><span style="color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(t.title)+'</span><span style="color:var(--text-muted);margin-left:8px;white-space:nowrap">'+t.age+'d</span></div>';
+    });
+    if(items.length>8)h+='<div style="font-size:10px;color:var(--text-muted);padding:2px 8px">+'+(items.length-8)+' more</div>';
+  });
+  if(stale.length===0)h+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No stale tasks! Great job.</div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickJsonFormatter(){
+  let d=document.getElementById('json-fmt-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='json-fmt-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:360px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">JSON Formatter</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<textarea id="jf-input" placeholder="Paste JSON to format..." style="width:100%;height:80px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;resize:none;box-sizing:border-box;font-family:monospace;margin-bottom:6px"></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:6px"><button onclick="window._jfFormat(2)" style="flex:1;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px">Format</button>';
+  h+='<button onclick="window._jfMinify()" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:12px">Minify</button>';
+  h+='<button onclick="window._jfFormat(4)" style="flex:1;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:12px">4-space</button></div>';
+  h+='<div id="jf-output" style="font-family:monospace;font-size:10px;padding:8px;background:var(--bg-surface);border-radius:4px;color:var(--text-secondary);max-height:200px;overflow:auto;white-space:pre-wrap;word-break:break-all;min-height:30px"></div>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'jf-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',600)" style="width:100%;margin-top:6px;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:12px">Copy</button>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._jfFormat=function(spaces){const i=document.getElementById('jf-input');const o=document.getElementById('jf-output');if(!i||!o)return;try{o.textContent=JSON.stringify(JSON.parse(i.value),null,spaces);}catch(e){o.textContent='Error: '+e.message;}};
+  window._jfMinify=function(){const i=document.getElementById('jf-input');const o=document.getElementById('jf-output');if(!i||!o)return;try{o.textContent=JSON.stringify(JSON.parse(i.value));}catch(e){o.textContent='Error: '+e.message;}};
+}
+function showNextJSRef(){
+  let d=document.getElementById('nextjs-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='nextjs-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['npx create-next-app@latest','next dev','next build','next start','next lint','next export'],
+    'App Router':['app/page.tsx (root page)','app/layout.tsx (root layout)','app/loading.tsx (loading UI)','app/error.tsx (error boundary)','app/not-found.tsx (404 page)','app/api/route.ts (API route)','app/[slug]/page.tsx (dynamic)','app/[...slug]/page.tsx (catch-all)'],
+    'Data Fetching':['async function getData() { const res = await fetch(url); return res.json(); }','export const revalidate = 60 (ISR)','export const dynamic = "force-dynamic"','export const runtime = "edge"','import { cookies, headers } from "next/headers"','import { redirect, notFound } from "next/navigation"'],
+    'Components':['import Link from "next/link"','import Image from "next/image"','import { useRouter } from "next/navigation"','import { useSearchParams } from "next/navigation"','import { usePathname } from "next/navigation"','"use client" (client component)'],
+    'Middleware':['export function middleware(request: NextRequest) { ... }','export const config = { matcher: ["/dashboard/:path*"] }','NextResponse.next()','NextResponse.redirect(url)','NextResponse.rewrite(url)'],
+    'Config':['next.config.js','images: { domains: ["example.com"] }','env: { API_KEY: process.env.API_KEY }','redirects: async () => [{ source, destination, permanent }]','headers: async () => [{ source, headers: [] }]']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Next.js Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskCompletionForecast(){
+  let d=document.getElementById('forecast-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='forecast-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const open=tasks.filter(t=>t.status!=='done').length;
+  const now=new Date();const weekAgo=new Date(now-7*86400000);
+  const doneThisWeek=tasks.filter(t=>{
+    const dd=t.completedAt||t.doneAt;
+    return dd&&new Date(dd)>=weekAgo;
+  }).length;
+  const avgPerDay=doneThisWeek/7;
+  const daysToComplete=avgPerDay>0?Math.ceil(open/avgPerDay):999;
+  const forecastDate=new Date(now);forecastDate.setDate(forecastDate.getDate()+daysToComplete);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Completion Forecast</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:var(--accent)">'+open+'</div><div style="font-size:10px;color:var(--text-muted)">Open Tasks</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">'+doneThisWeek+'</div><div style="font-size:10px;color:var(--text-muted)">Done This Week</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#38bdf8">'+avgPerDay.toFixed(1)+'</div><div style="font-size:10px;color:var(--text-muted)">Avg/Day</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:'+(daysToComplete>30?'#f87171':'#fbbf24')+'">'+daysToComplete+'d</div><div style="font-size:10px;color:var(--text-muted)">Days to Clear</div></div>';
+  h+='</div>';
+  if(avgPerDay>0){
+    h+='<div style="padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center;font-size:12px;color:var(--text-secondary)">At current pace, all tasks cleared by <span style="color:var(--accent);font-weight:600">'+forecastDate.toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'})+'</span></div>';
+  }else{
+    h+='<div style="padding:10px;background:var(--bg-surface);border-radius:6px;text-align:center;font-size:12px;color:#f87171">No tasks completed this week. Start completing to see forecast.</div>';
+  }
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickHashGenerator(){
+  let d=document.getElementById('hash-gen-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='hash-gen-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Hash Generator</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<input id="hash-input" placeholder="Enter text to hash..." style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:13px;box-sizing:border-box;margin-bottom:8px">';
+  h+='<div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap">';
+  ['SHA-256','SHA-384','SHA-512','SHA-1'].forEach(algo=>{
+    h+='<button onclick="window._hashGen(\''+algo+'\')" style="padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:11px">'+algo+'</button>';
+  });
+  h+='</div>';
+  h+='<div id="hash-output" style="font-family:monospace;font-size:10px;padding:8px;background:var(--bg-surface);border-radius:4px;color:var(--text-secondary);word-break:break-all;min-height:20px"></div>';
+  h+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'hash-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy Hash\',600)" style="width:100%;margin-top:6px;padding:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);cursor:pointer;font-size:12px">Copy Hash</button>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._hashGen=async function(algo){
+    const inp=document.getElementById('hash-input');const out=document.getElementById('hash-output');
+    if(!inp||!out)return;const text=inp.value;if(!text){out.textContent='Enter text first';return;}
+    try{
+      const data=new TextEncoder().encode(text);
+      const hash=await crypto.subtle.digest(algo,data);
+      const arr=Array.from(new Uint8Array(hash));
+      out.textContent=arr.map(b=>b.toString(16).padStart(2,'0')).join('');
+    }catch(e){out.textContent='Error: '+e.message;}
   };
 }
 function showProjectRoadmap(filterProject){
