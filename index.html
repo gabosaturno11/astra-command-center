@@ -6617,6 +6617,12 @@ function cmdGetItems(q) {
       ['prisma','Prisma ORM schema and query reference'],
       ['label cloud','Task label tag cloud visualization'],
       ['ip info','IP address info lookup'],
+      ['react','React hooks components patterns'],
+      ['overdue aging','Overdue task aging report'],
+      ['text diff','Side-by-side text comparison'],
+      ['svelte','Svelte and SvelteKit reference'],
+      ['productivity','Productivity score dashboard'],
+      ['number format','Number formatter (dec hex bin)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10637,6 +10643,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='ip info' || ql==='ip lookup' || ql==='my ip' || ql==='ip address')){
     items.unshift({title:'IP Info Lookup',desc:'Your IP address details',icon:'I',type:'action',action:()=>{closeCommandPalette();showQuickIpInfoLookup();}});
+  }
+  if(ql && (ql==='react' || ql==='react ref' || ql==='react hooks' || ql==='react reference')){
+    items.unshift({title:'React Reference',desc:'Hooks, components, patterns',icon:'R',type:'action',action:()=>{closeCommandPalette();showReactRef();}});
+  }
+  if(ql && (ql==='overdue aging' || ql==='overdue report' || ql==='aging report' || ql==='overdue tasks aging')){
+    items.unshift({title:'Overdue Aging',desc:'How overdue are your tasks',icon:'O',type:'action',action:()=>{closeCommandPalette();showTaskOverdueAging();}});
+  }
+  if(ql && (ql==='text diff' || ql==='diff' || ql==='compare text' || ql==='text compare')){
+    items.unshift({title:'Text Diff',desc:'Side-by-side text comparison',icon:'D',type:'action',action:()=>{closeCommandPalette();showQuickTextDiff();}});
+  }
+  if(ql && (ql==='svelte' || ql==='svelte ref' || ql==='sveltekit' || ql==='svelte reference')){
+    items.unshift({title:'Svelte Reference',desc:'Reactivity, template, SvelteKit',icon:'S',type:'action',action:()=>{closeCommandPalette();showSvelteRef();}});
+  }
+  if(ql && (ql==='productivity' || ql==='productivity score' || ql==='prod score' || ql==='performance score')){
+    items.unshift({title:'Productivity Score',desc:'Overall productivity metrics',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskProductivityScore();}});
+  }
+  if(ql && (ql==='number format' || ql==='number formatter' || ql==='num format' || ql==='format number')){
+    items.unshift({title:'Number Formatter',desc:'Decimal, hex, binary, currency',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNumberFormatter();}});
   }
   return items.slice(0, 20);
 }
@@ -36938,6 +36962,165 @@ function showQuickIpInfoLookup(){
     const loading=document.getElementById('ip-loading');
     if(loading)loading.textContent='Error: '+e.message;
   });
+}
+function showReactRef(){
+  let d=document.getElementById('react-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='react-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'Hooks':['useState(initialValue)','useEffect(() => { ... }, [deps])','useContext(MyContext)','useRef(initialValue)','useMemo(() => compute(), [deps])','useCallback((args) => { ... }, [deps])','useReducer(reducer, initialState)','useId()'],
+    'Components':['function App() { return <div>Hello</div>; }','export default function Page({ params }) { ... }','const Btn = React.memo(({ onClick }) => <button onClick={onClick}>Go</button>)','React.lazy(() => import("./Heavy"))','<Suspense fallback={<Spinner />}>...</Suspense>','<ErrorBoundary fallback={<Error />}>...</ErrorBoundary>'],
+    'Patterns':['const [items, setItems] = useState([])','setItems(prev => [...prev, newItem])','useEffect(() => { const ctrl = new AbortController(); fetch(url, { signal: ctrl.signal }); return () => ctrl.abort(); }, [])','const value = useMemo(() => expensive(a, b), [a, b])'],
+    'JSX':['{ condition && <Component /> }','{ items.map(item => <Item key={item.id} {...item} />) }','<input value={val} onChange={e => setVal(e.target.value)} />','className={`base ${active ? "active" : ""}`}','style={{ color: "red", fontSize: 14 }}','dangerouslySetInnerHTML={{ __html: html }}'],
+    'Server':['use server','use client','React.cache(fn)','revalidatePath("/path")','redirect("/login")','cookies().get("token")'],
+    'CLI':['npx create-react-app my-app','npx create-react-app my-app --template typescript','npm start','npm run build','npm test']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">React Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskOverdueAging(){
+  let d=document.getElementById('overdue-aging-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='overdue-aging-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&t.due);
+  const now=new Date().toISOString().split('T')[0];
+  const overdue=tasks.filter(t=>t.due<now).map(t=>{
+    const diff=Math.floor((Date.now()-new Date(t.due).getTime())/(1000*60*60*24));
+    return{...t,daysOverdue:diff};
+  }).sort((a,b)=>b.daysOverdue-a.daysOverdue);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Overdue Aging Report</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:12px;color:'+(overdue.length>0?'#f87171':'#4ade80')+';margin-bottom:12px;font-weight:600">'+overdue.length+' overdue task'+(overdue.length!==1?'s':'')+'</div>';
+  if(overdue.length>0){
+    const maxDays=overdue[0].daysOverdue||1;
+    overdue.slice(0,15).forEach(t=>{
+      const pct=Math.round((t.daysOverdue/maxDays)*100);
+      const color=t.daysOverdue>14?'#dc2626':t.daysOverdue>7?'#f87171':t.daysOverdue>3?'#fb923c':'#fbbf24';
+      h+='<div style="margin:6px 0"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(t.title)+'</span><span style="color:'+color+';font-weight:600;margin-left:8px">'+t.daysOverdue+'d</span></div>';
+      h+='<div style="height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px"></div></div></div>';
+    });
+  }else{
+    h+='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No overdue tasks. You are on track!</div>';
+  }
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickTextDiff(){
+  let d=document.getElementById('text-diff-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='text-diff-widget';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Text Diff</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">';
+  h+='<div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Original</div><textarea id="diff-a" placeholder="Original text..." style="width:100%;height:100px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;resize:none;box-sizing:border-box;font-family:monospace"></textarea></div>';
+  h+='<div><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Modified</div><textarea id="diff-b" placeholder="Modified text..." style="width:100%;height:100px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:11px;resize:none;box-sizing:border-box;font-family:monospace"></textarea></div>';
+  h+='</div>';
+  h+='<button onclick="window._diffCompare()" style="width:100%;padding:6px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;margin-bottom:8px">Compare</button>';
+  h+='<div id="diff-output" style="font-family:monospace;font-size:11px;padding:8px;background:var(--bg-surface);border-radius:4px;max-height:200px;overflow-y:auto;white-space:pre-wrap"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._diffCompare=function(){
+    const a=document.getElementById('diff-a').value.split('\n');
+    const b=document.getElementById('diff-b').value.split('\n');
+    const out=document.getElementById('diff-output');if(!out)return;
+    let r='';const maxLen=Math.max(a.length,b.length);
+    for(let i=0;i<maxLen;i++){
+      const lineA=a[i]||'';const lineB=b[i]||'';
+      if(lineA===lineB){r+='<div style="color:var(--text-muted)">  '+esc(lineA)+'</div>';}
+      else{
+        if(lineA)r+='<div style="color:#f87171;background:rgba(248,113,113,0.1)">- '+esc(lineA)+'</div>';
+        if(lineB)r+='<div style="color:#4ade80;background:rgba(74,222,128,0.1)">+ '+esc(lineB)+'</div>';
+      }
+    }
+    const changes=a.filter((l,i)=>l!==(b[i]||'')).length+Math.max(0,b.length-a.length);
+    r='<div style="margin-bottom:6px;font-size:10px;color:var(--text-muted)">'+changes+' line(s) changed</div>'+r;
+    out.innerHTML=r;
+  };
+}
+function showSvelteRef(){
+  let d=document.getElementById('svelte-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='svelte-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['npx sv create my-app','npm run dev','npm run build','npm run preview','npx svelte-kit sync'],
+    'Reactivity':['let count = $state(0)','let doubled = $derived(count * 2)','$effect(() => { console.log(count); })','$effect.pre(() => { ... })','$inspect(value)'],
+    'Template':['<script>...</script>','<style>...</style>','{#if condition}...{:else}...{/if}','{#each items as item (item.id)}...{/each}','{#await promise}...{:then data}...{:catch error}...{/await}','{@html rawHtml}','<svelte:component this={Component} />'],
+    'Bindings':['bind:value={text}','bind:checked={bool}','bind:group={selected}','bind:this={element}','on:click={handler}','on:submit|preventDefault={handler}'],
+    'Props & Events':['let { data, count = 0 } = $props()','<Component {prop} />','<Component {...obj} />','<Component on:event={handler} />','createEventDispatcher()'],
+    'SvelteKit':['export async function load({ params, fetch }) { ... }','+page.svelte','+layout.svelte','+server.ts (API route)','+error.svelte','export const prerender = true','export const ssr = false']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Svelte Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskProductivityScore(){
+  let d=document.getElementById('prod-score-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='prod-score-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const now=new Date();const weekAgo=new Date(now-7*86400000);
+  const doneThisWeek=tasks.filter(t=>{const dd=t.completedAt||t.doneAt;return dd&&new Date(dd)>=weekAgo;}).length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&t.due<now.toISOString().split('T')[0]).length;
+  const total=tasks.length||1;
+  const doneTotal=tasks.filter(t=>t.status==='done').length;
+  const completionRate=Math.round((doneTotal/total)*100);
+  const overdueRate=Math.round((overdue/Math.max(tasks.filter(t=>t.status!=='done').length,1))*100);
+  const velocityScore=Math.min(100,doneThisWeek*15);
+  const overdueScore=Math.max(0,100-overdueRate*2);
+  const consistencyScore=completionRate;
+  const overall=Math.round((velocityScore+overdueScore+consistencyScore)/3);
+  const color=overall>=80?'#4ade80':overall>=50?'#fbbf24':'#f87171';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Productivity Score</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="text-align:center;margin-bottom:16px"><svg viewBox="0 0 120 70" style="width:160px"><path d="M10,60 A50,50 0 0,1 110,60" fill="none" stroke="var(--bg-surface)" stroke-width="8" stroke-linecap="round"/>';
+  const angle=Math.PI-(overall/100)*Math.PI;
+  const endX=60+50*Math.cos(angle);const endY=60-50*Math.sin(angle);
+  h+='<path d="M10,60 A50,50 0 '+(overall>50?'0':'0')+',1 '+endX+','+endY+'" fill="none" stroke="'+color+'" stroke-width="8" stroke-linecap="round"/>';
+  h+='<text x="60" y="55" text-anchor="middle" fill="'+color+'" style="font-size:20px;font-weight:700">'+overall+'</text><text x="60" y="66" text-anchor="middle" fill="var(--text-muted)" style="font-size:8px">/100</text></svg></div>';
+  const metrics=[
+    {label:'Velocity',score:velocityScore,detail:doneThisWeek+' done this week'},
+    {label:'On-Time',score:overdueScore,detail:overdue+' overdue tasks'},
+    {label:'Completion',score:consistencyScore,detail:doneTotal+'/'+total+' total done'}
+  ];
+  metrics.forEach(m=>{
+    const mc=m.score>=70?'#4ade80':m.score>=40?'#fbbf24':'#f87171';
+    h+='<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span style="color:var(--text-secondary)">'+m.label+'</span><span style="color:'+mc+';font-weight:600">'+m.score+'</span></div>';
+    h+='<div style="height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+m.score+'%;background:'+mc+';border-radius:3px"></div></div>';
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-top:2px">'+m.detail+'</div></div>';
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickNumberFormatter(){
+  let d=document.getElementById('num-fmt-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='num-fmt-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Number Formatter</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<input id="nf-input" type="text" placeholder="Enter number..." style="width:100%;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:14px;box-sizing:border-box;margin-bottom:8px;font-family:monospace" oninput="window._nfFormat()">';
+  h+='<div id="nf-output" style="font-size:12px"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._nfFormat=function(){
+    const v=document.getElementById('nf-input').value.replace(/[,\s]/g,'');
+    const out=document.getElementById('nf-output');if(!out)return;
+    const n=parseFloat(v);
+    if(isNaN(n)){out.innerHTML='<span style="color:var(--text-muted)">Enter a valid number</span>';return;}
+    const formats=[
+      {label:'Decimal',value:n.toLocaleString('en-US')},
+      {label:'Currency (USD)',value:'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})},
+      {label:'Currency (EUR)',value:n.toLocaleString('de-DE',{style:'currency',currency:'EUR'})},
+      {label:'Percentage',value:(n*100).toFixed(2)+'%'},
+      {label:'Scientific',value:n.toExponential(4)},
+      {label:'Binary',value:Number.isInteger(n)?(n>>>0).toString(2):'N/A'},
+      {label:'Hex',value:Number.isInteger(n)?'0x'+(n>>>0).toString(16).toUpperCase():'N/A'},
+      {label:'Octal',value:Number.isInteger(n)?'0o'+(n>>>0).toString(8):'N/A'},
+      {label:'Compact',value:new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(n)}
+    ];
+    let r='';formats.forEach(f=>{
+      r+='<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--text-muted);font-size:11px">'+f.label+'</span><span style="color:var(--text-primary);font-family:monospace;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-primary)\',600)">'+f.value+'</span></div>';
+    });
+    out.innerHTML=r;
+  };
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
