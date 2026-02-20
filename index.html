@@ -4195,7 +4195,8 @@ function renderProjectView() {
   const pKB=(S.kb||[]).filter(k=>k.projectId===p.id);
   const pContent=S.content.filter(c=>(c.tags||[]).includes(p.name.toLowerCase()));
   const statsBar=document.getElementById('proj-stats-bar');
-  statsBar.innerHTML=`<span style="font-size:9px;color:var(--text-muted)" title="${pTasks.length} tasks (${pTasksDone} done)">T:${pTasksDone}/${pTasks.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pDocs.length} living docs">D:${pDocs.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pKB.length} KB items">KB:${pKB.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pLinks.length} links">L:${pLinks.length}</span>`;
+  const pPct=pTasks.length?Math.round(pTasksDone/pTasks.length*100):0;
+  statsBar.innerHTML=`<span style="font-size:9px;color:var(--text-muted)" title="${pTasks.length} tasks (${pTasksDone} done)">T:${pTasksDone}/${pTasks.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pDocs.length} living docs">D:${pDocs.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pKB.length} KB items">KB:${pKB.length}</span><span style="font-size:9px;color:var(--text-muted)" title="${pLinks.length} links">L:${pLinks.length}</span><span style="display:flex;align-items:center;gap:4px" title="${pPct}% complete"><span style="width:60px;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden;display:inline-block"><span style="display:block;height:100%;width:${pPct}%;background:${pPct>=100?'var(--accent)':pPct>=50?'#22d3ee':'var(--orange)'};border-radius:2px;transition:width 0.3s"></span></span><span style="font-size:8px;color:${pPct>=100?'var(--accent)':'var(--text-muted)'}">${pPct}%</span></span>`;
   // Apply project color to tabs
   document.documentElement.style.setProperty('--proj-accent', p.color);
   setProjTab(activeProjTab);
@@ -5668,6 +5669,7 @@ function cmdGetItems(q) {
       ['export:','All export options'],['standup','Daily standup summary'],
       ['search: keyword','Deep search across ALL sections'],['find: keyword','Alias for search:'],
       ['history:','Recent activity across all sections'],
+      ['digest','Daily briefing + overdue + progress'],['goals:','Track daily + weekly goals'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -6601,6 +6603,38 @@ function cmdGetItems(q) {
       items.unshift({title:'Activity (last '+days+' days): '+recent.length+' items',desc:'Type history:N for custom range',icon:'H',type:'info'});
       recent.slice(0,15).forEach(r=>{items.unshift({title:r.title,desc:r.type+' | '+timeAgo(r.time),icon:r.icon,type:'action',action:r.action});});
     }else{items.unshift({title:'No activity in last '+days+' days',desc:'Type history:N for custom range',icon:'!',type:'info'});}
+  }
+  // Digest prefix — daily briefing
+  if(ql && (ql==='digest' || ql.startsWith('digest:') || ql==='brief' || ql==='morning')){
+    const today=new Date().toISOString().split('T')[0];const now=new Date();
+    const overdue=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due<today);
+    const dueToday=S.tasks.filter(t=>t.status!=='done'&&t.due===today);
+    const inProgress=S.tasks.filter(t=>t.status==='progress');
+    const upcoming=S.tasks.filter(t=>t.status!=='done'&&t.due&&t.due>today&&t.due<=new Date(now.getTime()+7*86400000).toISOString().split('T')[0]).sort((a,b)=>a.due.localeCompare(b.due));
+    const todayCreated=S.tasks.filter(t=>t.created&&t.created.startsWith(today)).length;
+    const todayDone=S.tasks.filter(t=>t.completedAt&&t.completedAt.startsWith(today)).length;
+    const docsToday=S.docs.filter(d=>d.updated&&d.updated.startsWith(today));
+    const totalWords=docsToday.reduce((s,d)=>s+countW(d.body),0);
+    items.unshift({title:'Daily Digest — '+new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'}),desc:dueToday.length+' due today | '+overdue.length+' overdue | '+inProgress.length+' in progress',icon:'D',type:'info'});
+    if(overdue.length)items.unshift({title:'OVERDUE: '+overdue.length+' tasks need attention',desc:overdue.slice(0,3).map(t=>t.title).join(', '),icon:'!',type:'action',action:()=>{closeCommandPalette();setTaskFilter('overdue');switchSection('tasks',null);}});
+    if(dueToday.length)dueToday.slice(0,3).forEach(t=>{items.unshift({title:'Due today: '+esc(t.title),desc:(t.priority||'p2').toUpperCase()+' | '+(t.project||'No project'),icon:'T',type:'action',action:()=>{closeCommandPalette();openTaskDetail(t.id);}});});
+    if(inProgress.length)items.unshift({title:inProgress.length+' tasks in progress',desc:inProgress.slice(0,3).map(t=>t.title).join(', '),icon:'>',type:'info'});
+    items.unshift({title:'Today: +'+todayCreated+' created, '+todayDone+' completed',desc:totalWords?'Wrote '+totalWords+' words across '+docsToday.length+' docs':'No writing today yet',icon:'*',type:'info'});
+    if(upcoming.length)items.unshift({title:'Upcoming (7d): '+upcoming.length+' tasks',desc:upcoming.slice(0,3).map(t=>t.title+' ('+t.due.substring(5)+')').join(', '),icon:'U',type:'info'});
+  }
+  // Goals prefix — daily/weekly goals tracking
+  if(ql && (ql==='goals' || ql.startsWith('goals:') || ql==='goal')){
+    if(!S.goals)S.goals=[];
+    const today=new Date().toISOString().split('T')[0];
+    const weekStart=new Date();weekStart.setDate(weekStart.getDate()-weekStart.getDay()+1);const ws=weekStart.toISOString().split('T')[0];
+    const todayGoals=S.goals.filter(g=>g.date===today);
+    const weekGoals=S.goals.filter(g=>g.date>=ws&&g.type==='weekly');
+    const doneToday=todayGoals.filter(g=>g.done).length;
+    items.unshift({title:'Goals: '+doneToday+'/'+todayGoals.length+' today',desc:weekGoals.length+' weekly goals set',icon:'G',type:'info'});
+    items.unshift({title:'+ Add daily goal',desc:'Creates a goal for today',icon:'+',type:'action',action:()=>{closeCommandPalette();const text=prompt('Daily goal:');if(!text||!text.trim())return;if(!S.goals)S.goals=[];S.goals.push({id:Date.now(),text:text.trim(),type:'daily',date:today,done:false,created:new Date().toISOString()});save();toast('Goal added for today');}});
+    items.unshift({title:'+ Add weekly goal',desc:'Creates a goal for this week',icon:'+',type:'action',action:()=>{closeCommandPalette();const text=prompt('Weekly goal:');if(!text||!text.trim())return;if(!S.goals)S.goals=[];S.goals.push({id:Date.now(),text:text.trim(),type:'weekly',date:ws,done:false,created:new Date().toISOString()});save();toast('Weekly goal added');}});
+    todayGoals.forEach(g=>{items.unshift({title:(g.done?'[x] ':'[ ] ')+esc(g.text),desc:'Daily goal'+(g.done?' (completed)':''),icon:g.done?'*':'G',type:'action',action:()=>{g.done=!g.done;save();toast(g.done?'Goal completed':'Goal unchecked');cmdSearch();}});});
+    weekGoals.forEach(g=>{items.unshift({title:(g.done?'[x] ':'[ ] ')+esc(g.text),desc:'Weekly goal'+(g.done?' (completed)':''),icon:g.done?'*':'G',type:'action',action:()=>{g.done=!g.done;save();toast(g.done?'Goal completed':'Goal unchecked');cmdSearch();}});});
   }
   return items.slice(0, 20);
 }
