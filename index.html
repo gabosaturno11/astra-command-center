@@ -6083,6 +6083,12 @@ function cmdGetItems(q) {
       ['diff tool','Compare two texts and highlight differences'],
       ['task radar','Radar chart showing task health across 5 axes'],
       ['journal','Quick daily journal with timestamped entries'],
+      ['password generator','Secure random password generator with strength meter'],
+      ['completion trend','30-day task completion trend with daily bars and cumulative line'],
+      ['quick bookmarks','Quick-access bookmark manager widget'],
+      ['ascii art','Convert text to ASCII block letters'],
+      ['priority matrix','Task priority matrix showing all 4 priority levels'],
+      ['code snippets','Save and manage reusable code snippets'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8501,6 +8507,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='journal' || ql==='daily journal' || ql==='quick journal' || ql==='diary')){
     items.unshift({title:'Quick Journal',desc:'Daily journal with timestamps',icon:'J',type:'action',action:()=>{closeCommandPalette();showQuickJournal();}});
+  }
+  if(ql && (ql==='password generator' || ql==='password' || ql==='pwd gen' || ql==='generate password')){
+    items.unshift({title:'Password Generator',desc:'Secure random password generator',icon:'P',type:'action',action:()=>{closeCommandPalette();showPasswordGenerator();}});
+  }
+  if(ql && (ql==='completion trend' || ql==='task trend' || ql==='trend' || ql==='30 day trend')){
+    items.unshift({title:'Completion Trend',desc:'30-day task completion trend chart',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskCompletionTrend();}});
+  }
+  if(ql && (ql==='quick bookmarks' || ql==='bookmarks' || ql==='bookmark manager' || ql==='saved links')){
+    items.unshift({title:'Quick Bookmarks',desc:'Quick-access bookmark manager',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBookmark();}});
+  }
+  if(ql && (ql==='ascii art' || ql==='ascii' || ql==='text art' || ql==='block letters')){
+    items.unshift({title:'ASCII Art',desc:'Convert text to ASCII block letters',icon:'A',type:'action',action:()=>{closeCommandPalette();showAsciiArt();}});
+  }
+  if(ql && (ql==='priority matrix' || ql==='priorities' || ql==='priority grid' || ql==='task priorities')){
+    items.unshift({title:'Priority Matrix',desc:'Task priority 4-quadrant grid',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityMatrix();}});
+  }
+  if(ql && (ql==='code snippets' || ql==='snippets' || ql==='snippet' || ql==='code manager')){
+    items.unshift({title:'Code Snippets',desc:'Save and manage code snippets',icon:'S',type:'action',action:()=>{closeCommandPalette();showQuickSnippet();}});
   }
   return items.slice(0, 20);
 }
@@ -18635,6 +18659,191 @@ function showQuickJournal(){
     el.innerHTML=h2;
   };
   window._jnlRender();
+}
+function showPasswordGenerator(){
+  let panel=document.getElementById('pwd-gen-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='pwd-gen-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:400px;width:90vw';
+  window._pwdGen=function(){
+    var len=parseInt(document.getElementById('pwd-len').value)||16;
+    var upper=document.getElementById('pwd-upper').checked;
+    var lower=document.getElementById('pwd-lower').checked;
+    var nums=document.getElementById('pwd-nums').checked;
+    var syms=document.getElementById('pwd-syms').checked;
+    var chars='';
+    if(upper)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(lower)chars+='abcdefghijklmnopqrstuvwxyz';
+    if(nums)chars+='0123456789';
+    if(syms)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if(!chars)chars='abcdefghijklmnopqrstuvwxyz0123456789';
+    var pwd='';var arr=new Uint32Array(len);crypto.getRandomValues(arr);
+    for(var i=0;i<len;i++)pwd+=chars[arr[i]%chars.length];
+    document.getElementById('pwd-out').value=pwd;
+    var strength=0;
+    if(len>=12)strength++;if(len>=16)strength++;
+    if(upper&&lower)strength++;if(nums)strength++;if(syms)strength++;
+    var labels=['Very Weak','Weak','Fair','Strong','Very Strong'];
+    var colors=['#ef4444','#f59e0b','#eab308','#22c55e','#4ade80'];
+    var si=Math.min(strength,4);
+    document.getElementById('pwd-strength').textContent=labels[si];
+    document.getElementById('pwd-strength').style.color=colors[si];
+  };
+  var cbStyle='accent-color:var(--accent)';
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Password Generator</span><button onclick="document.getElementById(\'pwd-gen-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><label style="font-size:10px;color:var(--text-muted)">Length:</label><input id="pwd-len" type="number" value="16" min="4" max="128" style="width:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 6px;font-size:11px;color:var(--text);outline:none;font-family:var(--mono)"></div>';
+  h+='<div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap">';
+  h+='<label style="font-size:10px;color:var(--text);display:flex;align-items:center;gap:4px"><input id="pwd-upper" type="checkbox" checked style="'+cbStyle+'">ABC</label>';
+  h+='<label style="font-size:10px;color:var(--text);display:flex;align-items:center;gap:4px"><input id="pwd-lower" type="checkbox" checked style="'+cbStyle+'">abc</label>';
+  h+='<label style="font-size:10px;color:var(--text);display:flex;align-items:center;gap:4px"><input id="pwd-nums" type="checkbox" checked style="'+cbStyle+'">123</label>';
+  h+='<label style="font-size:10px;color:var(--text);display:flex;align-items:center;gap:4px"><input id="pwd-syms" type="checkbox" checked style="'+cbStyle+'">!@#</label>';
+  h+='</div>';
+  h+='<button onclick="window._pwdGen()" style="padding:6px 16px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:11px;font-weight:600;margin-bottom:10px">Generate</button>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:6px"><input id="pwd-out" readonly style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px;font-size:13px;color:var(--accent);font-family:var(--mono);outline:none"><button onclick="navigator.clipboard.writeText(document.getElementById(\'pwd-out\').value);this.textContent=\'Done\';var b=this;setTimeout(function(){b.textContent=\'Copy\'},800)" style="padding:6px 12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Copy</button></div>';
+  h+='<div id="pwd-strength" style="font-size:10px;font-weight:600;text-align:center"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  window._pwdGen();
+}
+function showTaskCompletionTrend(){
+  let panel=document.getElementById('task-trend-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-trend-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw';
+  var days=30;var today=new Date();var dates=[];
+  for(var i=days-1;i>=0;i--){var d=new Date(today);d.setDate(d.getDate()-i);dates.push(d.toISOString().split('T')[0]);}
+  var completed=dates.map(function(ds){return S.tasks.filter(function(t){return t.completedAt&&t.completedAt.startsWith(ds);}).length;});
+  var cumul=[];var sum=0;
+  completed.forEach(function(c){sum+=c;cumul.push(sum);});
+  var maxC=Math.max.apply(null,completed.concat([1]));
+  var maxCum=Math.max.apply(null,cumul.concat([1]));
+  var w=500,ht=220,pad=40,gw=w-pad*2,gh=ht-pad*2;
+  var svg='<svg width="'+w+'" height="'+ht+'" viewBox="0 0 '+w+' '+ht+'" style="font-family:var(--mono)">';
+  // Grid
+  for(var g=0;g<=4;g++){var y=pad+gh-gh*(g/4);svg+='<line x1="'+pad+'" y1="'+y+'" x2="'+(pad+gw)+'" y2="'+y+'" stroke="#222" stroke-width="0.5"/>';}
+  // Daily bars
+  var barW=Math.max(2,Math.floor(gw/days*0.6));
+  dates.forEach(function(ds,i){
+    var x=pad+i*(gw/days);
+    var bh=completed[i]?(completed[i]/maxC)*gh:0;
+    svg+='<rect x="'+x+'" y="'+(pad+gh-bh)+'" width="'+barW+'" height="'+bh+'" fill="#4ade80" rx="1" opacity="0.6"><title>'+ds+': '+completed[i]+' done</title></rect>';
+    if(i%7===0){svg+='<text x="'+(x+barW/2)+'" y="'+(ht-5)+'" fill="#666" font-size="7" text-anchor="middle">'+ds.substring(5)+'</text>';}
+  });
+  // Cumulative line
+  var pts=[];
+  dates.forEach(function(ds,i){
+    var x=pad+i*(gw/days)+barW/2;
+    var y=pad+gh-gh*(cumul[i]/maxCum);
+    pts.push(x+','+y);
+  });
+  svg+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.8"/>';
+  svg+='</svg>';
+  var avg=(sum/days).toFixed(1);
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Completion Trend (30d)</span><button onclick="document.getElementById(\'task-trend-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="overflow-x:auto">'+svg+'</div>';
+  h+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:6px"><span>Total: '+sum+' completed</span><span>Avg: '+avg+'/day</span><span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:#4ade80;border-radius:1px"></span>Daily <span style="width:10px;height:3px;background:#3b82f6;border-radius:1px"></span>Cumulative</span></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickBookmark(){
+  let panel=document.getElementById('qbm-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='qbm-widget';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:300px;max-height:400px;overflow-y:auto';
+  if(!S._quickBookmarks)S._quickBookmarks=[];
+  window._qbmAdd=function(){
+    var inp=document.getElementById('qbm-url');var name=document.getElementById('qbm-name');
+    if(!inp||!inp.value.trim())return;
+    S._quickBookmarks.unshift({url:inp.value.trim(),name:(name&&name.value.trim())||inp.value.trim(),added:new Date().toISOString().split('T')[0]});
+    save();window._qbmRender();
+  };
+  window._qbmDel=function(i){S._quickBookmarks.splice(i,1);save();window._qbmRender();};
+  window._qbmRender=function(){
+    var el=document.getElementById('qbm-widget');if(!el)return;
+    var h2='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:600;font-size:11px;color:var(--text-muted)">Quick Bookmarks</span><button onclick="document.getElementById(\'qbm-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+    h2+='<div style="display:flex;gap:4px;margin-bottom:8px"><input id="qbm-url" placeholder="URL..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 6px;font-size:9px;color:var(--text);outline:none"><input id="qbm-name" placeholder="Label..." style="width:70px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 6px;font-size:9px;color:var(--text);outline:none"><button onclick="window._qbmAdd()" style="padding:4px 8px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:9px;font-weight:600">+</button></div>';
+    S._quickBookmarks.forEach(function(b,i){
+      h2+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)">';
+      h2+='<img src="https://www.google.com/s2/favicons?domain='+encodeURIComponent(b.url)+'" width="12" height="12" style="border-radius:2px" onerror="this.style.display=\'none\'">';
+      h2+='<a href="'+esc(b.url)+'" target="_blank" style="font-size:10px;color:var(--accent);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(b.name)+'</a>';
+      h2+='<span style="font-size:8px;color:#555;font-family:var(--mono)">'+b.added+'</span>';
+      h2+='<button onclick="window._qbmDel('+i+')" style="background:none;border:none;color:#666;cursor:pointer;font-size:9px">x</button>';
+      h2+='</div>';
+    });
+    if(S._quickBookmarks.length===0)h2+='<div style="padding:8px;text-align:center;font-size:10px;color:var(--text-muted)">No bookmarks yet</div>';
+    el.innerHTML=h2;
+  };
+  window._qbmRender();
+}
+function showAsciiArt(){
+  let panel=document.getElementById('ascii-art-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='ascii-art-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  var bigLetters={A:['  #  ','## ##','#####','#   #','#   #'],B:['#### ','#   #','#### ','#   #','#### '],C:[' ### ','#   ','#   ',' #  ',' ### '],D:['#### ','#   #','#   #','#   #','#### '],E:['#####','#    ','#### ','#    ','#####'],F:['#####','#    ','#### ','#    ','#    '],G:[' ### ','#    ','# ##','#  # ',' ### '],H:['#   #','#   #','#####','#   #','#   #'],I:['#####','  #  ','  #  ','  #  ','#####'],K:['#  # ','# #  ','##   ','# #  ','#  # '],L:['#    ','#    ','#    ','#    ','#####'],M:['#   #','## ##','# # #','#   #','#   #'],N:['#   #','##  #','# # #','#  ##','#   #'],O:[' ### ','#   #','#   #','#   #',' ### '],P:['#### ','#   #','#### ','#    ','#    '],R:['#### ','#   #','#### ','# #  ','#  ##'],S:[' ####','#    ',' ### ','    #','#### '],T:['#####','  #  ','  #  ','  #  ','  #  '],U:['#   #','#   #','#   #','#   #',' ### '],V:['#   #','#   #',' # # ',' # # ','  #  '],W:['#   #','#   #','# # #','## ##','#   #'],X:['#   #',' # # ','  #  ',' # # ','#   #'],Y:['#   #',' # # ','  #  ','  #  ','  #  '],Z:['#####','   # ','  #  ',' #   ','#####'],' ':['     ','     ','     ','     ','     ']};
+  window._asciiGen=function(){
+    var txt=(document.getElementById('ascii-input').value||'').toUpperCase();
+    var lines=['','','','',''];
+    for(var c=0;c<txt.length;c++){
+      var ch=txt[c];var letter=bigLetters[ch]||bigLetters[' '];
+      for(var r=0;r<5;r++)lines[r]+=letter[r]+' ';
+    }
+    document.getElementById('ascii-out').textContent=lines.join('\n');
+  };
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">ASCII Art Generator</span><button onclick="document.getElementById(\'ascii-art-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:10px"><input id="ascii-input" oninput="window._asciiGen()" placeholder="Type text..." maxlength="12" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px 10px;font-size:12px;color:var(--text);outline:none"><button onclick="navigator.clipboard.writeText(document.getElementById(\'ascii-out\').textContent);this.textContent=\'Done\';var b=this;setTimeout(function(){b.textContent=\'Copy\'},800)" style="padding:6px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);cursor:pointer;font-size:10px">Copy</button></div>';
+  h+='<pre id="ascii-out" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:10px;color:var(--accent);font-family:var(--mono);overflow-x:auto;line-height:1.2;min-height:60px"></pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskPriorityMatrix(){
+  let panel=document.getElementById('task-primatrix-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-primatrix-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:560px;width:90vw;max-height:80vh;overflow-y:auto';
+  var pMap={p0:{label:'Critical',color:'#ef4444',bg:'rgba(239,68,68,0.1)'},p1:{label:'High',color:'#f59e0b',bg:'rgba(245,158,11,0.1)'},p2:{label:'Medium',color:'#3b82f6',bg:'rgba(59,130,246,0.1)'},p3:{label:'Low',color:'#6b7280',bg:'rgba(107,114,128,0.1)'}};
+  var active=S.tasks.filter(function(t){return t.status!=='done';});
+  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Priority Matrix</span><button onclick="document.getElementById(\'task-primatrix-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  ['p0','p1','p2','p3'].forEach(function(p){
+    var info=pMap[p];
+    var tasks=active.filter(function(t){return (t.priority||'p2')===p;});
+    h+='<div style="background:'+info.bg+';border:1px solid '+info.color+'33;border-radius:var(--radius);padding:10px">';
+    h+='<div style="font-size:11px;font-weight:600;color:'+info.color+';margin-bottom:6px;display:flex;justify-content:space-between"><span>'+info.label+'</span><span style="font-family:var(--mono)">'+tasks.length+'</span></div>';
+    tasks.slice(0,8).forEach(function(t){
+      h+='<div onclick="document.getElementById(\'task-primatrix-panel\').remove();openTaskDetail('+t.id+')" style="font-size:10px;color:var(--text);padding:3px 6px;background:var(--bg-surface);border-radius:3px;margin-bottom:3px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" onmouseenter="this.style.background=\'var(--bg-hover)\'" onmouseleave="this.style.background=\'var(--bg-surface)\'">';
+      h+=esc(t.title||'Untitled');
+      if(t.due){var isOd=t.due<new Date().toISOString().split('T')[0];h+=' <span style="font-size:8px;color:'+(isOd?'#ef4444':'var(--text-muted)')+';font-family:var(--mono)">'+t.due.substring(5)+'</span>';}
+      h+='</div>';
+    });
+    if(tasks.length>8)h+='<div style="font-size:9px;color:var(--text-muted);margin-top:3px">+'+(tasks.length-8)+' more</div>';
+    if(tasks.length===0)h+='<div style="font-size:9px;color:var(--text-muted);font-style:italic">No tasks</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickSnippet(){
+  let panel=document.getElementById('snippet-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='snippet-widget';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._snippets)S._snippets=[];
+  window._snipAdd=function(){
+    var title=document.getElementById('snip-title');var code=document.getElementById('snip-code');var lang=document.getElementById('snip-lang');
+    if(!title||!code||!title.value.trim()||!code.value.trim())return;
+    S._snippets.unshift({title:title.value.trim(),code:code.value.trim(),lang:(lang&&lang.value)||'text',created:new Date().toISOString().split('T')[0]});
+    save();window._snipRender();
+  };
+  window._snipDel=function(i){S._snippets.splice(i,1);save();window._snipRender();};
+  window._snipCopy=function(i){navigator.clipboard.writeText(S._snippets[i].code);};
+  window._snipRender=function(){
+    var el=document.getElementById('snippet-widget');if(!el)return;
+    var h2='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Code Snippets</span><div style="display:flex;align-items:center;gap:8px"><span style="font-size:10px;color:var(--text-muted)">'+S._snippets.length+'</span><button onclick="document.getElementById(\'snippet-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div></div>';
+    h2+='<div style="display:flex;gap:4px;margin-bottom:6px"><input id="snip-title" placeholder="Title..." style="flex:1;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px 6px;font-size:10px;color:var(--text);outline:none"><select id="snip-lang" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:4px;font-size:9px;color:var(--text);outline:none"><option>js</option><option>css</option><option>html</option><option>python</option><option>bash</option><option>sql</option><option>text</option></select></div>';
+    h2+='<textarea id="snip-code" placeholder="Paste code..." style="width:100%;height:60px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;font-size:10px;color:var(--text);font-family:var(--mono);resize:vertical;outline:none;margin-bottom:6px;box-sizing:border-box"></textarea>';
+    h2+='<button onclick="window._snipAdd()" style="padding:5px 14px;background:var(--accent);border:none;border-radius:var(--radius);color:#000;cursor:pointer;font-size:10px;font-weight:600;margin-bottom:10px">Save Snippet</button>';
+    S._snippets.slice(0,15).forEach(function(s,i){
+      h2+='<div style="border:1px solid var(--border);border-radius:var(--radius);margin-bottom:6px;overflow:hidden">';
+      h2+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;background:var(--bg-surface)"><span style="font-size:10px;color:var(--text);font-weight:600">'+esc(s.title)+'</span><div style="display:flex;gap:4px"><span style="font-size:8px;color:var(--accent);font-family:var(--mono)">'+s.lang+'</span><button onclick="window._snipCopy('+i+')" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--text-muted);cursor:pointer;font-size:8px;padding:1px 6px">Copy</button><button onclick="window._snipDel('+i+')" style="background:none;border:none;color:#666;cursor:pointer;font-size:9px">x</button></div></div>';
+      h2+='<pre style="padding:6px 8px;font-size:9px;color:var(--text-muted);font-family:var(--mono);margin:0;max-height:80px;overflow-y:auto;white-space:pre-wrap">'+esc(s.code)+'</pre>';
+      h2+='</div>';
+    });
+    if(S._snippets.length===0)h2+='<div style="padding:10px;text-align:center;font-size:10px;color:var(--text-muted)">No snippets saved yet</div>';
+    el.innerHTML=h2;
+  };
+  window._snipRender();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
