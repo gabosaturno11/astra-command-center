@@ -6377,6 +6377,9 @@ function cmdGetItems(q) {
       ['nuget','NuGet/.NET command reference'],
       ['productivity','Productivity index by time period'],
       ['gradient','CSS gradient generator'],
+      ['helm','Helm/Kubernetes chart reference'],
+      ['health dashboard','System-wide health dashboard'],
+      ['font pairing','Font pairing suggestions'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9677,6 +9680,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='gradient' || ql==='css gradient' || ql==='gradient generator' || ql==='linear gradient')){
     items.unshift({title:'Gradient Generator',desc:'CSS gradient presets with preview',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGradientGenerator();}});
+  }
+  if(ql && (ql==='helm' || ql==='helm commands' || ql==='helm chart' || ql==='helm ref')){
+    items.unshift({title:'Helm Reference',desc:'Helm chart management cheatsheet',icon:'H',type:'action',action:()=>{closeCommandPalette();showHelmRef();}});
+  }
+  if(ql && (ql==='health dashboard' || ql==='health' || ql==='system health' || ql==='dashboard health')){
+    items.unshift({title:'Health Dashboard',desc:'System-wide health metrics',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskHealthDashboard();}});
+  }
+  if(ql && (ql==='font pairing' || ql==='fonts' || ql==='font pair' || ql==='typography')){
+    items.unshift({title:'Font Pairings',desc:'Curated font pairing suggestions',icon:'F',type:'action',action:()=>{closeCommandPalette();showQuickFontPairing();}});
   }
   return items.slice(0, 20);
 }
@@ -29046,6 +29058,86 @@ function showQuickGradientGenerator(){
     document.getElementById('grad-preview').style.background=val;
     document.getElementById('grad-css').textContent='background: '+val+';';
   };
+}
+function showHelmRef(){
+  const d=document.createElement('div');d.id='helm-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:75vh;overflow-y:auto';
+  const cats={
+    'Chart':['helm create <name>','helm install <name> <chart>','helm upgrade <name> <chart>','helm uninstall <name>'],
+    'Repo':['helm repo add <name> <url>','helm repo update','helm repo list','helm search repo <query>','helm search hub <query>'],
+    'Status':['helm list','helm status <name>','helm history <name>','helm get values <name>','helm get manifest <name>'],
+    'Template':['helm template <name> <chart>','helm lint <chart>','helm package <chart>','helm pull <chart>'],
+    'Other':['helm version','helm env','helm rollback <name> <rev>','helm show values <chart>','helm dependency update']
+  };
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Helm Reference</h3><button onclick="document.getElementById(\'helm-ref-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  Object.entries(cats).forEach(([cat,cmds])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px">'+cat+'</div>';
+    cmds.forEach(c=>{
+      html+='<div onclick="navigator.clipboard.writeText(\''+c.replace(/'/g,"\\'")+'\');this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'\',600)" style="padding:5px 8px;font-family:monospace;font-size:11px;color:var(--text-secondary);cursor:pointer;border-radius:4px;margin-bottom:2px" onmouseover="this.style.background=\'var(--bg-surface)\'" onmouseout="this.style.background=\'none\'">'+c+'</div>';
+    });
+    html+='</div>';
+  });
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskHealthDashboard(){
+  const d=document.createElement('div');d.id='health-dashboard-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:520px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const content=(S.content||[]);const docs=(S.writerDocs||[]);const links=(S.links||[]);
+  const now=new Date();
+  const active=tasks.filter(t=>t.status!=='done');const done=tasks.filter(t=>t.status==='done');
+  const overdue=active.filter(t=>t.due&&new Date(t.due)<now);
+  const wip=active.filter(t=>t.status==='in-progress');
+  const doneToday=done.filter(t=>t.updatedAt&&new Date(t.updatedAt).toDateString()===now.toDateString());
+  const totalWords=docs.reduce((s,d2)=>s+(d2.content?d2.content.split(/\s+/).length:0),0);
+  const metrics=[
+    {label:'Active Tasks',val:active.length,col:active.length>20?'#f59e0b':'#4ade80'},
+    {label:'Done Today',val:doneToday.length,col:doneToday.length>0?'#4ade80':'var(--text-muted)'},
+    {label:'Overdue',val:overdue.length,col:overdue.length>0?'#ef4444':'#4ade80'},
+    {label:'WIP',val:wip.length,col:wip.length>5?'#f59e0b':'#4ade80'},
+    {label:'Content Items',val:content.length,col:'#3b82f6'},
+    {label:'Writer Docs',val:docs.length,col:'#8b5cf6'},
+    {label:'Links',val:links.length,col:'#06b6d4'},
+    {label:'Total Words',val:totalWords.toLocaleString(),col:'#4ade80'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Health Dashboard</h3><button onclick="document.getElementById(\'health-dashboard-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  metrics.forEach(m=>{
+    html+='<div style="background:var(--bg-surface);padding:12px;border-radius:6px;text-align:center"><div style="font-size:20px;color:'+m.col+';font-weight:700">'+m.val+'</div><div style="font-size:10px;color:var(--text-muted)">'+m.label+'</div></div>';
+  });
+  html+='</div>';
+  let healthScore=100;
+  if(overdue.length>0)healthScore-=overdue.length*5;
+  if(wip.length>5)healthScore-=15;
+  if(active.length>30)healthScore-=10;
+  healthScore=Math.max(0,Math.min(100,healthScore));
+  const hCol=healthScore>=80?'#4ade80':healthScore>=50?'#f59e0b':'#ef4444';
+  html+='<div style="margin-top:16px;text-align:center;padding:12px;background:var(--bg-surface);border-radius:8px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">System Health</div><div style="font-size:28px;color:'+hCol+';font-weight:700">'+healthScore+'%</div></div>';
+  d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickFontPairing(){
+  const d=document.createElement('div');d.id='font-pairing-panel';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px;max-height:70vh;overflow-y:auto';
+  const pairings=[
+    {heading:'Inter',body:'system-ui',desc:'Clean & modern'},
+    {heading:'Georgia',body:'Verdana',desc:'Classic editorial'},
+    {heading:'Helvetica',body:'Georgia',desc:'Swiss + serif'},
+    {heading:'Futura',body:'Times New Roman',desc:'Modernist contrast'},
+    {heading:'Playfair Display',body:'Source Sans Pro',desc:'Elegant + readable'},
+    {heading:'Montserrat',body:'Merriweather',desc:'Geometric + traditional'},
+    {heading:'Oswald',body:'Lato',desc:'Bold headlines'},
+    {heading:'Roboto',body:'Roboto Slab',desc:'Google Material'},
+    {heading:'Poppins',body:'Inter',desc:'Friendly & modern'},
+    {heading:'Space Grotesk',body:'Space Mono',desc:'Tech / monospace'}
+  ];
+  let html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80;font-size:14px">Font Pairings</h3><button onclick="document.getElementById(\'font-pairing-panel\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer">&times;</button></div>';
+  pairings.forEach(p=>{
+    html+='<div onclick="navigator.clipboard.writeText(\'font-family: '+p.heading+', sans-serif;\')" style="padding:10px;background:var(--bg-surface);border-radius:6px;margin-bottom:6px;cursor:pointer" onmouseover="this.style.borderColor=\'#4ade80\'" onmouseout="this.style.borderColor=\'transparent\'">';
+    html+='<div style="font-family:'+p.heading+',sans-serif;font-size:16px;color:var(--text-primary);font-weight:700;margin-bottom:2px">'+p.heading+'</div>';
+    html+='<div style="font-family:'+p.body+',serif;font-size:12px;color:var(--text-secondary);margin-bottom:4px">Body text in '+p.body+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">'+p.desc+'</div></div>';
+  });
+  html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click pairing to copy heading font-family</div>';
+  d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
