@@ -6599,6 +6599,12 @@ function cmdGetItems(q) {
       ['ansible','Ansible playbook and CLI reference'],
       ['due calendar','Due date calendar view mini'],
       ['readability','Readability score analyzer'],
+      ['linux network','Linux network commands reference'],
+      ['priority matrix','Eisenhower priority matrix view'],
+      ['regex','Regex tester with live matching'],
+      ['vite','Vite build tool reference'],
+      ['weekday','Task creation/completion by weekday'],
+      ['word frequency','Word frequency analyzer'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -10565,6 +10571,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='readability' || ql==='readability score' || ql==='flesch' || ql==='reading level')){
     items.unshift({title:'Readability Score',desc:'Flesch readability analyzer',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickReadabilityScore();}});
+  }
+  if(ql && (ql==='linux network' || ql==='network commands' || ql==='ip addr' || ql==='netstat')){
+    items.unshift({title:'Linux Network Ref',desc:'IP, DNS, ports, firewall',icon:'N',type:'action',action:()=>{closeCommandPalette();showLinuxNetworkRef();}});
+  }
+  if(ql && (ql==='priority matrix' || ql==='eisenhower' || ql==='urgency matrix' || ql==='importance matrix')){
+    items.unshift({title:'Priority Matrix',desc:'Eisenhower urgency/importance',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPriorityMatrix();}});
+  }
+  if(ql && (ql==='regex' || ql==='regex tester' || ql==='regexp' || ql==='regular expression')){
+    items.unshift({title:'Regex Tester',desc:'Live regex pattern tester',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickRegexTester();}});
+  }
+  if(ql && (ql==='vite' || ql==='vite ref' || ql==='vite config' || ql==='vite commands')){
+    items.unshift({title:'Vite Reference',desc:'CLI, config, plugins, env',icon:'V',type:'action',action:()=>{closeCommandPalette();showViteRef();}});
+  }
+  if(ql && (ql==='weekday' || ql==='weekday analysis' || ql==='day of week' || ql==='weekday stats')){
+    items.unshift({title:'Weekday Analysis',desc:'Tasks by day of week',icon:'W',type:'action',action:()=>{closeCommandPalette();showTaskWeekdayAnalysis();}});
+  }
+  if(ql && (ql==='word frequency' || ql==='word count' || ql==='word freq' || ql==='frequent words')){
+    items.unshift({title:'Word Frequency',desc:'Word frequency analyzer',icon:'W',type:'action',action:()=>{closeCommandPalette();showQuickWordFrequency();}});
   }
   return items.slice(0, 20);
 }
@@ -36440,6 +36464,156 @@ function showQuickReadabilityScore(){
     r+='<div style="padding:6px;background:var(--bg-surface);border-radius:4px;text-align:center"><div style="color:var(--text-primary);font-weight:600">'+avgWordsPerSent.toFixed(1)+'</div><div style="color:var(--text-muted)">Words/Sent</div></div>';
     r+='<div style="padding:6px;background:var(--bg-surface);border-radius:4px;text-align:center"><div style="color:var(--text-primary);font-weight:600">'+Math.round(fk)+'</div><div style="color:var(--text-muted)">Grade Level</div></div>';
     r+='</div>';
+    out.innerHTML=r;
+  };
+}
+function showLinuxNetworkRef(){
+  let d=document.getElementById('netref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='netref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'IP & Interface':['ip addr show','ip link set eth0 up','ip route show','ifconfig','hostname -I','nmcli device status','ip neigh show'],
+    'DNS':['dig example.com','nslookup example.com','host example.com','cat /etc/resolv.conf','resolvectl status','dig +short A example.com'],
+    'Connectivity':['ping -c 4 example.com','traceroute example.com','mtr example.com','curl -I https://example.com','wget -q --spider https://example.com','nc -zv host 80'],
+    'Ports & Sockets':['ss -tulnp','netstat -tulnp','lsof -i :8080','nmap -sT localhost','fuser 80/tcp','ss -s'],
+    'Firewall':['iptables -L -n','ufw status verbose','ufw allow 80/tcp','ufw deny from 10.0.0.0/8','firewall-cmd --list-all','iptables -A INPUT -p tcp --dport 443 -j ACCEPT'],
+    'Transfer':['scp file.txt user@host:/path/','rsync -avz src/ user@host:dest/','curl -X POST -d @data.json url','wget -O file.zip url','ssh -L 8080:localhost:80 user@host']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Linux Network Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskPriorityMatrix(){
+  let d=document.getElementById('priority-matrix-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='priority-matrix-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  const now=new Date().toISOString().split('T')[0];
+  const urgent=tasks.filter(t=>t.due&&t.due<=now||(t.priority==='p0'));
+  const important=tasks.filter(t=>!urgent.includes(t)&&(t.priority==='p1'||(t.due&&t.due<=new Date(Date.now()+7*86400000).toISOString().split('T')[0])));
+  const delegate=tasks.filter(t=>!urgent.includes(t)&&!important.includes(t)&&(t.priority==='p2'));
+  const later=tasks.filter(t=>!urgent.includes(t)&&!important.includes(t)&&!delegate.includes(t));
+  const quadrants=[
+    {title:'Do First (Urgent + Important)',tasks:urgent,color:'#f87171'},
+    {title:'Schedule (Important)',tasks:important,color:'#fbbf24'},
+    {title:'Delegate (Urgent, Less Important)',tasks:delegate,color:'#38bdf8'},
+    {title:'Later (Low Priority)',tasks:later,color:'#94a3b8'}
+  ];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Priority Matrix</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+  quadrants.forEach(q=>{
+    h+='<div style="padding:10px;background:var(--bg-surface);border-radius:6px;border-left:3px solid '+q.color+'">';
+    h+='<div style="font-size:11px;font-weight:600;color:'+q.color+';margin-bottom:6px">'+q.title+' ('+q.tasks.length+')</div>';
+    q.tasks.slice(0,5).forEach(t=>{
+      h+='<div style="font-size:11px;color:var(--text-secondary);padding:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.title)+'</div>';
+    });
+    if(q.tasks.length>5)h+='<div style="font-size:10px;color:var(--text-muted)">+'+(q.tasks.length-5)+' more</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickRegexTester(){
+  let d=document.getElementById('regex-tester-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='regex-tester-widget';
+  d.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:340px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Regex Tester</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<input id="rx-pattern" placeholder="Regular expression..." style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-family:monospace;font-size:13px;margin-bottom:4px;box-sizing:border-box" oninput="window._rxTest()">';
+  h+='<input id="rx-flags" placeholder="Flags (g, i, m)" value="g" style="width:100%;padding:4px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-muted);font-family:monospace;font-size:11px;margin-bottom:6px;box-sizing:border-box" oninput="window._rxTest()">';
+  h+='<textarea id="rx-text" placeholder="Test string..." style="width:100%;height:60px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;resize:none;box-sizing:border-box;margin-bottom:6px" oninput="window._rxTest()"></textarea>';
+  h+='<div id="rx-result" style="font-size:12px;color:var(--text-secondary);padding:6px;background:var(--bg-surface);border-radius:4px;min-height:20px;max-height:100px;overflow-y:auto"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._rxTest=function(){
+    const pat=document.getElementById('rx-pattern').value;
+    const flags=document.getElementById('rx-flags').value;
+    const text=document.getElementById('rx-text').value;
+    const out=document.getElementById('rx-result');if(!out)return;
+    if(!pat){out.innerHTML='<span style="color:var(--text-muted)">Enter a pattern</span>';return;}
+    try{
+      const re=new RegExp(pat,flags);
+      const matches=text.match(re);
+      if(!matches){out.innerHTML='<span style="color:#f87171">No matches</span>';return;}
+      out.innerHTML='<span style="color:#4ade80">'+matches.length+' match(es):</span><br>'+matches.map(m=>'<span style="color:var(--accent);font-family:monospace">'+esc(m)+'</span>').join(', ');
+    }catch(e){
+      out.innerHTML='<span style="color:#f87171">Error: '+esc(e.message)+'</span>';
+    }
+  };
+}
+function showViteRef(){
+  let d=document.getElementById('vite-ref-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='vite-ref-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const cmds={
+    'CLI':['npm create vite@latest my-app','npm create vite@latest my-app -- --template react-ts','vite','vite build','vite preview','vite optimize'],
+    'Config (vite.config.ts)':['export default defineConfig({ plugins: [react()] })','server: { port: 3000, open: true }','build: { outDir: "dist", sourcemap: true }','resolve: { alias: { "@": "/src" } }','define: { "process.env": {} }','css: { modules: { localsConvention: "camelCase" } }'],
+    'Plugins':['@vitejs/plugin-react','@vitejs/plugin-vue','vite-plugin-svgr','vite-plugin-pwa','vite-tsconfig-paths','unplugin-auto-import/vite'],
+    'Env Variables':['import.meta.env.VITE_API_URL','import.meta.env.MODE','import.meta.env.DEV','import.meta.env.PROD','import.meta.env.SSR','.env.local (gitignored)'],
+    'Features':['import styles from "./app.module.css"','import.meta.glob("./modules/*.ts")','new URL("./asset.png", import.meta.url).href','import Worker from "./worker?worker"']
+  };
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Vite Reference</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  Object.entries(cmds).forEach(([cat,arr])=>{
+    h+='<div style="font-size:11px;color:var(--accent);margin:12px 0 6px;font-weight:600">'+cat+'</div>';
+    arr.forEach(c=>{h+='<div style="font-size:12px;padding:4px 8px;margin:2px 0;background:var(--bg-surface);border-radius:4px;cursor:pointer;font-family:monospace;color:var(--text-secondary)" onclick="navigator.clipboard.writeText(this.textContent);this.style.color=\'#4ade80\';setTimeout(()=>this.style.color=\'var(--text-secondary)\',600)">'+c+'</div>';});
+  });
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showTaskWeekdayAnalysis(){
+  let d=document.getElementById('weekday-analysis-panel');if(d)d.remove();
+  d=document.createElement('div');d.id='weekday-analysis-panel';
+  d.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const created=new Array(7).fill(0);
+  const completed=new Array(7).fill(0);
+  tasks.forEach(t=>{
+    if(t.createdAt){const d2=new Date(t.createdAt).getDay();if(!isNaN(d2))created[d2]++;}
+    const dd=t.completedAt||t.doneAt;
+    if(dd){const d2=new Date(dd).getDay();if(!isNaN(d2))completed[d2]++;}
+  });
+  const maxV=Math.max(...created,...completed,1);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><span style="font-weight:700;font-size:16px;color:var(--accent)">Weekday Analysis</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<svg viewBox="0 0 420 160" style="width:100%;margin:8px 0">';
+  const bw=420/7;
+  days.forEach((day,i)=>{
+    const ch=Math.round((created[i]/maxV)*110);
+    const dh=Math.round((completed[i]/maxV)*110);
+    h+='<rect x="'+(i*bw+bw*0.1)+'" y="'+(125-ch)+'" width="'+(bw*0.35)+'" height="'+ch+'" fill="#38bdf8" rx="2"/>';
+    h+='<rect x="'+(i*bw+bw*0.5)+'" y="'+(125-dh)+'" width="'+(bw*0.35)+'" height="'+dh+'" fill="#4ade80" rx="2"/>';
+    h+='<text x="'+(i*bw+bw/2)+'" y="145" text-anchor="middle" fill="var(--text-muted)" style="font-size:10px">'+day+'</text>';
+  });
+  h+='</svg>';
+  h+='<div style="display:flex;gap:16px;justify-content:center;font-size:10px"><span style="color:#38bdf8">Created</span><span style="color:#4ade80">Completed</span></div>';
+  const bestCreate=days[created.indexOf(Math.max(...created))];
+  const bestComplete=days[completed.indexOf(Math.max(...completed))];
+  h+='<div style="margin-top:12px;display:flex;gap:8px"><div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center;font-size:11px"><div style="color:var(--text-muted)">Most Created</div><div style="color:#38bdf8;font-weight:700;font-size:14px">'+bestCreate+'</div></div>';
+  h+='<div style="flex:1;padding:8px;background:var(--bg-surface);border-radius:6px;text-align:center;font-size:11px"><div style="color:var(--text-muted)">Most Completed</div><div style="color:#4ade80;font-weight:700;font-size:14px">'+bestComplete+'</div></div></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+}
+function showQuickWordFrequency(){
+  let d=document.getElementById('word-freq-widget');if(d)d.remove();
+  d=document.createElement('div');d.id='word-freq-widget';
+  d.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:300px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:14px;color:var(--accent)">Word Frequency</span><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button></div>';
+  h+='<textarea id="wf-input" placeholder="Paste text to analyze word frequency..." style="width:100%;height:60px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:4px;color:var(--text-primary);font-size:12px;resize:none;box-sizing:border-box;margin-bottom:6px" oninput="window._wfAnalyze()"></textarea>';
+  h+='<div id="wf-output" style="max-height:200px;overflow-y:auto"></div>';
+  d.innerHTML=h;document.body.appendChild(d);
+  window._wfAnalyze=function(){
+    const text=document.getElementById('wf-input').value;
+    const out=document.getElementById('wf-output');if(!out)return;
+    if(!text.trim()){out.innerHTML='';return;}
+    const stop=new Set(['the','a','an','and','or','but','in','on','at','to','for','of','is','it','that','this','was','are','be','has','had','have','with','as','by','from','not','no','so','if','do','did','will','can','may','its','my','your','we','you','he','she','they','their','our','i','me','us','him','her','them']);
+    const words=text.toLowerCase().replace(/[^a-z\s]/g,'').split(/\s+/).filter(w=>w.length>1&&!stop.has(w));
+    const freq={};words.forEach(w=>{freq[w]=(freq[w]||0)+1;});
+    const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]).slice(0,20);
+    const maxV=sorted.length>0?sorted[0][1]:1;
+    let r='';
+    sorted.forEach(([word,count])=>{
+      const pct=Math.round((count/maxV)*100);
+      r+='<div style="display:flex;align-items:center;gap:6px;margin:2px 0;font-size:11px"><span style="width:60px;text-align:right;font-family:monospace;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+word+'</span><div style="flex:1;height:6px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:3px"></div></div><span style="color:var(--text-muted);width:20px;text-align:right">'+count+'</span></div>';
+    });
     out.innerHTML=r;
   };
 }
