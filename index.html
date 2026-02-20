@@ -5978,6 +5978,12 @@ function cmdGetItems(q) {
       ['content duplicates','Find and remove duplicate content items'],
       ['priority report','Task priority breakdown with completion rates'],
       ['embed','Save embeddable URLs (YouTube, Twitter, Figma)'],
+      ['cleanup','Workspace cleanup: find stale tasks, empty content, broken links'],
+      ['batch edit','Bulk edit tasks: select + set priority/status/delete'],
+      ['version compare','Compare writer document versions side by side'],
+      ['focus','Full-screen focus mode showing top P0/P1 task'],
+      ['time estimates','Task time estimates breakdown by priority'],
+      ['deep search','Global deep search across all workspace data'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7988,6 +7994,30 @@ function cmdGetItems(q) {
   // Embed prefix
   if(ql && (ql==='embed' || ql==='quick embed' || ql==='embeds' || ql==='save embed')){
     items.unshift({title:'Quick Embed',desc:'Save embeddable URLs for quick access',icon:'E',type:'action',action:()=>{closeCommandPalette();showQuickEmbed();}});
+  }
+  // Cleanup prefix
+  if(ql && (ql==='cleanup' || ql==='workspace cleanup' || ql==='clean up' || ql==='tidy')){
+    items.unshift({title:'Workspace Cleanup',desc:'Find stale tasks, empty content, broken links',icon:'C',type:'action',action:()=>{closeCommandPalette();showWorkspaceCleanup();}});
+  }
+  // Batch edit prefix
+  if(ql && (ql==='batch edit' || ql==='bulk edit' || ql==='mass edit' || ql==='edit tasks')){
+    items.unshift({title:'Task Batch Editor',desc:'Bulk select and edit tasks',icon:'B',type:'action',action:()=>{closeCommandPalette();showTaskBatchEdit();}});
+  }
+  // Version compare prefix
+  if(ql && (ql==='version compare' || ql==='compare versions' || ql==='doc versions' || ql==='diff')){
+    items.unshift({title:'Doc Version Compare',desc:'Compare writer doc versions with word diff',icon:'V',type:'action',action:()=>{closeCommandPalette();showDocVersionCompare();}});
+  }
+  // Focus mode prefix
+  if(ql && (ql==='focus' || ql==='focus mode' || ql==='zen focus' || ql==='deep focus')){
+    items.unshift({title:'Focus Mode',desc:'Full-screen focus on top priority task',icon:'F',type:'action',action:()=>{closeCommandPalette();showFocusModePanel();}});
+  }
+  // Time estimates prefix
+  if(ql && (ql==='time estimates' || ql==='estimates' || ql==='task time' || ql==='how long')){
+    items.unshift({title:'Time Estimates',desc:'Task time breakdown by priority',icon:'T',type:'action',action:()=>{closeCommandPalette();showTaskTimeEstimates();}});
+  }
+  // Deep search prefix
+  if(ql && (ql==='deep search' || ql==='search all' || ql==='global search' || ql==='find all')){
+    items.unshift({title:'Global Deep Search',desc:'Search across all workspace sections',icon:'S',type:'action',action:()=>{closeCommandPalette();showGlobalSearch();}});
   }
   return items.slice(0, 20);
 }
@@ -14674,6 +14704,183 @@ function showQuickEmbed(){
     });
   }
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWorkspaceCleanup(){
+  let panel=document.getElementById('workspace-cleanup-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='workspace-cleanup-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=S.tasks||[];const content=S.content||[];const links=S.links||[];const docs=S.writerDocs||[];
+  const issues=[];
+  // Stale tasks
+  const staleTasks=tasks.filter(t=>{if(t.status==='done')return false;const created=t.created?new Date(t.created):new Date();return(Date.now()-created.getTime())>(60*24*60*60*1000);});
+  if(staleTasks.length>0)issues.push({type:'warning',text:staleTasks.length+' tasks older than 60 days and not done',action:'Archive stale tasks',fn:'(function(){S.tasks.forEach(t=>{const created=t.created?new Date(t.created):new Date();if(t.status!=="done"&&(Date.now()-created.getTime())>(60*24*60*60*1000))t.status="done";});save();showWorkspaceCleanup();})()'});
+  // Empty content
+  const emptyContent=content.filter(c=>!c.body||c.body.trim().length<10);
+  if(emptyContent.length>0)issues.push({type:'info',text:emptyContent.length+' content items with nearly empty body',action:'Delete empty content',fn:'(function(){S.content=S.content.filter(c=>c.body&&c.body.trim().length>=10);save();showWorkspaceCleanup();})()'});
+  // Untitled items
+  const untitled=content.filter(c=>!c.title||c.title.trim()==='Untitled'||c.title.trim()==='');
+  if(untitled.length>0)issues.push({type:'info',text:untitled.length+' content items with no title',action:null,fn:null});
+  // Empty docs
+  const emptyDocs=docs.filter(d=>!d.content||d.content.trim().length<20);
+  if(emptyDocs.length>0)issues.push({type:'info',text:emptyDocs.length+' writer docs with nearly empty content',action:'Delete empty docs',fn:'(function(){S.writerDocs=S.writerDocs.filter(d=>d.content&&d.content.trim().length>=20);save();showWorkspaceCleanup();})()'});
+  // Broken links (no URL)
+  const brokenLinks=links.filter(l=>!l.url||l.url.trim()==='');
+  if(brokenLinks.length>0)issues.push({type:'error',text:brokenLinks.length+' links with no URL',action:'Delete broken links',fn:'(function(){S.links=S.links.filter(l=>l.url&&l.url.trim()!=="");save();showWorkspaceCleanup();})()'});
+  // Storage usage
+  const storageBytes=JSON.stringify(S).length;
+  const storageMB=(storageBytes/(1024*1024)).toFixed(2);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Workspace Cleanup</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;margin-bottom:16px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Storage: '+storageMB+' MB</div><div style="height:6px;background:var(--bg-elevated);border-radius:3px;overflow:hidden"><div style="height:100%;background:var(--accent);width:'+Math.min(100,storageBytes/5000000*100)+'%"></div></div></div>';
+  if(issues.length===0){h+='<div style="color:var(--accent);text-align:center;padding:30px 0">Workspace is clean! No issues found.</div>';}
+  issues.forEach(i=>{
+    const col=i.type==='error'?'#ef4444':i.type==='warning'?'#f97316':'var(--accent)';
+    h+='<div style="padding:10px;border-left:3px solid '+col+';background:var(--bg-surface);border-radius:0 8px 8px 0;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">';
+    h+='<span style="font-size:11px">'+esc(i.text)+'</span>';
+    if(i.action)h+='<button onclick="'+i.fn+'" style="background:none;border:1px solid '+col+';color:'+col+';padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;white-space:nowrap;margin-left:8px">'+esc(i.action)+'</button>';
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskBatchEdit(){
+  let panel=document.getElementById('task-batch-edit-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='task-batch-edit-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Batch Editor</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">'+tasks.length+' active tasks. Use checkboxes to select, then apply bulk actions.</div>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">';
+  h+='<button onclick="(function(){const checked=document.querySelectorAll(\'.tbe-cb:checked\');const ids=Array.from(checked).map(c=>c.dataset.id);if(!ids.length)return;ids.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t)t.priority=\'p0\';});save();showTaskBatchEdit();})()" style="padding:4px 8px;background:none;border:1px solid #ef4444;color:#ef4444;border-radius:4px;cursor:pointer;font-size:10px">Set P0</button>';
+  h+='<button onclick="(function(){const checked=document.querySelectorAll(\'.tbe-cb:checked\');const ids=Array.from(checked).map(c=>c.dataset.id);if(!ids.length)return;ids.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t)t.priority=\'p1\';});save();showTaskBatchEdit();})()" style="padding:4px 8px;background:none;border:1px solid #f97316;color:#f97316;border-radius:4px;cursor:pointer;font-size:10px">Set P1</button>';
+  h+='<button onclick="(function(){const checked=document.querySelectorAll(\'.tbe-cb:checked\');const ids=Array.from(checked).map(c=>c.dataset.id);if(!ids.length)return;ids.forEach(id=>{const t=S.tasks.find(x=>x.id===id);if(t)t.status=\'done\';});save();showTaskBatchEdit();})()" style="padding:4px 8px;background:none;border:1px solid var(--accent);color:var(--accent);border-radius:4px;cursor:pointer;font-size:10px">Mark Done</button>';
+  h+='<button onclick="(function(){const checked=document.querySelectorAll(\'.tbe-cb:checked\');const ids=Array.from(checked).map(c=>c.dataset.id);if(!ids.length||!confirm(\'Delete \'+ids.length+\' tasks?\'))return;S.tasks=S.tasks.filter(t=>!ids.includes(t.id));save();showTaskBatchEdit();})()" style="padding:4px 8px;background:none;border:1px solid #ef4444;color:#ef4444;border-radius:4px;cursor:pointer;font-size:10px">Delete</button>';
+  h+='<button onclick="document.querySelectorAll(\'.tbe-cb\').forEach(c=>c.checked=!c.checked)" style="padding:4px 8px;background:none;border:1px solid var(--border);color:var(--text-muted);border-radius:4px;cursor:pointer;font-size:10px">Toggle All</button></div>';
+  tasks.slice(0,40).forEach(t=>{
+    const color=t.priority==='p0'?'#ef4444':t.priority==='p1'?'#f97316':t.priority==='p2'?'#3b82f6':'#6b7280';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">';
+    h+='<input type="checkbox" class="tbe-cb" data-id="'+t.id+'" style="accent-color:var(--accent)">';
+    h+='<span style="color:'+color+';font-size:10px;width:25px">'+esc((t.priority||'p3').toUpperCase())+'</span>';
+    h+='<span style="font-size:11px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</span>';
+    h+='<span style="font-size:9px;color:var(--text-muted)">'+esc(t.status)+'</span></div>';
+  });
+  if(tasks.length>40)h+='<div style="font-size:10px;color:var(--text-muted);text-align:center;padding:8px 0">Showing 40 of '+tasks.length+'</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDocVersionCompare(){
+  let panel=document.getElementById('doc-version-compare-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='doc-version-compare-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:800px;width:95vw;max-height:85vh;overflow-y:auto';
+  const docs=S.writerDocs||[];
+  const docsWithVersions=docs.filter(d=>d.versions&&d.versions.length>0);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Doc Version Compare</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  if(docsWithVersions.length===0){h+='<div style="color:var(--text-muted);text-align:center;padding:40px 0">No documents with version history found.</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  docsWithVersions.forEach(doc=>{
+    const currentWords=(doc.content||'').split(/\s+/).filter(w=>w).length;
+    h+='<div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px">';
+    h+='<div style="font-size:13px;font-weight:600;margin-bottom:8px">'+esc(doc.title)+' <span style="color:var(--text-muted);font-weight:400;font-size:11px">('+currentWords+' words, '+doc.versions.length+' versions)</span></div>';
+    doc.versions.slice(-5).reverse().forEach((v,i)=>{
+      const vWords=(v.content||'').split(/\s+/).filter(w=>w).length;
+      const diff=currentWords-vWords;
+      const diffStr=diff>0?'+'+diff:diff<0?''+diff:'0';
+      const diffColor=diff>0?'#4ade80':diff<0?'#ef4444':'var(--text-muted)';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid var(--border);font-size:11px">';
+      h+='<span style="color:var(--text-muted)">v'+(doc.versions.length-i)+'</span>';
+      h+='<span>'+vWords+' words</span>';
+      h+='<span style="color:'+diffColor+'">'+diffStr+' vs current</span>';
+      h+='<span style="color:var(--text-muted);font-size:9px">'+(v.date||'').split('T')[0]+'</span></div>';
+    });
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showFocusModePanel(){
+  let panel=document.getElementById('focus-mode-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='focus-mode-panel';
+  panel.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;z-index:2000;background:#050508;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&(t.priority==='p0'||t.priority==='p1'));
+  const topTask=tasks[0];
+  let h='<div style="text-align:center;max-width:500px">';
+  h+='<div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:3px;margin-bottom:24px">Focus Mode</div>';
+  if(topTask){
+    const color=topTask.priority==='p0'?'#ef4444':'#f97316';
+    h+='<div style="font-size:10px;color:'+color+';margin-bottom:8px">'+esc(topTask.priority.toUpperCase())+' PRIORITY</div>';
+    h+='<div style="font-size:24px;font-weight:bold;color:var(--text-primary);margin-bottom:12px;line-height:1.4">'+esc(topTask.title)+'</div>';
+    if(topTask.description)h+='<div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.6">'+esc(topTask.description.substring(0,200))+'</div>';
+    if(topTask.subtasks&&topTask.subtasks.length>0){
+      const done=topTask.subtasks.filter(s=>s.done).length;
+      h+='<div style="margin-bottom:16px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Subtasks: '+done+'/'+topTask.subtasks.length+'</div>';
+      h+='<div style="height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden"><div style="height:100%;background:var(--accent);width:'+(topTask.subtasks.length>0?done/topTask.subtasks.length*100:0)+'%"></div></div></div>';
+    }
+    h+='<div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px">';
+    h+='<button onclick="(function(){const t=S.tasks.find(x=>x.id===\''+topTask.id+'\');if(t)t.status=\'done\';save();showFocusModePanel();})()" style="background:var(--accent);color:#000;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Complete</button>';
+    h+='<button onclick="(function(){const t=S.tasks.find(x=>x.id===\''+topTask.id+'\');if(t)t.status=\'in-progress\';save();showFocusModePanel();})()" style="background:none;border:1px solid var(--border);color:var(--text-primary);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px">Start</button></div>';
+    if(tasks.length>1){
+      h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">Up next ('+Math.min(tasks.length-1,5)+' more):</div>';
+      tasks.slice(1,6).forEach(t=>{
+        h+='<div style="font-size:11px;color:var(--text-muted);padding:4px 0">'+esc(t.priority.toUpperCase())+' - '+esc(t.title)+'</div>';
+      });
+    }
+  }else{
+    h+='<div style="font-size:20px;color:var(--accent);margin-bottom:12px">All clear!</div>';
+    h+='<div style="font-size:13px;color:var(--text-muted)">No P0 or P1 tasks remaining. Nice work!</div>';
+  }
+  h+='<div style="margin-top:32px"><button onclick="document.getElementById(\'focus-mode-panel\').remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:11px">Exit Focus Mode (Esc)</button></div></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  const handler=e=>{if(e.key==='Escape'){document.getElementById('focus-mode-panel')?.remove();document.removeEventListener('keydown',handler);}};
+  document.addEventListener('keydown',handler);
+}
+function showTaskTimeEstimates(){
+  let panel=document.getElementById('time-estimates-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='time-estimates-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  let totalMinutes=0;
+  tasks.forEach(t=>{
+    if(t.estimate){
+      const m=t.estimate.match(/(\d+)\s*(h|m)/i);
+      if(m){totalMinutes+=m[2].toLowerCase()==='h'?parseInt(m[1])*60:parseInt(m[1]);}
+    }
+  });
+  const withEst=tasks.filter(t=>t.estimate);
+  const withoutEst=tasks.filter(t=>!t.estimate);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Task Time Estimates</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+Math.floor(totalMinutes/60)+'h '+totalMinutes%60+'m</div><div style="font-size:10px;color:var(--text-muted)">Total Estimated</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:var(--accent)">'+withEst.length+'</div><div style="font-size:10px;color:var(--text-muted)">With Estimates</div></div>';
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;text-align:center"><div style="font-size:20px;font-weight:bold;color:'+(withoutEst.length>0?'#f97316':'var(--accent)')+'">'+withoutEst.length+'</div><div style="font-size:10px;color:var(--text-muted)">No Estimate</div></div></div>';
+  // By priority
+  const priorities=['p0','p1','p2','p3'];
+  const pColors={'p0':'#ef4444','p1':'#f97316','p2':'#3b82f6','p3':'#6b7280'};
+  h+='<h4 style="margin:0 0 8px;font-size:12px;color:var(--text-muted)">Estimated Time by Priority</h4>';
+  priorities.forEach(p=>{
+    let mins=0;
+    tasks.filter(t=>(t.priority||'p3')===p&&t.estimate).forEach(t=>{
+      const m=t.estimate.match(/(\d+)\s*(h|m)/i);
+      if(m)mins+=m[2].toLowerCase()==='h'?parseInt(m[1])*60:parseInt(m[1]);
+    });
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">';
+    h+='<span style="font-size:11px;width:30px;color:'+pColors[p]+';font-weight:600">'+p.toUpperCase()+'</span>';
+    h+='<div style="flex:1;height:16px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+pColors[p]+';width:'+(totalMinutes>0?mins/totalMinutes*100:0)+'%"></div></div>';
+    h+='<span style="font-size:10px;color:var(--text-muted);width:50px;text-align:right">'+Math.floor(mins/60)+'h '+mins%60+'m</span></div>';
+  });
+  // Tasks without estimates
+  if(withoutEst.length>0){
+    h+='<h4 style="margin:16px 0 8px;font-size:12px;color:var(--text-muted)">Tasks Missing Estimates</h4>';
+    withoutEst.slice(0,10).forEach(t=>{
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px"><span>'+esc(t.title)+'</span>';
+      h+='<input placeholder="e.g. 30m, 2h" onchange="(function(v){const t=S.tasks.find(x=>x.id===\''+t.id+'\');if(t)t.estimate=v;save();})(this.value)" style="width:80px;padding:2px 6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:3px;color:var(--text-primary);font-size:10px;text-align:right"></div>';
+    });
+  }
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showGlobalSearch(){
+  let panel=document.getElementById('global-search-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='global-search-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Global Deep Search</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<input id="gs-input" placeholder="Search across everything..." style="width:100%;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;color:var(--text-primary);font-size:13px;margin-bottom:12px;box-sizing:border-box" oninput="(function(q){const r=document.getElementById(\'gs-results\');if(!q){r.innerHTML=\'\';return;}q=q.toLowerCase();const results=[];(S.tasks||[]).forEach(t=>{if((t.title||\'\').toLowerCase().includes(q)||(t.description||\'\').toLowerCase().includes(q))results.push({type:\'task\',title:t.title,preview:t.description||\'Status: \'+t.status,section:\'tasks\'});});(S.content||[]).forEach(c=>{if((c.title||\'\').toLowerCase().includes(q)||(c.body||\'\').toLowerCase().includes(q))results.push({type:\'content\',title:c.title,preview:(c.body||\'\').substring(0,100),section:\'content\'});});(S.links||[]).forEach(l=>{if((l.title||\'\').toLowerCase().includes(q)||(l.url||\'\').toLowerCase().includes(q))results.push({type:\'link\',title:l.title||l.url,preview:l.url,section:\'links\'});});(S.writerDocs||[]).forEach(d=>{if((d.title||\'\').toLowerCase().includes(q)||(d.content||\'\').toLowerCase().includes(q))results.push({type:\'doc\',title:d.title,preview:(d.content||\'\').substring(0,100),section:\'writer\'});});const typeColors={task:\'#4ade80\',content:\'#22d3ee\',link:\'#f97316\',doc:\'#a78bfa\'};let html=\'<div style=\"font-size:10px;color:var(--text-muted);margin-bottom:8px\">\'+results.length+\' results</div>\';results.slice(0,20).forEach(item=>{html+=\'<div onclick=\"document.getElementById(\\\\\'global-search-panel\\\\\').remove();switchSection(\\\\\'\'+item.section+\'\\\\\')\" style=\"padding:8px;border-bottom:1px solid var(--border);cursor:pointer\"><div style=\"display:flex;align-items:center;gap:6px\"><span style=\"font-size:9px;color:\'+typeColors[item.type]+\';text-transform:uppercase\">\'+item.type+\'</span><span style=\"font-size:12px\">\'+item.title+\'</span></div><div style=\"font-size:10px;color:var(--text-muted);margin-top:2px\">\'+item.preview+\'</div></div>\';});r.innerHTML=html;})(this.value)">';
+  h+='<div id="gs-results"></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const i=document.getElementById('gs-input');if(i)i.focus();},100);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
