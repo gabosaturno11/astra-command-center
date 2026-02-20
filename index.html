@@ -6065,6 +6065,9 @@ function cmdGetItems(q) {
       ['base64','Encode and decode Base64 strings'],
       ['mini kanban','Quick kanban with click-to-move status buttons'],
       ['clock','Floating live clock widget'],
+      ['url encode','URL encode and decode utility'],
+      ['pareto','Pareto analysis of task completions by project'],
+      ['affirmation','Random positive affirmation display'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8423,6 +8426,18 @@ function cmdGetItems(q) {
   // Clock prefix
   if(ql && (ql==='clock' || ql==='time' || ql==='watch' || ql==='current time')){
     items.unshift({title:'Clock Widget',desc:'Floating live clock',icon:'C',type:'action',action:()=>{closeCommandPalette();showClockWidget();}});
+  }
+  // URL encode prefix
+  if(ql && (ql==='url encode' || ql==='url decode' || ql==='urlencode' || ql==='percent encode')){
+    items.unshift({title:'URL Encoder',desc:'Encode and decode URLs',icon:'U',type:'action',action:()=>{closeCommandPalette();showUrlEncoder();}});
+  }
+  // Pareto prefix
+  if(ql && (ql==='pareto' || ql==='80 20' || ql==='pareto analysis' || ql==='top projects')){
+    items.unshift({title:'Pareto Analysis',desc:'80/20 task completion analysis',icon:'P',type:'action',action:()=>{closeCommandPalette();showTaskPareto();}});
+  }
+  // Affirmation prefix
+  if(ql && (ql==='affirmation' || ql==='motivate' || ql==='motivation' || ql==='inspire')){
+    items.unshift({title:'Affirmation',desc:'Random positive affirmation',icon:'*',type:'action',action:()=>{closeCommandPalette();showAffirmations();}});
   }
   return items.slice(0, 20);
 }
@@ -17853,6 +17868,88 @@ function showClockWidget(){
   tick();
   panel._interval=setInterval(tick,1000);
   document.body.appendChild(panel);
+}
+function showUrlEncoder(){
+  let panel=document.getElementById('url-encoder-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='url-encoder-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">URL Encode/Decode</span><button onclick="this.closest(\'#url-encoder-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<textarea id="ue-input" placeholder="Paste URL or text to encode/decode..." style="width:100%;height:70px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;resize:vertical;box-sizing:border-box;font-family:monospace;margin-bottom:6px"></textarea>';
+  h+='<div style="display:flex;gap:6px;margin-bottom:8px">';
+  h+='<button onclick="document.getElementById(\'ue-output\').textContent=encodeURIComponent(document.getElementById(\'ue-input\').value)" style="flex:1;padding:6px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Encode</button>';
+  h+='<button onclick="try{document.getElementById(\'ue-output\').textContent=decodeURIComponent(document.getElementById(\'ue-input\').value)}catch(e){document.getElementById(\'ue-output\').textContent=\'Error: \'+e.message}" style="flex:1;padding:6px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Decode</button>';
+  h+='<button onclick="document.getElementById(\'ue-output\').textContent=encodeURI(document.getElementById(\'ue-input\').value)" style="flex:1;padding:6px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Encode URI</button>';
+  h+='<button onclick="const o=document.getElementById(\'ue-output\').textContent;if(o)navigator.clipboard.writeText(o);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="padding:6px 10px;background:var(--bg-surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:11px">Copy</button>';
+  h+='</div>';
+  h+='<pre id="ue-output" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:10px;color:#4ade80;font-family:monospace;white-space:pre-wrap;word-break:break-all;max-height:120px;overflow-y:auto;min-height:30px"></pre>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskPareto(){
+  let panel=document.getElementById('task-pareto-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='task-pareto-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const byProject={};
+  tasks.forEach(t=>{const p=t.project||'No Project';if(!byProject[p])byProject[p]={total:0,done:0};byProject[p].total++;if(t.status==='done')byProject[p].done++;});
+  const sorted=Object.entries(byProject).sort((a,b)=>b[1].done-a[1].done);
+  const totalDone=sorted.reduce((a,e)=>a+e[1].done,0)||1;
+  let cumPct=0;
+  const paretoLine=sorted.map(e=>{cumPct+=e[1].done/totalDone*100;return Math.round(cumPct);});
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Pareto Analysis</span><button onclick="this.closest(\'#task-pareto-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Which projects produce the most completed tasks?</div>';
+  // Find the 80% cutoff
+  const cutoff=paretoLine.findIndex(p=>p>=80);
+  if(cutoff>=0){
+    h+='<div style="font-size:11px;color:#4ade80;margin-bottom:10px">Top '+(cutoff+1)+' project'+(cutoff>0?'s':'')+' account for 80%+ of completions ('+paretoLine[cutoff]+'%)</div>';
+  }
+  const colors=['#4ade80','#3b82f6','#f59e0b','#a78bfa','#22d3ee','#f472b6','#ef4444','#84cc16'];
+  sorted.forEach((e,i)=>{
+    const col=colors[i%colors.length];
+    const pct=Math.round(e[1].done/totalDone*100);
+    const above80=paretoLine[i]<=80||i===cutoff;
+    h+='<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;'+(above80?'':'opacity:0.5')+'">';
+    h+='<span style="font-size:10px;color:var(--text);width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(e[0])+'</span>';
+    h+='<div style="flex:1;height:14px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+col+';width:'+pct+'%"></div></div>';
+    h+='<span style="font-size:10px;color:var(--text-muted);width:50px;text-align:right">'+e[1].done+' ('+pct+'%)</span>';
+    h+='<span style="font-size:9px;color:var(--text-muted);width:35px;text-align:right">cum:'+paretoLine[i]+'%</span>';
+    h+='</div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showAffirmations(){
+  let panel=document.getElementById('affirmation-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='affirmation-widget';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;text-align:center';
+  const affirmations=[
+    'You are capable of amazing things.',
+    'Every line of code you write makes the world better.',
+    'Progress, not perfection.',
+    'You handle challenges with grace and determination.',
+    'Your creativity knows no bounds.',
+    'Small steps every day lead to massive results.',
+    'You are building something that matters.',
+    'Trust the process. The work compounds.',
+    'You are exactly where you need to be.',
+    'Your persistence is your superpower.',
+    'The best time to start was yesterday. The next best time is now.',
+    'You turn obstacles into stepping stones.',
+    'Focus is your unfair advantage.',
+    'Done is better than perfect.',
+    'You are the architect of your own success.',
+    'Every expert was once a beginner.',
+    'Discipline is choosing between what you want now and what you want most.',
+    'Ship it. Iterate later.',
+    'Your potential is limitless.',
+    'The only way to do great work is to love what you do.',
+  ];
+  function show(){
+    const a=affirmations[Math.floor(Math.random()*affirmations.length)];
+    let h='<button onclick="this.closest(\'#affirmation-widget\').remove()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">X</button>';
+    h+='<div style="font-size:18px;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:16px">'+a+'</div>';
+    h+='<button onclick="this.closest(\'#affirmation-widget\')._show()" style="padding:6px 20px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:600">Another One</button>';
+    panel.innerHTML=h;panel._show=show;
+  }
+  show();document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
