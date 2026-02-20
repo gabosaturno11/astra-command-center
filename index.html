@@ -6038,6 +6038,12 @@ function cmdGetItems(q) {
       ['writer stats','Writer productivity statistics and metrics'],
       ['velocity','Task completion velocity over 8 weeks'],
       ['captures','Quick capture dashboard grouped by type'],
+      ['theme analyzer','Content theme breakdown with word counts'],
+      ['project notes','Per-project notes editor'],
+      ['daily goals','Floating daily goal tracker widget'],
+      ['status board','Kanban status overview with counts'],
+      ['word history','Document word count progression chart'],
+      ['bookmark bar','Floating quick-access links bar'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8288,6 +8294,30 @@ function cmdGetItems(q) {
   // Captures prefix
   if(ql && (ql==='captures' || ql==='capture dashboard' || ql==='quick captures' || ql==='captured')){
     items.unshift({title:'Captures Dashboard',desc:'All captures grouped by type',icon:'C',type:'action',action:()=>{closeCommandPalette();showQuickCaptureDashboard();}});
+  }
+  // Theme analyzer prefix
+  if(ql && (ql==='theme analyzer' || ql==='themes' || ql==='content themes' || ql==='theme breakdown')){
+    items.unshift({title:'Theme Analyzer',desc:'Content theme breakdown',icon:'T',type:'action',action:()=>{closeCommandPalette();showThemeAnalyzer();}});
+  }
+  // Project notes prefix
+  if(ql && (ql==='project notes' || ql==='project note' || ql==='notes per project' || ql==='proj notes')){
+    items.unshift({title:'Project Notes',desc:'Per-project notes editor',icon:'N',type:'action',action:()=>{closeCommandPalette();showProjectNotes();}});
+  }
+  // Daily goals prefix
+  if(ql && (ql==='daily goals' || ql==='goals' || ql==='goal tracker' || ql==='daily target')){
+    items.unshift({title:'Daily Goals',desc:'Floating goal tracker widget',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGoal();}});
+  }
+  // Status board prefix
+  if(ql && (ql==='status board' || ql==='kanban overview' || ql==='status overview' || ql==='task status')){
+    items.unshift({title:'Status Board',desc:'Kanban status counts overview',icon:'K',type:'action',action:()=>{closeCommandPalette();showStatusBoard();}});
+  }
+  // Word history prefix
+  if(ql && (ql==='word history' || ql==='word count history' || ql==='doc growth' || ql==='word progression')){
+    items.unshift({title:'Word History',desc:'Document word count chart',icon:'W',type:'action',action:()=>{closeCommandPalette();showDocWordHistory();}});
+  }
+  // Bookmark bar prefix
+  if(ql && (ql==='bookmark bar' || ql==='bookmarks bar' || ql==='link bar' || ql==='quick links')){
+    items.unshift({title:'Bookmark Bar',desc:'Floating quick-access links',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBookmarkbar();}});
   }
   return items.slice(0, 20);
 }
@@ -16847,6 +16877,203 @@ function showQuickCaptureDashboard(){
     if(items.length>5)h+='<div style="font-size:10px;color:var(--text-muted);padding:4px">+'+(items.length-5)+' more</div>';
     h+='</div>';
   });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showThemeAnalyzer(){
+  let panel=document.getElementById('theme-analyzer-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='theme-analyzer-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const byTheme={};
+  content.forEach(c=>{
+    const theme=c.theme||'untagged';
+    if(!byTheme[theme])byTheme[theme]={count:0,words:0,items:[]};
+    byTheme[theme].count++;
+    byTheme[theme].words+=(c.body||'').split(/\s+/).filter(Boolean).length;
+    byTheme[theme].items.push(c);
+  });
+  const sorted=Object.entries(byTheme).sort((a,b)=>b[1].count-a[1].count);
+  const totalWords=sorted.reduce((a,e)=>a+e[1].words,0)||1;
+  const themeColors={strategy:'#3b82f6',creative:'#a78bfa',technical:'#4ade80',personal:'#f472b6',business:'#f59e0b',research:'#22d3ee',untagged:'#6b7280'};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Theme Analyzer</span><button onclick="this.closest(\'#theme-analyzer-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+content.length+' items | '+sorted.length+' themes | '+totalWords+' total words</div>';
+  sorted.forEach(([theme,data])=>{
+    const col=themeColors[theme]||'#6b7280';
+    const pct=Math.round(data.words/totalWords*100);
+    h+='<div style="margin-bottom:10px">';
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:3px">';
+    h+='<span style="font-size:12px;font-weight:600;color:'+col+'">'+esc(theme)+'</span>';
+    h+='<span style="font-size:10px;color:var(--text-muted)">'+data.count+' items | '+data.words.toLocaleString()+' words ('+pct+'%)</span>';
+    h+='</div>';
+    h+='<div style="height:12px;background:var(--bg-surface);border-radius:3px;overflow:hidden"><div style="height:100%;background:'+col+';width:'+pct+'%"></div></div>';
+    h+='<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">';
+    data.items.slice(0,4).forEach(c=>{
+      h+='<span style="font-size:9px;padding:1px 5px;background:'+col+'15;color:'+col+';border-radius:2px">'+esc(c.title).substring(0,30)+'</span>';
+    });
+    if(data.items.length>4)h+='<span style="font-size:9px;color:var(--text-muted)">+'+(data.items.length-4)+'</span>';
+    h+='</div></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectNotes(){
+  let panel=document.getElementById('proj-notes-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='proj-notes-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._projectNotes)S._projectNotes={};
+  const projects=(S.projects||[]);
+  let selProj=projects.length?projects[0].id:'';
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Project Notes</span><button onclick="this.closest(\'#proj-notes-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<select onchange="this.closest(\'#proj-notes-panel\')._sel=this.value;this.closest(\'#proj-notes-panel\')._render()" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:8px">';
+    projects.forEach(p=>{h+='<option value="'+p.id+'"'+(selProj===p.id?' selected':'')+'>'+esc(p.name)+'</option>';});
+    h+='</select>';
+    const note=S._projectNotes[selProj]||'';
+    h+='<textarea id="pn-textarea" style="width:100%;height:200px;padding:8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:12px;resize:vertical;box-sizing:border-box;font-family:inherit;line-height:1.5" placeholder="Project notes, ideas, reminders...">'+esc(note)+'</textarea>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:8px">';
+    h+='<span style="font-size:10px;color:var(--text-muted)">'+(note.split(/\s+/).filter(Boolean).length)+' words</span>';
+    h+='<button onclick="S._projectNotes[this.closest(\'#proj-notes-panel\')._sel]=document.getElementById(\'pn-textarea\').value;save();this.textContent=\'Saved!\';setTimeout(()=>this.textContent=\'Save\',1000)" style="padding:4px 12px;background:var(--accent);color:#000;border:none;border-radius:var(--radius);cursor:pointer;font-size:11px;font-weight:600">Save</button>';
+    h+='</div>';
+    panel.innerHTML=h;panel._render=render;panel._sel=selProj;
+  }
+  render();document.body.appendChild(panel);
+}
+function showQuickGoal(){
+  let panel=document.getElementById('quick-goal-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-goal-widget';
+  panel.style.cssText='position:fixed;bottom:20px;left:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:14px;box-shadow:0 8px 32px rgba(0,0,0,0.6);width:260px';
+  if(!S._dailyGoals)S._dailyGoals={};
+  const today=new Date().toISOString().substring(0,10);
+  if(!S._dailyGoals[today])S._dailyGoals[today]={tasks:0,words:0,target_tasks:3,target_words:500};
+  const g=S._dailyGoals[today];
+  // Count today's completed tasks
+  const todayDone=(S.tasks||[]).filter(t=>t.completedAt&&t.completedAt.substring(0,10)===today).length;
+  g.tasks=todayDone;
+  function render(){
+    const taskPct=Math.min(100,Math.round(g.tasks/Math.max(1,g.target_tasks)*100));
+    const wordPct=Math.min(100,Math.round(g.words/Math.max(1,g.target_words)*100));
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:12px;color:var(--text)">Daily Goals</span><button onclick="this.closest(\'#quick-goal-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+    h+='<div style="font-size:10px;color:var(--text-muted);margin-bottom:8px">'+today+'</div>';
+    // Tasks goal
+    h+='<div style="margin-bottom:8px">';
+    h+='<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span style="color:var(--text)">Tasks completed</span><span style="color:#4ade80">'+g.tasks+'/'+g.target_tasks+'</span></div>';
+    h+='<div style="height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;background:#4ade80;width:'+taskPct+'%;transition:width 0.3s"></div></div>';
+    h+='</div>';
+    // Words goal
+    h+='<div style="margin-bottom:8px">';
+    h+='<div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span style="color:var(--text)">Words written</span><span style="color:#3b82f6">'+g.words+'/'+g.target_words+'</span></div>';
+    h+='<div style="height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden"><div style="height:100%;background:#3b82f6;width:'+wordPct+'%;transition:width 0.3s"></div></div>';
+    h+='<div style="display:flex;gap:4px;margin-top:4px">';
+    [100,250,500].forEach(n=>{
+      h+='<button onclick="S._dailyGoals[\''+today+'\'].words+='+n+';save();this.closest(\'#quick-goal-widget\')._render()" style="flex:1;padding:2px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-muted);cursor:pointer;font-size:9px">+'+n+'</button>';
+    });
+    h+='</div></div>';
+    // Targets
+    h+='<div style="display:flex;gap:6px;margin-top:6px">';
+    h+='<div style="flex:1"><span style="font-size:9px;color:var(--text-muted)">Task target</span><input type="number" value="'+g.target_tasks+'" min="1" onchange="S._dailyGoals[\''+today+'\'].target_tasks=+this.value;save();this.closest(\'#quick-goal-widget\')._render()" style="width:100%;padding:3px 5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px;box-sizing:border-box"></div>';
+    h+='<div style="flex:1"><span style="font-size:9px;color:var(--text-muted)">Word target</span><input type="number" value="'+g.target_words+'" min="1" step="100" onchange="S._dailyGoals[\''+today+'\'].target_words=+this.value;save();this.closest(\'#quick-goal-widget\')._render()" style="width:100%;padding:3px 5px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:10px;box-sizing:border-box"></div>';
+    h+='</div>';
+    panel.innerHTML=h;panel._render=render;
+  }
+  render();save();document.body.appendChild(panel);
+}
+function showStatusBoard(){
+  let panel=document.getElementById('status-board-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='status-board-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const statuses=['todo','in-progress','review','blocked','done'];
+  const statusColors={'todo':'#6b7280','in-progress':'#f59e0b','review':'#3b82f6','blocked':'#ef4444','done':'#4ade80'};
+  const total=tasks.length||1;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Status Board</span><button onclick="this.closest(\'#status-board-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">'+tasks.length+' total tasks</div>';
+  // Stacked bar at top
+  h+='<div style="display:flex;height:20px;border-radius:var(--radius);overflow:hidden;margin-bottom:16px">';
+  statuses.forEach(s=>{
+    const count=tasks.filter(t=>t.status===s).length;
+    const pct=Math.round(count/total*100);
+    if(pct>0)h+='<div style="width:'+pct+'%;background:'+statusColors[s]+';display:flex;align-items:center;justify-content:center;font-size:8px;color:#000;font-weight:700">'+(pct>=8?pct+'%':'')+'</div>';
+  });
+  h+='</div>';
+  // Columns
+  h+='<div style="display:grid;grid-template-columns:repeat('+statuses.length+',1fr);gap:8px">';
+  statuses.forEach(s=>{
+    const col=statusColors[s];
+    const items=tasks.filter(t=>t.status===s);
+    h+='<div style="background:var(--bg-surface);border-radius:var(--radius);padding:8px;border-top:3px solid '+col+'">';
+    h+='<div style="font-size:10px;font-weight:700;color:'+col+';text-transform:uppercase;margin-bottom:4px">'+s+'</div>';
+    h+='<div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:6px">'+items.length+'</div>';
+    items.slice(0,4).forEach(t=>{
+      h+='<div style="font-size:9px;color:var(--text-muted);padding:2px 0;border-bottom:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(t.title)+'</div>';
+    });
+    if(items.length>4)h+='<div style="font-size:9px;color:var(--text-muted);margin-top:2px">+'+(items.length-4)+' more</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDocWordHistory(){
+  let panel=document.getElementById('doc-word-hist-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='doc-word-hist-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const docs=(S.writerDocs||[]).filter(d=>d.versions&&d.versions.length);
+  let selDoc=docs.length?docs[0].id:'';
+  function render(){
+    let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:700;font-size:15px;color:var(--text)">Document Word History</span><button onclick="this.closest(\'#doc-word-hist-panel\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+    h+='<select onchange="this.closest(\'#doc-word-hist-panel\')._sel=this.value;this.closest(\'#doc-word-hist-panel\')._render()" style="width:100%;padding:6px 8px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:11px;margin-bottom:10px">';
+    docs.forEach(d=>{h+='<option value="'+d.id+'"'+(selDoc===d.id?' selected':'')+'>'+esc(d.title)+' ('+d.versions.length+' versions)</option>';});
+    if(!docs.length)h+='<option>No docs with versions</option>';
+    h+='</select>';
+    const doc=docs.find(d=>d.id===selDoc);
+    if(doc&&doc.versions&&doc.versions.length){
+      const points=doc.versions.map(v=>({date:v.savedAt||'',wc:(v.body||'').split(/\s+/).filter(Boolean).length}));
+      const currentWc=(doc.body||'').split(/\s+/).filter(Boolean).length;
+      points.push({date:new Date().toISOString(),wc:currentWc});
+      const maxWc=Math.max(...points.map(p=>p.wc),1);
+      // SVG line chart
+      const svgW=520,svgH=120;
+      h+='<svg width="100%" viewBox="0 0 '+svgW+' '+(svgH+20)+'" style="margin-bottom:8px">';
+      h+='<rect x="0" y="0" width="'+svgW+'" height="'+svgH+'" fill="none" stroke="var(--border)" stroke-width="0.5" rx="3"/>';
+      let pathD='';
+      points.forEach((p,i)=>{
+        const x=Math.round(i/(points.length-1||1)*svgW);
+        const y=svgH-Math.round(p.wc/maxWc*svgH);
+        pathD+=(i===0?'M':'L')+x+','+y;
+        h+='<circle cx="'+x+'" cy="'+y+'" r="3" fill="#4ade80"/>';
+      });
+      h+='<path d="'+pathD+'" fill="none" stroke="#4ade80" stroke-width="2"/>';
+      // Labels
+      h+='<text x="5" y="'+(svgH+14)+'" fill="#888" font-size="9">v1</text>';
+      h+='<text x="'+(svgW-20)+'" y="'+(svgH+14)+'" fill="#888" font-size="9">v'+points.length+'</text>';
+      h+='<text x="'+(svgW-60)+'" y="12" fill="#4ade80" font-size="9">'+currentWc+' words</text>';
+      h+='</svg>';
+      // Version list
+      h+='<div style="font-size:10px;color:var(--text-muted)">';
+      points.forEach((p,i)=>{
+        h+='<span>v'+(i+1)+': '+p.wc+'w</span>';
+        if(i<points.length-1)h+=' > ';
+      });
+      h+='</div>';
+    } else {
+      h+='<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:11px">Select a document with saved versions to see word count progression.</div>';
+    }
+    panel.innerHTML=h;panel._render=render;panel._sel=selDoc;
+  }
+  render();document.body.appendChild(panel);
+}
+function showQuickBookmarkbar(){
+  let panel=document.getElementById('quick-bmbar-widget');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-bmbar-widget';
+  panel.style.cssText='position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;box-shadow:0 4px 16px rgba(0,0,0,0.5);display:flex;gap:8px;align-items:center;max-width:90vw;overflow-x:auto';
+  const links=(S.links||[]).filter(l=>l.pinned).slice(0,8);
+  const fallback=(S.links||[]).slice(0,8);
+  const items=links.length?links:fallback;
+  let h='<span style="font-size:10px;color:var(--text-muted);font-weight:600;flex-shrink:0">Links:</span>';
+  items.forEach(l=>{
+    const title=(l.title||l.url||'').substring(0,20);
+    h+='<a href="'+esc(l.url)+'" target="_blank" rel="noopener" style="font-size:10px;color:var(--accent);text-decoration:none;padding:3px 8px;background:var(--bg-surface);border-radius:var(--radius);white-space:nowrap;flex-shrink:0">'+esc(title)+'</a>';
+  });
+  h+='<button onclick="this.closest(\'#quick-bmbar-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;flex-shrink:0;padding:0 4px">X</button>';
+  if(!items.length)h='<span style="font-size:10px;color:var(--text-muted)">No links saved yet</span><button onclick="this.closest(\'#quick-bmbar-widget\').remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;padding:0 4px">X</button>';
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
