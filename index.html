@@ -6446,6 +6446,9 @@ function cmdGetItems(q) {
       ['ffmpeg','FFmpeg video/audio processing reference'],
       ['workload','Open task workload balance by project'],
       ['quote','Random inspirational quote'],
+      ['imagemagick','ImageMagick image processing reference'],
+      ['velocity forecast','When will backlog be cleared'],
+      ['bookmarks','Quick bookmark manager with URLs'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9953,6 +9956,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='quote' || ql==='random quote' || ql==='inspiration' || ql==='motivate')){
     items.unshift({title:'Random Quote',desc:'Inspirational programming quote',icon:'Q',type:'action',action:()=>{closeCommandPalette();showQuickRandomQuote();}});
+  }
+  if(ql && (ql==='imagemagick' || ql==='image processing' || ql==='convert image' || ql==='magick')){
+    items.unshift({title:'ImageMagick Reference',desc:'Image processing CLI cheatsheet',icon:'I',type:'action',action:()=>{closeCommandPalette();showImageMagickRef();}});
+  }
+  if(ql && (ql==='velocity' || ql==='velocity forecast' || ql==='backlog forecast' || ql==='when done')){
+    items.unshift({title:'Velocity Forecast',desc:'When will backlog be cleared',icon:'V',type:'action',action:()=>{closeCommandPalette();showTaskVelocityForecast();}});
+  }
+  if(ql && (ql==='bookmarks' || ql==='bookmark manager' || ql==='save url' || ql==='quick bookmark')){
+    items.unshift({title:'Quick Bookmarks',desc:'Lightweight bookmark manager',icon:'B',type:'action',action:()=>{closeCommandPalette();showQuickBookmarkManager();}});
   }
   return items.slice(0, 20);
 }
@@ -31063,6 +31075,75 @@ function showQuickRandomQuote(){
   html+='<div style="font-size:12px;color:var(--text-muted)">- '+esc(quote.a)+'</div>';
   html+='<button onclick="this.closest(\'div[style*=fixed]\').remove();showQuickRandomQuote()" style="margin-top:16px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:8px 20px;border-radius:6px;cursor:pointer;font-size:12px">Another Quote</button>';
   html+='<button onclick="navigator.clipboard.writeText(\''+esc(quote.q)+' - '+esc(quote.a)+'\');this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="margin-top:16px;margin-left:8px;background:#4ade80;color:#000;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Copy</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showImageMagickRef(){
+  const cmds={
+    'Convert & Resize':['convert in.png out.jpg|Convert format','convert in.jpg -resize 800x600 out.jpg|Resize to 800x600','convert in.jpg -resize 50% out.jpg|Resize by percentage','convert in.jpg -resize 800x600! out.jpg|Force exact dimensions','convert in.jpg -resize 800x out.jpg|Set width, auto height','convert in.png -quality 85 out.jpg|Set JPEG quality'],
+    'Crop & Transform':['convert in.jpg -crop 400x300+100+50 out.jpg|Crop (WxH+X+Y)','convert in.jpg -rotate 90 out.jpg|Rotate 90 degrees','convert in.jpg -flip out.jpg|Flip vertically','convert in.jpg -flop out.jpg|Flip horizontally','convert in.jpg -trim out.jpg|Auto-trim borders'],
+    'Effects':['convert in.jpg -blur 0x3 out.jpg|Gaussian blur','convert in.jpg -sharpen 0x2 out.jpg|Sharpen','convert in.jpg -grayscale Rec709Luminance out.jpg|Grayscale','convert in.jpg -sepia-tone 80% out.jpg|Sepia tone','convert in.jpg -negate out.jpg|Invert colors','convert in.jpg -charcoal 2 out.jpg|Charcoal effect'],
+    'Text & Watermark':['convert in.jpg -gravity south -annotate +0+10 "Text" out.jpg|Add text','convert in.jpg watermark.png -gravity southeast -composite out.jpg|Overlay watermark','convert -size 400x200 xc:transparent -fill white -pointsize 36 -gravity center -annotate 0 "Hello" text.png|Create text image'],
+    'Batch & Info':['mogrify -resize 800x *.jpg|Batch resize all JPGs','mogrify -format png *.jpg|Batch convert to PNG','identify image.jpg|Show image info','identify -verbose image.jpg|Detailed image info','montage *.jpg -tile 3x -geometry 200x200+2+2 grid.jpg|Create grid/montage']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">ImageMagick Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskVelocityForecast(){
+  const tasks=(S.tasks||[]);const now=new Date();
+  const remaining=tasks.filter(t=>t.status!=='done').length;
+  const weeks=[];
+  for(let w=3;w>=0;w--){
+    const ws=new Date(now);ws.setDate(now.getDate()-now.getDay()-w*7);ws.setHours(0,0,0,0);
+    const we=new Date(ws);we.setDate(ws.getDate()+7);
+    const done=tasks.filter(t=>t.status==='done'&&t.updatedAt&&new Date(t.updatedAt)>=ws&&new Date(t.updatedAt)<we).length;
+    weeks.push(done);
+  }
+  const avgVelocity=weeks.length>0?weeks.reduce((a,b)=>a+b,0)/weeks.length:0;
+  const weeksToComplete=avgVelocity>0?Math.ceil(remaining/avgVelocity):Infinity;
+  const forecastDate=new Date(now);forecastDate.setDate(forecastDate.getDate()+weeksToComplete*7);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Velocity Forecast</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Avg Velocity</div><div style="font-size:22px;color:#4ade80;font-weight:700">'+avgVelocity.toFixed(1)+'</div><div style="font-size:9px;color:var(--text-muted)">tasks/week</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Remaining</div><div style="font-size:22px;color:#f59e0b;font-weight:700">'+remaining+'</div><div style="font-size:9px;color:var(--text-muted)">open tasks</div></div></div>';
+  html+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Last 4 weeks: '+weeks.join(', ')+' tasks done</div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:14px;text-align:center">';
+  if(weeksToComplete!==Infinity&&weeksToComplete<=52){
+    html+='<div style="font-size:10px;color:var(--text-muted)">Forecast: Clear Backlog By</div>';
+    html+='<div style="font-size:20px;color:#60a5fa;font-weight:700;margin:4px 0">'+(forecastDate.getMonth()+1)+'/'+forecastDate.getDate()+'/'+forecastDate.getFullYear()+'</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted)">~'+weeksToComplete+' weeks at current pace</div>';
+  } else {
+    html+='<div style="font-size:14px;color:#ef4444;font-weight:700">No completion forecast</div>';
+    html+='<div style="font-size:10px;color:var(--text-muted);margin-top:4px">Velocity too low to predict</div>';
+  }
+  html+='</div></div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickBookmarkManager(){
+  if(!S._bookmarks)S._bookmarks=[];
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h3 style="margin:0;color:#4ade80">Quick Bookmarks</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:flex;gap:6px;margin-bottom:12px"><input id="_bm-url" type="text" placeholder="URL" style="flex:2;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:6px;font-size:12px">';
+  html+='<input id="_bm-name" type="text" placeholder="Name" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);padding:8px;border-radius:6px;font-size:12px">';
+  html+='<button onclick="const u=document.getElementById(\'_bm-url\').value;const n=document.getElementById(\'_bm-name\').value;if(u){S._bookmarks.push({url:u,name:n||u,ts:Date.now()});save();showQuickBookmarkManager();}" style="background:#4ade80;color:#000;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Add</button></div>';
+  if(S._bookmarks.length>0){
+    S._bookmarks.slice().reverse().forEach((bm,i)=>{
+      const idx=S._bookmarks.length-1-i;
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-surface);border-radius:6px;margin-bottom:4px">';
+      html+='<a href="'+esc(bm.url)+'" target="_blank" style="flex:1;color:#4ade80;font-size:12px;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(bm.name)+'</a>';
+      html+='<button onclick="navigator.clipboard.writeText(\''+esc(bm.url).replace(/'/g,"\\'")+'\');this.textContent=\'!\';setTimeout(()=>this.textContent=\'C\',500)" style="background:none;border:1px solid var(--border);color:var(--text-muted);width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:10px">C</button>';
+      html+='<button onclick="S._bookmarks.splice('+idx+',1);save();showQuickBookmarkManager();" style="background:none;border:1px solid var(--border);color:#ef4444;width:24px;height:24px;border-radius:4px;cursor:pointer;font-size:10px">X</button>';
+      html+='</div>';
+    });
+  } else {
+    html+='<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:12px">No bookmarks yet. Add URLs above.</div>';
+  }
+  html+='<div style="margin-top:8px;font-size:10px;color:var(--text-muted)">'+S._bookmarks.length+' bookmarks saved</div>';
   html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
 }
 function showProjectRoadmap(filterProject){
