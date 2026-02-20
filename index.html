@@ -5996,6 +5996,12 @@ function cmdGetItems(q) {
       ['markdown','Live markdown editor with side-by-side preview'],
       ['task dashboard','Comprehensive task dashboard with metrics and donut'],
       ['changelog','Version changelog with entries and dates'],
+      ['reference','Quick reference cards with copy-to-clipboard'],
+      ['activity monitor','Last activity per section and session info'],
+      ['export','Export content, tasks, links as MD/CSV/JSON/download'],
+      ['random task','Pick a random active task to work on'],
+      ['sort content','Permanently sort all content items by various criteria'],
+      ['water','Track daily water intake with glass counter'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -8078,6 +8084,30 @@ function cmdGetItems(q) {
   // Changelog prefix
   if(ql && (ql==='changelog' || ql==='change log' || ql==='versions' || ql==='release notes')){
     items.unshift({title:'Changelog',desc:'Version changelog with entries',icon:'V',type:'action',action:()=>{closeCommandPalette();showRepoChangelog();}});
+  }
+  // Reference prefix
+  if(ql && (ql==='reference' || ql==='quick ref' || ql==='cheat sheet' || ql==='ref')){
+    items.unshift({title:'Quick Reference',desc:'Reference cards with copy',icon:'R',type:'action',action:()=>{closeCommandPalette();showQuickReference();}});
+  }
+  // Activity monitor prefix
+  if(ql && (ql==='activity monitor' || ql==='activity' || ql==='idle' || ql==='session')){
+    items.unshift({title:'Activity Monitor',desc:'Last activity per section',icon:'A',type:'action',action:()=>{closeCommandPalette();showIdleDetector();}});
+  }
+  // Export prefix
+  if(ql && (ql==='export' || ql==='export all' || ql==='download' || ql==='backup')){
+    items.unshift({title:'Content Exporter',desc:'Export as MD, CSV, JSON, or download all',icon:'E',type:'action',action:()=>{closeCommandPalette();showContentExporter();}});
+  }
+  // Random task prefix
+  if(ql && (ql==='random task' || ql==='random' || ql==='surprise' || ql==='pick task')){
+    items.unshift({title:'Random Task',desc:'Pick a random active task to work on',icon:'?',type:'action',action:()=>{closeCommandPalette();showRandomTask();}});
+  }
+  // Sort content prefix
+  if(ql && (ql==='sort content' || ql==='content sort' || ql==='reorder content' || ql==='organize content')){
+    items.unshift({title:'Content Sorter',desc:'Sort all content permanently',icon:'S',type:'action',action:()=>{closeCommandPalette();showContentSorter();}});
+  }
+  // Water prefix
+  if(ql && (ql==='water' || ql==='water tracker' || ql==='hydration' || ql==='drink')){
+    items.unshift({title:'Water Tracker',desc:'Track daily water glasses',icon:'W',type:'action',action:()=>{closeCommandPalette();showWaterTracker();}});
   }
   return items.slice(0, 20);
 }
@@ -15266,6 +15296,125 @@ function showRepoChangelog(){
     h+='</ul>';
     h+='<button onclick="(function(){S._changelog=S._changelog.filter(x=>x.id!=='+entry.id+');save();showRepoChangelog();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:9px;margin-top:4px">Delete</button></div>';
   });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickReference(){
+  let panel=document.getElementById('quick-ref-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='quick-ref-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  if(!S._quickRefs)S._quickRefs=[
+    {id:1,title:'Project URLs',content:'ASTRA: astra-command-center-sigma.vercel.app\nBonus: saturno-bonus-omega.vercel.app\nTitan: titan-forge-ten.vercel.app\nValentine: de-aqui-a-saturno-jet.vercel.app'},
+    {id:2,title:'Git Commands',content:'git add . && git commit -m "msg" && git push\ngit status\ngit log --oneline -5\ngit diff'},
+    {id:3,title:'Keyboard Shortcuts',content:'Cmd+K: Command palette\nCmd+S: Save\nCmd+B: Toggle sidebar\nCmd+1-9: Switch sections\nCmd+Shift+F: Focus mode'},
+  ];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Quick Reference</h3><div><button onclick="(function(){const t=prompt(\'Reference title:\');if(!t)return;const c=prompt(\'Content:\');if(!c)return;S._quickRefs.push({id:Date.now(),title:t,content:c});save();showQuickReference();})()" style="background:var(--accent);color:#000;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;margin-right:8px">+ Ref</button><button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div></div>';
+  S._quickRefs.forEach(r=>{
+    h+='<div style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><strong style="font-size:12px">'+esc(r.title)+'</strong><div>';
+    h+='<button onclick="(function(){navigator.clipboard.writeText(S._quickRefs.find(x=>x.id==='+r.id+').content);if(typeof showNotification===\'function\')showNotification(\'Copied!\');})()" style="background:none;border:1px solid var(--accent);color:var(--accent);padding:2px 6px;border-radius:3px;cursor:pointer;font-size:9px;margin-right:4px">Copy</button>';
+    h+='<button onclick="(function(){S._quickRefs=S._quickRefs.filter(x=>x.id!=='+r.id+');save();showQuickReference();})()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:10px">X</button></div></div>';
+    h+='<pre style="font-size:11px;color:var(--text-primary);background:var(--bg-surface);padding:8px;border-radius:4px;margin:0;white-space:pre-wrap;font-family:monospace;line-height:1.5">'+esc(r.content)+'</pre></div>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showIdleDetector(){
+  let panel=document.getElementById('idle-detector-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='idle-detector-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const now=Date.now();
+  const sections={tasks:{data:S.tasks||[],field:'created'},content:{data:S.content||[],field:'created'},links:{data:S.links||[],field:'created'},writer:{data:S.writerDocs||[],field:'modified'}};
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Activity Monitor</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Last activity per section and overall freshness.</div>';
+  Object.entries(sections).forEach(([name,info])=>{
+    let latest=null;
+    info.data.forEach(item=>{
+      const d=item[info.field]||item.created||'';
+      if(d&&(!latest||d>latest))latest=d;
+    });
+    const hours=latest?Math.round((now-new Date(latest).getTime())/(1000*60*60)):null;
+    const status=hours===null?'No data':hours<1?'Active now':hours<24?hours+'h ago':Math.round(hours/24)+'d ago';
+    const color=hours===null?'#6b7280':hours<24?'#4ade80':hours<72?'#f97316':'#ef4444';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px">';
+    h+='<div><div style="font-size:12px;font-weight:600;text-transform:capitalize">'+name+'</div><div style="font-size:10px;color:var(--text-muted)">'+info.data.length+' items</div></div>';
+    h+='<span style="padding:3px 8px;border-radius:10px;font-size:10px;background:'+color+'22;color:'+color+'">'+status+'</span></div>';
+  });
+  // Session info
+  h+='<div style="padding:12px;background:var(--bg-surface);border-radius:8px;margin-top:12px">';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Session Info</div>';
+  h+='<div style="font-size:11px">localStorage size: <strong style="color:var(--accent)">'+(JSON.stringify(S).length/1024).toFixed(0)+' KB</strong></div>';
+  h+='<div style="font-size:11px">Current time: <strong>'+new Date().toISOString()+'</strong></div></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentExporter(){
+  let panel=document.getElementById('content-exporter-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-exporter-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Exporter</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  const formats=[
+    {name:'All Content as Markdown',fn:'(function(){const md=(S.content||[]).map(c=>\"## \"+c.title+\"\\n\\n\"+c.body).join(\"\\n\\n---\\n\\n\");navigator.clipboard.writeText(md);if(typeof showNotification===\"function\")showNotification(\"Content exported as markdown!\");})()'},
+    {name:'All Tasks as CSV',fn:'(function(){const rows=[\"Title,Status,Priority,Due,Project\"];(S.tasks||[]).forEach(t=>{const p=(S.projects||[]).find(x=>x.id===t.projectId);rows.push(\"\\\"\"+(t.title||\"\")+\"\\\",\"+(t.status||\"\")+\",\"+(t.priority||\"\")+\",\"+(t.due||\"\")+\",\\\"\"+(p?p.name:\"\")+\"\\\"\");});navigator.clipboard.writeText(rows.join(\"\\n\"));if(typeof showNotification===\"function\")showNotification(\"Tasks exported as CSV!\");})()'},
+    {name:'All Links as JSON',fn:'(function(){navigator.clipboard.writeText(JSON.stringify(S.links||[],null,2));if(typeof showNotification===\"function\")showNotification(\"Links exported as JSON!\");})()'},
+    {name:'Writer Docs as Markdown',fn:'(function(){const md=(S.writerDocs||[]).map(d=>\"# \"+d.title+\"\\n\\n\"+(d.content||\"\")).join(\"\\n\\n---\\n\\n\");navigator.clipboard.writeText(md);if(typeof showNotification===\"function\")showNotification(\"Docs exported as markdown!\");})()'},
+    {name:'Full Workspace JSON',fn:'(function(){const blob=new Blob([JSON.stringify(S,null,2)],{type:\"application/json\"});const url=URL.createObjectURL(blob);const a=document.createElement(\"a\");a.href=url;a.download=\"astra-workspace-\"+new Date().toISOString().split(\"T\")[0]+\".json\";a.click();URL.revokeObjectURL(url);})()'},
+  ];
+  formats.forEach(f=>{
+    h+='<button onclick="'+f.fn+'" style="display:block;width:100%;padding:12px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);cursor:pointer;font-size:12px;text-align:left;margin-bottom:8px;transition:border-color 0.2s" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'+esc(f.name)+'</button>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showRandomTask(){
+  let panel=document.getElementById('random-task-panel');if(panel)panel.remove();
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done');
+  if(tasks.length===0){if(typeof showNotification==='function')showNotification('No active tasks!');return;}
+  const task=tasks[Math.floor(Math.random()*tasks.length)];
+  panel=document.createElement('div');panel.id='random-task-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:30px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;text-align:center';
+  const color=task.priority==='p0'?'#ef4444':task.priority==='p1'?'#f97316':task.priority==='p2'?'#3b82f6':'#6b7280';
+  let h='<div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px">Random Task Picker</div>';
+  h+='<div style="font-size:10px;color:'+color+';margin-bottom:8px">'+esc((task.priority||'p3').toUpperCase())+' PRIORITY</div>';
+  h+='<div style="font-size:20px;font-weight:bold;color:var(--text-primary);margin-bottom:12px;line-height:1.4">'+esc(task.title)+'</div>';
+  if(task.description)h+='<div style="font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.5">'+esc(task.description.substring(0,200))+'</div>';
+  h+='<div style="display:flex;gap:8px;justify-content:center">';
+  h+='<button onclick="showRandomTask()" style="background:var(--accent);color:#000;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600">Another One</button>';
+  h+='<button onclick="(function(){const t=S.tasks.find(x=>x.id===\''+task.id+'\');if(t)t.status=\'in-progress\';save();document.getElementById(\'random-task-panel\').remove();if(typeof showNotification===\'function\')showNotification(\'Task started!\');})()" style="background:none;border:1px solid var(--border);color:var(--text-primary);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:11px">Start This</button>';
+  h+='<button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:8px 16px;border-radius:6px;cursor:pointer;font-size:11px">Close</button></div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentSorter(){
+  let panel=document.getElementById('content-sorter-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-sorter-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:var(--accent)">Content Sorter</h3><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:1px solid var(--border);color:var(--text-muted);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">Close</button></div>';
+  h+='<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">Sort all content items permanently. Current order will be overwritten.</div>';
+  const sorts=[
+    {name:'Newest First',fn:'(function(){S.content.sort((a,b)=>(b.created||"").localeCompare(a.created||""));save();showContentSorter();if(typeof showNotification==="function")showNotification("Sorted by newest");})()'},
+    {name:'Oldest First',fn:'(function(){S.content.sort((a,b)=>(a.created||"").localeCompare(b.created||""));save();showContentSorter();if(typeof showNotification==="function")showNotification("Sorted by oldest");})()'},
+    {name:'Alphabetical (A-Z)',fn:'(function(){S.content.sort((a,b)=>(a.title||"").localeCompare(b.title||""));save();showContentSorter();if(typeof showNotification==="function")showNotification("Sorted A-Z");})()'},
+    {name:'Longest First',fn:'(function(){S.content.sort((a,b)=>((b.body||"").length)-((a.body||"").length));save();showContentSorter();if(typeof showNotification==="function")showNotification("Sorted by length");})()'},
+    {name:'By Theme',fn:'(function(){S.content.sort((a,b)=>(a.theme||"zzz").localeCompare(b.theme||"zzz"));save();showContentSorter();if(typeof showNotification==="function")showNotification("Sorted by theme");})()'},
+    {name:'Pinned First',fn:'(function(){S.content.sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));save();showContentSorter();if(typeof showNotification==="function")showNotification("Pinned items first");})()'},
+  ];
+  sorts.forEach(s=>{
+    h+='<button onclick="'+s.fn+'" style="display:block;width:100%;padding:10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;color:var(--text-primary);cursor:pointer;font-size:12px;text-align:left;margin-bottom:6px;transition:border-color 0.2s" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\'">'+esc(s.name)+'</button>';
+  });
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showWaterTracker(){
+  let panel=document.getElementById('water-tracker-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='water-tracker-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:250px';
+  if(!S._waterLog)S._waterLog={};
+  const todayKey=new Date().toISOString().split('T')[0];
+  const glasses=S._waterLog[todayKey]||0;
+  const goal=8;
+  const pct=Math.min(100,Math.round(glasses/goal*100));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h4 style="margin:0;color:var(--accent);font-size:13px">Water Tracker</h4><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<div style="text-align:center;margin-bottom:12px"><div style="font-size:32px;font-weight:bold;color:var(--accent)">'+glasses+'</div><div style="font-size:10px;color:var(--text-muted)">of '+goal+' glasses</div></div>';
+  h+='<div style="height:8px;background:var(--bg-surface);border-radius:4px;overflow:hidden;margin-bottom:12px"><div style="height:100%;background:var(--accent);width:'+pct+'%;border-radius:4px;transition:width 0.3s"></div></div>';
+  h+='<div style="display:flex;gap:6px;justify-content:center">';
+  h+='<button onclick="(function(){const k=new Date().toISOString().split(\'T\')[0];S._waterLog[k]=(S._waterLog[k]||0)+1;save();showWaterTracker();})()" style="flex:1;padding:8px;background:var(--accent);color:#000;border:none;border-radius:4px;cursor:pointer;font-size:11px;font-weight:600">+ Glass</button>';
+  h+='<button onclick="(function(){const k=new Date().toISOString().split(\'T\')[0];S._waterLog[k]=Math.max(0,(S._waterLog[k]||0)-1);save();showWaterTracker();})()" style="padding:8px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-muted);border-radius:4px;cursor:pointer;font-size:11px">-</button></div>';
+  if(glasses>=goal)h+='<div style="text-align:center;font-size:10px;color:var(--accent);margin-top:8px;font-weight:600">Goal reached! Stay hydrated!</div>';
   panel.innerHTML=h;document.body.appendChild(panel);
 }
 function showProjectRoadmap(filterProject){
