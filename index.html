@@ -6389,6 +6389,12 @@ function cmdGetItems(q) {
       ['nginx','nginx config and command reference'],
       ['estimate accuracy','How accurate are your time estimates'],
       ['css grid','CSS grid layout helper'],
+      ['terraform','Terraform CLI and IaC reference'],
+      ['day heatmap','Tasks created and completed by day of week'],
+      ['lorem ipsum','Generate lorem ipsum placeholder text'],
+      ['pulumi','Pulumi IaC CLI reference'],
+      ['creation hour','When do you create tasks by hour'],
+      ['password','Generate secure random passwords'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9725,6 +9731,24 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='css grid' || ql==='grid' || ql==='grid helper' || ql==='grid layout')){
     items.unshift({title:'CSS Grid Helper',desc:'Common CSS grid layout patterns',icon:'G',type:'action',action:()=>{closeCommandPalette();showQuickGridHelper();}});
+  }
+  if(ql && (ql==='terraform' || ql==='terraform cli' || ql==='tf' || ql==='iac')){
+    items.unshift({title:'Terraform Reference',desc:'Terraform CLI and IaC cheatsheet',icon:'T',type:'action',action:()=>{closeCommandPalette();showTerraformRef();}});
+  }
+  if(ql && (ql==='day heatmap' || ql==='day of week' || ql==='weekly heatmap' || ql==='dow')){
+    items.unshift({title:'Day-of-Week Heatmap',desc:'Tasks by day of week',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskDayOfWeekHeatmap();}});
+  }
+  if(ql && (ql==='lorem ipsum' || ql==='lorem' || ql==='placeholder text' || ql==='ipsum')){
+    items.unshift({title:'Lorem Ipsum Generator',desc:'Generate placeholder text',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLoremGenerator();}});
+  }
+  if(ql && (ql==='pulumi' || ql==='pulumi cli' || ql==='pulumi ref' || ql==='iac pulumi')){
+    items.unshift({title:'Pulumi Reference',desc:'Pulumi IaC CLI cheatsheet',icon:'P',type:'action',action:()=>{closeCommandPalette();showPulumiRef();}});
+  }
+  if(ql && (ql==='creation hour' || ql==='hour chart' || ql==='task hour' || ql==='when create')){
+    items.unshift({title:'Task Creation by Hour',desc:'When do you create tasks',icon:'H',type:'action',action:()=>{closeCommandPalette();showTaskCreationHourChart();}});
+  }
+  if(ql && (ql==='password' || ql==='password gen' || ql==='pw gen' || ql==='generate password')){
+    items.unshift({title:'Password Generator',desc:'Generate secure random passwords',icon:'P',type:'action',action:()=>{closeCommandPalette();showQuickPasswordGenerator();}});
   }
   return items.slice(0, 20);
 }
@@ -29394,6 +29418,153 @@ function showQuickGridHelper(){
   });
   html+='<div style="font-size:9px;color:var(--text-muted);margin-top:4px;text-align:center">Click any to copy CSS</div>';
   d.innerHTML=html;document.body.appendChild(d);
+}
+function showTerraformRef(){
+  const cmds={
+    'Init & Plan':['terraform init|Initialize working directory','terraform plan|Preview changes before apply','terraform plan -out=plan.tfplan|Save plan to file','terraform apply plan.tfplan|Apply saved plan'],
+    'Apply & Destroy':['terraform apply|Apply changes to infrastructure','terraform apply -auto-approve|Apply without confirmation prompt','terraform destroy|Destroy all managed infrastructure','terraform destroy -target=aws_instance.web|Destroy specific resource'],
+    'State':['terraform state list|List all resources in state','terraform state show aws_instance.web|Show details of a resource','terraform state mv old new|Rename resource in state','terraform state rm aws_instance.web|Remove resource from state','terraform state pull|Download remote state'],
+    'Workspace':['terraform workspace list|List all workspaces','terraform workspace new staging|Create new workspace','terraform workspace select prod|Switch to workspace','terraform workspace delete staging|Delete workspace'],
+    'Import & Format':['terraform import aws_instance.web i-abc123|Import existing resource','terraform fmt|Format .tf files','terraform fmt -recursive|Format all subdirectories','terraform validate|Validate configuration syntax'],
+    'Output & Graph':['terraform output|Show all outputs','terraform output -json|Outputs as JSON','terraform graph|Generate dependency graph DOT','terraform providers|List required providers']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Terraform Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskDayOfWeekHeatmap(){
+  const tasks=(S.tasks||[]);
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const created=new Array(7).fill(0);
+  const completed=new Array(7).fill(0);
+  tasks.forEach(t=>{
+    if(t.createdAt){const d=new Date(t.createdAt).getDay();created[d]++;}
+    if(t.status==='done'&&t.updatedAt){const d=new Date(t.updatedAt).getDay();completed[d]++;}
+  });
+  const maxC=Math.max(...created,1);const maxD=Math.max(...completed,1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Day-of-Week Heatmap</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">Tasks created &amp; completed by day of week</div>';
+  html+='<div style="display:grid;grid-template-columns:50px 1fr 1fr;gap:4px;margin-bottom:16px">';
+  html+='<div style="font-size:10px;color:var(--text-muted)"></div><div style="font-size:10px;color:var(--text-muted);text-align:center">Created</div><div style="font-size:10px;color:var(--text-muted);text-align:center">Completed</div>';
+  days.forEach((day,i)=>{
+    const cInt=Math.round((created[i]/maxC)*255);
+    const dInt=Math.round((completed[i]/maxD)*255);
+    html+='<div style="font-size:12px;color:var(--text-secondary);padding:8px 4px">'+day+'</div>';
+    html+='<div style="background:rgba(74,222,128,'+((created[i]/maxC)*0.8).toFixed(2)+');border-radius:6px;padding:8px;text-align:center;color:#fff;font-size:13px;font-weight:600">'+created[i]+'</div>';
+    html+='<div style="background:rgba(96,165,250,'+((completed[i]/maxD)*0.8).toFixed(2)+');border-radius:6px;padding:8px;text-align:center;color:#fff;font-size:13px;font-weight:600">'+completed[i]+'</div>';
+  });
+  html+='</div>';
+  const busiestCreate=days[created.indexOf(Math.max(...created))];
+  const busiestDone=days[completed.indexOf(Math.max(...completed))];
+  html+='<div style="display:flex;gap:12px"><div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Most Created</div><div style="font-size:16px;color:#4ade80;font-weight:700">'+busiestCreate+'</div></div>';
+  html+='<div style="flex:1;background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Most Completed</div><div style="font-size:16px;color:#60a5fa;font-weight:700">'+busiestDone+'</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickLoremGenerator(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Lorem Ipsum Generator</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">';
+  const presets=[{l:'1 Paragraph',n:1},{l:'3 Paragraphs',n:3},{l:'5 Paragraphs',n:5},{l:'10 Sentences',n:-10},{l:'50 Words',n:-50}];
+  presets.forEach(p=>{html+='<button onclick="window._genLorem('+p.n+')" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:11px">'+p.l+'</button>';});
+  html+='</div>';
+  html+='<textarea id="_lorem-out" readonly style="width:100%;height:200px;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-primary);border-radius:8px;padding:10px;font-size:12px;resize:vertical;font-family:inherit" placeholder="Click a preset above..."></textarea>';
+  html+='<button onclick="const t=document.getElementById(\'_lorem-out\');navigator.clipboard.writeText(t.value);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="margin-top:8px;background:#4ade80;color:#000;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px">Copy</button>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  const words='lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+  window._genLorem=function(n){
+    const out=document.getElementById('_lorem-out');if(!out)return;
+    function randSentence(){let len=8+Math.floor(Math.random()*12);let s='';for(let i=0;i<len;i++){s+=(i===0?'':' ')+words[Math.floor(Math.random()*words.length)];}return s.charAt(0).toUpperCase()+s.slice(1)+'.';}
+    function randParagraph(){let cnt=4+Math.floor(Math.random()*4);let p='';for(let i=0;i<cnt;i++){p+=(i===0?'':' ')+randSentence();}return p;}
+    if(n>0){let r=[];for(let i=0;i<n;i++)r.push(randParagraph());out.value=r.join('\n\n');}
+    else if(n<=-10 && n>-50){let r=[];for(let i=0;i<Math.abs(n);i++)r.push(randSentence());out.value=r.join(' ');}
+    else{let target=Math.abs(n);let r='';while(r.split(/\s+/).length<target){r+=(r?' ':'')+words[Math.floor(Math.random()*words.length)];}out.value=r.split(/\s+/).slice(0,target).join(' ')+'.';}
+  };
+}
+function showPulumiRef(){
+  const cmds={
+    'Stack Management':['pulumi new|Create a new Pulumi project','pulumi stack init staging|Create a new stack','pulumi stack select prod|Switch to stack','pulumi stack ls|List all stacks','pulumi stack rm staging|Remove a stack','pulumi stack export > state.json|Export stack state'],
+    'Deploy & Preview':['pulumi preview|Preview changes without applying','pulumi up|Deploy infrastructure changes','pulumi up --yes|Deploy without confirmation','pulumi up --diff|Show detailed diff on deploy','pulumi destroy|Tear down all resources','pulumi destroy --yes|Tear down without confirmation'],
+    'Config & Secrets':['pulumi config set key value|Set a config value','pulumi config set --secret dbPass s3cret|Set encrypted secret','pulumi config get key|Get a config value','pulumi config rm key|Remove config value','pulumi config|List all config values'],
+    'State & Import':['pulumi state delete urn|Remove resource from state','pulumi import aws:s3:Bucket myBucket id|Import existing resource','pulumi refresh|Reconcile state with cloud','pulumi stack graph graph.dot|Generate dependency graph'],
+    'Info':['pulumi whoami|Show current user','pulumi version|Show Pulumi version','pulumi about|Show environment info','pulumi logs|Show resource logs']
+  };
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Pulumi Reference</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  Object.entries(cmds).forEach(([cat,list])=>{
+    html+='<div style="margin-bottom:14px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">'+cat+'</div>';
+    list.forEach(c=>{const[cmd,desc]=c.split('|');html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--bg-surface);border-radius:6px;margin-bottom:3px;cursor:pointer" onclick="navigator.clipboard.writeText(\''+cmd.replace(/'/g,"\\'")+'\');this.style.background=\'#4ade8033\';setTimeout(()=>this.style.background=\'var(--bg-surface)\',500)"><code style="color:#4ade80;font-size:12px">'+cmd+'</code><span style="color:var(--text-muted);font-size:11px">'+desc+'</span></div>';});
+    html+='</div>';
+  });
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showTaskCreationHourChart(){
+  const tasks=(S.tasks||[]);
+  const hours=new Array(24).fill(0);
+  tasks.forEach(t=>{if(t.createdAt){const h=new Date(t.createdAt).getHours();hours[h]++;}});
+  const maxH=Math.max(...hours,1);
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Task Creation by Hour</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="margin-bottom:12px;font-size:11px;color:var(--text-muted)">When do you create tasks? (24-hour distribution)</div>';
+  html+='<svg viewBox="0 0 520 180" style="width:100%;margin-bottom:16px">';
+  hours.forEach((count,i)=>{
+    const bw=18;const gap=3.5;const x=i*(bw+gap)+10;const h=(count/maxH)*130;const y=150-h;
+    const color=i>=6&&i<12?'#4ade80':i>=12&&i<18?'#60a5fa':i>=18&&i<22?'#f59e0b':'#6b7280';
+    html+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" fill="'+color+'" rx="3" opacity="0.85"/>';
+    if(count>0)html+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" fill="var(--text-muted)" font-size="8" text-anchor="middle">'+count+'</text>';
+    html+='<text x="'+(x+bw/2)+'" y="166" fill="var(--text-muted)" font-size="7" text-anchor="middle">'+(i<10?'0':'')+i+'</text>';
+  });
+  html+='</svg>';
+  html+='<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:10px;margin-bottom:12px">';
+  html+='<span style="color:#4ade80">Morning (6-12)</span><span style="color:#60a5fa">Afternoon (12-18)</span><span style="color:#f59e0b">Evening (18-22)</span><span style="color:#6b7280">Night (22-6)</span>';
+  html+='</div>';
+  const peakHour=hours.indexOf(Math.max(...hours));
+  const totalMorn=hours.slice(6,12).reduce((a,b)=>a+b,0);const totalAft=hours.slice(12,18).reduce((a,b)=>a+b,0);
+  const totalEve=hours.slice(18,22).reduce((a,b)=>a+b,0);const totalNight=hours.slice(22).reduce((a,b)=>a+b,0)+hours.slice(0,6).reduce((a,b)=>a+b,0);
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Peak Hour</div><div style="font-size:18px;color:#4ade80;font-weight:700">'+(peakHour<10?'0':'')+peakHour+':00</div></div>';
+  html+='<div style="background:var(--bg-surface);border-radius:8px;padding:10px;text-align:center"><div style="font-size:10px;color:var(--text-muted)">Busiest Period</div><div style="font-size:14px;color:#60a5fa;font-weight:700">'+([totalMorn,totalAft,totalEve,totalNight].indexOf(Math.max(totalMorn,totalAft,totalEve,totalNight))===0?'Morning':([totalMorn,totalAft,totalEve,totalNight].indexOf(Math.max(totalMorn,totalAft,totalEve,totalNight))===1?'Afternoon':([totalMorn,totalAft,totalEve,totalNight].indexOf(Math.max(totalMorn,totalAft,totalEve,totalNight))===2?'Evening':'Night')))+'</div></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+}
+function showQuickPasswordGenerator(){
+  let html='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:450px;width:90vw;max-height:80vh;overflow-y:auto">';
+  html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="margin:0;color:#4ade80">Password Generator</h3><button onclick="this.closest(\'div[style*=fixed]\').remove()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">X</button></div>';
+  html+='<div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px;text-align:center"><code id="_pw-output" style="font-size:18px;color:#4ade80;letter-spacing:1px;word-break:break-all">Click Generate</code></div>';
+  html+='<div style="margin-bottom:12px"><label style="font-size:11px;color:var(--text-muted)">Length: <span id="_pw-len-val">16</span></label><input id="_pw-len" type="range" min="8" max="64" value="16" oninput="document.getElementById(\'_pw-len-val\').textContent=this.value" style="width:100%;accent-color:#4ade80"></div>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
+  html+='<label style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><input type="checkbox" id="_pw-upper" checked> Uppercase</label>';
+  html+='<label style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><input type="checkbox" id="_pw-lower" checked> Lowercase</label>';
+  html+='<label style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><input type="checkbox" id="_pw-nums" checked> Numbers</label>';
+  html+='<label style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:4px"><input type="checkbox" id="_pw-syms" checked> Symbols</label>';
+  html+='</div>';
+  html+='<div style="display:flex;gap:8px"><button onclick="window._genPw()" style="flex:1;background:#4ade80;color:#000;border:none;padding:10px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px">Generate</button>';
+  html+='<button onclick="navigator.clipboard.writeText(document.getElementById(\'_pw-output\').textContent);this.textContent=\'Copied!\';setTimeout(()=>this.textContent=\'Copy\',800)" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:10px;border-radius:6px;cursor:pointer;font-size:13px">Copy</button></div>';
+  html+='<div style="margin-top:12px"><div style="font-size:10px;color:var(--text-muted);margin-bottom:4px">Strength</div><div id="_pw-strength" style="height:6px;border-radius:3px;background:var(--bg-surface)"></div><div id="_pw-str-label" style="font-size:10px;color:var(--text-muted);margin-top:4px;text-align:right"></div></div>';
+  html+='</div>';const d=document.createElement('div');d.innerHTML=html;document.body.appendChild(d);
+  window._genPw=function(){
+    const len=parseInt(document.getElementById('_pw-len').value);
+    let chars='';
+    if(document.getElementById('_pw-upper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(document.getElementById('_pw-lower').checked)chars+='abcdefghijklmnopqrstuvwxyz';
+    if(document.getElementById('_pw-nums').checked)chars+='0123456789';
+    if(document.getElementById('_pw-syms').checked)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if(!chars)chars='abcdefghijklmnopqrstuvwxyz';
+    const arr=new Uint32Array(len);crypto.getRandomValues(arr);
+    let pw='';for(let i=0;i<len;i++)pw+=chars[arr[i]%chars.length];
+    document.getElementById('_pw-output').textContent=pw;
+    const strength=len>=32?100:len>=20?80:len>=16?60:len>=12?40:20;
+    const bar=document.getElementById('_pw-strength');
+    const label=document.getElementById('_pw-str-label');
+    const color=strength>=80?'#4ade80':strength>=60?'#60a5fa':strength>=40?'#f59e0b':'#ef4444';
+    bar.innerHTML='<div style="width:'+strength+'%;height:100%;background:'+color+';border-radius:3px;transition:width 0.3s"></div>';
+    label.textContent=strength>=80?'Very Strong':strength>=60?'Strong':strength>=40?'Medium':'Weak';
+    label.style.color=color;
+  };
+  window._genPw();
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
