@@ -5899,6 +5899,15 @@ function cmdGetItems(q) {
       ['export book','Export all content as markdown book'],
       ['overview','Full workspace overview dashboard'],
       ['sentiment','Content sentiment analysis (positive/negative)'],
+      ['project completion','Project completion % timeline bars'],
+      ['content calendar','Month calendar of content creation dates'],
+      ['velocity','Task velocity: completed vs created per week (8 weeks)'],
+      ['tag cloud','Visual tag cloud from all content, tasks, and links'],
+      ['due calendar','Month calendar of task due dates with overdue highlights'],
+      ['productivity','Weekly productivity insights with trends and tips'],
+      ['category breakdown','Stacked bar of content categories with legend'],
+      ['recent activity','Unified activity feed across all sections'],
+      ['quick note','Floating quick note saver (saves to content)'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -7593,6 +7602,42 @@ function cmdGetItems(q) {
   // Sentiment prefix
   if(ql && (ql==='sentiment' || ql==='content sentiment' || ql==='mood analysis' || ql==='positive negative')){
     items.unshift({title:'Content Sentiment',desc:'Keyword-based positive/neutral/negative analysis',icon:'S',type:'action',action:()=>{closeCommandPalette();showContentSentiment();}});
+  }
+  // Project completion prefix
+  if(ql && (ql==='project completion' || ql==='completion timeline' || ql==='project progress' || ql==='project bars')){
+    items.unshift({title:'Project Completion Timeline',desc:'Bar chart of completion % per project',icon:'P',type:'action',action:()=>{closeCommandPalette();showProjectCompletionTimeline();}});
+  }
+  // Content calendar prefix
+  if(ql && (ql==='content calendar' || ql==='creation dates' || ql==='content month' || ql==='when created')){
+    items.unshift({title:'Content Calendar',desc:'Month calendar showing content creation dates',icon:'C',type:'action',action:()=>{closeCommandPalette();showContentCalendar();}});
+  }
+  // Velocity prefix
+  if(ql && (ql==='velocity' || ql==='task velocity' || ql==='throughput' || ql==='tasks per week')){
+    items.unshift({title:'Task Velocity',desc:'Completed vs created per week (8-week chart)',icon:'V',type:'action',action:()=>{closeCommandPalette();showTaskVelocity();}});
+  }
+  // Tag cloud prefix
+  if(ql && (ql==='tag cloud' || ql==='tags visual' || ql==='all tags' || ql==='tag frequency')){
+    items.unshift({title:'Tag Cloud',desc:'Visual tag cloud sized by frequency',icon:'#',type:'action',action:()=>{closeCommandPalette();showTagCloud();}});
+  }
+  // Due calendar prefix
+  if(ql && (ql==='due calendar' || ql==='due dates' || ql==='deadline calendar' || ql==='due month')){
+    items.unshift({title:'Due Date Calendar',desc:'Month calendar of task due dates',icon:'D',type:'action',action:()=>{closeCommandPalette();showDueCalendar();}});
+  }
+  // Productivity prefix
+  if(ql && (ql==='productivity' || ql==='productivity insights' || ql==='weekly insights' || ql==='performance')){
+    items.unshift({title:'Productivity Insights',desc:'Weekly trends, comparisons, and actionable tips',icon:'P',type:'action',action:()=>{closeCommandPalette();showProductivityInsights();}});
+  }
+  // Category breakdown prefix
+  if(ql && (ql==='category breakdown' || ql==='categories' || ql==='content breakdown' || ql==='pie chart')){
+    items.unshift({title:'Category Breakdown',desc:'Stacked bar chart of content categories',icon:'C',type:'action',action:()=>{closeCommandPalette();showCategoryBreakdown();}});
+  }
+  // Recent activity prefix
+  if(ql && (ql==='recent activity' || ql==='activity feed' || ql==='activity log' || ql==='recent')){
+    items.unshift({title:'Recent Activity',desc:'Unified activity feed across all sections',icon:'A',type:'action',action:()=>{closeCommandPalette();showRecentActivity();}});
+  }
+  // Quick note prefix
+  if(ql && (ql==='quick note' || ql==='note' || ql==='jot' || ql==='capture note')){
+    items.unshift({title:'Quick Note',desc:'Floating quick note (saves to content)',icon:'N',type:'action',action:()=>{closeCommandPalette();showQuickNote();}});
   }
   return items.slice(0, 20);
 }
@@ -11760,6 +11805,333 @@ function showContentSentiment(){
   h+=`</div>`;
   h+=`<div style="font-size:9px;color:var(--text-muted);text-align:center">Keyword-based analysis of ${content.length} items (approximate)</div>`;
   panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProjectCompletionTimeline(){
+  let panel=document.getElementById('proj-timeline-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='proj-timeline-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:700px;width:90vw;max-height:80vh;overflow-y:auto';
+  const projects=(S.projects||[]);
+  const tasks=(S.tasks||[]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Project Completion Timeline</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!projects.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No projects found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  const w=620,barH=32,gap=8,top=30;
+  const svgH=top+projects.length*(barH+gap)+20;
+  h+=`<svg width="100%" viewBox="0 0 ${w} ${svgH}" style="display:block">`;
+  h+=`<text x="${w/2}" y="18" text-anchor="middle" fill="var(--text-muted)" font-size="11">Completion %</text>`;
+  const labels=['0%','25%','50%','75%','100%'];
+  labels.forEach((l,i)=>{const x=80+i*(w-100)/4;h+=`<text x="${x}" y="${top-4}" fill="var(--text-muted)" font-size="9" text-anchor="middle">${l}</text>`;h+=`<line x1="${x}" y1="${top}" x2="${x}" y2="${svgH-10}" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="3,3"/>`;});
+  projects.forEach((p,i)=>{
+    const pTasks=tasks.filter(t=>t.projectId===p.id||t.project===p.name);
+    const done=pTasks.filter(t=>t.status==='done').length;
+    const pct=pTasks.length?Math.round(done/pTasks.length*100):0;
+    const y=top+i*(barH+gap);
+    const maxW=w-100;
+    const barW=maxW*pct/100;
+    const color=pct>=75?'#4ade80':pct>=50?'#facc15':pct>=25?'#fb923c':'#f87171';
+    h+=`<text x="75" y="${y+barH/2+4}" text-anchor="end" fill="var(--text-secondary)" font-size="10">${(p.name||'Untitled').substring(0,12)}</text>`;
+    h+=`<rect x="80" y="${y}" width="${maxW}" height="${barH}" rx="4" fill="var(--bg-surface)"/>`;
+    if(barW>0)h+=`<rect x="80" y="${y}" width="${barW}" height="${barH}" rx="4" fill="${color}" opacity="0.8"/>`;
+    h+=`<text x="${80+maxW/2}" y="${y+barH/2+4}" text-anchor="middle" fill="var(--text-primary)" font-size="11" font-weight="600">${pct}% (${done}/${pTasks.length})</text>`;
+  });
+  h+=`</svg>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showContentCalendar(){
+  let panel=document.getElementById('content-cal-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='content-cal-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleString('default',{month:'long',year:'numeric'});
+  const dayMap={};
+  content.forEach(c=>{
+    if(!c.createdAt)return;
+    const d=new Date(c.createdAt);
+    if(d.getFullYear()===year&&d.getMonth()===month){
+      const day=d.getDate();
+      if(!dayMap[day])dayMap[day]=[];
+      dayMap[day].push(c);
+    }
+  });
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Content Calendar - '+monthName+'</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px">';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{h+=`<div style="text-align:center;font-size:10px;color:var(--text-muted);padding:4px">${d}</div>`;});
+  h+='</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+  for(let i=0;i<firstDay;i++)h+='<div></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===now.getDate();
+    const items=dayMap[d]||[];
+    const bg=items.length>0?'rgba(74,222,128,0.15)':'var(--bg-surface)';
+    const border=isToday?'border:1px solid var(--accent)':'border:1px solid transparent';
+    h+=`<div style="min-height:50px;${border};background:${bg};border-radius:4px;padding:3px;position:relative">`;
+    h+=`<div style="font-size:10px;color:${isToday?'var(--accent)':'var(--text-muted)'};font-weight:${isToday?'700':'400'}">${d}</div>`;
+    if(items.length>0)h+=`<div style="font-size:9px;color:var(--accent);margin-top:2px">${items.length} item${items.length>1?'s':''}</div>`;
+    items.slice(0,2).forEach(c=>{h+=`<div style="font-size:8px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.title||'').substring(0,15)}</div>`;});
+    h+='</div>';
+  }
+  h+='</div>';
+  const totalItems=content.filter(c=>{if(!c.createdAt)return false;const d=new Date(c.createdAt);return d.getFullYear()===year&&d.getMonth()===month;}).length;
+  const activeDays=Object.keys(dayMap).length;
+  h+=`<div style="margin-top:12px;font-size:10px;color:var(--text-muted);text-align:center">${totalItems} items created across ${activeDays} days this month</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTaskVelocity(){
+  let panel=document.getElementById('velocity-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='velocity-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:650px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);
+  const weeks=8;
+  const now=new Date();
+  const weekData=[];
+  for(let w=weeks-1;w>=0;w--){
+    const weekStart=new Date(now);weekStart.setDate(weekStart.getDate()-w*7-weekStart.getDay());weekStart.setHours(0,0,0,0);
+    const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+7);
+    const done=tasks.filter(t=>{
+      if(t.status!=='done'||!t.completedAt)return false;
+      const d=new Date(t.completedAt);return d>=weekStart&&d<weekEnd;
+    }).length;
+    const created=tasks.filter(t=>{
+      if(!t.createdAt)return false;
+      const d=new Date(t.createdAt);return d>=weekStart&&d<weekEnd;
+    }).length;
+    const label=weekStart.toLocaleDateString('en',{month:'short',day:'numeric'});
+    weekData.push({label,done,created});
+  }
+  const maxVal=Math.max(...weekData.map(w=>Math.max(w.done,w.created)),1);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Task Velocity (8 Weeks)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:flex;gap:4px;margin-bottom:8px"><span style="font-size:10px;color:#4ade80">■ Completed</span><span style="font-size:10px;color:#60a5fa">■ Created</span></div>';
+  const svgW=600,svgH=200,padL=40,padB=30,padT=10;
+  const chartW=svgW-padL-10,chartH=svgH-padT-padB;
+  const barW=chartW/weeks/2-4;
+  h+=`<svg width="100%" viewBox="0 0 ${svgW} ${svgH}" style="display:block">`;
+  for(let i=0;i<=4;i++){
+    const y=padT+chartH-i*(chartH/4);
+    const val=Math.round(maxVal*i/4);
+    h+=`<line x1="${padL}" y1="${y}" x2="${svgW-10}" y2="${y}" stroke="var(--border)" stroke-width="0.5"/>`;
+    h+=`<text x="${padL-5}" y="${y+3}" text-anchor="end" fill="var(--text-muted)" font-size="9">${val}</text>`;
+  }
+  weekData.forEach((w,i)=>{
+    const x=padL+i*(chartW/weeks)+chartW/weeks/2;
+    const doneH=maxVal?w.done/maxVal*chartH:0;
+    const createdH=maxVal?w.created/maxVal*chartH:0;
+    h+=`<rect x="${x-barW-1}" y="${padT+chartH-doneH}" width="${barW}" height="${doneH}" rx="2" fill="#4ade80" opacity="0.8"/>`;
+    h+=`<rect x="${x+1}" y="${padT+chartH-createdH}" width="${barW}" height="${createdH}" rx="2" fill="#60a5fa" opacity="0.8"/>`;
+    if(w.done>0)h+=`<text x="${x-barW/2-1}" y="${padT+chartH-doneH-3}" text-anchor="middle" fill="#4ade80" font-size="9">${w.done}</text>`;
+    if(w.created>0)h+=`<text x="${x+barW/2+1}" y="${padT+chartH-createdH-3}" text-anchor="middle" fill="#60a5fa" font-size="9">${w.created}</text>`;
+    h+=`<text x="${x}" y="${svgH-5}" text-anchor="middle" fill="var(--text-muted)" font-size="8">${w.label}</text>`;
+  });
+  h+=`</svg>`;
+  const avgDone=weekData.reduce((s,w)=>s+w.done,0)/weeks;
+  const avgCreated=weekData.reduce((s,w)=>s+w.created,0)/weeks;
+  h+=`<div style="display:flex;gap:20px;justify-content:center;margin-top:12px">`;
+  h+=`<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#4ade80">${avgDone.toFixed(1)}</div><div style="font-size:10px;color:var(--text-muted)">Avg completed/week</div></div>`;
+  h+=`<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#60a5fa">${avgCreated.toFixed(1)}</div><div style="font-size:10px;color:var(--text-muted)">Avg created/week</div></div>`;
+  h+=`<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:${avgDone>=avgCreated?'#4ade80':'#f87171'}">${avgDone>=avgCreated?'+':'-'}${Math.abs(avgDone-avgCreated).toFixed(1)}</div><div style="font-size:10px;color:var(--text-muted)">Net velocity</div></div>`;
+  h+=`</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showTagCloud(){
+  let panel=document.getElementById('tag-cloud-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='tag-cloud-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tagCount={};
+  (S.content||[]).forEach(c=>{(c.tags||[]).forEach(t=>{tagCount[t]=(tagCount[t]||0)+1;});});
+  (S.tasks||[]).forEach(t=>{(t.tags||[]).forEach(tg=>{tagCount[tg]=(tagCount[tg]||0)+1;});});
+  (S.links||[]).forEach(l=>{(l.tags||[]).forEach(t=>{tagCount[t]=(tagCount[t]||0)+1;});});
+  const tags=Object.entries(tagCount).sort((a,b)=>b[1]-a[1]);
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Tag Cloud ('+tags.length+' tags)</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!tags.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No tags found across content, tasks, or links</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  const maxCount=tags[0][1];
+  const colors=['#4ade80','#60a5fa','#facc15','#fb923c','#f87171','#a78bfa','#34d399','#f472b6','#38bdf8','#fbbf24'];
+  h+='<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:20px">';
+  tags.forEach(([tag,count],i)=>{
+    const size=12+Math.round((count/maxCount)*24);
+    const color=colors[i%colors.length];
+    const opacity=0.5+count/maxCount*0.5;
+    h+=`<span style="font-size:${size}px;color:${color};opacity:${opacity};cursor:default;padding:2px 6px;transition:opacity 0.2s" title="${count} items">${esc(tag)}</span>`;
+  });
+  h+='</div>';
+  h+='<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px"><div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">Top 10 tags:</div>';
+  tags.slice(0,10).forEach(([tag,count])=>{
+    const pct=Math.round(count/maxCount*100);
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="width:80px;font-size:10px;color:var(--text-secondary);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(tag)}</div><div style="flex:1;height:12px;background:var(--bg-surface);border-radius:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#4ade80;border-radius:6px"></div></div><div style="font-size:10px;color:var(--text-muted);width:30px">${count}</div></div>`;
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showDueCalendar(){
+  let panel=document.getElementById('due-cal-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='due-cal-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:600px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]).filter(t=>t.status!=='done'&&t.due);
+  const now=new Date();const year=now.getFullYear();const month=now.getMonth();
+  const firstDay=new Date(year,month,1).getDay();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const monthName=now.toLocaleString('default',{month:'long',year:'numeric'});
+  const dayMap={};
+  tasks.forEach(t=>{
+    const d=new Date(t.due);
+    if(d.getFullYear()===year&&d.getMonth()===month){
+      const day=d.getDate();
+      if(!dayMap[day])dayMap[day]=[];
+      dayMap[day].push(t);
+    }
+  });
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Due Date Calendar - '+monthName+'</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:8px">';
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach(d=>{h+=`<div style="text-align:center;font-size:10px;color:var(--text-muted);padding:4px">${d}</div>`;});
+  h+='</div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">';
+  for(let i=0;i<firstDay;i++)h+='<div></div>';
+  const today=now.getDate();
+  for(let d=1;d<=daysInMonth;d++){
+    const isToday=d===today;
+    const items=dayMap[d]||[];
+    const isOverdue=d<today&&items.length>0;
+    const bg=isOverdue?'rgba(248,113,113,0.15)':items.length>0?'rgba(74,222,128,0.15)':'var(--bg-surface)';
+    const border=isToday?'border:1px solid var(--accent)':'border:1px solid transparent';
+    h+=`<div style="min-height:50px;${border};background:${bg};border-radius:4px;padding:3px">`;
+    h+=`<div style="font-size:10px;color:${isToday?'var(--accent)':isOverdue?'#f87171':'var(--text-muted)'};font-weight:${isToday?'700':'400'}">${d}</div>`;
+    if(items.length>0)h+=`<div style="font-size:9px;color:${isOverdue?'#f87171':'var(--accent)'}">${items.length} task${items.length>1?'s':''}</div>`;
+    items.slice(0,2).forEach(t=>{
+      const pColor=t.priority==='p0'?'#f87171':t.priority==='p1'?'#fb923c':t.priority==='p2'?'#60a5fa':'#6b7280';
+      h+=`<div style="font-size:8px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span style="color:${pColor}">●</span> ${esc(t.title||'').substring(0,14)}</div>`;
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  const overdue=tasks.filter(t=>{const d=new Date(t.due);return d<now;}).length;
+  const upcoming=tasks.filter(t=>{const d=new Date(t.due);const week=new Date(now);week.setDate(week.getDate()+7);return d>=now&&d<=week;}).length;
+  h+=`<div style="display:flex;gap:16px;justify-content:center;margin-top:12px;font-size:10px;color:var(--text-muted)"><span style="color:#f87171">${overdue} overdue</span><span style="color:#facc15">${upcoming} due this week</span><span>${tasks.length} total open with dates</span></div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showProductivityInsights(){
+  let panel=document.getElementById('productivity-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='productivity-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const tasks=(S.tasks||[]);const content=(S.content||[]);const links=(S.links||[]);
+  const now=new Date();
+  const weekAgo=new Date(now);weekAgo.setDate(weekAgo.getDate()-7);
+  const twoWeeksAgo=new Date(now);twoWeeksAgo.setDate(twoWeeksAgo.getDate()-14);
+  const thisWeekDone=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=weekAgo).length;
+  const lastWeekDone=tasks.filter(t=>t.status==='done'&&t.completedAt&&new Date(t.completedAt)>=twoWeeksAgo&&new Date(t.completedAt)<weekAgo).length;
+  const thisWeekContent=content.filter(c=>c.createdAt&&new Date(c.createdAt)>=weekAgo).length;
+  const lastWeekContent=content.filter(c=>c.createdAt&&new Date(c.createdAt)>=twoWeeksAgo&&new Date(c.createdAt)<weekAgo).length;
+  const thisWeekLinks=links.filter(l=>l.createdAt&&new Date(l.createdAt)>=weekAgo).length;
+  const overdue=tasks.filter(t=>t.status!=='done'&&t.due&&new Date(t.due)<now).length;
+  const wip=tasks.filter(t=>t.status==='in-progress').length;
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Productivity Insights</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  const taskTrend=thisWeekDone>lastWeekDone?'up':thisWeekDone<lastWeekDone?'down':'flat';
+  const contentTrend=thisWeekContent>lastWeekContent?'up':thisWeekContent<lastWeekContent?'down':'flat';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#4ade80">${thisWeekDone}</div><div style="font-size:10px;color:var(--text-muted)">Tasks done this week</div><div style="font-size:10px;color:${taskTrend==='up'?'#4ade80':taskTrend==='down'?'#f87171':'var(--text-muted)'}">${taskTrend==='up'?'^ Up':'v Down'} from ${lastWeekDone} last week</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#60a5fa">${thisWeekContent}</div><div style="font-size:10px;color:var(--text-muted)">Content created this week</div><div style="font-size:10px;color:${contentTrend==='up'?'#4ade80':contentTrend==='down'?'#f87171':'var(--text-muted)'}">${contentTrend==='up'?'^ Up':'v Down'} from ${lastWeekContent} last week</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:#facc15">${thisWeekLinks}</div><div style="font-size:10px;color:var(--text-muted)">Links saved this week</div></div>`;
+  h+=`<div style="background:var(--bg-surface);padding:12px;border-radius:8px;text-align:center"><div style="font-size:24px;font-weight:700;color:${overdue>0?'#f87171':'#4ade80'}">${overdue}</div><div style="font-size:10px;color:var(--text-muted)">Overdue tasks</div></div>`;
+  h+='</div>';
+  h+='<div style="border-top:1px solid var(--border);padding-top:12px"><div style="font-size:12px;font-weight:600;color:var(--text-primary);margin-bottom:8px">Insights</div>';
+  const insights=[];
+  if(overdue>3)insights.push({icon:'!',color:'#f87171',text:`You have ${overdue} overdue tasks. Consider triaging: close outdated ones or reschedule.`});
+  if(wip>5)insights.push({icon:'!',color:'#fb923c',text:`${wip} tasks in-progress simultaneously. Focus on finishing before starting new.`});
+  if(thisWeekDone>lastWeekDone*1.5&&lastWeekDone>0)insights.push({icon:'+',color:'#4ade80',text:`Great momentum! Task completion up ${Math.round((thisWeekDone/lastWeekDone-1)*100)}% vs last week.`});
+  if(thisWeekDone===0)insights.push({icon:'?',color:'#facc15',text:'No tasks completed this week yet. Try breaking large tasks into smaller ones.'});
+  if(thisWeekContent>0&&thisWeekDone>0)insights.push({icon:'+',color:'#4ade80',text:'Balanced week: creating content AND completing tasks. Keep it up.'});
+  if(tasks.filter(t=>t.status==='todo').length>20)insights.push({icon:'!',color:'#fb923c',text:`${tasks.filter(t=>t.status==='todo').length} tasks in backlog. Consider archiving or prioritizing.`});
+  if(!insights.length)insights.push({icon:'+',color:'var(--text-muted)',text:'Looking good. Keep building consistently.'});
+  insights.forEach(ins=>{
+    h+=`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;padding:8px;background:var(--bg-surface);border-radius:6px"><span style="color:${ins.color};font-weight:700;font-size:14px;min-width:16px">${ins.icon}</span><span style="font-size:11px;color:var(--text-secondary)">${ins.text}</span></div>`;
+  });
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showCategoryBreakdown(){
+  let panel=document.getElementById('cat-breakdown-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='cat-breakdown-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:80vh;overflow-y:auto';
+  const content=(S.content||[]);
+  const catCount={};
+  content.forEach(c=>{const cat=c.theme||c.category||'Uncategorized';catCount[cat]=(catCount[cat]||0)+1;});
+  const cats=Object.entries(catCount).sort((a,b)=>b[1]-a[1]);
+  const total=content.length||1;
+  const colors=['#4ade80','#60a5fa','#facc15','#fb923c','#f87171','#a78bfa','#34d399','#f472b6','#38bdf8','#fbbf24','#818cf8','#2dd4bf'];
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Content Category Breakdown</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!cats.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No content found</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  // Horizontal stacked bar
+  h+='<div style="display:flex;height:32px;border-radius:8px;overflow:hidden;margin-bottom:16px">';
+  cats.forEach(([cat,count],i)=>{
+    const pct=count/total*100;
+    if(pct<2)return;
+    h+=`<div style="width:${pct}%;background:${colors[i%colors.length]};display:flex;align-items:center;justify-content:center" title="${cat}: ${count} (${pct.toFixed(1)}%)">`;
+    if(pct>8)h+=`<span style="font-size:9px;color:#000;font-weight:600">${pct.toFixed(0)}%</span>`;
+    h+='</div>';
+  });
+  h+='</div>';
+  // Legend list
+  cats.forEach(([cat,count],i)=>{
+    const pct=(count/total*100).toFixed(1);
+    h+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">`;
+    h+=`<div style="width:12px;height:12px;border-radius:3px;background:${colors[i%colors.length]};flex-shrink:0"></div>`;
+    h+=`<div style="flex:1;font-size:11px;color:var(--text-secondary)">${esc(cat)}</div>`;
+    h+=`<div style="font-size:11px;color:var(--text-muted)">${count} (${pct}%)</div>`;
+    h+=`</div>`;
+  });
+  h+=`<div style="margin-top:12px;font-size:10px;color:var(--text-muted);text-align:center">${content.length} total items across ${cats.length} categories</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showRecentActivity(){
+  let panel=document.getElementById('activity-feed-panel');if(panel)panel.remove();
+  panel=document.createElement('div');panel.id='activity-feed-panel';
+  panel.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:550px;width:90vw;max-height:80vh;overflow-y:auto';
+  const activities=[];
+  (S.tasks||[]).forEach(t=>{
+    if(t.createdAt)activities.push({type:'task',action:'created',title:t.title||'Untitled',date:t.createdAt,color:'#60a5fa'});
+    if(t.completedAt)activities.push({type:'task',action:'completed',title:t.title||'Untitled',date:t.completedAt,color:'#4ade80'});
+  });
+  (S.content||[]).forEach(c=>{
+    if(c.createdAt)activities.push({type:'content',action:'added',title:c.title||'Untitled',date:c.createdAt,color:'#a78bfa'});
+    if(c.updatedAt&&c.updatedAt!==c.createdAt)activities.push({type:'content',action:'updated',title:c.title||'Untitled',date:c.updatedAt,color:'#818cf8'});
+  });
+  (S.links||[]).forEach(l=>{
+    if(l.createdAt)activities.push({type:'link',action:'saved',title:l.title||l.url||'Untitled',date:l.createdAt,color:'#38bdf8'});
+  });
+  (S.writerDocs||[]).forEach(d=>{
+    if(d.updatedAt)activities.push({type:'doc',action:'edited',title:d.title||'Untitled',date:d.updatedAt,color:'#fbbf24'});
+  });
+  activities.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="font-weight:700;font-size:16px;color:var(--text-primary)">Recent Activity</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px">X</button></div>';
+  if(!activities.length){h+='<div style="color:var(--text-muted);text-align:center;padding:40px">No activity recorded yet</div>';panel.innerHTML=h;document.body.appendChild(panel);return;}
+  const shown=activities.slice(0,50);
+  let lastDate='';
+  shown.forEach(a=>{
+    const d=new Date(a.date);
+    const dateStr=d.toLocaleDateString('en',{month:'short',day:'numeric'});
+    if(dateStr!==lastDate){
+      h+=`<div style="font-size:10px;color:var(--text-muted);margin:12px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)">${dateStr}</div>`;
+      lastDate=dateStr;
+    }
+    const time=d.toLocaleTimeString('en',{hour:'2-digit',minute:'2-digit'});
+    h+=`<div style="display:flex;align-items:center;gap:8px;padding:4px 0">`;
+    h+=`<div style="width:6px;height:6px;border-radius:50%;background:${a.color};flex-shrink:0"></div>`;
+    h+=`<div style="font-size:11px;color:var(--text-secondary);flex:1"><span style="color:${a.color}">${a.type}</span> ${a.action}: <span style="color:var(--text-primary)">${esc(a.title).substring(0,40)}</span></div>`;
+    h+=`<div style="font-size:9px;color:var(--text-muted)">${time}</div>`;
+    h+=`</div>`;
+  });
+  h+=`<div style="margin-top:12px;font-size:10px;color:var(--text-muted);text-align:center">Showing ${shown.length} of ${activities.length} activities</div>`;
+  panel.innerHTML=h;document.body.appendChild(panel);
+}
+function showQuickNote(){
+  let panel=document.getElementById('quick-note-panel');if(panel){panel.remove();return;}
+  panel=document.createElement('div');panel.id='quick-note-panel';
+  panel.style.cssText='position:fixed;bottom:20px;right:20px;z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 12px 48px rgba(0,0,0,0.7);width:320px';
+  let h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700;font-size:13px;color:var(--text-primary)">Quick Note</div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:14px">X</button></div>';
+  h+='<textarea id="quick-note-text" style="width:100%;height:100px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:8px;font-size:12px;resize:vertical;font-family:inherit" placeholder="Type a quick note..."></textarea>';
+  h+='<div style="display:flex;gap:8px;margin-top:8px">';
+  h+='<input id="quick-note-tags" style="flex:1;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:11px" placeholder="Tags (comma-separated)">';
+  h+=`<button onclick="(function(){const text=document.getElementById('quick-note-text').value.trim();if(!text)return;if(!S.content)S.content=[];const title=text.substring(0,50);const tags=document.getElementById('quick-note-tags').value.split(',').map(t=>t.trim()).filter(Boolean);S.content.unshift({id:'c_'+Date.now(),title:title,body:text,tags:tags,theme:'Quick Note',createdAt:new Date().toISOString(),pinned:false});save();document.getElementById('quick-note-panel').remove();if(typeof renderContent==='function')renderContent();})()" style="background:var(--accent);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer">Save</button>`;
+  h+='</div>';
+  panel.innerHTML=h;document.body.appendChild(panel);
+  setTimeout(()=>{const ta=document.getElementById('quick-note-text');if(ta)ta.focus();},100);
 }
 function showProjectRoadmap(filterProject){
   let panel=document.getElementById('roadmap-panel');if(panel)panel.remove();
