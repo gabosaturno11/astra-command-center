@@ -876,6 +876,7 @@ textarea{resize:vertical;line-height:1.6}
             <option value="newest">Newest</option>
             <option value="alpha">A-Z</option>
             <option value="completed">Completed</option>
+            <option value="project">By Project</option>
           </select>
           <button class="btn btn-sm" onclick="exportTasks()" title="Copy tasks as markdown">Export</button>
           <span id="task-count-info" style="font-size:8px;color:var(--text-muted);font-family:var(--mono)"></span>
@@ -1708,6 +1709,7 @@ textarea{resize:vertical;line-height:1.6}
       <button class="btn btn-sm" onclick="taskToContent()" title="Save task details as content">To Content</button>
       <button class="btn btn-sm" id="td-timer-btn" onclick="toggleTaskTimer()" title="Start/stop time tracking"></button>
       <button class="btn btn-sm" onclick="ftStartForTask(taskDetailId)" title="Start 25min focus timer for this task" style="color:var(--accent)">Focus</button>
+      <button class="btn btn-sm" onclick="copyTaskAsMarkdown()" title="Copy task as markdown">Copy MD</button>
       <button class="btn btn-sm btn-danger" onclick="deleteTaskFromDetail()" style="margin-left:auto">Delete</button>
     </div>
   </div>
@@ -2417,7 +2419,7 @@ function contentInlineEdit(id,el,e){
 function setTaskView(v){taskView=v;document.getElementById('task-view-list').classList.toggle('active',v==='list');document.getElementById('task-view-board').classList.toggle('active',v==='board');document.getElementById('task-list-view').style.display=v==='list'?'block':'none';document.getElementById('task-board-view').classList.toggle('active',v==='board');renderTasks();}
 function setTaskFilter(f){taskFilter=f;taskProjectFilter=null;['all','active','todo','progress','blocked','done'].forEach(k=>{const el=document.getElementById('task-filter-'+k);if(el)el.classList.toggle('active',f===k);});renderTasks();}
 function filterTaskProject(p){taskProjectFilter=p;taskFilter='all';renderTasks();}
-function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');else if(taskFilter==='todo')items=items.filter(t=>t.status==='todo');else if(taskFilter==='progress')items=items.filter(t=>t.status==='progress');else if(taskFilter==='blocked')items=items.filter(t=>t.status==='blocked');else if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(sortVal==='completed')items.sort((a,b)=>new Date(b.completedAt||0)-new Date(a.completedAt||0));return items;}
+function getFilteredTasks(){const q=(document.getElementById('task-search')?.value||'').toLowerCase();let items=[...S.tasks];if(taskFilter==='active')items=items.filter(t=>t.status!=='done');else if(taskFilter==='todo')items=items.filter(t=>t.status==='todo');else if(taskFilter==='progress')items=items.filter(t=>t.status==='progress');else if(taskFilter==='blocked')items=items.filter(t=>t.status==='blocked');else if(taskFilter==='done')items=items.filter(t=>t.status==='done');if(taskProjectFilter)items=items.filter(t=>t.project===taskProjectFilter);if(q)items=items.filter(t=>(t.title+' '+t.project+' '+(t.description||'')).toLowerCase().includes(q));const sortVal=(document.getElementById('task-sort')?.value)||'manual';const pMap={p0:0,p1:1,p2:2,p3:3};if(sortVal==='priority')items.sort((a,b)=>(pMap[a.priority]||2)-(pMap[b.priority]||2));else if(sortVal==='due')items.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));else if(sortVal==='newest')items.sort((a,b)=>new Date(b.created||0)-new Date(a.created||0));else if(sortVal==='alpha')items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));else if(sortVal==='completed')items.sort((a,b)=>new Date(b.completedAt||0)-new Date(a.completedAt||0));else if(sortVal==='project')items.sort((a,b)=>(a.project||'zzz').localeCompare(b.project||'zzz'));return items;}
 
 function renderTasks(){
   const items=getFilteredTasks();
@@ -2666,6 +2668,24 @@ function taskToContent(){
   S.content.unshift({id:Date.now(),body,type:'caption',theme:t.project||'tasks',tags:['from-task',t.priority||'p2'].filter(Boolean),source:'task-convert',created:new Date().toISOString()});
   save();closeTaskDetail();if(currentSection==='content')renderContent();toast('Saved to Content');
 }
+function copyTaskAsMarkdown(){
+  const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
+  let md='## '+esc(t.title||'Untitled')+'\n\n';
+  md+='- **Status:** '+t.status+'\n';
+  md+='- **Priority:** '+(t.priority||'p2')+'\n';
+  if(t.project)md+='- **Project:** '+t.project+'\n';
+  if(t.due)md+='- **Due:** '+t.due+'\n';
+  if(t.estimate)md+='- **Estimate:** '+t.estimate+'\n';
+  if(t.recurrence)md+='- **Recurrence:** '+t.recurrence+'\n';
+  if(t.blockedBy)md+='- **Blocked by:** '+t.blockedBy+'\n';
+  if(t.timeSpent)md+='- **Time spent:** '+formatTimeSpent(t.timeSpent)+'\n';
+  if(t.description)md+='\n'+t.description+'\n';
+  if(t.subtasks&&t.subtasks.length){md+='\n### Subtasks\n';t.subtasks.forEach(s=>{md+='- ['+(s.done?'x':' ')+'] '+s.title+'\n';});}
+  if(t.log&&t.log.length){md+='\n### Activity\n';t.log.slice(0,10).forEach(l=>{md+='- '+l.from+' -> '+l.to+' ('+timeAgo(l.at)+')\n';});}
+  md+='\n*Created: '+(t.created||'unknown')+'*\n';
+  if(t.completedAt)md+='*Completed: '+t.completedAt+'*\n';
+  navigator.clipboard.writeText(md).then(()=>toast('Task copied as markdown'));
+}
 function toggleTaskTimer(){
   const t=S.tasks.find(x=>x.id===taskDetailId);if(!t)return;
   if(t.timeStarted){
@@ -2887,7 +2907,7 @@ function scheduleAutoBackup(){
   if(writerAutoBackupTimer)return;
   writerAutoBackupTimer=setTimeout(()=>{writerAutoBackupTimer=null;const d=getActiveDoc();if(!d)return;snapshotWriter();if(!d.versions)d.versions=[];const last=d.versions[0];const now=Date.now();if(last&&now-new Date(last.date).getTime()<300000)return;d.versions.unshift({id:now,title:d.title+' (auto)',body:d.body,words:countW(d.body),date:new Date().toISOString()});if(d.versions.length>50)d.versions=d.versions.slice(0,50);save();renderVersions();},600000);
 }
-function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;const paras=t.split(/\n\s*\n/).filter(p=>p.trim().length).length;const headings=e.querySelectorAll('h1,h2,h3,h4,h5,h6').length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=paras+'p / '+headings+'h';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
+function updateWS(){const e=document.getElementById('writer-editor'),t=e.innerText||'',w=t.trim().split(/\s+/).filter(x=>x.length).length;const paras=t.split(/\n\s*\n/).filter(p=>p.trim().length).length;const headings=e.querySelectorAll('h1,h2,h3,h4,h5,h6').length;document.getElementById('ws-words').textContent=w+' words';document.getElementById('ws-chars').textContent=paras+'p / '+headings+'h / '+t.length+'c';document.getElementById('ws-reading').textContent=Math.max(1,Math.ceil(w/238))+' min read';
   const d=getActiveDoc();const editedEl=document.getElementById('ws-edited');if(editedEl&&d&&d.updated)editedEl.textContent='Edited '+timeAgo(d.updated);
   const goal=d&&d.wordGoal?d.wordGoal:0;const goalEl=document.getElementById('ws-goal');
   if(goal>0){const pct=Math.min(100,Math.round(w/goal*100));goalEl.textContent=pct+'% of '+goal+'w goal';goalEl.style.color=pct>=100?'var(--green)':'var(--accent-cyan)';}else{goalEl.textContent='Set goal';goalEl.style.color='var(--text-muted)';}}
