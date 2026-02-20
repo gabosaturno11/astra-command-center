@@ -6302,6 +6302,9 @@ function cmdGetItems(q) {
       ['jwt','JWT token decoder'],
       ['task dashboard','Full task summary dashboard'],
       ['ascii art','ASCII art collection'],
+      ['redis','Redis command reference'],
+      ['progress gauge','Overall progress gauge'],
+      ['lorem ipsum','Lorem ipsum text generator'],
     ];
     items.unshift({title:'Cmd+K Prefixes ('+prefixes.length+')',desc:'Type any prefix to activate',icon:'?',type:'info'});
     prefixes.forEach(([name,desc])=>{items.push({title:name,desc,icon:'>',type:'info'});});
@@ -9377,6 +9380,15 @@ function cmdGetItems(q) {
   }
   if(ql && (ql==='ascii art' || ql==='ascii' || ql==='text art' || ql==='art')){
     items.unshift({title:'ASCII Art',desc:'Copy fun ASCII art characters',icon:'A',type:'action',action:()=>{closeCommandPalette();showQuickAsciiArt();}});
+  }
+  if(ql && (ql==='redis' || ql==='redis commands' || ql==='redis ref' || ql==='cache commands')){
+    items.unshift({title:'Redis Reference',desc:'Redis command cheatsheet by category',icon:'R',type:'action',action:()=>{closeCommandPalette();showRedisCommandRef();}});
+  }
+  if(ql && (ql==='progress gauge' || ql==='gauge' || ql==='overall progress' || ql==='progress ring')){
+    items.unshift({title:'Progress Gauge',desc:'Circular gauge of overall task completion',icon:'G',type:'action',action:()=>{closeCommandPalette();showTaskProgressGauge();}});
+  }
+  if(ql && (ql==='lorem ipsum' || ql==='lorem' || ql==='placeholder text' || ql==='dummy text')){
+    items.unshift({title:'Lorem Ipsum',desc:'Generate placeholder text paragraphs',icon:'L',type:'action',action:()=>{closeCommandPalette();showQuickLoremIpsum();}});
   }
   return items.slice(0, 20);
 }
@@ -26860,6 +26872,72 @@ function showQuickAsciiArt(){
     </div>`;
   };
   window._setAscii=(k)=>{sel=k;rend();};
+  document.body.appendChild(d);rend();
+}
+function showRedisCommandRef(){
+  let ex=document.getElementById('redis-ref-float');if(ex){ex.remove();return;}
+  const categories={
+    'Strings':['SET key value [EX seconds]','GET key','MSET key1 val1 key2 val2','MGET key1 key2','INCR key','INCRBY key amount','DECR key','APPEND key value','STRLEN key','SETEX key seconds value','SETNX key value','GETSET key value'],
+    'Hashes':['HSET key field value','HGET key field','HMSET key f1 v1 f2 v2','HMGET key f1 f2','HGETALL key','HDEL key field','HEXISTS key field','HINCRBY key field amount','HKEYS key','HVALS key','HLEN key'],
+    'Lists':['LPUSH key value','RPUSH key value','LPOP key','RPOP key','LRANGE key start stop','LLEN key','LINDEX key index','LSET key index value','LREM key count value','LINSERT key BEFORE|AFTER pivot value'],
+    'Sets':['SADD key member','SREM key member','SMEMBERS key','SISMEMBER key member','SCARD key','SUNION key1 key2','SINTER key1 key2','SDIFF key1 key2','SRANDMEMBER key [count]'],
+    'Sorted Sets':['ZADD key score member','ZREM key member','ZRANGE key start stop [WITHSCORES]','ZREVRANGE key start stop','ZSCORE key member','ZRANK key member','ZCARD key','ZINCRBY key increment member','ZRANGEBYSCORE key min max'],
+    'Keys':['DEL key','EXISTS key','EXPIRE key seconds','TTL key','PERSIST key','KEYS pattern','TYPE key','RENAME key newkey','SCAN cursor [MATCH pattern] [COUNT count]']
+  };
+  let sel='Strings';
+  const d=document.createElement('div');d.id='redis-ref-float';
+  const rend=()=>{
+    const tabs=Object.keys(categories).map(k=>`<span onclick="window._redisTab('${k}')" style="padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;${k===sel?'background:var(--accent);color:#000':'color:var(--text-muted)'}">${k}</span>`).join('');
+    const cmds=categories[sel].map(c=>`<div onclick="navigator.clipboard.writeText('${c.replace(/'/g,"\\'")}');this.style.color='#4ade80';setTimeout(()=>this.style.color='',600)" style="padding:4px 8px;font-size:11px;color:var(--text-secondary);font-family:monospace;cursor:pointer;border-bottom:1px solid var(--border)">${esc(c)}</div>`).join('');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:75vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Redis Command Reference</span><span onclick="document.getElementById('redis-ref-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px">${tabs}</div>
+      <div style="border:1px solid var(--border);border-radius:6px;overflow:hidden">${cmds}</div>
+      <div style="margin-top:8px;font-size:9px;color:var(--text-muted)">Click any command to copy</div>
+    </div>`;
+  };
+  window._redisTab=(k)=>{sel=k;rend();};
+  document.body.appendChild(d);rend();
+}
+function showTaskProgressGauge(){
+  let ex=document.getElementById('progress-gauge-float');if(ex){ex.remove();return;}
+  const tasks=S.tasks||[];
+  const total=tasks.length||1;
+  const done=tasks.filter(t=>t.status==='done').length;
+  const pct=Math.round((done/total)*100);
+  const r=70;const circ=2*Math.PI*r;const offset=circ-(pct/100)*circ;
+  const color=pct>=80?'#4ade80':pct>=50?'#facc15':pct>=25?'#fb923c':'#f87171';
+  const d=document.createElement('div');d.id='progress-gauge-float';
+  d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:280px;width:90vw;text-align:center">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Overall Progress</span><span onclick="document.getElementById('progress-gauge-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+    <svg width="180" height="180" viewBox="0 0 180 180">
+      <circle cx="90" cy="90" r="${r}" fill="none" stroke="var(--bg-surface)" stroke-width="12"/>
+      <circle cx="90" cy="90" r="${r}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 90 90)" style="transition:stroke-dashoffset 1s ease"/>
+      <text x="90" y="85" text-anchor="middle" fill="var(--text-primary)" font-size="32" font-weight="700">${pct}%</text>
+      <text x="90" y="105" text-anchor="middle" fill="var(--text-muted)" font-size="11">${done} / ${total} tasks</text>
+    </svg>
+    <div style="margin-top:8px;font-size:10px;color:var(--text-muted)">${total-done} remaining</div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function showQuickLoremIpsum(){
+  let ex=document.getElementById('lorem-float');if(ex){ex.remove();return;}
+  const paras=['Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.','Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.','Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.','Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.','At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident.'];
+  let count=3;
+  const d=document.createElement('div');d.id='lorem-float';
+  const rend=()=>{
+    const text=paras.slice(0,count).join('\n\n');
+    d.innerHTML=`<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:1500;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 12px 48px rgba(0,0,0,0.7);max-width:500px;width:90vw;max-height:70vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><span style="font-weight:600;color:var(--text-primary)">Lorem Ipsum</span><span onclick="document.getElementById('lorem-float').remove()" style="cursor:pointer;color:var(--text-muted);font-size:18px">x</span></div>
+      <div style="display:flex;gap:4px;margin-bottom:10px">${[1,2,3,4,5].map(n=>`<button onclick="window._setLorem(${n})" style="background:${count===n?'var(--accent)':'var(--bg-surface)'};color:${count===n?'#000':'var(--text-secondary)'};border:1px solid var(--border);padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px">${n}p</button>`).join('')}</div>
+      <div style="background:var(--bg-surface);border-radius:6px;padding:12px;font-size:12px;color:var(--text-secondary);line-height:1.6;white-space:pre-wrap">${text}</div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="navigator.clipboard.writeText(document.querySelector('#lorem-float div[style*=pre-wrap]').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy Text',1200)" style="background:var(--accent);color:#000;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">Copy Text</button>
+        <span style="font-size:10px;color:var(--text-muted);align-self:center">${text.split(/\s+/).length} words</span>
+      </div>
+    </div>`;
+  };
+  window._setLorem=(n)=>{count=n;rend();};
   document.body.appendChild(d);rend();
 }
 function showProjectRoadmap(filterProject){
