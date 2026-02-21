@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASTRA Command Center - User Manual</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050711;
+    --bg-card: #0e0e14;
+    --bg-section: #0a0a10;
+    --accent: #06b6d4;
+    --accent-light: #22d3ee;
+    --accent-green: #4ade80;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --text-muted: #64748b;
+    --border: #1e293b;
+    --red: #ef4444;
+    --orange: #f97316;
+    --blue: #3b82f6;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --yellow: #facc15;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* --- COVER PAGE --- */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 30%, rgba(6,182,212,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, rgba(74,222,128,0.04) 0%, transparent 40%),
+                var(--bg);
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='g' width='40' height='40' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='20' cy='20' r='.4' fill='%2322d3ee' opacity='.15'/%3E%3C/pattern%3E%3C/defs%3E%3Crect fill='url(%23g)' width='400' height='400'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .cover-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-green));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--bg);
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover h1 {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 8px;
+  }
+
+  .cover .subtitle {
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover .version-badge {
+    display: inline-block;
+    padding: 6px 20px;
+    border: 1px solid var(--accent);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 24px;
+  }
+
+  .cover .tagline {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 500px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- TABLE OF CONTENTS --- */
+  .toc {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 40px;
+    page-break-before: always;
+  }
+
+  .toc h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: var(--accent-light);
+    letter-spacing: -0.5px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    text-decoration: none;
+    color: var(--text);
+    transition: color 0.2s;
+  }
+
+  .toc-item:hover { color: var(--accent-light); }
+
+  .toc-num {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  .toc-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .toc-page {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-left: 16px;
+  }
+
+  .toc-dots {
+    flex: 1;
+    border-bottom: 1px dotted var(--border);
+    margin: 0 12px;
+    min-width: 40px;
+  }
+
+  /* --- SECTIONS --- */
+  .manual-section {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 80px 40px 40px;
+    page-break-before: always;
+  }
+
+  .section-header {
+    margin-bottom: 48px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .section-number {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .section-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .section-header .section-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-weight: 300;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 40px 0 16px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 28px 0 12px;
+    color: var(--accent-light);
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: var(--text-dim);
+  }
+
+  ul, ol {
+    margin-bottom: 16px;
+    padding-left: 24px;
+  }
+
+  li {
+    margin-bottom: 6px;
+    color: var(--text-dim);
+  }
+
+  li strong { color: var(--text); }
+
+  /* --- CARDS / FEATURE BLOCKS --- */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+
+  .feature-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .feature-card .fc-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .feature-card h5 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .feature-card p {
+    font-size: 13px;
+    margin-bottom: 0;
+    color: var(--text-muted);
+  }
+
+  /* --- KEYBOARD SHORTCUTS --- */
+  .shortcut-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  .shortcut-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .shortcut-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 14px;
+  }
+
+  .shortcut-table tr:hover { background: rgba(6,182,212,0.03); }
+
+  kbd {
+    display: inline-block;
+    padding: 2px 8px;
+    font-family: 'Sora', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-light);
+    background: rgba(6,182,212,0.1);
+    border: 1px solid rgba(6,182,212,0.2);
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  /* --- CALLOUT BOXES --- */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    font-size: 14px;
+  }
+
+  .callout-tip {
+    background: rgba(6,182,212,0.06);
+    border-left: 3px solid var(--accent);
+  }
+
+  .callout-tip .callout-label { color: var(--accent); }
+
+  .callout-important {
+    background: rgba(239,68,68,0.06);
+    border-left: 3px solid var(--red);
+  }
+
+  .callout-important .callout-label { color: var(--red); }
+
+  .callout-note {
+    background: rgba(167,139,250,0.06);
+    border-left: 3px solid var(--purple);
+  }
+
+  .callout-note .callout-label { color: var(--purple); }
+
+  .callout-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .callout p { margin-bottom: 0; color: var(--text-dim); }
+
+  /* --- CODE BLOCKS --- */
+  code {
+    font-family: 'Sora', monospace;
+    font-size: 13px;
+    padding: 2px 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    color: var(--accent-light);
+  }
+
+  .code-block {
+    background: #0a0a0f;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-family: 'Sora', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+
+  /* --- PRIORITY BADGES --- */
+  .priority { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; }
+  .priority-p0 { background: rgba(239,68,68,0.15); color: var(--red); }
+  .priority-p1 { background: rgba(249,115,22,0.15); color: var(--orange); }
+  .priority-p2 { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .priority-p3 { background: rgba(148,163,184,0.15); color: var(--text-muted); }
+
+  /* --- SECTION ICON BADGES --- */
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 4px 4px 4px 0;
+  }
+
+  .sb-content { background: rgba(6,182,212,0.1); color: var(--accent); }
+  .sb-tasks { background: rgba(249,115,22,0.1); color: var(--orange); }
+  .sb-calendar { background: rgba(59,130,246,0.1); color: var(--blue); }
+  .sb-writer { background: rgba(167,139,250,0.1); color: var(--purple); }
+  .sb-docs { background: rgba(74,222,128,0.1); color: var(--accent-green); }
+  .sb-links { background: rgba(244,114,182,0.1); color: var(--pink); }
+  .sb-whiteboard { background: rgba(250,204,21,0.1); color: var(--yellow); }
+  .sb-pipeline { background: rgba(148,163,184,0.1); color: var(--text-dim); }
+  .sb-repos { background: rgba(239,68,68,0.1); color: var(--red); }
+
+  /* --- DIVIDERS --- */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* --- PRINT STYLES --- */
+  @media print {
+    body { background: #fff; color: #1a1a2e; font-size: 12px; }
+    .cover { min-height: auto; padding: 80px 40px; background: #fff; }
+    .cover::before { display: none; }
+    .cover h1 { -webkit-text-fill-color: #06b6d4; }
+    .cover .subtitle { color: #555; }
+    .section-header h2 { color: #1a1a2e; }
+    h3 { color: #1a1a2e; }
+    h4 { color: #06b6d4; }
+    p, li { color: #333; }
+    .feature-card { border-color: #ddd; background: #f8f9fa; }
+    .feature-card h5 { color: #1a1a2e; }
+    .feature-card p { color: #555; }
+    kbd { background: #f0f0f0; border-color: #ccc; color: #06b6d4; }
+    .callout { break-inside: avoid; }
+    .callout-tip { background: #f0fffe; border-left-color: #06b6d4; }
+    .callout p { color: #444; }
+    .shortcut-table td, .shortcut-table th { color: #333; }
+    .manual-section { page-break-before: always; padding: 40px 20px; }
+    a { color: #06b6d4; }
+    .code-block { background: #f5f5f5; border-color: #ddd; color: #333; }
+    code { background: #f0f0f0; color: #06b6d4; }
+  }
+
+  @media (max-width: 640px) {
+    .feature-grid { grid-template-columns: 1fr; }
+    .cover h1 { font-size: 36px; }
+    .manual-section { padding: 40px 20px; }
+  }
+
+  /* --- QUICK REF SIDEBAR --- */
+  .quick-ref {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 24px 0;
+  }
+
+  .quick-ref h5 {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .quick-ref ul { list-style: none; padding: 0; }
+  .quick-ref li {
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .quick-ref li:last-child { border: none; }
+
+  /* --- WORKFLOW STEPS --- */
+  .workflow {
+    margin: 24px 0;
+    counter-reset: step;
+  }
+
+  .workflow-step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .workflow-step::before {
+    counter-increment: step;
+    content: counter(step);
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(6,182,212,0.1);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .workflow-step .ws-content { flex: 1; padding-top: 4px; }
+  .workflow-step .ws-title { font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .workflow-step .ws-desc { font-size: 13px; color: var(--text-muted); }
+
+  /* --- FOOTER --- */
+  .manual-footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 40px 80px;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .manual-footer p {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== COVER PAGE ========== -->
+<div class="cover">
+  <div class="cover-logo">A</div>
+  <h1>ASTRA</h1>
+  <div class="subtitle">Command Center</div>
+  <div class="version-badge">User Manual &mdash; v2.0</div>
+  <p class="tagline">A zero-dependency, offline-first command center for managing projects, tasks, content, writing, knowledge, and creative workflows &mdash; all from a single interface.</p>
+</div>
+
+<!-- ========== TABLE OF CONTENTS ========== -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+
+  <a class="toc-item" href="#getting-started">
+    <span class="toc-num">01</span>
+    <span class="toc-title">Getting Started</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#interface">
+    <span class="toc-num">02</span>
+    <span class="toc-title">The Interface</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#content">
+    <span class="toc-num">03</span>
+    <span class="toc-title">Content Vault</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#tasks">
+    <span class="toc-num">04</span>
+    <span class="toc-title">Task Management</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#calendar">
+    <span class="toc-num">05</span>
+    <span class="toc-title">Calendar</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#writer">
+    <span class="toc-num">06</span>
+    <span class="toc-title">Writing Hub</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#living-docs">
+    <span class="toc-num">07</span>
+    <span class="toc-title">Living Docs</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#links">
+    <span class="toc-num">08</span>
+    <span class="toc-title">Links Directory</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#whiteboard">
+    <span class="toc-num">09</span>
+    <span class="toc-title">Whiteboard</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#pipeline">
+    <span class="toc-num">10</span>
+    <span class="toc-title">Pipeline</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#repos">
+    <span class="toc-num">11</span>
+    <span class="toc-title">Repos</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#command-palette">
+    <span class="toc-num">12</span>
+    <span class="toc-title">Command Palette</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#context-panel">
+    <span class="toc-num">13</span>
+    <span class="toc-title">Context Panel</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#projects">
+    <span class="toc-num">14</span>
+    <span class="toc-title">Projects &amp; Knowledge Base</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#keyboard">
+    <span class="toc-num">15</span>
+    <span class="toc-title">Keyboard Shortcuts Reference</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#data">
+    <span class="toc-num">16</span>
+    <span class="toc-title">Data &amp; Storage</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#workflows">
+    <span class="toc-num">17</span>
+    <span class="toc-title">Workflows &amp; Best Practices</span>
+    <span class="toc-dots"></span>
+  </a>
+  <a class="toc-item" href="#roadmap">
+    <span class="toc-num">18</span>
+    <span class="toc-title">Roadmap</span>
+    <span class="toc-dots"></span>
+  </a>
+</div>
+
+<!-- ========== 01: GETTING STARTED ========== -->
+<div class="manual-section" id="getting-started">
+  <div class="section-header">
+    <div class="section-number">Section 01</div>
+    <h2>Getting Started</h2>
+    <p class="section-desc">Everything you need to launch ASTRA and start working in under 60 seconds.</p>
+  </div>
+
+  <h3>What is ASTRA?</h3>
+  <p>ASTRA Command Center is a <strong>single-file, zero-dependency web application</strong> that serves as your complete digital workspace. It combines project management, content capture, long-form writing, specifications, bookmarks, visual diagramming, text processing, and repository tracking &mdash; all in one interface that works entirely offline.</p>
+  <p>There is no backend required for core functionality. Everything runs in your browser and is stored in <code>localStorage</code>. Optional cloud sync via Vercel Blob is available for cross-device persistence.</p>
+
+  <h3>Quick Start</h3>
+  <div class="workflow">
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Open the app</div>
+        <div class="ws-desc">Navigate to your deployed URL (e.g., <code>astra-command-center-sigma.vercel.app</code>) or open <code>index.html</code> locally in any modern browser.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Explore the sidebar</div>
+        <div class="ws-desc">The left sidebar shows all 9 sections: Content, Tasks, Calendar, Writing Hub, Living Docs, Links, Whiteboard, Pipeline, and Repos. Click any section or press <kbd>Cmd+1</kbd> through <kbd>Cmd+9</kbd>.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Open the Command Palette</div>
+        <div class="ws-desc">Press <kbd>Cmd+K</kbd> to open the command palette. This is the fastest way to navigate, search, create tasks, add notes, and trigger any action in ASTRA.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Create your first item</div>
+        <div class="ws-desc">Type <code>task: Build the landing page @tomorrow !p1</code> in the command palette to create your first task. Or press <kbd>Cmd+N</kbd> to create a new item in the current section.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Pro Tip</div>
+    <p>ASTRA is installable as a PWA. On mobile or desktop, use your browser's "Add to Home Screen" or "Install App" option for a native-like experience with full offline support.</p>
+  </div>
+
+  <h3>System Requirements</h3>
+  <ul>
+    <li>Any modern browser (Chrome, Firefox, Safari, Edge)</li>
+    <li>No server required for core features</li>
+    <li>Vercel deployment for cloud sync and API endpoints (optional)</li>
+    <li>Works fully offline after first load</li>
+  </ul>
+</div>
+
+<!-- ========== 02: THE INTERFACE ========== -->
+<div class="manual-section" id="interface">
+  <div class="section-header">
+    <div class="section-number">Section 02</div>
+    <h2>The Interface</h2>
+    <p class="section-desc">A three-panel layout designed for deep work and rapid navigation.</p>
+  </div>
+
+  <h3>Layout Overview</h3>
+  <p>ASTRA uses a resizable three-panel layout:</p>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="fc-icon" style="background:rgba(6,182,212,0.1);color:var(--accent)">L</div>
+      <h5>Left Sidebar</h5>
+      <p>Section navigation, project folders, mini dashboard with task/doc/project counts. Collapsible to a 52px icon strip with <kbd>Cmd+B</kbd>.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon" style="background:rgba(167,139,250,0.1);color:var(--purple)">C</div>
+      <h5>Center Panel</h5>
+      <p>Primary workspace. Shows the active section content: cards, lists, boards, editors, canvas, or grid views depending on which section is selected.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon" style="background:rgba(74,222,128,0.1);color:var(--accent-green)">R</div>
+      <h5>Right Context Panel</h5>
+      <p>Focus Timer, Today's Focus, Quick Note, Stats, and Related Items. Toggle with <kbd>Cmd+E</kbd>. Auto-updates in real time.</p>
+    </div>
+    <div class="feature-card">
+      <div class="fc-icon" style="background:rgba(250,204,21,0.1);color:var(--yellow)">P</div>
+      <h5>Project Panel</h5>
+      <p>When a project is selected from sidebar folders, the right panel shows project-specific tabs: Instructions, Living Docs, KB, Tasks, and Links.</p>
+    </div>
+  </div>
+
+  <h3>View Modes</h3>
+  <p>ASTRA offers three modes accessible via buttons in the top-right corner:</p>
+  <ul>
+    <li><strong>Default Mode</strong> &mdash; Sidebar + center panel visible. Context panel hidden.</li>
+    <li><strong>Focus Mode</strong> (<kbd>Cmd+Shift+F</kbd> or <kbd>Cmd+\</kbd>) &mdash; Hides sidebar entirely. Full-screen primary content for distraction-free work.</li>
+    <li><strong>Extended Mode</strong> (E button) &mdash; Sidebar + center + context panel all visible. Best for comprehensive view with timer, notes, and stats always on screen.</li>
+  </ul>
+
+  <h3>Sidebar Navigation</h3>
+  <p>The sidebar contains nine section icons, each accessible via keyboard shortcut:</p>
+
+  <div class="quick-ref">
+    <h5>Section Shortcuts</h5>
+    <ul>
+      <li><span><span class="section-badge sb-content">C</span> Content</span> <kbd>Cmd+1</kbd></li>
+      <li><span><span class="section-badge sb-tasks">T</span> Tasks</span> <kbd>Cmd+2</kbd></li>
+      <li><span><span class="section-badge sb-calendar">D</span> Calendar</span> <kbd>Cmd+3</kbd></li>
+      <li><span><span class="section-badge sb-writer">W</span> Writing Hub</span> <kbd>Cmd+4</kbd></li>
+      <li><span><span class="section-badge sb-docs">S</span> Living Docs</span> <kbd>Cmd+5</kbd></li>
+      <li><span><span class="section-badge sb-links">L</span> Links</span> <kbd>Cmd+6</kbd></li>
+      <li><span><span class="section-badge sb-whiteboard">B</span> Whiteboard</span> <kbd>Cmd+7</kbd></li>
+      <li><span><span class="section-badge sb-pipeline">P</span> Pipeline</span> <kbd>Cmd+8</kbd></li>
+      <li><span><span class="section-badge sb-repos">R</span> Repos</span> <kbd>Cmd+9</kbd></li>
+    </ul>
+  </div>
+
+  <h3>Responsive Design</h3>
+  <p>On mobile (<768px), the sidebar collapses into a hamburger menu overlay. Board views scroll horizontally. The context panel hides by default and can be toggled. All interactive elements are sized for touch (48px+ tap targets).</p>
+</div>
+
+<!-- ========== 03: CONTENT VAULT ========== -->
+<div class="manual-section" id="content">
+  <div class="section-header">
+    <div class="section-number">Section 03</div>
+    <h2>Content Vault</h2>
+    <p class="section-desc">Capture, organize, tag, and transform every idea, quote, caption, and insight.</p>
+  </div>
+
+  <h3>Overview</h3>
+  <p>The Content section is your universal capture inbox. Every piece of text &mdash; captions, quotes, research notes, ideas, bookmarks &mdash; lives here. Items are displayed as cards in a responsive grid with real-time search, tag filtering, and multiple sort options.</p>
+
+  <h3>Creating Content</h3>
+  <ul>
+    <li><strong>Quick Capture</strong> (<kbd>Cmd+Shift+N</kbd>) &mdash; Floating input that saves directly to Content</li>
+    <li><strong>Command Palette</strong> &mdash; Type <code>note: your text here</code> in <kbd>Cmd+K</kbd></li>
+    <li><strong>Context Panel</strong> &mdash; Quick Note widget: type and press Enter or click "Save to Content"</li>
+    <li><strong>Batch Import</strong> &mdash; Paste multiple items separated by <code>---</code> delimiter</li>
+    <li><strong>Markdown Import</strong> &mdash; Headings become themes, paragraphs become content items</li>
+  </ul>
+
+  <h3>Content Properties</h3>
+  <ul>
+    <li><strong>Body</strong> &mdash; The actual content text</li>
+    <li><strong>Type</strong> &mdash; Caption, quote, thought, idea, research, bookmark, task</li>
+    <li><strong>Theme/Category</strong> &mdash; Auto-suggested from existing data, or custom</li>
+    <li><strong>Tags</strong> &mdash; Multi-select, filterable via tag pills in toolbar</li>
+    <li><strong>Pin</strong> &mdash; Pinned items sort to top with green border</li>
+    <li><strong>Star/Favorite</strong> &mdash; Yellow indicator, also sorts to top</li>
+    <li><strong>Reading Time</strong> &mdash; Auto-calculated for items over 50 words</li>
+    <li><strong>Word Count</strong> &mdash; Per-item and total across all content</li>
+  </ul>
+
+  <h3>Views &amp; Organization</h3>
+  <ul>
+    <li><strong>Grid view</strong> (default) &mdash; 3-column responsive card layout</li>
+    <li><strong>Compact list view</strong> &mdash; Single column, tight spacing</li>
+    <li><strong>Read mode</strong> &mdash; Full-screen reading overlay with minimal UI</li>
+    <li><strong>Sort:</strong> Newest, Oldest, Alphabetical, Word Count, By Theme</li>
+    <li><strong>Search:</strong> Real-time filtering with green highlighting across body + theme + tags</li>
+    <li><strong>Tag pills:</strong> Click any tag in the toolbar to filter instantly</li>
+  </ul>
+
+  <h3>Actions</h3>
+  <ul>
+    <li><strong>Inline Edit</strong> &mdash; Double-click any card, <kbd>Cmd+Enter</kbd> to save</li>
+    <li><strong>Bulk Select</strong> &mdash; Select multiple items, then tag/pin/delete/move in batch</li>
+    <li><strong>Convert To:</strong> Task, Writer Document, or Pipeline for further processing</li>
+    <li><strong>Duplicate &amp; Merge</strong> &mdash; Copy items or combine selected items into one</li>
+    <li><strong>Export</strong> &mdash; All items as grouped markdown, or just the filtered view</li>
+    <li><strong>Undo Delete</strong> &mdash; <kbd>Cmd+Z</kbd> restores the last deleted item</li>
+    <li><strong>Tag Management</strong> &mdash; Rename or delete tags across all items at once</li>
+  </ul>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Pro Tip</div>
+    <p>Use the "Pipe" button on any content card to send it directly to the Pipeline section for text processing &mdash; summarize, extract action items, or generate social posts from your raw content.</p>
+  </div>
+</div>
+
+<!-- ========== 04: TASKS ========== -->
+<div class="manual-section" id="tasks">
+  <div class="section-header">
+    <div class="section-number">Section 04</div>
+    <h2>Task Management</h2>
+    <p class="section-desc">Kanban boards, lists, Eisenhower matrix, priorities, subtasks, time tracking, and recurring tasks.</p>
+  </div>
+
+  <h3>Overview</h3>
+  <p>The Task section is a full project management system. You get three views &mdash; Kanban board, list, and Eisenhower matrix &mdash; with drag-and-drop, priority color coding, time tracking, and powerful filtering.</p>
+
+  <h3>Views</h3>
+
+  <h4>Kanban Board</h4>
+  <p>Four columns: <strong>TO DO</strong>, <strong>IN PROGRESS</strong>, <strong>IN REVIEW</strong>, <strong>DONE</strong>. Drag tasks between columns. Each card shows the title, priority bar (color-coded on the left edge), due date, description preview, subtask progress bar, time estimate, blocked-by badge, and project label. Columns can be collapsed. WIP limit warning turns the "In Progress" header red when more than 5 tasks are active.</p>
+
+  <h4>List View</h4>
+  <p>A sortable table with checkbox selection, status dropdown, priority badges, due dates, project filters, and time spent. Overdue rows are highlighted in red. Navigate with arrow keys, press <kbd>Enter</kbd> to open task detail.</p>
+
+  <h4>Eisenhower Matrix</h4>
+  <p>Four quadrants: Urgent+Important, Not Urgent+Important, Urgent+Not Important, Not Urgent+Not Important. Tasks are auto-sorted based on priority and due date.</p>
+
+  <h3>Task Properties</h3>
+  <ul>
+    <li><strong>Title</strong> &mdash; Main identifier</li>
+    <li><strong>Description</strong> &mdash; Multi-line rich text</li>
+    <li><strong>Subtasks</strong> &mdash; Nested checkboxes with individual titles and progress bar on parent</li>
+    <li><strong>Status</strong> &mdash; Todo, In Progress, In Review, Done</li>
+    <li><strong>Priority</strong> &mdash; <span class="priority priority-p0">P0 Critical</span> <span class="priority priority-p1">P1 High</span> <span class="priority priority-p2">P2 Medium</span> <span class="priority priority-p3">P3 Low</span></li>
+    <li><strong>Due Date</strong> &mdash; Quick-set buttons: Today, Tomorrow, +1 Week, +1 Month</li>
+    <li><strong>Project</strong> &mdash; Assign to any project, filter by project in toolbar</li>
+    <li><strong>Tags</strong> &mdash; Multi-tag support</li>
+    <li><strong>Recurrence</strong> &mdash; Daily, Weekday, Weekly, Biweekly, Monthly. Auto-creates next instance on completion.</li>
+    <li><strong>Estimate</strong> &mdash; Time estimate (e.g. "30m", "2h"), shown in cyan on board cards</li>
+    <li><strong>Time Spent</strong> &mdash; Accumulated from Start/Stop timer in detail modal</li>
+    <li><strong>Blocked By</strong> &mdash; Dependency field. Shows "B" badge on board. Prevents premature completion.</li>
+    <li><strong>Activity Log</strong> &mdash; Tracks every status change with timestamps</li>
+  </ul>
+
+  <h3>Creating Tasks</h3>
+  <ul>
+    <li><kbd>Cmd+Shift+T</kbd> &mdash; New task from anywhere</li>
+    <li>Command Palette: <code>task: title @date !priority</code></li>
+    <li>Quick inline add from board column headers</li>
+    <li>Templates: Daily standup, Weekly review, Bug report, Feature request, Documentation</li>
+    <li>Convert from Content: press "Task" button on any content card</li>
+  </ul>
+
+  <h3>Task Detail Modal</h3>
+  <p>Click any task to open the full detail modal. Keyboard shortcuts inside the modal:</p>
+  <table class="shortcut-table">
+    <tr><th>Key</th><th>Action</th></tr>
+    <tr><td><kbd>1</kbd>&ndash;<kbd>4</kbd></td><td>Set priority P0/P1/P2/P3</td></tr>
+    <tr><td><kbd>D</kbd></td><td>Toggle done/todo</td></tr>
+    <tr><td><kbd>T</kbd></td><td>Set due date to today</td></tr>
+    <tr><td><kbd>S</kbd></td><td>Save task</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Close modal</td></tr>
+  </table>
+
+  <h3>Bulk Operations &amp; More</h3>
+  <ul>
+    <li><strong>Bulk select</strong> &mdash; Select multiple tasks, apply status/priority/due date in batch</li>
+    <li><strong>Archive</strong> &mdash; Move completed tasks older than 30 days to hidden archive</li>
+    <li><strong>Daily Standup</strong> &mdash; <kbd>Cmd+K</kbd> > "standup" generates a daily summary</li>
+    <li><strong>Export</strong> &mdash; Filtered or all tasks as grouped markdown or CSV</li>
+    <li><strong>Duplicate</strong> &mdash; Copy any task with all properties</li>
+    <li><strong>Convert to Content</strong> &mdash; Transform a task into a content item</li>
+    <li><strong>Focus Timer</strong> &mdash; Start a 25-minute Pomodoro + time tracking for a single task</li>
+  </ul>
+
+  <div class="callout callout-important">
+    <div class="callout-label">Important</div>
+    <p>Overdue tasks are highlighted in red across all views &mdash; board cards, list rows, and calendar. The sidebar shows a red count badge when any tasks are overdue.</p>
+  </div>
+</div>
+
+<!-- ========== 05: CALENDAR ========== -->
+<div class="manual-section" id="calendar">
+  <div class="section-header">
+    <div class="section-number">Section 05</div>
+    <h2>Calendar</h2>
+    <p class="section-desc">Month and week views with task scheduling, drag-drop, and ICS import/export.</p>
+  </div>
+
+  <h3>Views</h3>
+  <ul>
+    <li><strong>Month view</strong> &mdash; Grid with day numbers and task count badges. Click any day to create a task or view that day's tasks in a detail popup. Today is highlighted with a teal background.</li>
+    <li><strong>Week view</strong> &mdash; 7-column layout showing all tasks per day. Task count badges in headers. Drag tasks across days.</li>
+    <li><strong>Year heatmap</strong> &mdash; Mini 12-month grid showing task density per day.</li>
+  </ul>
+
+  <h3>Features</h3>
+  <ul>
+    <li><strong>Task scheduling</strong> &mdash; Click a date to create a task on that day. Drag tasks to reschedule.</li>
+    <li><strong>Priority colors</strong> &mdash; Task pills match priority (red/orange/blue/gray)</li>
+    <li><strong>Day detail popup</strong> &mdash; Click any date to see all tasks with quick-complete checkboxes</li>
+    <li><strong>Upcoming tasks list</strong> &mdash; Shown below the calendar grid: overdue first, then upcoming</li>
+    <li><strong>ICS import</strong> &mdash; Parse <code>.ics</code> calendar files. Auto-deduplicates by title+date</li>
+    <li><strong>ICS export</strong> &mdash; Download all active tasks as a calendar file for Google Calendar or Outlook</li>
+    <li><strong>Week export</strong> &mdash; <kbd>Cmd+K</kbd> > "export week" copies this week's tasks as markdown</li>
+  </ul>
+</div>
+
+<!-- ========== 06: WRITING HUB ========== -->
+<div class="manual-section" id="writer">
+  <div class="section-header">
+    <div class="section-number">Section 06</div>
+    <h2>Writing Hub</h2>
+    <p class="section-desc">A full-featured document editor with Zen mode, versioning, word goals, and export.</p>
+  </div>
+
+  <h3>Editor</h3>
+  <p>The Writing Hub provides a rich text editor (WYSIWYG) with heading styles, bold, italic, and code formatting. Auto-save triggers on every keystroke (debounced 800ms), and auto-backup creates a new version every 10 minutes of active editing (up to 50 versions per document).</p>
+
+  <h3>Zen Writer Mode</h3>
+  <p>Press <kbd>Cmd+Shift+W</kbd> from anywhere to enter Zen Writer &mdash; a full-screen, distraction-free editor with doubled line spacing and typewriter-style cursor positioning. Exit with <kbd>Esc</kbd>.</p>
+
+  <h3>Features</h3>
+  <ul>
+    <li><strong>Word count &amp; character count</strong> in the footer</li>
+    <li><strong>Versions</strong> &mdash; Manual snapshots + automatic backups. Preview any version before restoring.</li>
+    <li><strong>Word goals</strong> &mdash; Set daily/weekly/monthly targets with progress tracking</li>
+    <li><strong>Find &amp; Replace</strong> &mdash; <kbd>Cmd+F</kbd> bar in the editor</li>
+    <li><strong>TOC Generator</strong> &mdash; Auto-generates table of contents from document headings</li>
+    <li><strong>Duplicate document</strong> &mdash; <kbd>Cmd+D</kbd></li>
+    <li><strong>Export</strong> &mdash; Markdown (.md), HTML (.html), Plain text (.txt), or copy to clipboard</li>
+    <li><strong>Convert to Content</strong> &mdash; Save any document as a content item</li>
+  </ul>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Pro Tip</div>
+    <p>Zen Writer has its own document picker dropdown, so you can switch between documents without leaving the distraction-free environment.</p>
+  </div>
+</div>
+
+<!-- ========== 07: LIVING DOCS ========== -->
+<div class="manual-section" id="living-docs">
+  <div class="section-header">
+    <div class="section-number">Section 07</div>
+    <h2>Living Docs</h2>
+    <p class="section-desc">Structured specification documents with sections, icons, colors, and per-project customization.</p>
+  </div>
+
+  <h3>Overview</h3>
+  <p>Living Docs are multi-section specification documents. Think PRDs, RFCs, retrospectives, or any structured document that evolves over time. Each spec has multiple titled sections with rich text, an icon, and a color for visual identification.</p>
+
+  <h3>Working with Specs</h3>
+  <ul>
+    <li><strong>Add sections</strong> with the + button. Each section has a title and a rich text body.</li>
+    <li><strong>Drag-and-drop reorder</strong> sections using the drag handle.</li>
+    <li><strong>Collapse/Expand</strong> individual sections or all at once.</li>
+    <li><strong>Word count</strong> per section shown in headers, plus total spec word count.</li>
+    <li><strong>Icon picker</strong> &mdash; 20 icons to visually identify each spec.</li>
+    <li><strong>Color picker</strong> &mdash; 10 colors per spec.</li>
+  </ul>
+
+  <h3>Templates</h3>
+  <ul>
+    <li><strong>PRD</strong> &mdash; Product Requirements Document</li>
+    <li><strong>RFC</strong> &mdash; Request for Comments</li>
+    <li><strong>Retrospective</strong> &mdash; Went well / To improve / Actions</li>
+    <li><strong>Checklist</strong> &mdash; Reusable process checklists</li>
+  </ul>
+
+  <h3>Export &amp; Actions</h3>
+  <ul>
+    <li><strong>Export</strong> as HTML, Markdown, or Plain Text (full spec + all sections)</li>
+    <li><strong>Copy individual section</strong> as markdown with the "C" button per section</li>
+    <li><strong>Duplicate</strong> entire spec with all sections</li>
+    <li><strong>Import</strong> spec from markdown or text</li>
+  </ul>
+
+  <h3>Per-Project Living Docs</h3>
+  <p>Each project can have its own Living Docs with tailored sections. When you create or select a project, its specs appear in the project panel on the right.</p>
+</div>
+
+<!-- ========== 08: LINKS ========== -->
+<div class="manual-section" id="links">
+  <div class="section-header">
+    <div class="section-number">Section 08</div>
+    <h2>Links Directory</h2>
+    <p class="section-desc">Bookmarks organized by category with favicons, search, and batch import.</p>
+  </div>
+
+  <h3>Link Properties</h3>
+  <ul>
+    <li><strong>Title</strong> &mdash; Auto-fetched from page or entered manually</li>
+    <li><strong>URL</strong> &mdash; Validated web address with domain favicon display</li>
+    <li><strong>Category</strong> &mdash; Production, Reference, Tools, Learning, etc. (auto-suggest from existing)</li>
+    <li><strong>Description</strong> &mdash; Optional notes</li>
+    <li><strong>Tags</strong> &mdash; Multi-select (shared with content tags)</li>
+    <li><strong>Pin</strong> &mdash; Pinned items sort to top with green border</li>
+    <li><strong>Read Later</strong> &mdash; Separate filter view for your reading list</li>
+  </ul>
+
+  <h3>Features</h3>
+  <ul>
+    <li><strong>Favicons</strong> &mdash; Auto-fetched via Google Favicon API</li>
+    <li><strong>Batch import</strong> &mdash; Paste multiple URLs at once</li>
+    <li><strong>Fetch title</strong> &mdash; Button to auto-fetch page title from URL</li>
+    <li><strong>Duplicate detection</strong> &mdash; Warns before adding duplicate URLs</li>
+    <li><strong>Category tabs</strong> &mdash; Filter by category with count badges</li>
+    <li><strong>Sort</strong> &mdash; Newest, Oldest, Alphabetical, By Category, By Domain, By Tag</li>
+    <li><strong>Export</strong> &mdash; Categorized markdown or styled HTML</li>
+    <li><strong>Open all</strong> &mdash; Open all visible links in new tabs</li>
+    <li><strong>URL copy</strong> &mdash; Copy any URL to clipboard</li>
+    <li><strong>Markdown copy</strong> &mdash; Copy as <code>[title](url)</code> format</li>
+    <li><strong>Link checker</strong> &mdash; Verify reachability of all URLs</li>
+    <li><strong>Undo delete</strong> &mdash; <kbd>Cmd+Z</kbd></li>
+  </ul>
+</div>
+
+<!-- ========== 09: WHITEBOARD ========== -->
+<div class="manual-section" id="whiteboard">
+  <div class="section-header">
+    <div class="section-number">Section 09</div>
+    <h2>Whiteboard</h2>
+    <p class="section-desc">Visual canvas for diagramming, mind-mapping, and spatial thinking.</p>
+  </div>
+
+  <h3>Canvas Tools</h3>
+  <ul>
+    <li><strong>Node creation</strong> &mdash; Click to place editable text nodes</li>
+    <li><strong>Connector tool</strong> &mdash; Click-to-connect nodes with lines</li>
+    <li><strong>Hand pan</strong> &mdash; Grab and drag the canvas</li>
+    <li><strong>Text tool</strong> &mdash; Add rich text elements</li>
+    <li><strong>Sticky note</strong> &mdash; Floating note boxes</li>
+    <li><strong>Rectangle/shape</strong> &mdash; Draw boxes</li>
+    <li><strong>Color picker</strong> &mdash; 12 colors, accessible via hover popup</li>
+  </ul>
+
+  <h3>Node Features</h3>
+  <ul>
+    <li><strong>Editable text</strong> &mdash; Click to edit node content</li>
+    <li><strong>Drag-drop</strong> &mdash; Free movement across canvas</li>
+    <li><strong>Lock/Unlock</strong> &mdash; Prevent accidental dragging (dashed border indicator)</li>
+    <li><strong>Duplicate</strong> &mdash; Green + button duplicates any node</li>
+    <li><strong>Delete</strong> &mdash; X button removes</li>
+  </ul>
+
+  <h3>Navigation</h3>
+  <ul>
+    <li><strong>Zoom</strong> &mdash; Scroll wheel</li>
+    <li><strong>Pan</strong> &mdash; Hand tool or Spacebar+drag</li>
+    <li><strong>Fit to view</strong> &mdash; Auto-scale to show all content</li>
+    <li><strong>Grid</strong> &mdash; Toggleable background grid (8% opacity)</li>
+    <li><strong>Minimap</strong> &mdash; Bottom-right corner viewport indicator</li>
+  </ul>
+
+  <h3>Templates</h3>
+  <p>20 built-in templates including flowcharts, wireframes, mind maps, org charts, and more. Click any template to pre-populate the canvas.</p>
+
+  <h3>Export</h3>
+  <ul>
+    <li><strong>PNG</strong> &mdash; Rasterized image</li>
+    <li><strong>SVG</strong> &mdash; Scalable vector graphic</li>
+    <li><strong>JSON</strong> &mdash; Save canvas state for later import</li>
+    <li><strong>Import JSON</strong> &mdash; Restore previously saved canvas</li>
+  </ul>
+</div>
+
+<!-- ========== 10: PIPELINE ========== -->
+<div class="manual-section" id="pipeline">
+  <div class="section-header">
+    <div class="section-number">Section 10</div>
+    <h2>Pipeline</h2>
+    <p class="section-desc">Text and audio processing hub with local modes, prompt templates, and history.</p>
+  </div>
+
+  <h3>Input Methods</h3>
+  <ul>
+    <li><strong>Text input</strong> &mdash; Paste or type text into the textarea</li>
+    <li><strong>Audio recording</strong> &mdash; Click to record voice (WebM blob)</li>
+    <li><strong>File drop</strong> &mdash; Drag-drop audio or text files onto the panel</li>
+    <li><strong>File picker</strong> &mdash; Browse for files</li>
+  </ul>
+
+  <h3>Local Processing Modes (No API Required)</h3>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h5>Summarize</h5>
+      <p>Extractive summary pulling key sentences from your text.</p>
+    </div>
+    <div class="feature-card">
+      <h5>Action Items</h5>
+      <p>Extract tasks and bullet points from meeting notes or raw text.</p>
+    </div>
+    <div class="feature-card">
+      <h5>Clean Up</h5>
+      <p>Fix punctuation, capitalize, deduplicate lines.</p>
+    </div>
+    <div class="feature-card">
+      <h5>Statistics</h5>
+      <p>Word, character, line, sentence counts + reading time estimate.</p>
+    </div>
+  </div>
+  <p>Additional local modes: <strong>Keywords</strong> (extract key terms), <strong>Bullets</strong> (convert to bulleted list), <strong>Headlines</strong> (generate outline headers), <strong>Questions</strong> (generate Q&amp;A), <strong>Translate</strong>, <strong>Rewrite</strong>.</p>
+
+  <h3>Prompt Templates</h3>
+  <p>Pre-built buttons for: Summarize, Action Items, Social Post, Clean Text, Expand, Quiz, Outline, Stats, and Custom prompts. You can save your own custom prompt templates.</p>
+
+  <h3>History</h3>
+  <p>Every processed input is saved with its result, source type (text/audio/file), and timestamp. Search, expand/collapse, delete individual entries, or clear all.</p>
+
+  <h3>Save to Content</h3>
+  <p>Any pipeline result can be pushed directly to the Content section as a new item with one click.</p>
+
+  <div class="callout callout-note">
+    <div class="callout-label">Note</div>
+    <p>API mode (Whisper transcription via OpenAI) is available when <code>OPENAI_API_KEY</code> is configured in Vercel environment variables. Without it, all processing happens locally in the browser.</p>
+  </div>
+</div>
+
+<!-- ========== 11: REPOS ========== -->
+<div class="manual-section" id="repos">
+  <div class="section-header">
+    <div class="section-number">Section 11</div>
+    <h2>Repos</h2>
+    <p class="section-desc">Track your repositories with status, tech stacks, health checks, and live links.</p>
+  </div>
+
+  <h3>Repo Properties</h3>
+  <ul>
+    <li><strong>Name &amp; Description</strong></li>
+    <li><strong>GitHub URL</strong> and <strong>Live URL</strong> (deployed site)</li>
+    <li><strong>Tech Stack</strong> &mdash; Languages/frameworks shown as pill badges</li>
+    <li><strong>Role</strong> &mdash; Product, Research, Infrastructure, Internal Tools, Archive (with icon)</li>
+    <li><strong>Status</strong> &mdash; Active, Staging, Archived, Beta</li>
+    <li><strong>Last Commit Message</strong> &mdash; Editable for quick reference</li>
+    <li><strong>Notes</strong> &mdash; Custom status notes (green accent strip on card)</li>
+    <li><strong>Health Indicator</strong> &mdash; Green/red dot based on live URL ping</li>
+  </ul>
+
+  <h3>Features</h3>
+  <ul>
+    <li><strong>Health check</strong> &mdash; Pings all live URLs. Green dot = responding, red = down.</li>
+    <li><strong>Search/filter</strong> &mdash; By name, tech stack, role, or status</li>
+    <li><strong>Open all</strong> &mdash; Open all live URLs in new tabs</li>
+    <li><strong>Copy URL</strong> &mdash; Copy GitHub or live URL to clipboard</li>
+  </ul>
+</div>
+
+<!-- ========== 12: COMMAND PALETTE ========== -->
+<div class="manual-section" id="command-palette">
+  <div class="section-header">
+    <div class="section-number">Section 12</div>
+    <h2>Command Palette</h2>
+    <p class="section-desc">The brain of ASTRA. Search anything, create anything, navigate anywhere &mdash; all from <kbd>Cmd+K</kbd>.</p>
+  </div>
+
+  <h3>How It Works</h3>
+  <p>Press <kbd>Cmd+K</kbd> to open the command palette. Start typing to fuzzy-search across all items: content, tasks, documents, specs, repos, KB entries, projects, and commands. Results are grouped by type with icons.</p>
+
+  <h3>Quick Create</h3>
+  <ul>
+    <li><code>task: Build landing page @tomorrow !p1</code> &mdash; Creates a P1 task due tomorrow</li>
+    <li><code>note: Great idea for the homepage</code> &mdash; Saves to Content instantly</li>
+    <li><code>link: https://example.com</code> &mdash; Adds a link</li>
+  </ul>
+
+  <h3>Prefix Commands (29 Total)</h3>
+  <table class="shortcut-table">
+    <tr><th>Prefix</th><th>Function</th></tr>
+    <tr><td><code>task:</code></td><td>Quick-create task with <code>@date !priority</code> syntax</td></tr>
+    <tr><td><code>note:</code></td><td>Quick-save content item</td></tr>
+    <tr><td><code>link:</code></td><td>Quick-add bookmark</td></tr>
+    <tr><td><code>doc:</code></td><td>Search writer documents</td></tr>
+    <tr><td><code>spec:</code></td><td>Search living docs</td></tr>
+    <tr><td><code>tag:</code></td><td>Filter by content tag</td></tr>
+    <tr><td><code>project:</code></td><td>Filter tasks by project</td></tr>
+    <tr><td><code>goto:</code></td><td>Jump to any item by name</td></tr>
+    <tr><td><code>calc:</code></td><td>Quick calculator</td></tr>
+    <tr><td><code>focus:</code></td><td>Show P0/P1 + overdue tasks</td></tr>
+    <tr><td><code>due:</code></td><td>Show overdue tasks grouped by date</td></tr>
+    <tr><td><code>status:</code></td><td>Filter by task status</td></tr>
+    <tr><td><code>p:</code></td><td>Priority filter (p0/p1/p2/p3)</td></tr>
+    <tr><td><code>recent:</code></td><td>Show 10 recently touched items</td></tr>
+    <tr><td><code>count:</code></td><td>Item counts per section</td></tr>
+    <tr><td><code>overdue:</code></td><td>List all overdue tasks</td></tr>
+    <tr><td><code>today:</code></td><td>Show today's tasks/calendar</td></tr>
+    <tr><td><code>week:</code></td><td>Weekly summary + export</td></tr>
+    <tr><td><code>starred:</code></td><td>Show pinned/favorite items</td></tr>
+    <tr><td><code>random:</code></td><td>Pick random content for inspiration</td></tr>
+    <tr><td><code>pin:</code></td><td>Show all pinned items</td></tr>
+    <tr><td><code>progress:</code></td><td>Show in-progress tasks</td></tr>
+    <tr><td><code>blocked:</code></td><td>Show blocked tasks</td></tr>
+    <tr><td><code>export:</code></td><td>Export current section</td></tr>
+    <tr><td><code>wc:</code></td><td>Word count across all sections</td></tr>
+    <tr><td><code>archive:</code></td><td>Show archived tasks</td></tr>
+    <tr><td><code>time:</code></td><td>Time tracking + pomodoro stats</td></tr>
+    <tr><td><code>in:</code></td><td>Scoped search (e.g. <code>in:tasks keyword</code>)</td></tr>
+    <tr><td><code>all:</code></td><td>Show all items across sections</td></tr>
+  </table>
+
+  <h3>Special Actions</h3>
+  <ul>
+    <li><strong>Session Handoff</strong> &mdash; Generates a structured context report</li>
+    <li><strong>Daily Dashboard</strong> &mdash; Full daily briefing with overdue, today, in-progress stats</li>
+    <li><strong>Morning Briefing</strong> &mdash; Quick standup summary</li>
+    <li><strong>Data Stats</strong> &mdash; Storage breakdown by section</li>
+    <li><strong>Calendar Export</strong> &mdash; Download tasks as ICS</li>
+    <li><strong>Vimeo Manager</strong> &mdash; Video link management panel</li>
+    <li><strong>Keyboard Shortcuts</strong> &mdash; Full shortcuts reference</li>
+  </ul>
+</div>
+
+<!-- ========== 13: CONTEXT PANEL ========== -->
+<div class="manual-section" id="context-panel">
+  <div class="section-header">
+    <div class="section-number">Section 13</div>
+    <h2>Context Panel</h2>
+    <p class="section-desc">Your always-visible companion: timer, focus tasks, quick notes, stats, and streaks.</p>
+  </div>
+
+  <p>Toggle the context panel with <kbd>Cmd+E</kbd> or by switching to Extended Mode. It appears on the right side and contains:</p>
+
+  <h3>Focus Timer</h3>
+  <p>Built-in Pomodoro timer with preset durations: 25 minutes (standard), 5 minutes (break), 15 minutes (short). Associates with the currently focused task for automatic time tracking. Audio alert on completion.</p>
+
+  <h3>Today's Focus</h3>
+  <p>Shows your most urgent items in priority order:</p>
+  <ul>
+    <li><strong style="color:var(--red)">Overdue tasks</strong> &mdash; Red highlight, shown first</li>
+    <li><strong style="color:var(--blue)">Due today</strong> &mdash; Blue highlight</li>
+    <li><strong style="color:var(--yellow)">In Progress</strong> &mdash; Yellow highlight</li>
+  </ul>
+  <p>Each item has a quick-complete checkbox. Click the title to open the full task detail modal.</p>
+
+  <h3>Quick Note</h3>
+  <p>A textarea for jotting quick thoughts. Press <kbd>Enter</kbd> to save to Content, or click "As Task" to convert the note into a task. No friction &mdash; capture first, organize later.</p>
+
+  <h3>Stats</h3>
+  <ul>
+    <li><strong>Done Today</strong> &mdash; Count of tasks completed today</li>
+    <li><strong>Day Streak</strong> &mdash; Consecutive days with at least one completed task. Turns teal at 3+ days.</li>
+    <li><strong>Overdue / Today / Total</strong> task counts</li>
+    <li><strong>Words written</strong> (today + total)</li>
+    <li><strong>Time tracked</strong> (today + total)</li>
+  </ul>
+
+  <h3>Related Items</h3>
+  <p>When a task or document is selected, this section shows linked items from across the system &mdash; cross-referenced documents, related tasks, and content items that share tags or projects.</p>
+</div>
+
+<!-- ========== 14: PROJECTS & KB ========== -->
+<div class="manual-section" id="projects">
+  <div class="section-header">
+    <div class="section-number">Section 14</div>
+    <h2>Projects &amp; Knowledge Base</h2>
+    <p class="section-desc">Organize everything around projects. Each project gets its own tasks, docs, links, KB, and instructions.</p>
+  </div>
+
+  <h3>Project Panel</h3>
+  <p>Click a project folder in the sidebar to open the project panel on the right. It replaces the context panel and shows:</p>
+  <ul>
+    <li><strong>Instructions</strong> &mdash; Rich text editor for project notes, goals, and working context</li>
+    <li><strong>Living Docs</strong> &mdash; Specs attached to this project</li>
+    <li><strong>Knowledge Base</strong> &mdash; KB items (text, URLs, uploads) specific to this project</li>
+    <li><strong>Tasks</strong> &mdash; All tasks assigned to this project</li>
+    <li><strong>Links</strong> &mdash; Bookmarks categorized under this project</li>
+  </ul>
+
+  <h3>Project Properties</h3>
+  <ul>
+    <li><strong>Name</strong> &mdash; Editable</li>
+    <li><strong>Icon &amp; Color</strong> &mdash; Visual identification</li>
+    <li><strong>Stats bar</strong> &mdash; Shows task count, doc count, KB count, link count</li>
+  </ul>
+
+  <h3>Knowledge Base</h3>
+  <p>Each project has its own KB section. Add text items, URLs, file references, or images. The KB is searchable across all projects. Use it for deployment notes, design decisions, environment variables, API keys (encrypted), or any reference material.</p>
+
+  <div class="callout callout-tip">
+    <div class="callout-label">Pro Tip</div>
+    <p>Use the <code>project:</code> prefix in Cmd+K to quickly filter tasks by project. Type <code>project: ASTRA</code> to see all ASTRA-related tasks.</p>
+  </div>
+</div>
+
+<!-- ========== 15: KEYBOARD SHORTCUTS ========== -->
+<div class="manual-section" id="keyboard">
+  <div class="section-header">
+    <div class="section-number">Section 15</div>
+    <h2>Keyboard Shortcuts Reference</h2>
+    <p class="section-desc">Every shortcut at a glance. Press <kbd>Cmd+/</kbd> in-app to see the full list.</p>
+  </div>
+
+  <h3>Global Navigation</h3>
+  <table class="shortcut-table">
+    <tr><th>Shortcut</th><th>Action</th></tr>
+    <tr><td><kbd>Cmd+K</kbd></td><td>Open Command Palette</td></tr>
+    <tr><td><kbd>Cmd+1</kbd>&ndash;<kbd>Cmd+9</kbd></td><td>Switch to section 1-9</td></tr>
+    <tr><td><kbd>Cmd+B</kbd></td><td>Toggle sidebar collapse</td></tr>
+    <tr><td><kbd>Cmd+E</kbd></td><td>Toggle context panel</td></tr>
+    <tr><td><kbd>Cmd+\</kbd></td><td>Toggle focus mode</td></tr>
+    <tr><td><kbd>Cmd+N</kbd></td><td>New item in current section</td></tr>
+    <tr><td><kbd>Cmd+Z</kbd></td><td>Undo last delete</td></tr>
+    <tr><td><kbd>Cmd+S</kbd></td><td>Save / Cloud sync</td></tr>
+    <tr><td><kbd>Cmd+/</kbd></td><td>Show keyboard shortcuts help</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>Close modal / palette / zen mode</td></tr>
+  </table>
+
+  <h3>Quick Actions</h3>
+  <table class="shortcut-table">
+    <tr><th>Shortcut</th><th>Action</th></tr>
+    <tr><td><kbd>Cmd+Shift+N</kbd></td><td>Quick Capture (floating input)</td></tr>
+    <tr><td><kbd>Cmd+Shift+T</kbd></td><td>New task from anywhere</td></tr>
+    <tr><td><kbd>Cmd+Shift+S</kbd></td><td>Toggle Scratchpad</td></tr>
+    <tr><td><kbd>Cmd+Shift+D</kbd></td><td>Today View dashboard</td></tr>
+    <tr><td><kbd>Cmd+Shift+F</kbd></td><td>Toggle Focus Mode</td></tr>
+    <tr><td><kbd>Cmd+Shift+M</kbd></td><td>Morning Briefing</td></tr>
+    <tr><td><kbd>Cmd+Shift+E</kbd></td><td>Export current section</td></tr>
+    <tr><td><kbd>Cmd+Shift+W</kbd></td><td>Open Zen Writer</td></tr>
+    <tr><td><kbd>Cmd+Shift+P</kbd></td><td>Scratchpad</td></tr>
+  </table>
+
+  <h3>Writer Shortcuts</h3>
+  <table class="shortcut-table">
+    <tr><th>Shortcut</th><th>Action</th></tr>
+    <tr><td><kbd>Cmd+D</kbd></td><td>Duplicate document</td></tr>
+    <tr><td><kbd>Cmd+F</kbd></td><td>Find &amp; Replace</td></tr>
+    <tr><td><kbd>Cmd+Enter</kbd></td><td>Save inline edit</td></tr>
+  </table>
+
+  <h3>Task List Navigation</h3>
+  <table class="shortcut-table">
+    <tr><th>Key</th><th>Action</th></tr>
+    <tr><td><kbd>Up/Down</kbd></td><td>Navigate through tasks</td></tr>
+    <tr><td><kbd>Enter</kbd></td><td>Open selected task detail</td></tr>
+    <tr><td><kbd>D</kbd></td><td>Toggle done/todo</td></tr>
+    <tr><td><kbd>X</kbd></td><td>Delete selected task</td></tr>
+    <tr><td><kbd>P</kbd></td><td>Cycle priority</td></tr>
+    <tr><td><kbd>Space</kbd></td><td>Expand/collapse description</td></tr>
+  </table>
+</div>
+
+<!-- ========== 16: DATA & STORAGE ========== -->
+<div class="manual-section" id="data">
+  <div class="section-header">
+    <div class="section-number">Section 16</div>
+    <h2>Data &amp; Storage</h2>
+    <p class="section-desc">How ASTRA stores, syncs, imports, and exports your data.</p>
+  </div>
+
+  <h3>localStorage (Primary)</h3>
+  <p>All data is stored in your browser's <code>localStorage</code> under the key <code>astra-state</code>. This means:</p>
+  <ul>
+    <li>No server required &mdash; works fully offline</li>
+    <li>Data persists between browser sessions</li>
+    <li>Data is browser-specific (Chrome and Safari have separate stores)</li>
+    <li>Storage limit warning appears at 80% capacity</li>
+  </ul>
+
+  <h3>Cloud Sync (Optional)</h3>
+  <p>When <code>BLOB_READ_WRITE_TOKEN</code> is configured in Vercel environment variables:</p>
+  <ul>
+    <li><kbd>Cmd+S</kbd> encrypts and uploads your workspace to Vercel Blob storage</li>
+    <li>On app load, <code>cloudLoad()</code> retrieves the latest cloud state</li>
+    <li>Falls back to localStorage if cloud is unavailable</li>
+    <li>Sync indicator in the header shows connection status</li>
+  </ul>
+
+  <h3>Export Options</h3>
+  <ul>
+    <li><strong>Full JSON backup</strong> &mdash; Complete workspace export</li>
+    <li><strong>Per-section export</strong> &mdash; Markdown, HTML, CSV, or JSON per section</li>
+    <li><strong>Filtered view export</strong> &mdash; Export only what's currently visible</li>
+    <li><strong>ICS export</strong> &mdash; Tasks as calendar events</li>
+    <li><strong>Whiteboard PNG/SVG/JSON</strong></li>
+  </ul>
+
+  <h3>Import Options</h3>
+  <ul>
+    <li><strong>JSON</strong> &mdash; Restore from backup (merge or replace)</li>
+    <li><strong>Markdown</strong> &mdash; Parse into content items</li>
+    <li><strong>ICS</strong> &mdash; Import calendar events as tasks</li>
+    <li><strong>CSV</strong> &mdash; Import tasks from spreadsheets</li>
+    <li><strong>Whiteboard JSON</strong> &mdash; Restore canvas state</li>
+  </ul>
+
+  <div class="callout callout-important">
+    <div class="callout-label">Important</div>
+    <p>Regularly export a JSON backup of your workspace. While localStorage is persistent, clearing browser data will delete everything. Use <kbd>Cmd+K</kbd> > "export" to quickly save a backup.</p>
+  </div>
+</div>
+
+<!-- ========== 17: WORKFLOWS ========== -->
+<div class="manual-section" id="workflows">
+  <div class="section-header">
+    <div class="section-number">Section 17</div>
+    <h2>Workflows &amp; Best Practices</h2>
+    <p class="section-desc">Recommended ways to use ASTRA for maximum productivity.</p>
+  </div>
+
+  <h3>Morning Routine</h3>
+  <div class="workflow">
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Morning Briefing</div>
+        <div class="ws-desc">Press <kbd>Cmd+Shift+M</kbd> to get your daily summary: overdue tasks, today's due items, in-progress work, and recent completions.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Review Today's Focus</div>
+        <div class="ws-desc">Open the Context Panel (<kbd>Cmd+E</kbd>) and check the Today's Focus widget. Quick-complete any already-done items.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Start your first Pomodoro</div>
+        <div class="ws-desc">Pick your top P0/P1 task, click "Focus" on the task card, and start the 25-minute timer. ASTRA tracks time automatically.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Content Capture Flow</h3>
+  <div class="workflow">
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Capture everything</div>
+        <div class="ws-desc">Use <kbd>Cmd+Shift+N</kbd> (Quick Capture) or the Context Panel's Quick Note for rapid input. Don't organize yet &mdash; just capture.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Process in Pipeline</div>
+        <div class="ws-desc">Click "Pipe" on any content card to send it to Pipeline. Use Summarize, Action Items, or Clean Up to extract value.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Transform to outputs</div>
+        <div class="ws-desc">Convert refined content to Tasks (actionable items), Docs (long-form writing), or Living Docs (structured specs).</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Project Management Flow</h3>
+  <div class="workflow">
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Create a project</div>
+        <div class="ws-desc">Add a project folder in the sidebar. Set its icon and color. Write project instructions in the Instructions tab.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Build the spec</div>
+        <div class="ws-desc">Create a Living Doc for the project with sections for requirements, design decisions, architecture, and milestones.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Break into tasks</div>
+        <div class="ws-desc">Create tasks and assign them to the project. Use subtasks for granular work items. Set priorities and due dates.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Track on the board</div>
+        <div class="ws-desc">Use the Kanban board (<kbd>Cmd+2</kbd>) to drag tasks through statuses: To Do, In Progress, In Review, Done.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Writing Flow</h3>
+  <div class="workflow">
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Outline in Whiteboard</div>
+        <div class="ws-desc">Use the Whiteboard's mind map template to visually organize your ideas before writing.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Draft in Zen Writer</div>
+        <div class="ws-desc">Press <kbd>Cmd+Shift+W</kbd> to enter Zen Writer. Full-screen, distraction-free, with auto-save and version tracking.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Set word goals</div>
+        <div class="ws-desc">Use the word goals feature to set daily targets. Track progress in the context panel stats.</div>
+      </div>
+    </div>
+    <div class="workflow-step">
+      <div class="ws-content">
+        <div class="ws-title">Export</div>
+        <div class="ws-desc">Export as Markdown for GitHub, HTML for web, or plain text for any other use.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Session Handoff</h3>
+  <p>When working with AI assistants or handing off context to a collaborator, use <kbd>Cmd+K</kbd> > "Session Handoff" to generate a structured markdown report of all active projects, priority tasks, in-progress work, overdue items, and recent completions. Copies to clipboard for instant pasting.</p>
+</div>
+
+<!-- ========== 18: ROADMAP ========== -->
+<div class="manual-section" id="roadmap">
+  <div class="section-header">
+    <div class="section-number">Section 18</div>
+    <h2>Roadmap</h2>
+    <p class="section-desc">What's coming next for ASTRA Command Center.</p>
+  </div>
+
+  <h3>Current Status: v2.0 (Shipped)</h3>
+  <p>ASTRA v2.0 includes 9 full sections, 224+ functions, zero external dependencies, PWA support, and 137+ features. The app is fully functional for daily use as a project management and creative workflow hub.</p>
+
+  <h3>Near-Term (v2.1)</h3>
+  <ul>
+    <li><strong>Cloud Sync activation</strong> &mdash; Configure <code>BLOB_READ_WRITE_TOKEN</code> in Vercel for cross-device persistence</li>
+    <li><strong>Google Calendar integration</strong> &mdash; Two-way sync with Google Calendar API</li>
+    <li><strong>Year heatmap</strong> &mdash; GitHub-style contribution heatmap in Calendar section</li>
+    <li><strong>Print/Export All Living Docs</strong> &mdash; Export entire spec collection as formatted HTML</li>
+    <li><strong>Whiteboard minimap viewport</strong> &mdash; Show current viewport position on the minimap</li>
+    <li><strong>Content drag-to-reorder</strong> &mdash; Manual ordering of content cards</li>
+    <li><strong>Task board: collapse descriptions toggle</strong> &mdash; Clean board view option</li>
+    <li><strong>Pipeline: translate &amp; rewrite modes</strong> &mdash; Enhanced local text processing</li>
+  </ul>
+
+  <h3>Mid-Term (v2.5)</h3>
+  <ul>
+    <li><strong>Whisper API integration</strong> &mdash; Voice-to-text transcription in Pipeline (requires OpenAI API key)</li>
+    <li><strong>Multi-device real-time sync</strong> &mdash; Live collaboration across devices</li>
+    <li><strong>Browser extension capture</strong> &mdash; Nexus Capture extension integration for universal highlight capture</li>
+    <li><strong>Habit tracker consolidation</strong> &mdash; Unified daily tracking system</li>
+    <li><strong>Email capture</strong> &mdash; Forward emails to ASTRA for automatic content/task creation</li>
+    <li><strong>Mobile-first responsive pass</strong> &mdash; Optimized touch interactions across all sections</li>
+    <li><strong>Offline queue</strong> &mdash; Queue cloud sync operations when offline, auto-sync on reconnect</li>
+  </ul>
+
+  <h3>Long-Term (v3.0)</h3>
+  <ul>
+    <li><strong>AI-powered Pipeline</strong> &mdash; Claude API integration for intelligent content processing, summarization, and task extraction</li>
+    <li><strong>Team collaboration</strong> &mdash; Shared workspaces with role-based permissions</li>
+    <li><strong>Plugin system</strong> &mdash; Extensible architecture for custom sections and integrations</li>
+    <li><strong>Native desktop app</strong> &mdash; Electron or Tauri wrapper for system-level integration</li>
+    <li><strong>API endpoints</strong> &mdash; RESTful API for third-party integrations (Zapier, n8n, etc.)</li>
+    <li><strong>Version history with diff</strong> &mdash; Track all changes across all sections with visual diffs</li>
+  </ul>
+
+  <div class="callout callout-note">
+    <div class="callout-label">Architecture Note</div>
+    <p>ASTRA is built as a single-file HTML application with zero external JavaScript dependencies. All 5,600+ lines of code live in <code>index.html</code>. This architecture ensures instant loading, full offline capability, and complete portability. The only external resource is the Sora font from Google Fonts.</p>
+  </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+<div class="manual-footer">
+  <p style="font-size:20px;font-weight:700;color:var(--accent-light);margin-bottom:8px;">ASTRA</p>
+  <p style="letter-spacing:3px;text-transform:uppercase;font-size:11px;margin-bottom:24px;">Command Center v2.0</p>
+  <p>Built with zero dependencies. Runs offline. Yours forever.</p>
+  <p style="margin-top:8px;color:var(--text-muted);">Saturno Movement &mdash; 2026</p>
+</div>
+
+</body>
+</html>
