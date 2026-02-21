@@ -546,6 +546,7 @@
   <a class="toc-item" href="#keyboard"><span class="toc-num">15</span><span class="toc-title">All Keyboard Shortcuts</span><span class="toc-dots"></span></a>
   <a class="toc-item" href="#data"><span class="toc-num">16</span><span class="toc-title">Your Data (Storage &amp; Export)</span><span class="toc-dots"></span></a>
   <a class="toc-item" href="#workflows"><span class="toc-num">17</span><span class="toc-title">Real Workflows (Copy These)</span><span class="toc-dots"></span><span class="toc-badge" style="background:rgba(167,139,250,0.15);color:var(--purple)">RECIPES</span></a>
+  <a class="toc-item" href="#changelog"><span class="toc-num">18</span><span class="toc-title">Changelog</span><span class="toc-dots"></span><span class="toc-badge" style="background:rgba(6,182,212,0.15);color:var(--accent)">VERSIONS</span></a>
 </div>
 
 <!-- ========== 01: QUICK START ========== -->
@@ -1337,12 +1338,80 @@
   </div>
 </div>
 
+<!-- ========== CHANGELOG ========== -->
+<div class="section" id="changelog">
+  <h2>18. Changelog</h2>
+  <p class="section-desc">Version history. Updated with every commit. Most recent first.</p>
+
+  <div style="margin-top:16px">
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.9</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-21</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Board Tag Editor</strong> &mdash; Click tags on any board card to open inline tag editor popup. Add/remove tags without opening task detail.<br>
+        <strong>Whiteboard Mermaid Export</strong> &mdash; Export whiteboard as Mermaid diagram syntax (graph TD). Available in dropdown and Cmd+K.<br>
+        <strong>Clean .gitignore</strong> &mdash; node_modules, .DS_Store, temp files now properly ignored.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.8</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-21</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Project Context Tab</strong> &mdash; Claude.ai-style context builder with 4 quick actions (Plan, Research, Context, Prompt), depth meter, project snapshot, milestones.<br>
+        <strong>Manual Rewrite</strong> &mdash; Complete rewrite of this manual to be visual, step-by-step, and "dumb proof."<br>
+        <strong>Cmd+K Scoping</strong> &mdash; Results boosted for active project. Scope indicator in placeholder.<br>
+        <strong>Overdue Badge</strong> &mdash; Red "!" on sidebar task count when overdue tasks exist.<br>
+        <strong>Read Later</strong> &mdash; Cmd+K "read later" shows all RL content and links.<br>
+        <strong>Project Milestones</strong> &mdash; Add, complete, remove milestones with target dates.<br>
+        <strong>Minimap Click</strong> &mdash; Click anywhere on whiteboard minimap to navigate there.<br>
+        <strong>Project Nav</strong> &mdash; Prev/next arrows for quick project switching.<br>
+        <strong>Habit Tracker Fix</strong> &mdash; Consolidated data format, auto-migrates old habits.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.7</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-19</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Batches 49-57</strong> &mdash; Features 111-137 including Zen Writer shortcut, tag management, ICS import, link copy URLs, star/favorite content, repo commit messages, pipeline templates, whiteboard color picker, daily dashboard, duplicate nodes, pipeline search, tech stack tags, reading overlay, section copy MD, board priority cycle, writer versions, node lock, URL copy, quick task/note from Cmd+K, batch import, auto-backup.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.6</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-19</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Batches 43-48</strong> &mdash; Features 92-110 including content-to-pipeline, task timer, repo health check, time report, writer-to-content, markdown link copy, export selected, board column actions, pipeline local processing, whiteboard JSON import, Pomodoro focus, link pin, living doc/writer duplicate, week export, priority breakdown.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.0 - v2.5</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-16 to 2026-02-19</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        Full V2 rewrite: 3-panel layout, Cmd+K command palette, whiteboard, living docs, project system, KB, cloud sync API, 137+ features across tasks, calendar, writer, content, links, repos, pipeline. See CLAUDE.md for complete feature list.
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.0</p>
+  <p>ASTRA Command Center &mdash; v2.9</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
-  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Last updated: February 2026</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.9 | Last updated: 2026-02-21</p>
 </div>
 
 </body>
