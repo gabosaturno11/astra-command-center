@@ -62,54 +62,58 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-21 session 7)
+## CURRENT STATE (Updated: 2026-02-21 session 8)
 
-### FEB 21 SESSION 7 — CONTINUATION (Karina + Content-Beast + ASTRA polish)
-Latest commit: `0ba797f` — all pushed to main, Vercel auto-deployed.
+### FEB 21 SESSION 8 — CONTINUATION (Manual rewrite + Context Builder + Polish)
+Latest commit: `4b7d795` — all pushed to main, Vercel auto-deployed.
 
-**WHAT THIS SESSION DID (14 commits):**
-- Populated De Aqui a Saturno living doc (ld_karina) with 5 rich sections
-- Built Vimeo Video Manager in ASTRA (Cmd+K > "vimeo") — interactive panel with thumbnails, manage links, copy embed
-- Fixed empty living doc sections bug — patchKarina() IIFE fills empty bodies in existing localStorage
-- Added Content-Beast project (proj_content_beast) with 5-section living doc
-- Added Client OS project (proj_client_os, status: pending) with Gabo's full vision quote
-- Added 3 seed tasks: Replace CH4 video, WhatsApp pipeline, Client OS portal
-- Fixed subtask rendering bug — patchSubtaskTitles() fills empty subtask titles
-- Cleaned up "Content Monster" KB entry from localStorage
-- **Replaced Knowledge Graph with Today's Focus widget** (overdue, in-progress, due today + quick-complete checkboxes)
-- **Context panel: Done Today + Day Streak stats** (teal accent at 3+ day streak)
-- **Quick Note widget** in context panel (Enter to save to content, "As Task" button)
-- **Session Handoff Cmd+K command** — generates structured handoff report
-- Removed 135 lines of dead Knowledge Graph canvas code
-- Context panel auto-updates on save() when visible
+**WHAT THIS SESSION DID (10 commits):**
+- Removed duplicate showHabitTracker #2 (history-array format)
+- Fixed Cmd+K habit code to use log-object format (was using array `.includes()/.push()`, now uses object `{date:true}`) + auto-migrates old array habits
+- **PROJECT CONTEXT TAB** (Claude.ai-style) — new "Context" tab in project panel with:
+  - 4 quick action buttons: Plan & Work, Research, Create Context, Create Prompt
+  - Context Depth Meter (Shallow/Growing/Rich/Deep based on word count across instructions+KB+docs)
+  - Project Snapshot (6 stat cards: active tasks, completed, overdue, docs, KB, links)
+  - Copy Full Project Context to Clipboard button
+  - Recent Activity feed (48h)
+  - **Project Milestones** — add/complete/remove milestones with dates, overdue indicators
+- **ASTRA Manual rewrite** — completely rewrote astra-manual.html to be "dumb proof":
+  - 5-Minute Quick Start with "START HERE" badge
+  - Visual layout diagram (ASCII art showing 3-panel structure)
+  - 9-section navigation map grid with Cmd+1-9 shortcuts
+  - "Try It Now" boxes with step-by-step instructions
+  - Real workflow recipes (Morning Kickoff, Capture Ideas, Plan Project, Write, Handoff, Pipeline)
+  - Reduced from 18 to 17 focused sections, 698 lines added / 925 removed
+- Cmd+K: project-scoped search (boosts results from active project to top)
+- Cmd+K: active project name shown in placeholder when project panel is open
+- Cmd+K: "read later" command shows all RL content and links
+- Sidebar: overdue tasks red badge + "!" indicator on task count
+- Whiteboard: click-to-navigate minimap (click anywhere to pan canvas there)
+- Project panel: prev/next arrows for quick project switching
 
 **COMMITS (astra-command-center):**
-- `b1a22ee`: Populate De Aqui a Saturno living doc
-- `a0d47c5`: Add Vimeo Video Manager to ASTRA + Cmd+K command
-- `2d3a0d3`: Patch: force-fill ld_karina sections in existing localStorage
-- `72e7473`: Add Content-Beast project + living doc + THE VISION saved
-- `07040d1`: Add Client OS project + 3 seed tasks + enriched Content-Beast specs
-- `e77fc19`: Fix subtask titles + cleanup Content Monster KB entry
-- `3acc727`: Replace Knowledge Graph with Today's Focus widget
-- `dbeec8e`: Context panel: Done Today + Streak stats
-- `c9c4a06`: Auto-update context panel on save
-- `140bd15`: Update CLAUDE.md with session 7 state
-- `ef95a73`: Remove dead Knowledge Graph canvas code (135 lines)
-- `b081454`: Today's Focus: quick-complete checkboxes
-- `fce5e14`: Quick Note widget (Save to Content / As Task)
-- `0ba797f`: Session Handoff Cmd+K command
+- `9d144bc`: Remove duplicate showHabitTracker #2
+- `37c816f`: Fix Cmd+K habit code to use log-object format + auto-migrate
+- `78ac93c`: Add Project Context tab (Claude.ai-style)
+- `a911e05`: Rewrite ASTRA manual to be dumb proof
+- `c6affd8`: Cmd+K: boost results from active project
+- `ce47a1c`: Overdue badge + Read Later Cmd+K command
+- `07ed39f`: Project milestones tracker
+- `ca98b03`: Whiteboard minimap click-to-navigate
+- `4b7d795`: Project prev/next arrows + Cmd+K scope indicator
 
 **WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
-1. Test the Vimeo Video Manager at astra-command-center-sigma.vercel.app (Cmd+K > "vimeo")
-2. The "Related Items" section in context panel could show recent activity log instead of stale data
-3. Add year heatmap to calendar (already has `renderYearHeatmap` function, check if it works)
-4. Content-Beast repo doesn't exist on C1 yet — needs `git clone` to ~/dev/ when Gabo is ready
-5. Living Docs: add "Print/Export All" button to export entire spec as formatted HTML
-6. Task board: add "collapse all descriptions" toggle
-7. Pipeline: local text processing could add "translate" and "rewrite" modes
-8. Whiteboard: the minimap could show current viewport position
-9. Multiple habit tracker data structures exist (_habits uses checks/log/dates inconsistently) — consolidate
-10. Cmd+K "knowledge graph" still triggers showKnowledgeGraphStats() — rename to "wiki stats" for clarity
+1. Test Project Context tab (open any project > Context tab > try all 4 buttons + milestones)
+2. Content-Beast repo doesn't exist on C1 yet — needs `git clone` to ~/dev/ when Gabo is ready
+3. Content: drag-to-reorder items (mentioned as remaining, not yet implemented)
+4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env (to unlock API mode + cloud sync)
+5. Whiteboard: export as Mermaid diagram syntax
+6. Task: tag management from board view (currently only in detail modal)
+7. Calendar: Google Calendar sync (future/complex)
+8. Living Docs: wiki-link rendering inside contenteditable editors
+9. Gabo wants "imagine that feature" — Claude.ai project context UI is DONE in Context tab, but he might want more (ask him)
+10. Bonus page work (~/dev/saturno-bonus/) — was deprioritized during ASTRA polish phase
+11. de-aqui-a-saturno: plan exists to fix Vimeo 403s, compress videos, make 20x more beautiful (see plan file)
 
 ### FEB 19 SESSION 6 — CONTINUATION (batches 49-57)
 Latest commit: `2c73572` — all pushed to main, Vercel auto-deployed.
