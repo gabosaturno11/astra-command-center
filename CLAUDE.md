@@ -65,24 +65,25 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 ## CURRENT STATE (Updated: 2026-02-21 session 7)
 
 ### FEB 21 SESSION 7 — CONTINUATION (Karina + Content-Beast + ASTRA polish)
-Latest commit: `c9c4a06` — all pushed to main, Vercel auto-deployed.
+Latest commit: `0ba797f` — all pushed to main, Vercel auto-deployed.
 
-**WHAT THIS SESSION DID:**
-- Populated De Aqui a Saturno living doc (ld_karina) with 5 rich sections (architecture, content, design, blockers, deployment)
-- Built Vimeo Video Manager in ASTRA (Cmd+K > "vimeo") — interactive panel with all 9 video embeds, thumbnails, manage links, copy embed, play preview
-- Added ld_d6 section for Vimeo Manager with auto-render when ld_karina is active
+**WHAT THIS SESSION DID (14 commits):**
+- Populated De Aqui a Saturno living doc (ld_karina) with 5 rich sections
+- Built Vimeo Video Manager in ASTRA (Cmd+K > "vimeo") — interactive panel with thumbnails, manage links, copy embed
 - Fixed empty living doc sections bug — patchKarina() IIFE fills empty bodies in existing localStorage
-- Added Content-Beast project (proj_content_beast) with 5-section living doc (vision, architecture, workflow, WhatsApp pipeline, client portal)
+- Added Content-Beast project (proj_content_beast) with 5-section living doc
 - Added Client OS project (proj_client_os, status: pending) with Gabo's full vision quote
 - Added 3 seed tasks: Replace CH4 video, WhatsApp pipeline, Client OS portal
-- Fixed subtask rendering bug — patchSubtaskTitles() fills empty subtask titles in existing localStorage
-- Cleaned up "Content Monster" KB entry from localStorage (Gabo requested)
-- Replaced useless Knowledge Graph canvas with Today's Focus widget (overdue, in-progress, due today)
-- Context panel stats: replaced Projects/KB Items with Done Today + Day Streak (teal at 3+)
-- Context panel now auto-updates on save() when visible
-- Saved messages 58-64 to gabo-messages.json
+- Fixed subtask rendering bug — patchSubtaskTitles() fills empty subtask titles
+- Cleaned up "Content Monster" KB entry from localStorage
+- **Replaced Knowledge Graph with Today's Focus widget** (overdue, in-progress, due today + quick-complete checkboxes)
+- **Context panel: Done Today + Day Streak stats** (teal accent at 3+ day streak)
+- **Quick Note widget** in context panel (Enter to save to content, "As Task" button)
+- **Session Handoff Cmd+K command** — generates structured handoff report
+- Removed 135 lines of dead Knowledge Graph canvas code
+- Context panel auto-updates on save() when visible
 
-**COMMITS THIS SESSION (astra-command-center):**
+**COMMITS (astra-command-center):**
 - `b1a22ee`: Populate De Aqui a Saturno living doc
 - `a0d47c5`: Add Vimeo Video Manager to ASTRA + Cmd+K command
 - `2d3a0d3`: Patch: force-fill ld_karina sections in existing localStorage
@@ -92,18 +93,23 @@ Latest commit: `c9c4a06` — all pushed to main, Vercel auto-deployed.
 - `3acc727`: Replace Knowledge Graph with Today's Focus widget
 - `dbeec8e`: Context panel: Done Today + Streak stats
 - `c9c4a06`: Auto-update context panel on save
+- `140bd15`: Update CLAUDE.md with session 7 state
+- `ef95a73`: Remove dead Knowledge Graph canvas code (135 lines)
+- `b081454`: Today's Focus: quick-complete checkboxes
+- `fce5e14`: Quick Note widget (Save to Content / As Task)
+- `0ba797f`: Session Handoff Cmd+K command
 
 **WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
 1. Test the Vimeo Video Manager at astra-command-center-sigma.vercel.app (Cmd+K > "vimeo")
-2. The "Related Items" section in context panel still shows stale data — could improve with recent activity log
+2. The "Related Items" section in context panel could show recent activity log instead of stale data
 3. Add year heatmap to calendar (already has `renderYearHeatmap` function, check if it works)
 4. Content-Beast repo doesn't exist on C1 yet — needs `git clone` to ~/dev/ when Gabo is ready
 5. Living Docs: add "Print/Export All" button to export entire spec as formatted HTML
 6. Task board: add "collapse all descriptions" toggle
 7. Pipeline: local text processing could add "translate" and "rewrite" modes
 8. Whiteboard: the minimap could show current viewport position
-9. ICS import from Cmd+K could also do Google Calendar sync (needs OAuth — future)
-10. The `renderGraph()` function is dead code now (Knowledge Graph removed) — can be cleaned up
+9. Multiple habit tracker data structures exist (_habits uses checks/log/dates inconsistently) — consolidate
+10. Cmd+K "knowledge graph" still triggers showKnowledgeGraphStats() — rename to "wiki stats" for clarity
 
 ### FEB 19 SESSION 6 — CONTINUATION (batches 49-57)
 Latest commit: `2c73572` — all pushed to main, Vercel auto-deployed.
