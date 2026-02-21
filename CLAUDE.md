@@ -62,7 +62,43 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-21 session 8)
+## CURRENT STATE (Updated: 2026-02-21 session 9)
+
+### FEB 21 SESSION 9 — Clean Environment + Extensions + Manual Versioning
+Latest commit: `8847220` — all pushed to main, Vercel auto-deployed.
+
+**GABO'S DIRECTIVES THIS SESSION:**
+- Content Monster is on C2 (MacBook) — can't fix from C1
+- Extension (nexus-capture) exists on C1, different folder from C2 — deploy to work on all devices
+- Focus on safe commits and clean environment — Gabo has unification steps to do
+- Update manual for every commit — version controlled
+- Check Perplexity paste for extension, respect the kernel
+
+**WHAT THIS SESSION DID (6 commits):**
+- Whiteboard Mermaid export function (`b00cb70`)
+- Wired Mermaid to UI dropdown + Cmd+K (`2d38fdb`)
+- Board: inline tag editor popup on card tags (`161083c`)
+- Clean .gitignore: node_modules, .DS_Store, temp files (`4611f67`)
+- Manual: version-controlled changelog section 18, from v2.0-v2.9 (`7cf2a81`)
+- Clean: removed 3 duplicate function definitions (`8847220`)
+- Also committed titan-forge .gitignore + logs (`6c9591d`)
+
+**EXTENSION STATUS (C1/iMac):**
+- NEXUS CAPTURE v1.1.0 at ~/dev/nexus-capture/ (own repo, 7 core files + shell scripts)
+- SATURNO CAPTURE v1.0.0 at ~/dev/titan-forge/saturno-capture-extension/ (older version)
+- Nexus-capture is the canonical, evolved version
+- Gabo wants it deployable across all devices (Chrome Web Store or hosted)
+- Content Monster is on C2 only — cannot access from here
+
+**SATURNO-BONUS WARNING:**
+- planet-logo.png deleted from root (still exists in assets/planet-logo.png)
+- Many HTML files reference root-level planet-logo.png — will break if deployed
+- Left untouched — Gabo said he has unification steps to do
+
+**MANUAL IS NOW VERSION-TRACKED:**
+- astra-manual.html Section 18: Changelog with v2.0-v2.9 history
+- Footer shows version number + date
+- Every future commit should add an entry to the changelog
 
 ### FEB 21 SESSION 8 — CONTINUATION (Manual rewrite + Context Builder + Polish)
 Latest commit: `4b7d795` — all pushed to main, Vercel auto-deployed.
@@ -103,17 +139,16 @@ Latest commit: `4b7d795` — all pushed to main, Vercel auto-deployed.
 - `4b7d795`: Project prev/next arrows + Cmd+K scope indicator
 
 **WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
-1. Test Project Context tab (open any project > Context tab > try all 4 buttons + milestones)
-2. Content-Beast repo doesn't exist on C1 yet — needs `git clone` to ~/dev/ when Gabo is ready
-3. Content: drag-to-reorder items (mentioned as remaining, not yet implemented)
+1. NEXUS CAPTURE: deploy extension to Chrome Web Store or make it loadable across devices (Gabo's request)
+2. Content Monster: lives on C2 — has a loading error Gabo wants fixed (need C2 access or Gabo to push repo)
+3. Continue duplicate function cleanup (many showXRef functions x3, showQuickNotepad x2, etc.)
 4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env (to unlock API mode + cloud sync)
-5. Whiteboard: export as Mermaid diagram syntax
-6. Task: tag management from board view (currently only in detail modal)
-7. Calendar: Google Calendar sync (future/complex)
-8. Living Docs: wiki-link rendering inside contenteditable editors
-9. Gabo wants "imagine that feature" — Claude.ai project context UI is DONE in Context tab, but he might want more (ask him)
-10. Bonus page work (~/dev/saturno-bonus/) — was deprioritized during ASTRA polish phase
-11. de-aqui-a-saturno: plan exists to fix Vimeo 403s, compress videos, make 20x more beautiful (see plan file)
+5. Living Docs: wiki-link rendering inside contenteditable editors
+6. Calendar: Google Calendar sync (future/complex)
+7. saturno-bonus: planet-logo.png path fix (root deleted, assets/ has it, HTML refs root)
+8. de-aqui-a-saturno: plan exists to fix Vimeo 403s, compress videos, make 20x more beautiful (see plan file)
+9. ASTRA manual: update changelog with every commit (now version-tracked in Section 18)
+10. Content-Beast repo doesn't exist on C1 yet — needs `git clone` to ~/dev/ when Gabo is ready
 
 ### FEB 19 SESSION 6 — CONTINUATION (batches 49-57)
 Latest commit: `2c73572` — all pushed to main, Vercel auto-deployed.
