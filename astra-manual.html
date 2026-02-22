@@ -1346,6 +1346,20 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.14</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Performance: Search Debouncing</strong> &mdash; All 9 search/filter inputs (tasks, content, links, KB, specs, whiteboard, pipeline, repos, Cmd+K) now debounce at 150-250ms. No more full DOM rebuild on every keystroke.<br>
+        <strong>Cmd+K Mass Dedup</strong> &mdash; Removed 578 duplicate command blocks (-1,791 lines). Every command now appears exactly once. File: 50.7K &rarr; 49K lines.<br>
+        <strong>specSearch Optimization</strong> &mdash; Replaced DOM createElement with regex for HTML tag stripping. No more temporary DOM nodes created per section per keystroke.<br>
+        <strong>Cloud Sync Race Fix</strong> &mdash; Auto-sync timer now resets after manual Cmd+S save, preventing duplicate sync requests.<br>
+        <strong>Debounce Cleanup</strong> &mdash; All pending debounce timers cleared on section switch, preventing stale render callbacks.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent)">v2.13</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
       </div>
@@ -1436,7 +1450,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.13</p>
+  <p>ASTRA Command Center &mdash; v2.14</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.12 | Last updated: 2026-02-21</p>
