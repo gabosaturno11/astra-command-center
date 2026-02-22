@@ -1346,6 +1346,23 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.17</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-21</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Toast Severity</strong> &mdash; Delete/archive/error toasts now show in yellow/red/cyan instead of all the same green. Visual clarity for destructive vs informational actions.<br>
+        <strong>Undo/Redo</strong> &mdash; Cmd+Shift+Z redo support. Redo reverses undo operations for tasks, content, links, and status changes. Available via keyboard and Cmd+K "redo" command.<br>
+        <strong>Context Menus</strong> &mdash; Right-click on content cards (12 actions), link cards (7 actions), and board cards (9 actions). Previously only task rows had a context menu.<br>
+        <strong>Link Bulk Operations</strong> &mdash; Select mode with checkboxes on link cards. Bulk set category, add tag, open selected, copy URLs, and delete. Matches content/task bulk patterns.<br>
+        <strong>Fuzzy Search</strong> &mdash; Cmd+K now finds results even with typos and partial matches. Falls back to character-sequence matching when exact substring fails. Results ranked by relevance score.<br>
+        <strong>Project Switcher</strong> &mdash; Cmd+J opens a filterable project list popup. Type to filter, Enter to select, shows task counts and active project indicator.<br>
+        <strong>Enhanced Quick-Add</strong> &mdash; Task quick-add supports multiple #tags, @project, !priority, ~due, and +description in any order. Both list and board quick-add use the same parser.<br>
+        <strong>Persistent State</strong> &mdash; Expanded task descriptions and collapsed board columns now persist across page reloads via localStorage.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent)">v2.16</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
       </div>
@@ -1481,7 +1498,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.16</p>
+  <p>ASTRA Command Center &mdash; v2.17</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.12 | Last updated: 2026-02-21</p>
