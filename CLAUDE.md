@@ -62,7 +62,36 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 14)
+## CURRENT STATE (Updated: 2026-02-22 session 15)
+
+### FEB 22 SESSION 15 — Cmd+K UX Intelligence + Navigation + Quick-Create
+Latest commit: `acdfdd1` — all pushed to main, Vercel auto-deployed.
+File: ~44,300 lines. Manual at v2.21.
+
+**WHAT THIS SESSION DID (9 commits):**
+- Cmd+K search history + Cmd+Shift+K repeat + activity sparkline (`96a62d4`)
+- Cmd+K inline calculator + CALC/MATH scope pills (`37d5c85`)
+- Cmd+K ghost autocomplete hint + result type counts in footer (`8e762c1`)
+- Section navigation shortcuts + section history tracking (`f7e5f74`)
+- Enhanced task: and note: quick-create with #tags @project parsing (`446d065`)
+- Cmd+Shift+U save clipboard URL + daily tips in Cmd+K (`cc3ad11`)
+- Manual v2.21 changelog (`acdfdd1`)
+- Cmd+K search highlight (from session 14 tail, `c2b7181`)
+
+**KEY IMPROVEMENTS:**
+- Recent search queries shown in empty Cmd+K (last 6, clickable to re-search)
+- Cmd+Shift+K: instant repeat of last executed Cmd+K action
+- 7-day activity sparkline in sidebar header (tasks + content + links created)
+- Inline calculator: type =2+3*4 or math:sqrt(16) for instant results with copy
+- Ghost autocomplete: faint completion suggestion in Cmd+K input, Right Arrow accepts
+- Footer type counts: shows T:5 C:3 D:2 L:1 breakdown when searching
+- Ctrl+[/]: cycle previous/next section
+- Cmd+`: switch to last visited section (Alt+Tab style)
+- task: prefix: parses #tags @project ~due !priority inline
+- note: prefix: parses #tags and @theme inline
+- Cmd+Shift+U: save clipboard URL as link from any section
+- Daily rotating tip in empty Cmd+K (14 tips, one per day)
+- Shortcuts modal updated with all new shortcuts
 
 ### FEB 22 SESSION 14 — Cmd+K Power Features + Mobile + UX Polish
 Latest commit: `505dc7a` — all pushed to main, Vercel auto-deployed.
