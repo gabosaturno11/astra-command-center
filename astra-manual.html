@@ -1346,6 +1346,27 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--accent);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent-green)">v2.22</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Search Result Count Badges</strong> &mdash; Content, tasks, and links search inputs show "X/total" count when filtering is active.<br>
+        <strong>sort: Prefix</strong> &mdash; Type "sort:" in Cmd+K to change sort order for the current section. Shows all available sort modes per section.<br>
+        <strong>tag:add / tag:remove</strong> &mdash; Bulk add or remove tags across all items in current section. Syntax: tag:add bugfix or tag:remove old.<br>
+        <strong>Cmd+D Expanded</strong> &mdash; Duplicate shortcut now works in tasks and content sections (was writer/specs only). Duplicates focused or first item.<br>
+        <strong>rename: Prefix</strong> &mdash; Rename tags and categories across all sections at once. Syntax: rename:old > new. Shows preview before applying.<br>
+        <strong>import: Prefix</strong> &mdash; 4 import modes from Cmd+K: tasks (line list from clipboard), content (--- separated), links (URL list), JSON backup (file upload).<br>
+        <strong>Task Detail Arrow Nav</strong> &mdash; Left/Right arrows navigate between tasks in the detail modal. Auto-saves when moving.<br>
+        <strong>Escape Auto-Save</strong> &mdash; Pressing Escape in task detail now auto-saves changes before closing.<br>
+        <strong>freq: Prefix</strong> &mdash; Word frequency analyzer shows top 20 most-used words. Scoping: freq:content, freq:docs, freq:tasks. Click words to search.<br>
+        <strong>remind: Prefix</strong> &mdash; Set timed browser notifications. Syntax: remind:5m Check email or remind:1h Stand up. Supports min/hour/sec.<br>
+        <strong>Section Quick Actions</strong> &mdash; Empty Cmd+K shows 3 context-specific shortcuts for the current section (tasks, content, writer, links).<br>
+        <strong>18 Daily Tips</strong> &mdash; Expanded from 14 to 18 rotating tips covering all new prefixes.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent-green)">v2.21</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
       </div>
@@ -1578,7 +1599,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.21</p>
+  <p>ASTRA Command Center &mdash; v2.22</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.12 | Last updated: 2026-02-21</p>
