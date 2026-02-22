@@ -2,19 +2,24 @@
  * ASTRA PIPELINE API
  * POST /api/pipeline
  *
- * The Saturno Pipeline: audio/text + custom prompt -> Whisper transcription -> GPT synthesis -> stored result
+ * The Saturno Pipeline: audio/text + custom prompt -> Whisper transcription -> AI synthesis -> stored result
  *
  * Accepts:
- *   - multipart/form-data with 'audio' file + 'prompt' field + optional 'source' field
- *   - OR application/json with { text, prompt, source }
+ *   - multipart/form-data with 'audio' file + 'prompt' field + optional 'source' + 'engine' field
+ *   - OR application/json with { text, prompt, source, engine }
+ *
+ * Engine options:
+ *   - "openai" (default): GPT-4o-mini via OpenAI API
+ *   - "claude": Claude Sonnet via Anthropic API
+ *   - "auto": tries Claude first (better quality), falls back to OpenAI
  *
  * Flow:
- *   1. If audio: transcribe via Whisper
- *   2. Run transcript (or text) through GPT with user's custom prompt
+ *   1. If audio: transcribe via Whisper (always OpenAI)
+ *   2. Run transcript (or text) through selected AI engine with user's custom prompt
  *   3. Store everything in ASTRA backend (Vercel Blob)
- *   4. Return { ok, transcript, synthesis, pipelineId }
+ *   4. Return { ok, transcript, synthesis, pipelineId, engine }
  *
- * Requires: OPENAI_API_KEY env var
+ * Requires: OPENAI_API_KEY and/or ANTHROPIC_API_KEY env var
  * Optional: BLOB_READ_WRITE_TOKEN for persistent storage
  */
 import { put, list } from '@vercel/blob';
@@ -64,7 +69,6 @@ function extractMultipartFields(buffer, contentType) {
     const headers = part.substring(0, headerEnd);
     const content = part.substring(headerEnd + 4).replace(/\r\n$/, '');
 
-    // Check for file field (audio)
     const nameMatch = headers.match(/name="([^"]+)"/);
     if (!nameMatch) continue;
     const name = nameMatch[1];
@@ -107,9 +111,9 @@ async function transcribeAudio(audioFile, openaiKey) {
   return { text: result.text || '', duration: result.duration || null };
 }
 
-async function synthesize(transcript, prompt, openaiKey) {
-  const systemPrompt = `You are ASTRA, Gabo Saturno's AI pipeline processor. You receive transcribed audio or text input along with a custom prompt. Process the input according to the prompt and return a clean, structured result. Be precise, actionable, and match Gabo's style — no fluff, no emojis, direct output.`;
+const SYSTEM_PROMPT = `You are ASTRA, Gabo Saturno's AI pipeline processor. You receive transcribed audio or text input along with a custom prompt. Process the input according to the prompt and return a clean, structured result. Be precise, actionable, and match Gabo's style — no fluff, no emojis, direct output.`;
 
+async function synthesizeOpenAI(transcript, prompt, openaiKey) {
   const userMessage = `## Input\n${transcript}\n\n## Prompt\n${prompt}`;
 
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -121,11 +125,11 @@ async function synthesize(transcript, prompt, openaiKey) {
     body: JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: userMessage },
       ],
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: 4096,
     }),
   });
 
@@ -136,6 +140,68 @@ async function synthesize(transcript, prompt, openaiKey) {
 
   const result = await res.json();
   return result.choices[0]?.message?.content || '';
+}
+
+async function synthesizeClaude(transcript, prompt, anthropicKey) {
+  const userMessage = `## Input\n${transcript}\n\n## Prompt\n${prompt}`;
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      messages: [
+        { role: 'user', content: userMessage },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Claude error ${res.status}: ${err}`);
+  }
+
+  const result = await res.json();
+  return result.content?.[0]?.text || '';
+}
+
+async function synthesize(transcript, prompt, engine) {
+  const openaiKey = process.env.OPENAI_API_KEY;
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+
+  if (engine === 'claude') {
+    if (!anthropicKey) throw new Error('ANTHROPIC_API_KEY not configured');
+    return { text: await synthesizeClaude(transcript, prompt, anthropicKey), engine: 'claude' };
+  }
+
+  if (engine === 'openai') {
+    if (!openaiKey) throw new Error('OPENAI_API_KEY not configured');
+    return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
+  }
+
+  // auto: try Claude first, fall back to OpenAI
+  if (anthropicKey) {
+    try {
+      return { text: await synthesizeClaude(transcript, prompt, anthropicKey), engine: 'claude' };
+    } catch (e) {
+      if (openaiKey) {
+        return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
+      }
+      throw e;
+    }
+  }
+
+  if (openaiKey) {
+    return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
+  }
+
+  throw new Error('No AI API key configured. Set ANTHROPIC_API_KEY and/or OPENAI_API_KEY in Vercel env vars.');
 }
 
 async function getPipelineIndex(token) {
@@ -156,16 +222,26 @@ export default async function handler(req, res) {
   if (!checkAuth(req, res)) return;
 
   const openaiKey = process.env.OPENAI_API_KEY;
-  if (!openaiKey) {
-    return res.status(503).json({ ok: false, error: 'OPENAI_API_KEY not configured' });
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+
+  if (!openaiKey && !anthropicKey) {
+    return res.status(503).json({
+      ok: false,
+      error: 'No AI API keys configured. Set OPENAI_API_KEY and/or ANTHROPIC_API_KEY in Vercel Dashboard > Settings > Environment Variables.'
+    });
   }
 
-  // GET: retrieve pipeline history
+  // GET: retrieve pipeline history + available engines
   if (req.method === 'GET') {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) return res.status(200).json({ results: [], _source: 'none' });
+    const engines = [];
+    if (anthropicKey) engines.push('claude');
+    if (openaiKey) engines.push('openai');
+    if (engines.length > 1) engines.unshift('auto');
+
+    if (!token) return res.status(200).json({ results: [], engines, whisper: !!openaiKey, _source: 'none' });
     const index = await getPipelineIndex(token);
-    return res.status(200).json({ ok: true, results: index, count: index.length });
+    return res.status(200).json({ ok: true, results: index, count: index.length, engines, whisper: !!openaiKey });
   }
 
   if (req.method !== 'POST') {
@@ -176,13 +252,13 @@ export default async function handler(req, res) {
     let transcript = '';
     let prompt = '';
     let source = 'unknown';
+    let engine = 'auto';
     let duration = null;
     let inputType = 'text';
 
     const contentType = req.headers['content-type'] || '';
 
     if (contentType.includes('multipart/form-data')) {
-      // Audio upload
       const buffer = await parseBody(req);
       const fields = extractMultipartFields(buffer, contentType);
 
@@ -192,9 +268,13 @@ export default async function handler(req, res) {
 
       prompt = fields.prompt || 'Transcribe and summarize this audio';
       source = fields.source || 'pipeline-upload';
+      engine = fields.engine || 'auto';
 
       if (fields._audio && fields._audio.data.length > 0) {
         inputType = 'audio';
+        if (!openaiKey) {
+          return res.status(503).json({ ok: false, error: 'Audio transcription requires OPENAI_API_KEY (Whisper)' });
+        }
         const whisperResult = await transcribeAudio(fields._audio, openaiKey);
         transcript = whisperResult.text;
         duration = whisperResult.duration;
@@ -204,20 +284,20 @@ export default async function handler(req, res) {
         return res.status(400).json({ ok: false, error: 'No audio file or text provided' });
       }
     } else {
-      // JSON body
       const buffer = await parseBody(req);
       const body = JSON.parse(buffer.toString());
       transcript = body.text || '';
       prompt = body.prompt || 'Summarize this text';
       source = body.source || 'pipeline-text';
+      engine = body.engine || 'auto';
 
       if (!transcript) {
         return res.status(400).json({ ok: false, error: 'text is required' });
       }
     }
 
-    // Run synthesis with GPT
-    const synthesis = await synthesize(transcript, prompt, openaiKey);
+    // Run synthesis with selected engine
+    const result = await synthesize(transcript, prompt, engine);
 
     // Store in ASTRA backend
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
@@ -230,24 +310,24 @@ export default async function handler(req, res) {
           inputType,
           transcript,
           prompt,
-          synthesis,
+          synthesis: result.text,
+          engine: result.engine,
           source,
           duration,
           createdAt: new Date().toISOString(),
         };
 
-        // Save full entry
         await put(`pipeline/${pipelineId}.json`, JSON.stringify(entry, null, 2), {
           access: 'public', addRandomSuffix: false, token: blobToken,
         });
 
-        // Update index
         const index = await getPipelineIndex(blobToken);
         index.unshift({
           id: pipelineId,
           inputType,
           prompt: prompt.substring(0, 100),
-          preview: synthesis.substring(0, 200),
+          preview: result.text.substring(0, 200),
+          engine: result.engine,
           source,
           createdAt: entry.createdAt,
         });
@@ -266,7 +346,8 @@ export default async function handler(req, res) {
       pipelineId,
       inputType,
       transcript,
-      synthesis,
+      synthesis: result.text,
+      engine: result.engine,
       duration,
       source,
     });
