@@ -1346,6 +1346,21 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent)">v2.15</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Dead Code Removal</strong> &mdash; Removed 177 dead functions (-5,572 lines, -11.4%). File: 49K &rarr; 43.4K lines. Only active code remains.<br>
+        <strong>Error Logging</strong> &mdash; 7 critical empty catch blocks now log warnings to console (load, integrity fix, archive, sync). Silent failures are now visible in DevTools.<br>
+        <strong>Board Column Cap</strong> &mdash; Board columns render max 25 cards with a "+ N more" expand button. Prevents DOM overload with large task lists.<br>
+        <strong>Task List Lazy Render</strong> &mdash; List view caps at 50 tasks with "Load more" button. Same pattern as content section lazy loading.<br>
+        <strong>Tablet Breakpoint</strong> &mdash; New 768px media query for tablet-optimized layout. Touch targets increased at 640px breakpoint.<br>
+        <strong>CSS Cleanup</strong> &mdash; Fixed 3 elements with duplicate display:none in inline styles.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent)">v2.14</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
       </div>
@@ -1450,7 +1465,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.14</p>
+  <p>ASTRA Command Center &mdash; v2.15</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.12 | Last updated: 2026-02-21</p>
