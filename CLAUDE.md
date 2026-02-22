@@ -62,7 +62,50 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 17)
+## CURRENT STATE (Updated: 2026-02-22 session 19)
+
+### FEB 22 SESSION 19 — Keyboard Power + UX Polish + Settings
+Latest commit: `cb14be7` — all pushed to main, Vercel auto-deployed.
+File: ~44,800 lines. Manual at v2.25.
+
+**WHAT THIS SESSION DID (7 commits):**
+- Cmd+Shift+A select all + Cmd+Shift+R filter reset + Escape exits bulk mode (`3dc9b9d`)
+- Scroll-to-top button + calendar empty state hint (`cdf7bf4`)
+- Context menu quick scheduling (Due Next Week/Month) + Wayback Machine link (`63d6033`)
+- Settings: scroll-top toggle, celebration toggle, default task sort (`a6adbda`)
+- Manual v2.25 changelog (`f60a9d5`)
+- Final safeOpen conversion (4 remaining) + board card ARIA role (`ceaa772`)
+- Task keyboard nav: C=copy title, R=reschedule, S=snooze +1 day (`cb14be7`)
+
+**KEY IMPROVEMENTS:**
+- Cmd+Shift+A: activates bulk mode + selects all filtered items (tasks/content/links)
+- Cmd+Shift+R: resets all filters (search, type, tag, project) for current section
+- Escape exits bulk mode in all 3 sections (tasks, content, links)
+- contentBulkSelectAll() added (was missing, tasks/links had it)
+- Scroll-to-top floating button appears after 300px scroll, targets active panel
+- Calendar shows friendly empty state when no tasks have due dates
+- Task/board context menus: Due Next Week, Due Next Month, Due Tomorrow
+- Link context menu: Wayback Machine option
+- Settings: Show Scroll-to-Top, Task Celebration, Default Sort (Tasks)
+- miniCelebrate() respects noCelebration setting
+- All remaining window.open calls converted to safeOpen (4 calls)
+- Board cards: role=button + aria-label for screen readers
+- Task keyboard: C=copy title, R=reschedule, S=snooze +1 day
+- Shortcuts modal + cheatsheet updated with all new shortcuts
+
+### FEB 22 SESSION 18 — Security + Accessibility + UX Quality
+Latest commit: `3cad04a` — all pushed to main, Vercel auto-deployed.
+File: ~44,700 lines. Manual at v2.24.
+
+**WHAT THIS SESSION DID (8 commits):**
+- macro: prefix for saving/running command sequences (`afc7570`)
+- safeOpen() URL sanitizer + data recovery banner + skeleton loading (`100a8bd`)
+- ARIA roles/labels on modals + viewport safe area (`405ce16`)
+- Context menu keyboard nav + toast progress bar + drag feedback (`5b3e038`)
+- iPad touch scroll + load-more spinners + date validation (`9d0a92e`)
+- Focus-visible outlines + storage warning (`8862c9a`)
+- Manual v2.24 changelog (`bd54d96`)
+- Cursor pointer + tooltips on truncated content (`3cad04a`)
 
 ### FEB 22 SESSION 17 — Smart Search + Accessibility + UX Quality
 Latest commit: `d0fd1d1` — all pushed to main, Vercel auto-deployed.
