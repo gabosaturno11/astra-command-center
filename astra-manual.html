@@ -1350,10 +1350,11 @@
         <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
       </div>
       <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
-        <strong>Inline Modal System</strong> &mdash; All browser prompt() and confirm() dialogs replaced with styled inline modals (astraPrompt, astraConfirm, astraSelect) matching the dark cosmic design. Promise-based, supports text/number/date/url/time inputs, multiline textarea, dropdown selection, and danger-mode confirm buttons.<br>
-        <strong>67 Modals Converted</strong> &mdash; 52 prompt() and 11 confirm() calls replaced across all sections: tasks, content, links, writer, living docs, projects, folders, Cmd+K config, goals, time blocks, habits, and more.<br>
-        <strong>astraSelect()</strong> &mdash; New list-selection modal for project moves, folder actions, board column moves, and doc merge/compare. Shows clickable option buttons instead of typing numbers.<br>
-        <strong>Folder Context Menu</strong> &mdash; Folder right-click now shows a proper 3-option selection modal (Rename, Delete, Sub-folder) instead of asking for a letter code.<br>
+        <strong>Inline Modal System (COMPLETE)</strong> &mdash; All 152 browser prompt() and confirm() dialogs replaced with styled inline modals (astraPrompt, astraConfirm, astraSelect) matching the dark cosmic design. Promise-based, supports text/number/date/url/time inputs, multiline textarea, dropdown selection, and danger-mode confirm buttons. 10 commits across 2 sessions.<br>
+        <strong>Final Stats</strong> &mdash; prompt(): 104 &rarr; 1 (bookmarklet intentionally kept native). confirm(): 48 &rarr; 0 (all converted). Zero browser dialogs remain in the app.<br>
+        <strong>astraSelect()</strong> &mdash; List-selection modal for project moves, folder actions, board column moves, doc merge/compare, Quick Convert item picking, time block editing, risk/RACI/OKR workflows. Clickable option buttons instead of typing numbers.<br>
+        <strong>Sequential Modal Chains</strong> &mdash; Multi-step workflows (contacts: 4 steps, what-if: 5 steps, risk: 3 steps) use nested .then() chains. Each step only proceeds if user provides input.<br>
+        <strong>Danger Mode</strong> &mdash; Destructive actions (delete, clear, factory reset, archive) use red confirm buttons via astraConfirm({danger:true}).<br>
         <strong>Smart Input Types</strong> &mdash; Date pickers for due dates and milestones, number inputs for word goals and WIP limits, time pickers for time blocks, URL inputs for link insertion and Wayback Machine.
       </div>
     </div>
@@ -1678,10 +1679,10 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.26</p>
+  <p>ASTRA Command Center &mdash; v2.27</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
-  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.13 | Last updated: 2026-02-22</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.14 | Last updated: 2026-02-22</p>
 </div>
 
 </body>
