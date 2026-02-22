@@ -62,7 +62,38 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 13)
+## CURRENT STATE (Updated: 2026-02-22 session 14)
+
+### FEB 22 SESSION 14 — Cmd+K Power Features + Mobile + UX Polish
+Latest commit: `505dc7a` — all pushed to main, Vercel auto-deployed.
+File: ~44,200 lines. Manual at v2.20.
+
+**WHAT THIS SESSION DID (8 commits):**
+- Mobile full-screen Cmd+K + timeline prefix + ? shortcut (`19ac721`)
+- Snapshot prefix + task streak tracker + shortcuts grid update (`e3e799a`)
+- Week planner prefix + active task in tab title + status dots (`5ce2780`)
+- Project color in Cmd+K + diff prefix + getProjectColor helper (`b4ac26e`)
+- Command execution log + manual v2.20 (`1e871b9`)
+- Section transitions + sidebar tooltips + cmdlog scope pill (`9203917`)
+- Cmd+Shift+H heatmap shortcut + clipboard auto-detect in Cmd+K (`505dc7a`)
+- Favicon fallback with colored initials (`16ff1d3` — from session 13 tail)
+
+**KEY IMPROVEMENTS:**
+- Cmd+K mobile: full-screen on 640px with 44px touch targets, swipe-down dismiss
+- timeline:/upcoming/schedule/agenda prefix: task timeline grouped by due date
+- week:/weekly prefix: current Mon-Sun planner with tasks per day
+- snapshot: prefix: save/compare workspace state over time
+- diff:/changes prefix: what changed since last snapshot
+- cmdlog: prefix: view executed Cmd+K action history
+- Task streak badge: orange "Nd" in sidebar for consecutive completion days
+- Tab title shows first In Progress task name
+- Status dots on task results in Cmd+K (green/cyan/orange/gray)
+- Project color accent on task icons in Cmd+K
+- ? key opens shortcuts modal
+- Cmd+Shift+H opens activity heatmap
+- Clipboard auto-detect: Cmd+K shows clipboard bar with one-click save
+- Section switch fade animation (0.15s)
+- Sidebar tooltips on all 9 sections
 
 ### FEB 22 SESSION 13 — Cmd+K Polish + UX Delight + Notification System
 Latest commit: `fc66449` — all pushed to main, Vercel auto-deployed.
