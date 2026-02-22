@@ -62,7 +62,41 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 15)
+## CURRENT STATE (Updated: 2026-02-22 session 16)
+
+### FEB 22 SESSION 16 — Bulk Operations + Quality Polish + New Prefixes
+Latest commit: `9162820` — all pushed to main, Vercel auto-deployed.
+File: ~44,500 lines. Manual at v2.22.
+
+**WHAT THIS SESSION DID (8 commits):**
+- Search result count badges on content, tasks, links (`acb2228`)
+- Cmd+K sort: prefix + tag:add/remove bulk + Cmd+D expansion (`4b66e8c`)
+- Cmd+K rename: prefix + import: prefix for bulk ops (`bea0013`)
+- Task detail arrow nav + freq: word frequency + Escape auto-save (`dea3abd`)
+- Cmd+K remind: prefix + section quick actions + daily tips (`a13ee6c`)
+- Manual v2.22 changelog (`073889c`)
+- Task estimate total in toolbar (`5da0c1d`)
+- Sidebar dblclick clear filters + clear: prefix + storage error handling (`955407d`, `9162820`)
+
+**KEY IMPROVEMENTS:**
+- Search count badges: X/total shown next to search inputs when filtering
+- sort: prefix: change sort order for current section from Cmd+K
+- tag:add/tag:remove: bulk add or remove tags across all items in section
+- rename: prefix: rename tags/categories across all sections (syntax: rename:old > new)
+- import: prefix: 4 import modes (tasks list, content blocks, URL list, JSON backup)
+- freq: prefix: word frequency analyzer showing top 20 words, scoped by section
+- remind: prefix: set timed browser notifications (remind:5m Check email)
+- clear: prefix: clear filters, archive done tasks, clear search/pinned/notifications
+- Cmd+D duplicates in tasks and content sections (was writer/specs only)
+- Task detail Left/Right arrow navigation between tasks
+- Escape auto-saves task detail before closing
+- Task estimate total (e.g. 3h45m) shown in toolbar for visible tasks
+- Double-click sidebar section to clear all filters for that section
+- Section-specific quick actions in empty Cmd+K (tasks/content/writer/links)
+- 18 daily tips (up from 14) covering new prefixes
+- localStorage QuotaExceeded handling with auto-archive and user warning
+- Added console.warn logging to critical catch blocks
+- Right Arrow ghost hint documented in Cmd+K footer
 
 ### FEB 22 SESSION 15 — Cmd+K UX Intelligence + Navigation + Quick-Create
 Latest commit: `acdfdd1` — all pushed to main, Vercel auto-deployed.
