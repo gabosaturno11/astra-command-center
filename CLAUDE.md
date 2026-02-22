@@ -62,34 +62,54 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 10)
+## CURRENT STATE (Updated: 2026-02-22 session 11)
+
+### FEB 22 SESSION 11 — Feature Polish + Quality of Life
+Latest commit: `0dc9ac1` — all pushed to main, Vercel auto-deployed.
+
+**WHAT THIS SESSION DID (5 commits):**
+- Auto-archive completed tasks >30 days old on load (`75f58fa`)
+- Wiki-link autocomplete: type [[ in any editor for suggestions (`5c1265d`)
+- Task stale indicators: >14 day old tasks with no due date get badge + Cmd+K command (`0ab05a6`)
+- Content similarity detection on Quick Capture + manual v2.13 (`83cb1d9`)
+- Persist recent items (Cmd+K recents) across page reloads (`0dc9ac1`)
+
+**ALSO IN THIS SESSION (committed by parallel session):**
+- Data integrity logging, health check progress counters, auto-backup guard (`13151ae`)
+- Book: 60 holographic quotes + 30 infographic briefs (`13151ae`)
+
+**NEW FEATURES ADDED:**
+- Wiki-link autocomplete in all contenteditable editors and textareas
+- Task stale-row CSS class + "stale" badge for neglected tasks
+- findSimilarContent() warns on 50%+ word overlap when adding content
+- autoArchiveOldTasks() runs on load for completed >30 day tasks
+- autoBackupToBlob() guard triggers every 10 saves
+- fixDataIntegrity() now logs repairs to console
+- repoHealthCheck and checkAllLinks show progress (1/N) and disable button
+- Recent items persist to localStorage
+
+**WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
+1. Continue ASTRA feature improvements
+2. NEXUS CAPTURE: Chrome Web Store deployment (tasks in ASTRA KB)
+3. Content Monster: on C2 — loading error needs fixing (need C2 access)
+4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
+5. saturno-bonus: planet-logo.png path fix
+6. de-aqui-a-saturno: plan exists to fix Vimeo 403s (see plan file)
+7. Cmd+K prefix block cleanup (8+ duplicate burndown blocks, 10+ weekly review blocks)
+8. Board card compact mode improvements
+9. Calendar Google Calendar sync (future/complex)
 
 ### FEB 22 SESSION 10 — Deep Codebase Cleanup + Feature Work
 Latest commit: `5ca8f6e` — all pushed to main, Vercel auto-deployed.
 **File reduced from 64,439 to 50,565 lines (21.5% reduction)**
 
-**WHAT THIS SESSION DID (6 commits):**
+**WHAT SESSION 10 DID (6 commits):**
 - Remove 19 duplicate function definitions + fix IP Lookup casing (`5d973c9`)
 - Cmd+K dedup guard: title-based deduplication in cmdGetItems return (`666c393`)
 - Mass remove 470+ duplicate function definitions, -13,874 lines (`df73f2c`)
 - Manual: update changelog to v2.12 (`87e954c`)
 - Content: drag-and-drop file import for txt/md/json/csv/html (`5ca8f6e`)
 - Continuation of session 9 commits below
-
-**CRITICAL CLEANUP DONE:**
-- Zero duplicate function definitions remain (was 470+ duplicates)
-- Cmd+K now deduplicates entries by title (was showing same tool 5-10x)
-- showQuickIpLookup -> showQuickIPLookup casing fix
-- JS syntax verified clean via Node.js after every cleanup pass
-
-**WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
-1. Continue ASTRA feature improvements (lots of room)
-2. NEXUS CAPTURE: Chrome Web Store deployment (tasks in ASTRA KB)
-3. Content Monster: on C2 — loading error needs fixing (need C2 access)
-4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
-5. Living Docs: wiki-link rendering inside contenteditable editors
-6. saturno-bonus: planet-logo.png path fix
-7. de-aqui-a-saturno: plan exists to fix Vimeo 403s (see plan file)
 
 ### FEB 21 SESSION 9 — Clean Environment + Extensions + Manual Versioning
 Latest commit: `fa147b1` — all pushed to main, Vercel auto-deployed.
