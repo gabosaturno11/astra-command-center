@@ -62,13 +62,13 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 12)
+## CURRENT STATE (Updated: 2026-02-22 session 12 continued)
 
-### FEB 22 SESSION 12 — Performance + Dedup + Persistence
-Latest commit: `3b628b7` — all pushed to main, Vercel auto-deployed.
-File: 49,000 lines (down from 50,770 — 1,770 lines removed via dedup).
+### FEB 22 SESSION 12 — Performance + Dedup + Persistence + Dead Code Removal
+Latest commit: `066e4c3` — all pushed to main, Vercel auto-deployed.
+File: 43,441 lines (down from 50,770 — massive 7,329 line reduction, -14.4%).
 
-**WHAT THIS SESSION DID (7 commits):**
+**WHAT THIS SESSION DID (12 commits):**
 - Debounce 9 search/filter inputs + fix specSearch perf (`2af133e`)
 - Remove 578 duplicate Cmd+K command blocks, -1,791 lines (`8b4d1bc`)
 - Cloud sync race fix + debounce cleanup + restore tag-tasks handler (`ee913aa`)
@@ -76,19 +76,28 @@ File: 49,000 lines (down from 50,770 — 1,770 lines removed via dedup).
 - Persist view preferences across page reloads (`ba010b3`)
 - Sync filter/tab UI state on section switch (`a5091fc`)
 - Persist sort order for tasks, content, and links (`3b628b7`)
+- Update CLAUDE.md with session 12 state (`9db35f2`)
+- Fix 2 missing Cmd+K action functions (`845f704`)
+- Remove 177 dead functions + fix CSS dupes + error logging (`92a7558`)
+- Cmd+K dedup, board column cap, merge duplicate Zen Writer (`f0c8720`)
+- Lazy render tasks + tablet breakpoint + manual v2.15 (`066e4c3`)
 
 **KEY IMPROVEMENTS:**
-- All 9 search inputs debounced (250ms default, 150ms for Cmd+K) — no more full DOM rebuild per keystroke
+- All 9 search inputs debounced (250ms default, 150ms for Cmd+K)
 - specSearch uses regex instead of DOM createElement for HTML tag stripping
 - cmdGetItems cleaned from 1,662 to 1,084 unique command blocks (578 duplicates removed)
-- Cloud sync reschedules timer after manual save (prevents race condition)
-- Debounce timers cleared on section switch (prevents stale renders)
-- Shortcuts modal updated: +5 whiteboard shortcuts, +wiki-link hint, fixed prefix typos
+- 177 dead functions removed (5,572 lines) — show*Ref, showQuick*, showTask* widgets never wired
+- 7 critical empty catch blocks now log warnings (load, integrity, archive, sync, etc.)
+- 3 duplicate display:none CSS issues fixed
+- Board columns cap at 25 cards with "+ N more" expand button
+- Task list view caps at 50 items with "Load more" button
+- Tablet 768px breakpoint added, mobile touch targets increased to 36px min
+- Cmd+K: duplicate Zen Writer merged, duplicate Export All Data removed
 - View persistence: section, taskView, boardCompact, taskFilter, contentType, sort orders
-- tag-tasks: Cmd+K handler restored (was lost in dedup)
+- Manual updated to v2.15
 
 **WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
-1. Continue ASTRA feature improvements
+1. Continue ASTRA feature improvements (accessibility, keyboard nav)
 2. NEXUS CAPTURE: Chrome Web Store deployment (tasks in ASTRA KB)
 3. Content Monster: on C2 — loading error needs fixing (need C2 access)
 4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
@@ -96,8 +105,8 @@ File: 49,000 lines (down from 50,770 — 1,770 lines removed via dedup).
 6. de-aqui-a-saturno: plan exists to fix Vimeo 403s (see plan file)
 7. Calendar Google Calendar sync (future/complex)
 8. Standardize created/createdAt fields across codebase (338 references)
-9. Virtual scrolling for large task/content lists (currently full DOM rebuild)
-10. Event delegation for context menus (currently adds listeners per render)
+9. Event delegation for context menus (currently adds listeners per render)
+10. Accessibility: aria-labels on buttons, role=dialog on modals
 
 ### FEB 22 SESSION 11 — Feature Polish + Quality of Life
 Latest commit: `0dc9ac1` — all pushed to main, Vercel auto-deployed.
