@@ -62,26 +62,55 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-21 session 9)
+## CURRENT STATE (Updated: 2026-02-22 session 10)
+
+### FEB 22 SESSION 10 — Deep Codebase Cleanup + Feature Work
+Latest commit: `5ca8f6e` — all pushed to main, Vercel auto-deployed.
+**File reduced from 64,439 to 50,565 lines (21.5% reduction)**
+
+**WHAT THIS SESSION DID (6 commits):**
+- Remove 19 duplicate function definitions + fix IP Lookup casing (`5d973c9`)
+- Cmd+K dedup guard: title-based deduplication in cmdGetItems return (`666c393`)
+- Mass remove 470+ duplicate function definitions, -13,874 lines (`df73f2c`)
+- Manual: update changelog to v2.12 (`87e954c`)
+- Content: drag-and-drop file import for txt/md/json/csv/html (`5ca8f6e`)
+- Continuation of session 9 commits below
+
+**CRITICAL CLEANUP DONE:**
+- Zero duplicate function definitions remain (was 470+ duplicates)
+- Cmd+K now deduplicates entries by title (was showing same tool 5-10x)
+- showQuickIpLookup -> showQuickIPLookup casing fix
+- JS syntax verified clean via Node.js after every cleanup pass
+
+**WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
+1. Continue ASTRA feature improvements (lots of room)
+2. NEXUS CAPTURE: Chrome Web Store deployment (tasks in ASTRA KB)
+3. Content Monster: on C2 — loading error needs fixing (need C2 access)
+4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
+5. Living Docs: wiki-link rendering inside contenteditable editors
+6. saturno-bonus: planet-logo.png path fix
+7. de-aqui-a-saturno: plan exists to fix Vimeo 403s (see plan file)
 
 ### FEB 21 SESSION 9 — Clean Environment + Extensions + Manual Versioning
-Latest commit: `8847220` — all pushed to main, Vercel auto-deployed.
+Latest commit: `fa147b1` — all pushed to main, Vercel auto-deployed.
 
-**GABO'S DIRECTIVES THIS SESSION:**
+**GABO'S DIRECTIVES (SESSION 9):**
 - Content Monster is on C2 (MacBook) — can't fix from C1
 - Extension (nexus-capture) exists on C1, different folder from C2 — deploy to work on all devices
 - Focus on safe commits and clean environment — Gabo has unification steps to do
 - Update manual for every commit — version controlled
 - Check Perplexity paste for extension, respect the kernel
 
-**WHAT THIS SESSION DID (6 commits):**
+**WHAT SESSION 9 DID (11 commits across 3 repos):**
 - Whiteboard Mermaid export function (`b00cb70`)
 - Wired Mermaid to UI dropdown + Cmd+K (`2d38fdb`)
 - Board: inline tag editor popup on card tags (`161083c`)
 - Clean .gitignore: node_modules, .DS_Store, temp files (`4611f67`)
 - Manual: version-controlled changelog section 18, from v2.0-v2.9 (`7cf2a81`)
 - Clean: removed 3 duplicate function definitions (`8847220`)
+- Perplexity audit findings + Chrome Store tasks (`fa147b1`)
 - Also committed titan-forge .gitignore + logs (`6c9591d`)
+- nexus-capture: README (`3f65beb`), NEXUS_URL fix (`4ddbd02`)
 
 **EXTENSION STATUS (C1/iMac):**
 - NEXUS CAPTURE v1.1.0 at ~/dev/nexus-capture/ (own repo, 7 core files + shell scripts)
