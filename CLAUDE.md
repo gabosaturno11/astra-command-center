@@ -62,7 +62,35 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 12 continued)
+## CURRENT STATE (Updated: 2026-02-22 session 12 continued x2)
+
+### FEB 22 SESSION 12 CONTINUED (x2) — Accessibility + UX Polish
+Latest commit: `4b5e553` — all pushed to main, Vercel auto-deployed.
+File: ~43,470 lines. Manual at v2.16.
+
+**WHAT THIS CONTINUATION DID (6 commits):**
+- Focus trap on 8 modals + scroll position preservation + board keyboard nav (`a6cd26d`)
+- Content + link card keyboard nav, focus-visible outlines, shortcuts docs (`1e972be`)
+- Slash-search (/), skip link, ARIA landmarks (role=navigation/main/complementary) (`88b8c38`)
+- Task action discoverability (opacity 0.25), quick capture Ctrl+1-4, empty state hints (`b5fa3d0`)
+- Board search highlight, task completion green flash, manual v2.16 (`456814f`)
+- Link search highlighting, native type=search clear buttons on all 4 search inputs (`4b5e553`)
+
+**KEY IMPROVEMENTS:**
+- Focus trapping: Tab cycles within modals (8 dialogs)
+- Scroll preservation: section positions saved/restored on switch
+- Keyboard nav: board cards, content cards, link cards all tabbable + Enter
+- Focus-visible outlines on all interactive cards
+- / shortcut focuses section search (content, tasks, links)
+- Skip-to-main-content link for screen readers
+- ARIA landmarks on sidebar, main area, context panel
+- Quick Capture: Ctrl+1-4 sets type (task/content/link/note)
+- Task row actions visible at 25% opacity (were invisible)
+- Board card titles highlight search matches
+- Task completion: brief green flash on row
+- Link card titles highlight search matches
+- All search inputs use type=search with native clear button
+- Content/task empty states mention Cmd+Shift+N Quick Capture
 
 ### FEB 22 SESSION 12 — Performance + Dedup + Persistence + Dead Code Removal
 Latest commit: `066e4c3` — all pushed to main, Vercel auto-deployed.
