@@ -62,7 +62,42 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 11)
+## CURRENT STATE (Updated: 2026-02-22 session 12)
+
+### FEB 22 SESSION 12 — Performance + Dedup + Persistence
+Latest commit: `3b628b7` — all pushed to main, Vercel auto-deployed.
+File: 49,000 lines (down from 50,770 — 1,770 lines removed via dedup).
+
+**WHAT THIS SESSION DID (7 commits):**
+- Debounce 9 search/filter inputs + fix specSearch perf (`2af133e`)
+- Remove 578 duplicate Cmd+K command blocks, -1,791 lines (`8b4d1bc`)
+- Cloud sync race fix + debounce cleanup + restore tag-tasks handler (`ee913aa`)
+- Update shortcuts help modal + manual v2.14 (`bea61d0`)
+- Persist view preferences across page reloads (`ba010b3`)
+- Sync filter/tab UI state on section switch (`a5091fc`)
+- Persist sort order for tasks, content, and links (`3b628b7`)
+
+**KEY IMPROVEMENTS:**
+- All 9 search inputs debounced (250ms default, 150ms for Cmd+K) — no more full DOM rebuild per keystroke
+- specSearch uses regex instead of DOM createElement for HTML tag stripping
+- cmdGetItems cleaned from 1,662 to 1,084 unique command blocks (578 duplicates removed)
+- Cloud sync reschedules timer after manual save (prevents race condition)
+- Debounce timers cleared on section switch (prevents stale renders)
+- Shortcuts modal updated: +5 whiteboard shortcuts, +wiki-link hint, fixed prefix typos
+- View persistence: section, taskView, boardCompact, taskFilter, contentType, sort orders
+- tag-tasks: Cmd+K handler restored (was lost in dedup)
+
+**WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
+1. Continue ASTRA feature improvements
+2. NEXUS CAPTURE: Chrome Web Store deployment (tasks in ASTRA KB)
+3. Content Monster: on C2 — loading error needs fixing (need C2 access)
+4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
+5. saturno-bonus: planet-logo.png path fix
+6. de-aqui-a-saturno: plan exists to fix Vimeo 403s (see plan file)
+7. Calendar Google Calendar sync (future/complex)
+8. Standardize created/createdAt fields across codebase (338 references)
+9. Virtual scrolling for large task/content lists (currently full DOM rebuild)
+10. Event delegation for context menus (currently adds listeners per render)
 
 ### FEB 22 SESSION 11 — Feature Polish + Quality of Life
 Latest commit: `0dc9ac1` — all pushed to main, Vercel auto-deployed.
@@ -77,27 +112,6 @@ Latest commit: `0dc9ac1` — all pushed to main, Vercel auto-deployed.
 **ALSO IN THIS SESSION (committed by parallel session):**
 - Data integrity logging, health check progress counters, auto-backup guard (`13151ae`)
 - Book: 60 holographic quotes + 30 infographic briefs (`13151ae`)
-
-**NEW FEATURES ADDED:**
-- Wiki-link autocomplete in all contenteditable editors and textareas
-- Task stale-row CSS class + "stale" badge for neglected tasks
-- findSimilarContent() warns on 50%+ word overlap when adding content
-- autoArchiveOldTasks() runs on load for completed >30 day tasks
-- autoBackupToBlob() guard triggers every 10 saves
-- fixDataIntegrity() now logs repairs to console
-- repoHealthCheck and checkAllLinks show progress (1/N) and disable button
-- Recent items persist to localStorage
-
-**WHAT NEXT CLAUDE SHOULD DO (pick any, all are valuable):**
-1. Continue ASTRA feature improvements
-2. NEXUS CAPTURE: Chrome Web Store deployment (tasks in ASTRA KB)
-3. Content Monster: on C2 — loading error needs fixing (need C2 access)
-4. Pipeline: OPENAI_API_KEY + BLOB_READ_WRITE_TOKEN in Vercel env
-5. saturno-bonus: planet-logo.png path fix
-6. de-aqui-a-saturno: plan exists to fix Vimeo 403s (see plan file)
-7. Cmd+K prefix block cleanup (8+ duplicate burndown blocks, 10+ weekly review blocks)
-8. Board card compact mode improvements
-9. Calendar Google Calendar sync (future/complex)
 
 ### FEB 22 SESSION 10 — Deep Codebase Cleanup + Feature Work
 Latest commit: `5ca8f6e` — all pushed to main, Vercel auto-deployed.
