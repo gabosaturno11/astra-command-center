@@ -1346,6 +1346,24 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--accent);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent-green)">v2.28</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Cross-Section Project System</strong> &mdash; Projects now connect to content, links, and writer docs via projectId. Colored project badges on cards link back to project panel. Project filter dropdowns on content, links, and writer doc list toolbars.<br>
+        <strong>Bulk Project Assignment</strong> &mdash; Content and link bulk actions now include "Set Project" button to assign selected items to a project via astraSelect.<br>
+        <strong>Quick Capture Project</strong> &mdash; Project selector dropdown in Quick Capture panel. Auto-selects active project. Assigns projectId to tasks, content, and links on creation.<br>
+        <strong>Writer Project System</strong> &mdash; Writer docs support projectId with colored badge on doc items. "P" button to assign project. New docs inherit active project. Project filter dropdown + breadcrumb pill.<br>
+        <strong>Enhanced project: Prefix</strong> &mdash; Cmd+K project: now opens the full project panel (was task filter only). Shows task/content/doc counts per project.<br>
+        <strong>Project Snapshot Expanded</strong> &mdash; Project context tab snapshot now shows 8 stats in 4-column grid: Active Tasks, Completed, Overdue, Content, Living Docs, Writer Docs, KB Items, Links. Context depth meter shows writer and content word counts.<br>
+        <strong>Content Reader TTS</strong> &mdash; "Speak" button in content reader overlay uses browser speech synthesis. Toggle to stop. speakText() function for any text.<br>
+        <strong>NEXUS Extension Fixes</strong> &mdash; Fixed auth header in sendToNexus() (was silently failing). Added Book/Research context menus. Chrome Side Panel v2.0 with mini ASTRA dashboard. ASTRA capture sync with category-to-project mapping.<br>
+        <strong>Alert Cleanup</strong> &mdash; 12 remaining alert() calls converted to toast(). 3 bookmarklet alerts intentionally kept native.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent-green)">v2.26</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-22</span>
       </div>
@@ -1682,7 +1700,7 @@
   <p>ASTRA Command Center &mdash; v2.27</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
-  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.14 | Last updated: 2026-02-22</p>
+  <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.15 | Last updated: 2026-02-22</p>
 </div>
 
 </body>
