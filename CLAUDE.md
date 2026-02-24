@@ -335,7 +335,15 @@ File: 43,441 lines (down from 50,770 — massive 7,329 line reduction, -14.4%).
 7. Calendar Google Calendar sync (future/complex)
 8. Standardize created/createdAt fields across codebase (338 references)
 9. Event delegation for context menus (currently adds listeners per render)
-10. Accessibility: aria-labels on buttons, role=dialog on modals
+10. Accessibility: deeper — 30+ modal form labels missing `for=` associations, 50+ buttons with only `title=`
+
+### FEB 24 SESSION 12 — Accessibility Fixes
+Latest commit: `2999961` — all pushed to main, Vercel auto-deployed.
+
+**WHAT THIS SESSION DID (1 commit):**
+- aria-modal="true" on quick-capture + zen-writer dialogs (`2999961`)
+- aria-labels on 15 elements: RL/EH/M/H buttons, writer find/replace/title, specs title, wb-search, pipeline textarea, context quick-note, bulk due date, zen-writer close
+- Part of a larger cross-repo accessibility sweep (saturno-bonus got 5 root pages fixed)
 
 ### FEB 22 SESSION 11 — Feature Polish + Quality of Life
 Latest commit: `0dc9ac1` — all pushed to main, Vercel auto-deployed.
