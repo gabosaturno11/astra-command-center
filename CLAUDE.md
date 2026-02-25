@@ -62,7 +62,45 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-22 session 19)
+## CURRENT STATE (Updated: 2026-02-25 session 20)
+
+### FEB 25 SESSION 20 — ASTRA Central Router Audit + Living Docs
+Latest commits: `ab6dcbd` through `d5fdc78` — 8 commits pushed to main, Vercel auto-deployed.
+Manual at v2.29.
+
+**GABO'S DIRECTIVE:** "nothing more gets built until Astra is the home"
+**MODE:** claude-no-stop (autonomous, push checkpoints, keep going)
+
+**WHAT THIS SESSION DID (8 commits):**
+- Power-Free + Resting Squat standardization tasks linked to Book project (`ab6dcbd`)
+- Help button (?) in header + Ecosystem Router living doc (10 sections) (`15e9358`)
+- Manual v2.29 changelog entry (`5ab6e0f`)
+- Claude Code spec: 5 sections filled with content + patch migration (`ec03584`)
+- Book arc name fix: Embodied Mastery -> Emergence (`ba49779`)
+- Bonus KB + project instructions updated to Feb 25 state (`a62722c`)
+- Bonus living doc patches: content inventory, blockers, roadmap updated (`4473eee`)
+- Cmd+K "User Manual" command (`d5fdc78`)
+
+**ALSO THIS SESSION (from prev context before compaction):**
+- AOC quality audit: all 10 critical issues fixed across SUBMISSION_PACKAGE_FINAL + C1 + CANNON
+- AOC audit report + KB entry updated (`0a608d4`, `cff03bb`)
+- Gabo messages 68-80 saved to saturno-bonus logs
+
+**KEY ADDITIONS:**
+- Ecosystem Router living doc (ld_ecosystem_router): 10 sections covering data flow, repos, file locations, routing conflicts, daily actions, production workflow, C1/C2 usage, Claude vs Desktop, accounts, blockers
+- Help button: opens astra-manual.html from header toolbar
+- Cmd+K: "help" / "manual" / "guide" opens user manual
+- Claude Code spec (ld_claude): all 5 sections now have content (was empty)
+- Bonus living doc: stale content from Feb 16 patched to Feb 25 state
+- iCloud TRAVEL_BACKUP: 59/60 scripts confirmed on G-DRIVE, 1 missing copied over, SAFE TO DELETE
+
+**WHAT STILL NEEDS WORK:**
+- Vercel env vars (BLOB_READ_WRITE_TOKEN, ASTRA_ADMIN_PASSWORD, OPENAI_API_KEY, ANTHROPIC_API_KEY) — only Gabo can add these
+- /api/verify cookie collision between saturno-bonus and titan-forge
+- Custom domain bonus.saturnomovement.com (Cloudflare CNAME)
+- Audio/video CDN for saturno-bonus
+- Physical device testing
+- Chrome Web Store for nexus-capture
 
 ### FEB 22 SESSION 19 — Keyboard Power + UX Polish + Settings
 Latest commit: `cb14be7` — all pushed to main, Vercel auto-deployed.
