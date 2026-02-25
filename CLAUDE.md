@@ -39,7 +39,7 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 1. **ASKED "where are we at?"** — THIS FILE tells you. DO NOT ASK.
 2. **ASKED "what's the priority?"** — THIS FILE tells you. DO NOT ASK.
 3. **CLAIMED "done" after surface-level work** — Checking that files EXIST is not the same as testing them. Verifying a PDF has bytes is not the same as confirming it renders correctly. Adding meta tags is not "Phase 1 complete."
-4. **Did not read Gabo's messages** — There are 64+ messages at ~/dev/saturno-bonus/logs/gabo-messages.json. READ THEM before doing anything.
+4. **Did not read Gabo's messages** — There are 80+ messages at ~/dev/saturno-bonus/logs/gabo-messages.json. READ THEM before doing anything.
 5. **Spent 30 minutes "orienting"** — You have THIS FILE. Read it, then EXECUTE. No orientation phase.
 6. **Created planning documents instead of doing work** — Do NOT create new .md planning files. Work on the actual code.
 7. **Batched commits** — Commit after EVERY meaningful change. Not at the end.
@@ -64,14 +64,14 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ## CURRENT STATE (Updated: 2026-02-25 session 20)
 
-### FEB 25 SESSION 20 — ASTRA Central Router Audit + Living Docs
-Latest commits: `ab6dcbd` through `d5fdc78` — 8 commits pushed to main, Vercel auto-deployed.
-Manual at v2.29.
+### FEB 25 SESSION 20/20b — ASTRA Central Router Audit + Living Docs + Routing Fix
+Latest commits: `ab6dcbd` through `0b67056` — 18 commits pushed to main, Vercel auto-deployed.
+Manual at v2.30. Also 1 commit to titan-forge, 1 to de-aqui-a-saturno.
 
 **GABO'S DIRECTIVE:** "nothing more gets built until Astra is the home"
 **MODE:** claude-no-stop (autonomous, push checkpoints, keep going)
 
-**WHAT THIS SESSION DID (8 commits):**
+**WHAT SESSION 20 DID (13 commits to ASTRA):**
 - Power-Free + Resting Squat standardization tasks linked to Book project (`ab6dcbd`)
 - Help button (?) in header + Ecosystem Router living doc (10 sections) (`15e9358`)
 - Manual v2.29 changelog entry (`5ab6e0f`)
@@ -80,6 +80,18 @@ Manual at v2.29.
 - Bonus KB + project instructions updated to Feb 25 state (`a62722c`)
 - Bonus living doc patches: content inventory, blockers, roadmap updated (`4473eee`)
 - Cmd+K "User Manual" command (`d5fdc78`)
+- 3 infra tasks added (Vercel env vars P0, cookie fix P2, iCloud cleanup P3) (`a842bfe`)
+- sync: prefix in Cmd+K (`1eb2348`)
+- Quick launch commands: Bonus, Karina, Titan, Vercel, GitHub (`f748018`)
+- Session 20 report KB entry (`9c8d6e7`)
+- CLAUDE.md session 20 state (`29f62bd`)
+
+**WHAT SESSION 20b DID (continuation after context compaction):**
+- Shortcuts modal: sync: prefix + Quick Commands section (`1bf57a4`)
+- Cookie collision FIXED: titan-forge `vault_auth` -> `forge_auth` (`991f417` in titan-forge)
+- Cookie task marked done + Router doc updated (`762cbb2`)
+- Manual v2.30 changelog (`0b67056`)
+- de-aqui-a-saturno CLAUDE.md created (`f21af9f`)
 
 **ALSO THIS SESSION (from prev context before compaction):**
 - AOC quality audit: all 10 critical issues fixed across SUBMISSION_PACKAGE_FINAL + C1 + CANNON
@@ -93,10 +105,11 @@ Manual at v2.29.
 - Claude Code spec (ld_claude): all 5 sections now have content (was empty)
 - Bonus living doc: stale content from Feb 16 patched to Feb 25 state
 - iCloud TRAVEL_BACKUP: 59/60 scripts confirmed on G-DRIVE, 1 missing copied over, SAFE TO DELETE
+- Cookie collision resolved: titan-forge uses `forge_auth`, saturno-bonus uses `vault_auth`
+- All 4 repos now have CLAUDE.md (de-aqui-a-saturno was missing)
 
 **WHAT STILL NEEDS WORK:**
 - Vercel env vars (BLOB_READ_WRITE_TOKEN, ASTRA_ADMIN_PASSWORD, OPENAI_API_KEY, ANTHROPIC_API_KEY) — only Gabo can add these
-- /api/verify cookie collision between saturno-bonus and titan-forge
 - Custom domain bonus.saturnomovement.com (Cloudflare CNAME)
 - Audio/video CDN for saturno-bonus
 - Physical device testing
