@@ -62,7 +62,23 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 22b)
+## CURRENT STATE (Updated: 2026-02-26 session 22c)
+
+### FEB 26 SESSION 22c — Data Integrity Deep Pass + Bug Fixes + UX Feedback
+Latest commit: `6a9f833`. Mode: claude-no-stop. Manual at v2.35.
+
+**WHAT SESSION 22c DID (5 commits):**
+- `b249d7b` — Fixed ALL 8 string ID creators (t_/c_/wd_ prefix -> numeric Date.now()). Added missing fields (projectId, tags, subtasks, type, source). Migration patch converts existing string IDs.
+- `93299e1` — 7 verified bugs: renderProjLinks missing `>`, S.kb->S.knowledgeBase (project context reads real KB now), restoreArchivedTask string ID, link normalizer added, Quick Convert dates standardized, emoji picker innerHTML fix, sticky note IDs.
+- `1caaaaf` — CSV export date field fix (t.created||t.createdAt). Activity sparkline link date fix. Weekly review 3 filters fixed. Snapshot diff link date fix. Duplicate condition removed.
+- `6e322a9` — Calculator error feedback (was silent). Quick widget string IDs fixed. Missing toasts: spec sections, milestones, quick link/task widgets.
+- `6a9f833` — Manual v2.35 changelog.
+
+**KEY FIXES:**
+- **S.kb vs S.knowledgeBase split** — project stats bar, context depth meter, plan/prompt generation, copy context ALL read from `S.kb` which was always empty. Now reads `S.knowledgeBase` (the real store). Research items pushed to correct store with proper schema (name/content not title/body).
+- **String ID epidemic** — 10+ places used `'t_'+Date.now()` for task IDs. These cause `ReferenceError` in onclick handlers like `openTaskDetail(${t.id})` where string ID renders as an undefined variable. ALL fixed to numeric `Date.now()`.
+- **Link date field split** — Links had no normalizer (tasks/content had one). Added. 3 creation paths standardized from `createdAt` to `created`.
+- **Emoji picker** — Only last category's emojis were visible due to innerHTML += destroying previously appendChild-ed grid children.
 
 ### FEB 26 SESSION 22b — Security Audit + Mobile Responsive + Performance + Data Integrity
 Latest commit: `975963c`. Mode: claude-no-stop. Manual at v2.34.
