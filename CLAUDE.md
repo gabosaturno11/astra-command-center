@@ -62,7 +62,21 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 21b)
+## CURRENT STATE (Updated: 2026-02-26 session 22)
+
+### FEB 26 SESSION 22 — Installed Tools + Branding Project + Bug Fixes
+Latest commit: `a475c34`. Mode: claude-no-stop.
+
+**WHAT SESSION 22 DID SO FAR:**
+- Added ld_c6 "Installed Tools & Dependencies" to Claude Code living doc (potrace, imagemagick, whisper, ffmpeg, git-filter-repo)
+- Added proj_branding project + kb_brand_system KB entry (modular logo system, 7 variants, SVG trace)
+- Fixed hostname regex bug: `.replace('www.','')` -> `.replace(/^www\./,'')` (4 occurrences)
+- Fixed link health check: silent fail now logs `console.warn` with URL and error message
+- Updated ld_c5 session logs with Feb 26 entry
+- Full Cmd+K audit (via agent): 200+ commands, 31 prefixes, ZERO dead refs
+- Full code quality audit (via agent): 28 empty catches (mostly acceptable), 2 real bugs fixed
+- KB/Living Docs inventory: 9 projects (now 10 with branding), 24+ living docs, 35+ KB entries
+- Gabo message 114 saved (2 Claudes coordination)
 
 ### FEB 26 SESSION 21b — Data Integrity + Seed Polish + Error Handling (continuation)
 Latest commits: `03e58de` (seed polish), `44b7af1` (data integrity), `0b24bc4` (manual v2.32), `eb1164f` (error handlers).
