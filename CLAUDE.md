@@ -62,7 +62,22 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 22e)
+## CURRENT STATE (Updated: 2026-02-26 session 22f)
+
+### FEB 26 SESSION 22f — KB Nav + Bug Fixes + Undo Parity
+Latest commit: `f6d8fc4`. Mode: claude-no-stop. Manual at v2.38.
+
+**WHAT SESSION 22f DID (4 commits):**
+- `8c62597` — KB keyboard navigation: J/K vim-style nav for KB cards (was content+links only). S/E/X/C shortcuts (view/edit/delete/copy). Shortcuts modal updated. Daily tip updated.
+- `33c5477` — Config generator null guards: 5 copy buttons (Makefile/Webpack/Babel/EditorConfig/Jest) now have querySelector null check + clipboard .catch(). Quick Capture clipboard race condition fixed (no longer overwrites user input). Writer section switch .app null guard.
+- `ab99bf1` — Undo parity: Writer doc delete + Living Doc spec delete now have Cmd+Z undo (was instant-delete with no recovery). Both now require astraConfirm confirmation dialog before delete.
+- `f6d8fc4` — Manual v2.38 changelog.
+
+**KEY IMPROVEMENTS:**
+- **KB fully navigable** — J/K/S/E/X/C keyboard shortcuts now work on KB cards (parity with content + links).
+- **Undo everywhere** — Doc and spec delete now have undo recovery (content, links, KB, tasks already had it).
+- **Config generators safe** — 5 copy buttons no longer crash on null querySelector or clipboard failure.
+- **Race condition fixed** — Quick Capture clipboard auto-detect respects user's typed input.
 
 ### FEB 26 SESSION 22e — Security + UX + Settings + KB Accessibility
 Latest commit: `16822f4`. Mode: claude-no-stop. Manual at v2.37.
