@@ -62,7 +62,24 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 21)
+## CURRENT STATE (Updated: 2026-02-26 session 21b)
+
+### FEB 26 SESSION 21b — Data Integrity + Seed Polish + Error Handling (continuation)
+Latest commits: `03e58de` (seed polish), `44b7af1` (data integrity), `0b24bc4` (manual v2.32), `eb1164f` (error handlers).
+Manual at v2.32. Mode: claude-no-stop. All 4 live URLs verified 200.
+
+**WHAT SESSION 21b DID:**
+- Cmd+K full audit: 200+ commands, zero dead function references, all quick-launch URLs live
+- Seed data audit: 9 projects, 12 tasks, 41 KB entries — zero broken cross-references
+- [GABO] prefix added to 5 tasks that need Gabo's action (book standardization, env vars, cleanup)
+- SM App living doc: 5 sections filled (architecture, handoff, tech stack, blockers, roadmap) — was empty
+- HBS living doc: 5 sections filled (solar system, inventory, SSK drive, blockers, launch plan) — was empty
+- Data integrity: ALL task creation paths now set both `project` + `projectId` (addTask, quickAddTask, qcSubmit, toggleTask recurring, addTaskFromTemplate, bulk assign, Cmd+K assign:)
+- normalizeProjectFields() patch: backfills missing field on load in either direction
+- Global error handlers: window.onerror + window.onunhandledrejection (was completely missing)
+- Manual v2.32 changelog
+- Error handling audit: 145 try/catch blocks reviewed, 25 empty catches identified (low priority)
+- Bonus page status audit: 61 tools, 7-10 weaker experience tools identified for upgrade
 
 ### FEB 26 SESSION 21 — Routing Audit + Accessibility Deep Pass + CLAUDE.md Fixes
 Latest commits: `d193627` (accessibility), `f155ea2` (manual v2.31).
