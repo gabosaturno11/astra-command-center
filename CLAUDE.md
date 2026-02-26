@@ -62,7 +62,25 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 22d)
+## CURRENT STATE (Updated: 2026-02-26 session 22e)
+
+### FEB 26 SESSION 22e — Security + UX + Settings + KB Accessibility
+Latest commit: `16822f4`. Mode: claude-no-stop. Manual at v2.37.
+
+**WHAT SESSION 22e DID (7 commits):**
+- `bbbdfa6` — XSS fix: readContent Copy/Speak buttons now use safe helper functions instead of inline JSON.stringify(body). NaN guard on task timer. Content reader overlay cleaned up on section switch.
+- `d7036b6` — Clipboard error handling: 5 operations now have .catch() handlers. Content reader click-outside-to-close.
+- `2629d69` — Performance: eliminated duplicate single-pass counting in renderTasks. data-id attributes on board-card, kb-card, writer-doc-item, specs-doc-item. Spec section/version delete now require astraConfirm.
+- `4c87451` — KB cards: tabindex, role=button, aria-label, Enter key handler. Right-click context menu with Open/Copy Content/Copy Name/Delete. Global contextmenu delegation.
+- `d48a402` — Auto-archive reads S._settings.autoArchiveDays (was hardcoded 30). Pipeline history XSS fix: Copy/To Content use safe helper functions.
+- `3adbf66` — Configurable WIP limit in Settings (3/5/7/10/unlimited). Unified across board, Kanban Metrics, health insights, Cmd+K config.
+- `16822f4` — Manual v2.37 changelog.
+
+**KEY IMPROVEMENTS:**
+- **XSS surface eliminated** — All inline JSON.stringify(body) patterns in onclick handlers replaced with safe ID-based lookup functions (readContent + pipeline history).
+- **KB fully accessible** — Cards are keyboard-navigable and have context menus (was click-only, no right-click, no keyboard).
+- **Settings expanded** — WIP limit and auto-archive now respect user preferences via Settings panel.
+- **Destructive actions safer** — Spec version/section delete require confirmation. Content reader closes properly.
 
 ### FEB 26 SESSION 22d — Whiteboard Touch + Performance + UX Polish
 Latest commit: `0725fef`. Mode: claude-no-stop. Manual at v2.36.
