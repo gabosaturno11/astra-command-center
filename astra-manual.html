@@ -524,7 +524,7 @@
   <div class="cover-logo">A</div>
   <h1>ASTRA</h1>
   <div class="subtitle">Command Center</div>
-  <div class="version-badge">User Manual &mdash; v2.36</div>
+  <div class="version-badge">User Manual &mdash; v2.37</div>
   <p class="tagline">Your entire digital workspace in one screen. Tasks, writing, knowledge, calendar, whiteboard, pipeline &mdash; zero dependencies, works offline, runs forever.</p>
 </div>
 
@@ -1348,6 +1348,25 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--accent);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent-green)">v2.37</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-26</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>XSS Fixes</strong> &mdash; Eliminated <code>JSON.stringify(body)</code> in inline onclick handlers across readContent (Copy/Speak buttons) and pipeline history (Copy/To Content). Replaced with safe helper functions that look up content by ID/index.<br>
+        <strong>Timer NaN Guard</strong> &mdash; Task timer validates <code>timeStarted</code> before arithmetic to prevent NaN corruption of <code>timeSpent</code> from invalid dates.<br>
+        <strong>Content Reader UX</strong> &mdash; Overlay now closes on click-outside (background area). Cleaned up on section switch. Previously only Escape/arrows closed it.<br>
+        <strong>Clipboard Error Handling</strong> &mdash; 5 clipboard operations now have <code>.catch()</code> handlers with user-visible feedback instead of silent failure.<br>
+        <strong>Performance</strong> &mdash; Eliminated duplicate single-pass task counting loop in <code>renderTasks</code> (was computing same counters twice per render).<br>
+        <strong>data-id Attributes</strong> &mdash; Added to board cards, KB cards, writer doc items, spec items. Fixes keyboard shortcuts (Cmd+D, S/E/X/C) that rely on <code>element.dataset.id</code>.<br>
+        <strong>KB Cards</strong> &mdash; Now keyboard accessible (tabindex, role=button, Enter key). Right-click context menu with Open/Copy/Delete actions.<br>
+        <strong>Destructive Actions</strong> &mdash; Spec section delete and spec version delete now require confirmation via <code>astraConfirm</code>.<br>
+        <strong>Configurable WIP Limit</strong> &mdash; Board WIP limit moved from hardcoded 5 to Settings panel (3/5/7/10/unlimited). Unified across board, Kanban Metrics, health insights, and Cmd+K config.<br>
+        <strong>Auto-Archive</strong> &mdash; Now reads Settings auto-archive days instead of hardcoded 30. Setting to 0 disables auto-archive.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent-green)">v2.36</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-26</span>
       </div>
@@ -1802,7 +1821,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.36</p>
+  <p>ASTRA Command Center &mdash; v2.37</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.29 | Last updated: 2026-02-25</p>
