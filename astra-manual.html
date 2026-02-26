@@ -524,7 +524,7 @@
   <div class="cover-logo">A</div>
   <h1>ASTRA</h1>
   <div class="subtitle">Command Center</div>
-  <div class="version-badge">User Manual &mdash; v2.34</div>
+  <div class="version-badge">User Manual &mdash; v2.35</div>
   <p class="tagline">Your entire digital workspace in one screen. Tasks, writing, knowledge, calendar, whiteboard, pipeline &mdash; zero dependencies, works offline, runs forever.</p>
 </div>
 
@@ -1348,6 +1348,21 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--accent);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent-green)">v2.35</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-26</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>Data Integrity</strong> &mdash; All task/content/doc creators now use numeric IDs (was string <code>t_/c_/wd_</code> causing JS errors in onclick handlers). Migration patch converts existing string IDs. 8 creators + 2 widgets fixed.<br>
+        <strong>S.kb/S.knowledgeBase Split Fixed</strong> &mdash; Project stats, context depth meter, plan/prompt generation, and copy context now read from real KB store. Research items now saved to correct store with proper schema.<br>
+        <strong>Date Field Normalization</strong> &mdash; Link normalizer added (was missing). 3 link creators + 3 quick-convert actions standardized to <code>created</code>. CSV export, sparkline, weekly review, and snapshot diff now use fallback pattern.<br>
+        <strong>HTML Fix</strong> &mdash; Project links card had missing <code>&gt;</code> on div tag (cards rendered empty). Restored button in archive browser had string ID mismatch (silently failed).<br>
+        <strong>Emoji Picker</strong> &mdash; Category headers changed from <code>innerHTML +=</code> to <code>appendChild</code> (was destroying grid children, only last category visible).<br>
+        <strong>UX Feedback</strong> &mdash; Toast messages added to: spec section add/remove, milestone add/toggle/remove, quick link/task widgets. Calculator errors now show message instead of silent fail.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent-green)">v2.34</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-26</span>
       </div>
@@ -1772,7 +1787,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.34</p>
+  <p>ASTRA Command Center &mdash; v2.35</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.29 | Last updated: 2026-02-25</p>
