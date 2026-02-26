@@ -62,12 +62,29 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 22)
+## CURRENT STATE (Updated: 2026-02-26 session 22b)
+
+### FEB 26 SESSION 22b — Security Audit + Mobile Responsive + Performance + Data Integrity
+Latest commit: `975963c`. Mode: claude-no-stop. Manual at v2.34.
+
+**WHAT SESSION 22b DID:**
+- Security audit: ALL 8 checks PASS (UI loads, 5 API endpoints return 401, health returns no secrets)
+- kb_cc_gabo_rules: logo rule updated (planet-logo.png -> modular system)
+- Pipeline fix: added missing pl-text-stats element + null-safe plCheckApi
+- Recurring task dedup: prevents duplicates on undo/fast-click
+- Toast grammar fix: "1 overdue task needs attention" (was "need")
+- Periodic overdue notification check every 30min (was only on load)
+- GitHub Pages Titan Forge link marked LEGACY
+- Mobile responsive (640px): hamburger 44px touch target, task table 4-col on mobile, icon picker 4-col, writer toolbar 36px, safe-area insets on modals
+- Performance: innerHTML += loops replaced with .map().join('')
+- Session 22 KB entry + branding repo patches committed
+- Manual v2.34 changelog
+- Gabo message 115 saved (security audit request)
 
 ### FEB 26 SESSION 22 — Installed Tools + Branding Project + Bug Fixes
 Latest commit: `a475c34`. Mode: claude-no-stop.
 
-**WHAT SESSION 22 DID SO FAR:**
+**WHAT SESSION 22 DID:**
 - Added ld_c6 "Installed Tools & Dependencies" to Claude Code living doc (potrace, imagemagick, whisper, ffmpeg, git-filter-repo)
 - Added proj_branding project + kb_brand_system KB entry (modular logo system, 7 variants, SVG trace)
 - Fixed hostname regex bug: `.replace('www.','')` -> `.replace(/^www\./,'')` (4 occurrences)
