@@ -524,7 +524,7 @@
   <div class="cover-logo">A</div>
   <h1>ASTRA</h1>
   <div class="subtitle">Command Center</div>
-  <div class="version-badge">User Manual &mdash; v2.37</div>
+  <div class="version-badge">User Manual &mdash; v2.38</div>
   <p class="tagline">Your entire digital workspace in one screen. Tasks, writing, knowledge, calendar, whiteboard, pipeline &mdash; zero dependencies, works offline, runs forever.</p>
 </div>
 
@@ -1348,6 +1348,21 @@
   <div style="margin-top:16px">
     <div style="padding:12px;background:var(--bg-card);border:1px solid var(--accent);border-radius:8px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-weight:700;color:var(--accent-green)">v2.38</span>
+        <span style="font-size:10px;color:var(--text-muted)">2026-02-26</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:6px">
+        <strong>KB Keyboard Navigation</strong> &mdash; J/K vim-style navigation now works on Knowledge Base cards (was content + links only). S opens viewer, E edits, X deletes, C copies content. Shortcuts modal updated.<br>
+        <strong>Config Generator Safety</strong> &mdash; 5 config generator copy buttons (Makefile, Webpack, Babel, EditorConfig, Jest) now have null guards and clipboard error handling. Previously could throw if modal was destroyed before onclick fired.<br>
+        <strong>Quick Capture Race Fix</strong> &mdash; Clipboard auto-detect no longer overwrites user input. If you start typing before the async clipboard read resolves, your input is preserved.<br>
+        <strong>Doc Delete Undo</strong> &mdash; Writer document deletion now has Cmd+Z undo support and requires confirmation dialog. Previously deleted instantly with no recovery.<br>
+        <strong>Spec Delete Undo</strong> &mdash; Living Doc spec deletion now has Cmd+Z undo support and requires confirmation dialog. Previously deleted instantly with no recovery.<br>
+        <strong>Null Guard</strong> &mdash; <code>.app</code> querySelector in writer section switch now checks for null before classList access.
+      </div>
+    </div>
+
+    <div style="padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
         <span style="font-weight:700;color:var(--accent-green)">v2.37</span>
         <span style="font-size:10px;color:var(--text-muted)">2026-02-26</span>
       </div>
@@ -1821,7 +1836,7 @@
 
 <!-- ========== FOOTER ========== -->
 <div class="manual-footer">
-  <p>ASTRA Command Center &mdash; v2.37</p>
+  <p>ASTRA Command Center &mdash; v2.38</p>
   <p style="margin-top:8px">Built by Saturno Movement. Zero dependencies. Works offline. Runs forever.</p>
   <p style="margin-top:16px;font-size:11px;color:var(--text-muted)">Live at <a href="https://astra-command-center-sigma.vercel.app" style="color:var(--accent)">astra-command-center-sigma.vercel.app</a></p>
   <p style="margin-top:8px;font-size:11px;color:var(--text-muted)">Manual version: 2.29 | Last updated: 2026-02-25</p>
