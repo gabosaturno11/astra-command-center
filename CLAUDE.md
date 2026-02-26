@@ -62,7 +62,23 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-25 session 20)
+## CURRENT STATE (Updated: 2026-02-26 session 21)
+
+### FEB 26 SESSION 21 — Routing Audit + Accessibility Deep Pass + CLAUDE.md Fixes
+Latest commits: `d193627` (accessibility), `f155ea2` (manual v2.31).
+Manual at v2.31. Priority shift: de-aqui-a-saturno PAUSED, ASTRA routing + Bonus #1.
+
+**WHAT SESSION 21 DID:**
+- Full routing audit across all 5 repos (98% clean, 1 known dead GH Pages link)
+- ~/CLAUDE.md C1/C2 label fix (iMac was labeled C1, should be C2)
+- ~/CLAUDE.md priorities updated (ASTRA + Bonus, not Book First)
+- titan-forge CLAUDE.md: bonus.html marked as LEGACY
+- Accessibility deep pass: 50+ form labels with for=, 20+ buttons with aria-label (`d193627`)
+- Project color picker: role=button + tabindex on all 8 colors
+- KB modal tabs: aria-labels on 4 tabs, image drop zone accessible
+- Task detail: due date quick-set buttons + natural date input labeled
+- Manual v2.31 changelog (`f155ea2`)
+- Gabo messages 89-95 saved
 
 ### FEB 25 SESSION 20/20b — ASTRA Central Router Audit + Living Docs + Routing Fix
 Latest commits: `ab6dcbd` through `0b67056` — 18 commits pushed to main, Vercel auto-deployed.
