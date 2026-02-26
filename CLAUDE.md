@@ -62,7 +62,25 @@ That is the real problem. And the answer right now is YES — because CLAUDE.md 
 
 ---
 
-## CURRENT STATE (Updated: 2026-02-26 session 22c)
+## CURRENT STATE (Updated: 2026-02-26 session 22d)
+
+### FEB 26 SESSION 22d — Whiteboard Touch + Performance + UX Polish
+Latest commit: `0725fef`. Mode: claude-no-stop. Manual at v2.36.
+
+**WHAT SESSION 22d DID (6 commits):**
+- `6938c1d` — Whiteboard full touch support: pan, drag, resize, pinch-to-zoom, connections, color picker. touch-action:none on canvas/nodes. Enlarged touch targets on coarse-pointer devices.
+- `6e5c9c7` — Null guards: switchSection panel null check, onWriterChange ws-saved, updateWS writer-editor + stat elements. CSS dedup: .context-resize and .sidebar-header consolidated.
+- `f6bdc4c` — createdAt sync in save() (items created in-session now visible in analytics). Content Timeline filter fixed. Accessibility: contenteditable role=textbox, notification bell keyboard, progress ring/sparkline accessible.
+- `05d39df` — Manual v2.36 changelog.
+- `23ef446` — Performance: renderTasks filter counts 11-pass -> 1 single forEach. updateSidebarCounts/updateHeaderStats 9-pass -> 1. dateGrp Date pre-computation.
+- `0725fef` — UX: deleteTaskFromDetail now has undo (pushUndo). KB delete requires confirmation + undo. Double-click rename on writer docs and spec docs.
+
+**KEY IMPROVEMENTS:**
+- **Whiteboard on iPad** — Was completely non-functional on touch devices. Now pan, drag nodes, resize, pinch zoom, draw connections, and color picker all work via touch.
+- **Performance** — ~20 array iterations per save() reduced to 1 single-pass. dateGrp no longer creates new Date() per card.
+- **Data integrity** — save() syncs created->createdAt so in-session analytics work immediately.
+- **Undo consistency** — Task detail delete, KB delete now have undo recovery like content/link delete.
+- **Accessibility** — 6 elements now keyboard-accessible (bell, ring, sparkline, 3 editors).
 
 ### FEB 26 SESSION 22c — Data Integrity Deep Pass + Bug Fixes + UX Feedback
 Latest commit: `6a9f833`. Mode: claude-no-stop. Manual at v2.35.
