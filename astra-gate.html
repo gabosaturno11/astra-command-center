@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASTRA — Access</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #050711;
+      color: #fafafa;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .gate {
+      text-align: center;
+      padding: 24px;
+      max-width: 360px;
+      width: 100%;
+    }
+    .gate h1 {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #4ade80;
+      margin-bottom: 32px;
+    }
+    .gate input {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(74,222,128,0.2);
+      color: #fafafa;
+      font-size: 14px;
+      text-align: center;
+      letter-spacing: 0.1em;
+      outline: none;
+      border-radius: 0;
+      -webkit-appearance: none;
+    }
+    .gate input:focus {
+      border-color: #4ade80;
+      box-shadow: 0 0 20px rgba(74,222,128,0.15);
+    }
+    .gate input::placeholder { color: #6b7280; }
+    .gate button {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px;
+      background: #4ade80;
+      color: #050711;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+    }
+    .gate button:hover { background: #22c55e; }
+    .err {
+      font-size: 11px;
+      color: #ef4444;
+      margin-top: 12px;
+      display: none;
+    }
+    .err.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="gate">
+    <h1>ASTRA Command Center</h1>
+    <form id="gf">
+      <input type="password" id="pw" placeholder="ACCESS CODE" autocomplete="off" autofocus>
+      <button type="submit">Enter</button>
+    </form>
+    <div class="err" id="err">Invalid code.</div>
+  </div>
+  <script>
+    // Check if already authed
+    function getCookie(n) {
+      var m = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+      return m ? m.pop() : null;
+    }
+    if (getCookie('astra_auth') || localStorage.getItem('astra_auth')) {
+      window.location.replace('/');
+    }
+
+    document.getElementById('gf').onsubmit = function(e) {
+      e.preventDefault();
+      var pw = document.getElementById('pw').value;
+      var err = document.getElementById('err');
+      err.classList.remove('show');
+
+      fetch('/api/astra-verify', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pw })
+      }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.ok) {
+          localStorage.setItem('astra_auth', 'granted');
+          window.location.replace('/');
+        } else {
+          err.classList.add('show');
+          document.getElementById('pw').value = '';
+        }
+      }).catch(function() {
+        // Fallback for local/offline
+        if (pw === 'saturno2025') {
+          var exp = new Date();
+          exp.setTime(exp.getTime() + 7 * 86400000);
+          document.cookie = 'astra_auth=astra-fallback-token;expires=' + exp.toUTCString() + ';path=/;SameSite=Lax';
+          localStorage.setItem('astra_auth', 'granted');
+          window.location.replace('/');
+        } else {
+          err.classList.add('show');
+          document.getElementById('pw').value = '';
+        }
+      });
+    };
+  </script>
+</body>
+</html>
