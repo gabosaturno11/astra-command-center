@@ -88,9 +88,22 @@ async function getRegistry(token) {
   }
 }
 
+function checkAuth(req) {
+  const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
+  if (!ADMIN_PASSWORD) return false;
+  const authHeader = req.headers.authorization || '';
+  const bearerToken = authHeader.replace(/^Bearer\s+/i, '');
+  return bearerToken === ADMIN_PASSWORD;
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
+
+  // Auth required — exposes repo names, URLs, paths
+  if (!checkAuth(req)) {
+    return res.status(401).json({ ok: false, error: 'Unauthorized' });
+  }
 
   const token = process.env.BLOB_READ_WRITE_TOKEN;
 
