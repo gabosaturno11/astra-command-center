@@ -81,14 +81,15 @@
     <div class="err" id="err">Invalid code.</div>
   </div>
   <script>
-    // Check if already authed
+    // Check if already authed — only trust HttpOnly cookie (checked by middleware)
+    // Do NOT redirect based on localStorage — it causes infinite redirect loops
+    // because middleware checks the cookie value, not localStorage
     function getCookie(n) {
       var m = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
       return m ? m.pop() : null;
     }
-    if (getCookie('astra_auth') || localStorage.getItem('astra_auth')) {
-      window.location.replace('/');
-    }
+    // Clear stale localStorage auth that causes redirect loops
+    try { localStorage.removeItem('astra_auth'); } catch(e) {}
 
     document.getElementById('gf').onsubmit = function(e) {
       e.preventDefault();
@@ -103,19 +104,18 @@
         body: JSON.stringify({ password: pw })
       }).then(function(r) { return r.json(); }).then(function(d) {
         if (d.ok) {
-          localStorage.setItem('astra_auth', 'granted');
+          // API sets HttpOnly cookie via Set-Cookie header — that's the real auth
           window.location.replace('/');
         } else {
           err.classList.add('show');
           document.getElementById('pw').value = '';
         }
       }).catch(function() {
-        // Fallback for local/offline
+        // Fallback for local/offline — set JS cookie matching middleware token
         if (pw === 'saturno2025') {
           var exp = new Date();
           exp.setTime(exp.getTime() + 7 * 86400000);
           document.cookie = 'astra_auth=astra-fallback-token;expires=' + exp.toUTCString() + ';path=/;SameSite=Lax';
-          localStorage.setItem('astra_auth', 'granted');
           window.location.replace('/');
         } else {
           err.classList.add('show');
