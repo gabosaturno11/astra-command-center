@@ -46,5 +46,119 @@
     "text": "every project should have Gabo messages from the project.",
     "timestamp": "2026-03-04T03:40:00Z",
     "context": "RULE: Per-project message logs. saturno-bonus/logs/ = bonus messages. astra-command-center/logs/ = ASTRA messages. sm-app-copy-v1/logs/ = SM App messages. No more cross-contamination."
+  },
+  {
+    "id": 9,
+    "text": "illl go for a break. Set up astra so WE FLY with every project!",
+    "timestamp": "2026-03-04T03:42:00Z",
+    "context": "Gabo on break. Claude setting up ASTRA: clean CLAUDE.md, Bonus 2.0 spec, master locations, C2 sync."
+  },
+  {
+    "id": 10,
+    "text": "can you access C2 /gabosaturno ?",
+    "timestamp": "2026-03-04T03:45:00Z",
+    "context": "Discovered /Volumes/gabosaturno/ is C2 MacBook accessible via SMB file sharing from C1."
+  },
+  {
+    "id": 11,
+    "text": "or these? /G-UTILITIES /G-DRIVE PRO /G-DRIVE USB-C",
+    "timestamp": "2026-03-04T03:46:00Z",
+    "context": "C2 external drives visible in Finder but not terminal-mountable via SMB. Need explicit mount."
+  },
+  {
+    "id": 12,
+    "text": "its literally C2!",
+    "timestamp": "2026-03-04T03:48:00Z",
+    "context": "Confirmed: /Volumes/gabosaturno/ IS C2 MacBook Pro connected via file sharing/Target Disk Mode."
+  },
+  {
+    "id": 13,
+    "text": "the gold drives ;)",
+    "timestamp": "2026-03-04T03:49:00Z",
+    "context": "G-DRIVE PRO, G-DRIVE USB-C, G-UTILITIES, Main LaCie — the drives with ALL brand assets."
+  },
+  {
+    "id": 14,
+    "text": "combine the claude Mds whatever you find there on C2",
+    "timestamp": "2026-03-04T03:50:00Z",
+    "context": "Merge C2 CLAUDE.md files into one clean version. Done: wrote new ~/CLAUDE.md on C2."
+  },
+  {
+    "id": 15,
+    "text": "use the same logic of oNE FOLDER 'Back up' on downloads in C2",
+    "timestamp": "2026-03-04T03:51:00Z",
+    "context": "Same cleanup pattern as C1: consolidate to one backup folder. C2 Downloads was already empty."
+  },
+  {
+    "id": 16,
+    "text": "check the repos we have on desktop on C2 (we have been pushing content beast and titan from there!",
+    "timestamp": "2026-03-04T03:52:00Z",
+    "context": "C2 Desktop showed empty via SMB. May have iCloud-synced content not visible over network."
+  },
+  {
+    "id": 17,
+    "text": "Double check with all the readmes we made and treat the computers as ONE thing",
+    "timestamp": "2026-03-04T03:53:00Z",
+    "context": "C1 + C2 = one unified system. MASTER_LOCATIONS.md created to track everything across both."
+  },
+  {
+    "id": 18,
+    "text": "clean C2 18gb is nothing",
+    "timestamp": "2026-03-04T03:54:00Z",
+    "context": "C2 had 14GB free. Cleaned loose files, deleted Cursor DMG (150MB), backed up rest to dev/C2_HOME_BACKUP_03.04.2026/."
+  },
+  {
+    "id": 19,
+    "text": "trash out... downloads -> if too heavy move it to C1 we are clean here.",
+    "timestamp": "2026-03-04T03:55:00Z",
+    "context": "C2 Downloads was empty. C1 is clean. If C2 has heavy downloads, move to C1 which has more space."
+  },
+  {
+    "id": 20,
+    "text": "commit and push! so we do not lose anything. we should end up WITH ONE DOC listing where the repos are and the 5+ cloud locations + 6 external HD",
+    "timestamp": "2026-03-04T03:56:00Z",
+    "context": "Done: MASTER_LOCATIONS.md created + committed + pushed (commit 6a1bee7). Lists all repos, drives, cloud locations, backups."
+  },
+  {
+    "id": 21,
+    "text": "Rename them if necessary on C2 or tell me to rename them",
+    "timestamp": "2026-03-04T03:57:00Z",
+    "context": "C2 files renamed where needed. ~/CLAUDE.md rewritten. Home cleaned."
+  },
+  {
+    "id": 22,
+    "text": "if we have Dev on Imac -> we fix bonuses without the subbase plan which idk if you remember, then we do all the chaos back end on C2 and whatever happens we just push from C1?",
+    "timestamp": "2026-03-04T03:58:00Z",
+    "context": "Strategy confirmed: C1 fixes bonus bugs (no Supabase). C2 builds Supabase backend. C1 = fallback."
+  },
+  {
+    "id": 23,
+    "text": "so C1 becomes the fall back?",
+    "timestamp": "2026-03-04T03:59:00Z",
+    "context": "YES. C1 = fallback + planning. C2 = execution + deploys."
+  },
+  {
+    "id": 24,
+    "text": "desktop still have stuff if I go to C2",
+    "timestamp": "2026-03-04T04:00:00Z",
+    "context": "C2 Desktop shows empty via SMB but may have iCloud-synced content visible only when logged in directly on C2."
+  },
+  {
+    "id": 25,
+    "text": "yes save!",
+    "timestamp": "2026-03-04T04:01:00Z",
+    "context": "Confirmed: save/commit everything."
+  },
+  {
+    "id": 26,
+    "text": "Leave yourself a note",
+    "timestamp": "2026-03-04T04:02:00Z",
+    "context": "Left detailed note in MEMORY.md for next Claude session with full context of what was done and what to do next."
+  },
+  {
+    "id": 27,
+    "text": "ill plug you on C2 now.",
+    "timestamp": "2026-03-04T04:03:00Z",
+    "context": "Gabo opening Claude Code on C2 MacBook. C2 is fully set up: 12 repos, clean CLAUDE.md, Bonus 2.0 spec, master locations, all message logs in place."
   }
 ]
