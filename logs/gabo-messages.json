@@ -262,5 +262,11 @@
     "text": "are you sure astra doesnt have an env variable? do not assume. all your answers are being based in 1% research/audit so either you get serious, or this wont work.",
     "timestamp": "2026-03-06T07:50:00Z",
     "context": "Called out for assuming instead of checking. ASTRA has 9 API endpoints, full cloud sync built in, and ALL env vars set since Feb 17-22. ANTHROPIC_API_KEY (All Env, Feb 22), ASTRA_ADMIN_PASSWORD (All Env, Feb 18), OPENAI_API_KEY (Dev+Preview+Prod, Feb 18), BLOB_READ_WRITE_TOKEN (Dev+Preview+Prod, Feb 17). The backend is LIVE and has been since February. Cloud sync just needs the admin password entered in the UI."
+  },
+  {
+    "id": 45,
+    "text": "[Screenshot from C2 Claude] Pipeline returning Unauthorized. C2 diagnosed 3 possibilities: 1) OpenAI key out of credits, 2) Key rotated, 3) ASTRA's own auth blocking before reaching OpenAI. C2 confirmed #3 — the pipeline calls /api/astra-verify first, ASTRA's middleware rejects before OpenAI is touched.",
+    "timestamp": "2026-03-06T07:55:00Z",
+    "context": "C2 partially right but middleware actually ALLOWS /api/* through (line 17-19). The real issue: frontend stores ASTRA_ADMIN_PW in localStorage. If never entered via Cmd+S cloud sync prompt, every API call sends empty Bearer token -> 401. Fix: open ASTRA, Cmd+S, enter admin password once. All APIs unlock."
   }
 ]
