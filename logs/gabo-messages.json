@@ -238,5 +238,29 @@
     "text": "thank you please log everything on Astra!",
     "timestamp": "2026-03-06T06:50:00Z",
     "context": "Save all messages + session work to ASTRA logs and KB. Done: messages 35-40 logged, session KB entry added."
+  },
+  {
+    "id": 41,
+    "text": "I am not at peace knowing that still most things are not fully connected and not even astra its a command center that updates as it should.",
+    "timestamp": "2026-03-06T07:00:00Z",
+    "context": "Core frustration: ASTRA is not alive. It's a static HTML file with localStorage. No real sync, no real connections, no real command center behavior."
+  },
+  {
+    "id": 42,
+    "text": "[Strategy session - long voice message] What env vars are we missing? Email capture we don't need now but faster the better. Don't want capture without proper backend. Check if blog is really broken. I have Chrome extensions and 5-10 apps with pipelines - can't be that I don't know how to route it. Content Beast missing an API. What's the biggest lever that changes everything? Titan Forge - is that more functional than ASTRA? It has logs and pipeline going there. Which Chrome extension? Nexus Capture? Want ASTRA to be alive - living docs, projects, connections. How can I activate that from my phone? Plugins from Claude Code? Skills? I feel like I'm not using Claude the way I should. Can we use tools to build my own things faster?",
+    "timestamp": "2026-03-06T07:05:00Z",
+    "context": "BIGGEST LEVER question. Multiple pain points: 1) env vars status unclear, 2) too many disconnected tools/extensions/apps, 3) Titan Forge vs ASTRA confusion, 4) Content Beast has no API, 5) wants ASTRA alive from phone, 6) Claude Code skills/plugins underutilized, 7) wants the ONE move that creates max leverage."
+  },
+  {
+    "id": 43,
+    "text": "[Screenshot] Vercel env vars for saturno-bonus: ADMIN_PASSWORD (Production), VAULT_TOKEN (Production), VAULT_PASSWORD (Production), BLOB_READ_WRITE_TOKEN (All Environments). ALL 4 SET.",
+    "timestamp": "2026-03-06T07:10:00Z",
+    "context": "CRITICAL DISCOVERY: All env vars already configured in Vercel. Auth should work with real tokens (not just 'granted' fallback). Blog Blob persistence should be live. Music Blob CDN should work. This was listed as a P2 blocker but it's DONE."
+  },
+  {
+    "id": 44,
+    "text": "are you sure astra doesnt have an env variable? do not assume. all your answers are being based in 1% research/audit so either you get serious, or this wont work.",
+    "timestamp": "2026-03-06T07:50:00Z",
+    "context": "Called out for assuming instead of checking. ASTRA has 9 API endpoints, full cloud sync built in, and ALL env vars set since Feb 17-22. ANTHROPIC_API_KEY (All Env, Feb 22), ASTRA_ADMIN_PASSWORD (All Env, Feb 18), OPENAI_API_KEY (Dev+Preview+Prod, Feb 18), BLOB_READ_WRITE_TOKEN (Dev+Preview+Prod, Feb 17). The backend is LIVE and has been since February. Cloud sync just needs the admin password entered in the UI."
   }
 ]
