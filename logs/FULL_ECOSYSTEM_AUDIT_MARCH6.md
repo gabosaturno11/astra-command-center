@@ -19,6 +19,9 @@
 11. **Auto-backup fixed** — Was creating blob URLs but never saving. Now saves snapshot to localStorage every hour + restore command
 12. **KB search added** — `kb:` prefix in Cmd+K searches all KB entries by name, content, ID, or tags
 13. **Restore from Backup command** — Cmd+K "Restore from Backup" to recover from auto-backup snapshot
+14. **Data Integrity Check command** — Cmd+K "Data Integrity Check" validates duplicate IDs, broken project refs, storage usage, stale entries. Copies report to clipboard.
+
+**Total: 14 fixes applied. 11 commits pushed. All deployed to production.**
 
 ---
 
