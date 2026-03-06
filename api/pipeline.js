@@ -2,24 +2,9 @@
  * ASTRA PIPELINE API
  * POST /api/pipeline
  *
- * The Saturno Pipeline: audio/text + custom prompt -> Whisper transcription -> AI synthesis -> stored result
- *
- * Accepts:
- *   - multipart/form-data with 'audio' file + 'prompt' field + optional 'source' + 'engine' field
- *   - OR application/json with { text, prompt, source, engine }
- *
- * Engine options:
- *   - "openai" (default): GPT-4o-mini via OpenAI API
- *   - "claude": Claude Sonnet via Anthropic API
- *   - "auto": tries Claude first (better quality), falls back to OpenAI
- *
- * Flow:
- *   1. If audio: transcribe via Whisper (always OpenAI)
- *   2. Run transcript (or text) through selected AI engine with user's custom prompt
- *   3. Store everything in ASTRA backend (Vercel Blob)
- *   4. Return { ok, transcript, synthesis, pipelineId, engine }
- *
- * Requires: OPENAI_API_KEY and/or ANTHROPIC_API_KEY env var
+ * Flow: audio/text + custom prompt -> Whisper -> AI synthesis -> stored result
+ * Engines: openai | claude | auto (Claude first, falls back to OpenAI)
+ * Requires: OPENAI_API_KEY and/or ANTHROPIC_API_KEY
  * Optional: BLOB_READ_WRITE_TOKEN for persistent storage
  */
 import { put, list } from '@vercel/blob';
@@ -29,9 +14,19 @@ const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
 
 function checkAuth(req, res) {
   if (!ADMIN_PASSWORD) { res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' }); return false; }
+
+  // Accept Bearer token (extensions, external calls)
   const auth = req.headers.authorization;
-  if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) { res.status(401).json({ ok: false, error: 'Unauthorized' }); return false; }
-  return true;
+  if (auth && auth === `Bearer ${ADMIN_PASSWORD}`) return true;
+
+  // Accept cookie (requests from ASTRA dashboard — cookie set after login)
+  const cookieHeader = req.headers.cookie || '';
+  const cookieMatch = cookieHeader.match(/(?:^|; )astra_auth=([^;]*)/);
+  const cookieToken = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
+  const authToken = process.env.ASTRA_AUTH_TOKEN || 'astra-fallback-token';
+  if (cookieToken === authToken) return true;
+
+  res.status(401).json({ ok: false, error: 'Unauthorized' }); return false;
 }
 
 function cors(res) {
@@ -156,9 +151,7 @@ async function synthesizeClaude(transcript, prompt, anthropicKey) {
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4096,
       system: SYSTEM_PROMPT,
-      messages: [
-        { role: 'user', content: userMessage },
-      ],
+      messages: [{ role: 'user', content: userMessage }],
     }),
   });
 
@@ -179,28 +172,20 @@ async function synthesize(transcript, prompt, engine) {
     if (!anthropicKey) throw new Error('ANTHROPIC_API_KEY not configured');
     return { text: await synthesizeClaude(transcript, prompt, anthropicKey), engine: 'claude' };
   }
-
   if (engine === 'openai') {
     if (!openaiKey) throw new Error('OPENAI_API_KEY not configured');
     return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
   }
-
   // auto: try Claude first, fall back to OpenAI
   if (anthropicKey) {
     try {
       return { text: await synthesizeClaude(transcript, prompt, anthropicKey), engine: 'claude' };
     } catch (e) {
-      if (openaiKey) {
-        return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
-      }
+      if (openaiKey) return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
       throw e;
     }
   }
-
-  if (openaiKey) {
-    return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
-  }
-
+  if (openaiKey) return { text: await synthesizeOpenAI(transcript, prompt, openaiKey), engine: 'openai' };
   throw new Error('No AI API key configured. Set ANTHROPIC_API_KEY and/or OPENAI_API_KEY in Vercel env vars.');
 }
 
@@ -211,9 +196,7 @@ async function getPipelineIndex(token) {
     const response = await fetch(blobs[0].url);
     if (!response.ok) return [];
     return await response.json();
-  } catch (e) {
-    return [];
-  }
+  } catch (e) { return []; }
 }
 
 export default async function handler(req, res) {
@@ -225,56 +208,36 @@ export default async function handler(req, res) {
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
 
   if (!openaiKey && !anthropicKey) {
-    return res.status(503).json({
-      ok: false,
-      error: 'No AI API keys configured. Set OPENAI_API_KEY and/or ANTHROPIC_API_KEY in Vercel Dashboard > Settings > Environment Variables.'
-    });
+    return res.status(503).json({ ok: false, error: 'No AI API keys configured.' });
   }
 
-  // GET: retrieve pipeline history + available engines
   if (req.method === 'GET') {
     const token = process.env.BLOB_READ_WRITE_TOKEN;
     const engines = [];
     if (anthropicKey) engines.push('claude');
     if (openaiKey) engines.push('openai');
     if (engines.length > 1) engines.unshift('auto');
-
     if (!token) return res.status(200).json({ results: [], engines, whisper: !!openaiKey, _source: 'none' });
     const index = await getPipelineIndex(token);
     return res.status(200).json({ ok: true, results: index, count: index.length, engines, whisper: !!openaiKey });
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ ok: false, error: 'GET or POST only' });
-  }
+  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'GET or POST only' });
 
   try {
-    let transcript = '';
-    let prompt = '';
-    let source = 'unknown';
-    let engine = 'auto';
-    let duration = null;
-    let inputType = 'text';
-
+    let transcript = '', prompt = '', source = 'unknown', engine = 'auto', duration = null, inputType = 'text';
     const contentType = req.headers['content-type'] || '';
 
     if (contentType.includes('multipart/form-data')) {
       const buffer = await parseBody(req);
       const fields = extractMultipartFields(buffer, contentType);
-
-      if (!fields) {
-        return res.status(400).json({ ok: false, error: 'Invalid multipart data' });
-      }
-
+      if (!fields) return res.status(400).json({ ok: false, error: 'Invalid multipart data' });
       prompt = fields.prompt || 'Transcribe and summarize this audio';
       source = fields.source || 'pipeline-upload';
       engine = fields.engine || 'auto';
-
       if (fields._audio && fields._audio.data.length > 0) {
         inputType = 'audio';
-        if (!openaiKey) {
-          return res.status(503).json({ ok: false, error: 'Audio transcription requires OPENAI_API_KEY (Whisper)' });
-        }
+        if (!openaiKey) return res.status(503).json({ ok: false, error: 'Audio transcription requires OPENAI_API_KEY (Whisper)' });
         const whisperResult = await transcribeAudio(fields._audio, openaiKey);
         transcript = whisperResult.text;
         duration = whisperResult.duration;
@@ -290,67 +253,25 @@ export default async function handler(req, res) {
       prompt = body.prompt || 'Summarize this text';
       source = body.source || 'pipeline-text';
       engine = body.engine || 'auto';
-
-      if (!transcript) {
-        return res.status(400).json({ ok: false, error: 'text is required' });
-      }
+      if (!transcript) return res.status(400).json({ ok: false, error: 'text is required' });
     }
 
-    // Run synthesis with selected engine
     const result = await synthesize(transcript, prompt, engine);
-
-    // Store in ASTRA backend
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
     let pipelineId = `p_${Date.now()}`;
 
     if (blobToken) {
       try {
-        const entry = {
-          id: pipelineId,
-          inputType,
-          transcript,
-          prompt,
-          synthesis: result.text,
-          engine: result.engine,
-          source,
-          duration,
-          createdAt: new Date().toISOString(),
-        };
-
-        await put(`pipeline/${pipelineId}.json`, JSON.stringify(entry, null, 2), {
-          access: 'public', addRandomSuffix: false, token: blobToken,
-        });
-
+        const entry = { id: pipelineId, inputType, transcript, prompt, synthesis: result.text, engine: result.engine, source, duration, createdAt: new Date().toISOString() };
+        await put(`pipeline/${pipelineId}.json`, JSON.stringify(entry, null, 2), { access: 'public', addRandomSuffix: false, token: blobToken });
         const index = await getPipelineIndex(blobToken);
-        index.unshift({
-          id: pipelineId,
-          inputType,
-          prompt: prompt.substring(0, 100),
-          preview: result.text.substring(0, 200),
-          engine: result.engine,
-          source,
-          createdAt: entry.createdAt,
-        });
+        index.unshift({ id: pipelineId, inputType, prompt: prompt.substring(0, 100), preview: result.text.substring(0, 200), engine: result.engine, source, createdAt: entry.createdAt });
         if (index.length > 500) index.length = 500;
-
-        await put(PIPELINE_INDEX, JSON.stringify(index, null, 2), {
-          access: 'public', addRandomSuffix: false, token: blobToken,
-        });
-      } catch (e) {
-        // Don't fail if storage fails
-      }
+        await put(PIPELINE_INDEX, JSON.stringify(index, null, 2), { access: 'public', addRandomSuffix: false, token: blobToken });
+      } catch (e) { /* Don't fail if storage fails */ }
     }
 
-    return res.status(200).json({
-      ok: true,
-      pipelineId,
-      inputType,
-      transcript,
-      synthesis: result.text,
-      engine: result.engine,
-      duration,
-      source,
-    });
+    return res.status(200).json({ ok: true, pipelineId, inputType, transcript, synthesis: result.text, engine: result.engine, duration, source });
   } catch (e) {
     return res.status(500).json({ ok: false, error: e.message });
   }
