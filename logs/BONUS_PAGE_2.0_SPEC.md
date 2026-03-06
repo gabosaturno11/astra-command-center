@@ -80,9 +80,9 @@ bonus.saturnomovement.com (HTTP 200, live)
 5. Verify API leaks env var names in error response
 6. Brevo subscribe lies ("You are on the list" when nothing happens)
 7. Query param auth on community-msg.js and blog-notifications.js
-8. Stats counter shows 0 (intersection observer not triggering)
-9. Roulette/Spin the Rings not rendering
-10. "0 WEEKS PROGRAM" should show "6"
+8. ~~Stats counter shows 0~~ VERIFIED WORKING
+9. ~~Roulette/Spin the Rings not rendering~~ VERIFIED WORKING
+10. ~~"0 WEEKS PROGRAM" should show "6"~~ VERIFIED WORKING
 
 **PRIORITY 2 (after backend):**
 11-25. See C1_AUDIT_MARCH4_BB_EDITS.md in iCloud ASTRA_INTERNAL_TRANSFER/
@@ -354,9 +354,9 @@ Full schema in SATURNO_MOVEMENT_COMPLETE_REBUILD_BLUEPRINT.md (25+ tables).
 - Add CORS headers to 3 API routes
 - Fix brevo-subscribe honesty (don't lie about success)
 - Remove query param auth from 2 endpoints
-- Fix stats counter (intersection observer)
-- Fix roulette rendering
-- Fix "0 WEEKS" -> "6"
+- ~~Fix stats counter (intersection observer)~~ VERIFIED WORKING
+- ~~Fix roulette rendering~~ VERIFIED WORKING
+- ~~Fix "0 WEEKS" -> "6"~~ VERIFIED WORKING
 
 ### Phase 2: Restore Security (1 hour)
 - Restore middleware.js
