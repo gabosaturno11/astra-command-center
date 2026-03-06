@@ -160,5 +160,83 @@
     "text": "ill plug you on C2 now.",
     "timestamp": "2026-03-04T04:03:00Z",
     "context": "Gabo opening Claude Code on C2 MacBook. C2 is fully set up: 12 repos, clean CLAUDE.md, Bonus 2.0 spec, master locations, all message logs in place."
+  },
+  {
+    "id": 28,
+    "text": "ALL YOURS. ALL AT ONCE. BUILT FOR CALISTHENICS. and ONE TIME DELIVERY change it for something good lol",
+    "timestamp": "2026-03-04T07:45:00Z",
+    "context": "Proof strip ticker copy changes. Changed to: Free Forever / smiling alien SVG / Movement. Sound. Language."
+  },
+  {
+    "id": 29,
+    "text": "put Smile and an alien svg lol",
+    "timestamp": "2026-03-04T07:46:00Z",
+    "context": "Replaced 'Built Solo by Gabo' with inline smiling alien SVG in proof strip ticker."
+  },
+  {
+    "id": 30,
+    "text": "the darker-ish background the quality of this [visual blocks screenshot from titan-forge]",
+    "timestamp": "2026-03-04T07:48:00Z",
+    "context": "Wants titan-forge visual quality. Changed --bg to #050508 (darker) and visual-block bg to rgba(5,5,8,0.6) with cyan border."
+  },
+  {
+    "id": 31,
+    "text": "music to Vault page should play automatic",
+    "timestamp": "2026-03-04T07:49:00Z",
+    "context": "Added auto-play to vault.html music player. Tries immediate play, falls back to first user interaction."
+  },
+  {
+    "id": 32,
+    "text": "roulette still doesn make a sound",
+    "timestamp": "2026-03-04T07:50:00Z",
+    "context": "wheelSfx volume was 0.012/0.015 — basically silent. Bumped to 0.4/0.5."
+  },
+  {
+    "id": 33,
+    "text": "BUTTTT wait index changes are not showing!",
+    "timestamp": "2026-03-04T07:52:00Z",
+    "context": "Was viewing production (bonus.saturnomovement.com) not local. Changes are local only, not pushed."
+  },
+  {
+    "id": 34,
+    "text": "do not even push until we make sure local version is actually the repo version because whatever is live is working... move to C2, automatic music, automatic music on blog page, move the quote to the big space below hero, sound of roulette, little sound effects on the squares, titan song sounds like 5 seconds, change ASTRA album cover to real covers from the drives (white universe, black universe, full moon — all on the LaCie). Songs are on the hard drive pushing them to repo wont work thats why we need Supabase.",
+    "timestamp": "2026-03-04T07:56:00Z",
+    "context": "CRITICAL: Production has hero-quote-block that local repo does NOT have. DO NOT PUSH until HTML mismatch resolved. Full task list for C2 session. Gold drives have album covers + all music files."
+  },
+  {
+    "id": 35,
+    "text": "claude would you mind auditing bonus.saturnomovement.com for me please? including the blog page and also can we add a simple link in astra that directs me to the admin panel of the blog?",
+    "timestamp": "2026-03-06T06:00:00Z",
+    "context": "Requested full live site audit of bonus.saturnomovement.com (main + blog + gate + blog-admin). Also requested blog admin link in ASTRA sidebar."
+  },
+  {
+    "id": 36,
+    "text": "this might help: bonus-page-3.0.html, Bonus-page-3.1.html, Bonus-Page-3.2.html — the raw page (renamed) + architecture reference docs. 6 files total. All in your iCloud transfer folder.",
+    "timestamp": "2026-03-06T06:05:00Z",
+    "context": "3 bonus page reference docs in iCloud with architecture breakdowns and 15-section analysis. Useful for C2 bonus iteration."
+  },
+  {
+    "id": 37,
+    "text": "every report should be saved in astra automatically please! and also this leads me to gate bonus.saturnomovement.com/blog-admin and it glitches",
+    "timestamp": "2026-03-06T06:15:00Z",
+    "context": "TWO ISSUES: 1) Reports/audits must auto-save to ASTRA KB. 2) Blog admin link redirects to gate and flashes/glitches. Root cause: middleware.js deleted + gate.html has no cookie pre-check + gate always redirects to /vault not /blog-admin."
+  },
+  {
+    "id": 38,
+    "text": "[Full bulletproof patch list] P0: middleware restore, gate redirect fix, cookie pre-check, stats counter fix. P1: og:image, Brevo, 3 ASTRA tracks, gabo-shatter.jpg, countdown verify. P2: env vars, Supabase migration.",
+    "timestamp": "2026-03-06T06:30:00Z",
+    "context": "Gabo provided complete prioritized fix list with code patches. All P0 items executed by C1: middleware.js restored, gate.html cookie pre-check + redirect param, counter rewritten with rAF, og meta fixed. Needs C2 push to deploy."
+  },
+  {
+    "id": 39,
+    "text": "can you leave a note to C2 via dev so she can go in one go?",
+    "timestamp": "2026-03-06T06:45:00Z",
+    "context": "Created C2_HANDOFF_MARCH6.md in astra-command-center/logs/ with exact commands, file changes, verification steps. C2 reads it and runs 3 commands."
+  },
+  {
+    "id": 40,
+    "text": "thank you please log everything on Astra!",
+    "timestamp": "2026-03-06T06:50:00Z",
+    "context": "Save all messages + session work to ASTRA logs and KB. Done: messages 35-40 logged, session KB entry added."
   }
 ]
