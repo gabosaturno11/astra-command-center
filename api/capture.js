@@ -10,6 +10,20 @@ import { put, list } from '@vercel/blob';
 const CAPTURES_FILE = 'captures-log.json';
 const ADMIN_PASSWORD = process.env.ASTRA_ADMIN_PASSWORD;
 
+function checkAuth(req) {
+  if (!ADMIN_PASSWORD) return false;
+  // Accept Bearer token (extensions, external calls)
+  const auth = req.headers.authorization;
+  if (auth && auth === `Bearer ${ADMIN_PASSWORD}`) return true;
+  // Accept cookie (requests from ASTRA dashboard — cookie set after login)
+  const cookieHeader = req.headers.cookie || '';
+  const cookieMatch = cookieHeader.match(/(?:^|; )astra_auth=([^;]*)/);
+  const cookieToken = cookieMatch ? decodeURIComponent(cookieMatch[1]) : null;
+  const authToken = process.env.ASTRA_AUTH_TOKEN || 'astra-fallback-token';
+  if (cookieToken === authToken) return true;
+  return false;
+}
+
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -23,9 +37,7 @@ async function getCaptures(token) {
     const response = await fetch(blobs[0].url);
     if (!response.ok) return [];
     return await response.json();
-  } catch (e) {
-    return [];
-  }
+  } catch (e) { return []; }
 }
 
 export default async function handler(req, res) {
@@ -35,26 +47,15 @@ export default async function handler(req, res) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
 
   if (req.method === 'GET') {
-    if (!ADMIN_PASSWORD) return res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' });
-    const auth = req.headers.authorization;
-    if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) return res.status(401).json({ ok: false, error: 'Unauthorized' });
-
+    if (!checkAuth(req)) return res.status(401).json({ ok: false, error: 'Unauthorized' });
     if (!token) return res.status(200).json({ captures: [], _source: 'none' });
     const captures = await getCaptures(token);
     return res.status(200).json({ captures, count: captures.length, _source: 'blob' });
   }
 
   if (req.method === 'POST') {
-    if (!ADMIN_PASSWORD) {
-      return res.status(503).json({ ok: false, error: 'ASTRA_ADMIN_PASSWORD not configured' });
-    }
-    const auth = req.headers.authorization;
-    if (!auth || auth !== `Bearer ${ADMIN_PASSWORD}`) {
-      return res.status(401).json({ ok: false, error: 'Unauthorized' });
-    }
-    if (!token) {
-      return res.status(503).json({ ok: false, error: 'BLOB_READ_WRITE_TOKEN not configured' });
-    }
+    if (!checkAuth(req)) return res.status(401).json({ ok: false, error: 'Unauthorized' });
+    if (!token) return res.status(503).json({ ok: false, error: 'BLOB_READ_WRITE_TOKEN not configured' });
 
     try {
       const { content, category, source, sourceTitle, tags, type } = req.body;
@@ -73,8 +74,6 @@ export default async function handler(req, res) {
 
       const captures = await getCaptures(token);
       captures.unshift(capture);
-
-      // Keep last 2000 captures
       if (captures.length > 2000) captures.length = 2000;
 
       await put(CAPTURES_FILE, JSON.stringify(captures, null, 2), {
