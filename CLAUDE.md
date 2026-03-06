@@ -1,5 +1,52 @@
 # ASTRA COMMAND CENTER — CLAUDE.md
-## Last Updated: March 4, 2026
+## Last Updated: March 6, 2026
+
+---
+
+## C2 HANDOFF — MARCH 6 AUDIT SESSION
+
+C1 completed a FULL ecosystem audit. 15 commits pushed. Everything deployed.
+
+### WHAT C1 DID (March 6)
+1. Deep-read ALL 59 KB entries, 37 Desktop HTMLs, 339-line Nexus background.js
+2. Tested every API endpoint with real curl requests
+3. Checked all Vercel env vars for 12 projects
+4. Found 46 Chrome extensions across 7 profiles
+5. Analyzed 675+ Gabo messages (top wants, frustrations, unaddressed requests)
+6. Created FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines, 12 sections, 50 improvements)
+7. Fixed 15 bugs in ASTRA index.html (see below)
+8. All pushed and deployed to production
+
+### WHAT C2 SHOULD DO NEXT
+1. **Read the audit:** ~/dev/astra-command-center/logs/FULL_ECOSYSTEM_AUDIT_MARCH6.md
+2. **Start Bonus Page 2.0 Phase 1:** Fix 10 critical/priority-1 bugs (spec at logs/BONUS_PAGE_2.0_SPEC.md)
+3. **Supabase backend:** If Gabo created the project, start migration. If not, ask him.
+4. **Content Beast:** Link to Vercel (`cd ~/dev/content-beast && vercel link`). Currently 404.
+5. **7 Desktop book HTMLs not in any repo:** AOC_MANUSCRIPT_TRACKER, EXERCISE_DATABASE_VISUAL, etc. Consider importing to ASTRA KB.
+
+### FIXES ALREADY APPLIED (DO NOT RE-DO)
+- S.kb -> S.knowledgeBase (4 entries)
+- 4 duplicate KB IDs removed
+- 20+ stale URLs replaced (omega -> bonus.saturnomovement.com)
+- C1/C2 labels fixed (3 occurrences)
+- cloudLoad 401 handling added
+- Auto-backup fixed (was no-op)
+- 5 repos added to ASTRA (10 total)
+- KB search via kb: prefix in Cmd+K
+- 6 new Cmd+K commands
+- KB staleness indicator
+- Data integrity check command
+- Full workspace export now includes knowledgeBase
+- 2 completed tasks marked done (domain + env vars)
+
+### REMAINING FROM 50 IMPROVEMENTS (not done yet)
+Top priorities for C2:
+- #1 Supabase migration (replaces localStorage)
+- #2 Real-time sync (Supabase Realtime)
+- #3 Silent auth fix (stale password prompt improvement) — partially done
+- #7 Capture inbox (display Nexus captures in ASTRA — syncCaptures exists, needs UI)
+- #8 Pipeline runner in ASTRA
+- #45 Book project dashboard (import AOC_MANUSCRIPT_TRACKER)
 
 ---
 
@@ -14,7 +61,7 @@ Read it. Trust it. Execute from it.
 
 ## WHAT IS ASTRA
 
-ASTRA Command Center is Gabo's private operating system — a 45,738-line single HTML file that manages ALL projects across the Saturno ecosystem.
+ASTRA Command Center is Gabo's private operating system — a 45,800+ line single HTML file that manages ALL projects across the Saturno ecosystem.
 
 - **Live URL:** astra-command-center-sigma.vercel.app
 - **GitHub:** gabosaturno11/astra-command-center
@@ -45,20 +92,23 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | f818e8a (KB: bonus page bug audit) |
-| Uncommitted | logs/gabo-messages.json (new, 8 messages) |
+| Last commit | 460d3ee (March 6 audit — 15 commits) |
+| Uncommitted | This CLAUDE.md update |
 | Manual version | v2.38 |
-| File size | 4.5 MB, 45,738 lines |
-| Storage | localStorage only (DATA LOST Feb-Mar auth lockout) |
+| File size | ~4.5 MB, 45,800+ lines |
+| Storage | localStorage + Vercel Blob cloud sync (Cmd+S) |
+| Auto-backup | Saves snapshot to localStorage every hour |
 | Middleware | Restored (commit db85fb3) |
+| Audit | FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines) |
 
-### Blocked on Vercel Env Vars (only Gabo can set)
+### Vercel Env Vars (ALL SET — verified March 6 audit)
 
-| Var | Purpose |
-|-----|---------|
-| BLOB_READ_WRITE_TOKEN | Vercel Blob state sync |
-| ASTRA_ADMIN_PASSWORD | /api/repos endpoint auth |
-| OPENAI_API_KEY | Music/content pipeline |
+| Var | Purpose | Status |
+|-----|---------|--------|
+| BLOB_READ_WRITE_TOKEN | Vercel Blob state sync | SET |
+| ASTRA_ADMIN_PASSWORD | API auth (Bearer token) | SET |
+| OPENAI_API_KEY | Whisper transcription, pipeline | SET |
+| ANTHROPIC_API_KEY | AI synthesis | SET |
 
 ---
 
