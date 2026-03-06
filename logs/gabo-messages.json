@@ -300,5 +300,47 @@
     "context": "After full ecosystem audit. Gabo frustrated at 3 hours wasted before audit was done right. Voice transcription.",
     "sentiment": "frustrated",
     "saved_by": "claude"
+  },
+  {
+    "id": 51,
+    "text": "Go make sure experience is not open to the public and create a 5h script caffeinate the laptop and recursively look for Bugs",
+    "timestamp": "2026-03-06T19:10:00Z",
+    "context": "TWO TASKS: 1) Lock down de-aqui-a-saturno (Valentine's experience was fully public). 2) Create 5h caffeinate bug-hunting script. DONE: Added middleware.js to de-aqui-a-saturno blocking /media/ and /scripts/ without auth cookie. Pushed commit dd6e66f.",
+    "saved_by": "claude"
+  },
+  {
+    "id": 52,
+    "text": "and read that [Living Canvas V4]",
+    "timestamp": "2026-03-06T19:12:00Z",
+    "context": "Sent the SATURNO LIVING CANVAS V4 HTML - an autopsy of previous session's errors. CRITICAL CORRECTIONS: VB book contract CANCELLED Feb 20, $20K is a DEBT not unlock, vault serves BF members not VB buyers, index.html must stay public.",
+    "saved_by": "claude"
+  },
+  {
+    "id": 53,
+    "text": "so you do not make the same fucking mistakes all claudes did today.",
+    "timestamp": "2026-03-06T19:13:00Z",
+    "context": "Emphasis: READ the Living Canvas V4 and internalize the corrections. Previous Claudes got book status, vault audience, and auth architecture WRONG.",
+    "saved_by": "claude"
+  },
+  {
+    "id": 54,
+    "text": "are we clear????",
+    "timestamp": "2026-03-06T19:14:00Z",
+    "context": "Confirmation demand. YES: VB contract cancelled, $20K is debt, vault = BF community, index.html stays public, gate.html is the lock.",
+    "saved_by": "claude"
+  },
+  {
+    "id": 55,
+    "text": "what are you doin in that project?",
+    "timestamp": "2026-03-06T19:20:00Z",
+    "context": "Re: de-aqui-a-saturno. Adding server-side middleware to protect /media/ files (Karina photos/videos) from direct access without auth. Gate already exists client-side.",
+    "saved_by": "claude"
+  },
+  {
+    "id": 56,
+    "text": "dude WTF is going on.....",
+    "timestamp": "2026-03-06T19:22:00Z",
+    "context": "Frustration at slow progress. Claude was reading files and updating kernel instead of moving fast on the two tasks.",
+    "saved_by": "claude"
   }
 ]
