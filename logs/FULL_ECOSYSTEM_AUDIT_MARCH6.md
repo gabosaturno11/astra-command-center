@@ -11,6 +11,14 @@
 3. **20+ stale URLs replaced** — All `saturno-bonus-omega.vercel.app` -> `bonus.saturnomovement.com` (the actual custom domain)
 4. **C1/C2 labels fixed** — 2 occurrences had iMac labeled as C2 and MacBook as C1 (WRONG). Fixed to C1=iMac, C2=MacBook
 5. **Audit KB entry added** — `kb_full_audit_mar6` now appears in ASTRA Knowledge Base
+6. **cloudLoad auth fix** — cloudLoad() now handles 401 (stale password) instead of silent "No cloud state found"
+7. **5 missing repos added** — saturno-beast-api, content-beast, saturno-movement-studio, sm-app-copy-v1, saturno-branding-assets (5 -> 10 total)
+8. **KB content updated** — Messages backend (30 -> 675+, per-project routing), Handoff doc (updated URLs, message logs, GitHub info)
+9. **Stale data fixed** — Bonus message count 68 -> 612
+10. **5 new Cmd+K commands** — Force Cloud Sync, Cloud Load, Clear LocalStorage, Export All KB, Clear Saved Password
+11. **Auto-backup fixed** — Was creating blob URLs but never saving. Now saves snapshot to localStorage every hour + restore command
+12. **KB search added** — `kb:` prefix in Cmd+K searches all KB entries by name, content, ID, or tags
+13. **Restore from Backup command** — Cmd+K "Restore from Backup" to recover from auto-backup snapshot
 
 ---
 
