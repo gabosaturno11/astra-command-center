@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 # SATURNO ECOSYSTEM BUG HUNTER — 5 HOUR AUTONOMOUS SCRIPT
 # Keeps machine awake with caffeinate, recursively scans ALL repos for bugs
 # Output: ~/dev/astra-command-center/logs/BUG_HUNT_REPORT_$(date).md
@@ -76,11 +76,11 @@ for repo in "$REPOS_DIR"/*/; do
 
     # Git status
     cd "$repo"
-    status=$(git status --porcelain 2>/dev/null || echo "ERROR")
-    if [ -n "$status" ] && [ "$status" != "ERROR" ]; then
+    git_st=$(git status --porcelain 2>/dev/null || echo "ERROR")
+    if [ -n "$git_st" ] && [ "$git_st" != "ERROR" ]; then
       found_warning "$repo_name has uncommitted changes:"
       echo '```' >> "$REPORT"
-      echo "$status" >> "$REPORT"
+      echo "$git_st" >> "$REPORT"
       echo '```' >> "$REPORT"
     else
       log "- Clean working tree"
@@ -194,14 +194,8 @@ done
 # ============================================================
 section "PHASE 4: LIVE URL HEALTH CHECKS"
 
-declare -A URLS
-URLS["astra-command-center"]="https://astra-command-center-sigma.vercel.app"
-URLS["saturno-bonus"]="https://bonus.saturnomovement.com"
-URLS["de-aqui-a-saturno"]="https://de-aqui-a-saturno-jet.vercel.app"
-URLS["titan-forge"]="https://titan-forge-ten.vercel.app"
-
-for name in "${!URLS[@]}"; do
-  url="${URLS[$name]}"
+check_url() {
+  local name="$1" url="$2"
   http_code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "TIMEOUT")
   if [ "$http_code" = "200" ]; then
     log "- $name ($url): HTTP $http_code OK"
@@ -212,7 +206,12 @@ for name in "${!URLS[@]}"; do
   else
     found_warning "$name ($url): HTTP $http_code"
   fi
-done
+}
+
+check_url "astra-command-center" "https://astra-command-center-sigma.vercel.app"
+check_url "saturno-bonus" "https://bonus.saturnomovement.com"
+check_url "de-aqui-a-saturno" "https://de-aqui-a-saturno-jet.vercel.app"
+check_url "titan-forge" "https://titan-forge-ten.vercel.app"
 
 # Check API endpoints for ASTRA
 subsection "ASTRA API Endpoint Health"
