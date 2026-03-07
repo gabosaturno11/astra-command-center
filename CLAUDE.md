@@ -41,10 +41,15 @@ C1 completed a FULL ecosystem audit. 15 commits pushed. Everything deployed.
 
 ### REMAINING FROM 50 IMPROVEMENTS (not done yet)
 - ~~#1 Supabase migration~~ **DONE** (March 7 — dual-write to Blob + Supabase)
-- #2 Real-time sync (Supabase Realtime — subscribe to changes)
-- #3 Silent auth fix (stale password prompt improvement) — partially done
-- #7 Capture inbox (display Nexus captures in ASTRA — syncCaptures exists, needs UI)
+- ~~#2 Real-time sync~~ **DONE** (March 7 — Supabase Realtime, 6 tables, CDN client)
+- ~~#3 Silent auth fix~~ **DONE** (March 7 — always shows toast on 401)
+- ~~#4 Auto-save~~ **DONE** (Blob 30s + Supabase 60s debounced)
+- ~~#5 Export/Import versioning~~ **DONE** (March 7 — metadata on export, validation on import)
+- ~~#6 API endpoint health~~ **DONE** (March 7 — Ecosystem Health panel)
+- ~~#7 Capture inbox~~ **DONE** (March 7 — Capture Inbox viewer)
 - ~~#8 Pipeline runner in ASTRA~~ **DONE** (voice modes + faders wired)
+- #9 Blog CMS integration
+- #10 Vercel deployment status (partially in Ecosystem Health)
 - #45 Book project dashboard (import AOC_MANUSCRIPT_TRACKER)
 
 ### GABO ACTION REQUIRED FOR SUPABASE
@@ -97,15 +102,17 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 3ab31a9 (March 7 — v2.40) |
-| Manual version | v2.40 |
-| File size | ~4.6 MB, 46,500+ lines |
-| Storage | localStorage + Vercel Blob + **Supabase** (triple sync) |
+| Last commit | 5a7cf60 (March 7 — v2.41) |
+| Manual version | v2.41 |
+| File size | ~4.7 MB, 46,700+ lines |
+| Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
 | Auto-backup | Saves snapshot to localStorage every hour |
+| Auto-sync | Blob every 30s, **Supabase every 60s** (debounced) |
+| Realtime | Supabase Realtime: 6 tables, live cross-machine sync |
 | Middleware | Restored (commit db85fb3) |
 | Audit | FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines) |
 
-### March 7 Session — 20 Commits
+### March 7 Session — 28 Commits
 **First batch (13):** Supabase + voice modes + brain dump + rant actions + KB
 1. `58ba812` — Supabase backend: migration SQL, sync API, config endpoint
 2. `0c32795` — Supabase frontend: dual-write, Cmd+K commands, status dot
@@ -124,17 +131,34 @@ Supabase migration gives ASTRA real persistent memory.
 18. `5482daf` — Declutter Tasks toolbar + responsive dashboard grid
 19. `3ab31a9` — Version bump to v2.40
 
-### New Features Added (v2.40)
+**Third batch (8):** Realtime sync + UX polish + ecosystem health
+20. `cfc7c0e` — Supabase Realtime: auto-sync every 60s + live cross-machine sync (6 tables)
+21. `d2199e2` — UX polish: sidebar active indicator, smoother transitions, count highlight
+22. `82672c0` — Ecosystem Health panel: live API/deployment/sync status checker
+23. `bc00a39` — Fix silent auth: always show toast on 401
+24. `38ddb12` — Export/Import versioning: metadata on export, validation on import
+25. `efa7343` — Shortcuts modal: add Dashboard (Cmd+0)
+26. `5a7cf60` — Notification history: toast log with Cmd+K viewer
+
+### New Features Added (v2.41)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
 - **Supabase sync**: Dual-write to Blob AND Supabase on every save
+- **Supabase Realtime**: CDN-loaded client subscribes to 6 tables for live cross-machine sync
+- **Auto Supabase sync**: Debounced push every 60s (in addition to Blob every 30s)
+- **Remote change detection**: Toast + banner with reload button when data changes on another machine
 - **Brain Dump**: Quick rant panel (Cmd+K > Quick Rant), browse rants viewer, rant actions (To Content, To Pipeline, Copy)
 - **Voice Modes**: 8 modes (Raw, Teacher, Prophet, etc.) + 6 faders imported from Titan Forge
 - **Pipeline to Supabase**: Pipeline results saved to astra_pipeline_results table
 - **Capture Inbox**: Browse cloud captures from Nexus extension, import new ones
 - **Toolbar cleanup**: Content and Tasks toolbars decluttered with grouped dropdown menus
+- **Ecosystem Health**: Live checker for all 10 API endpoints + 4 deployments (Cmd+K > Ecosystem Health)
+- **Notification History**: All toasts logged, browsable via Cmd+K
+- **Export versioning**: Exports include version, timestamp, item counts; imports show confirmation with metadata
+- **Silent auth fix**: 401 errors always show warning toast (was silently swallowed on auto-sync)
+- **UX polish**: Sidebar active indicator (left border), smoother panel transitions, progressive icon opacity
 - **7 KB entries updated**: All stale entries now reflect March 7 state
-- **Supabase status dot**: Green when connected, click to sync
-- **Cmd+K commands**: Push/Load/Status Supabase, Dashboard, Capture Inbox, Quick Rant, Prompt Templates, quick links
+- **Supabase status dot**: Green when connected, glow when Realtime LIVE
+- **Cmd+K commands**: Push/Load/Status Supabase, Dashboard, Capture Inbox, Quick Rant, Prompt Templates, Ecosystem Health, Notification History, quick links
 
 ### Vercel Env Vars (ALL SET — verified March 6 audit)
 
@@ -182,7 +206,7 @@ Key KB entries:
 
 **11 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos
 **Core:** Projects, Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
-**New (March 7):** Dashboard (Cmd+0), Brain Dump (rants), Voice Modes + Faders, Supabase sync, Capture Inbox, decluttered toolbars
+**New (March 7):** Dashboard (Cmd+0), Brain Dump (rants), Voice Modes + Faders, Supabase sync + Realtime, Capture Inbox, Ecosystem Health, Notification History, decluttered toolbars, export versioning
 **Sessions:** 24+ documented sessions (Feb 16 - Mar 7)
 
 ---
