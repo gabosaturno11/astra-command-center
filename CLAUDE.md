@@ -104,7 +104,7 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 58e4119 (March 7 — v2.42) |
+| Last commit | 8a4caf9 (March 7 — v2.42) |
 | Manual version | v2.42 |
 | File size | ~4.7 MB, 46,700+ lines |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
@@ -159,6 +159,14 @@ Supabase migration gives ASTRA real persistent memory.
 40. `58e4119` — Section-colored progress bar, declutter links toolbar
 41. Version bump to v2.42
 
+**Fifth batch (6):** Deep declutter + bugfixes
+42. `75ff680` — Touch UX: always show actions on coarse pointer devices
+43. `043458b` — KB viewer: markdown rendering + meta info
+44. `e8d2a07` — Declutter: writer toolbar, specs header, calendar nav arrows
+45. `aa157b7` — Declutter: content card actions (14->4+dropdown), sidebar section dividers
+46. `1cd8a22` — Dashboard: count-up animation for metric cards
+47. `8a4caf9` — Fix: openProjectById was passing index instead of ID
+
 ### New Features Added (v2.42)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
 - **Supabase sync**: Dual-write to Blob AND Supabase on every save
@@ -196,6 +204,16 @@ Supabase migration gives ASTRA real persistent memory.
 - **Links toolbar declutter**: Open All/Copy URLs/Tags/Check/Select grouped into More dropdown
 - **Standup fix**: Uses completedAt for done tasks instead of created date
 - **Dashboard auto-refresh**: 60s interval auto-refreshes while dashboard is visible
+- **Touch UX**: Content card and task row actions always visible on touch devices (pointer:coarse)
+- **KB viewer markdown**: Markdown content rendered with headings/bold/lists instead of plain text
+- **KB viewer meta**: Word count, update time, storage type shown below content
+- **Writer toolbar declutter**: 20+ buttons reduced to formatting essentials + "Tools" dropdown (Stats, Outline, Merge, Split, Compare, Word Freq)
+- **Specs header declutter**: Export/History/Import grouped into "More" dropdown
+- **Calendar nav cleanup**: Prev/Next replaced with arrow buttons, Google Cal link removed
+- **Content card declutter**: 14 action buttons reduced to 4 visible (Star, Copy, Edit, Pin) + "..." dropdown for Dup/Doc/Pipeline/Task/Split/RL/Archive/Delete
+- **Sidebar section dividers**: Subtle dividers group sections into logical groups (Core/Organize/Reference/Create)
+- **Dashboard count-up**: Metric numbers animate counting up when dashboard renders
+- **Bugfix**: openProjectById was passing index instead of project ID — dashboard project cards now open correctly
 
 ### Vercel Env Vars (ALL SET — verified March 6 audit)
 
