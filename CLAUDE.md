@@ -1,5 +1,5 @@
 # ASTRA COMMAND CENTER — CLAUDE.md
-## Last Updated: March 6, 2026
+## Last Updated: March 7, 2026
 
 ---
 
@@ -104,8 +104,8 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | dc23899 (March 7 — v2.41) |
-| Manual version | v2.41 |
+| Last commit | 58e4119 (March 7 — v2.42) |
+| Manual version | v2.42 |
 | File size | ~4.7 MB, 46,700+ lines |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
 | Auto-backup | Saves snapshot to localStorage every hour |
@@ -114,7 +114,7 @@ Supabase migration gives ASTRA real persistent memory.
 | Middleware | Restored (commit db85fb3) |
 | Audit | FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines) |
 
-### March 7 Session — 37 Commits
+### March 7 Session — 41 Commits
 **First batch (13):** Supabase + voice modes + brain dump + rant actions + KB
 1. `58ba812` — Supabase backend: migration SQL, sync API, config endpoint
 2. `0c32795` — Supabase frontend: dual-write, Cmd+K commands, status dot
@@ -149,7 +149,17 @@ Supabase migration gives ASTRA real persistent memory.
 32. `2cd2718` — KB archive feature: archive/unarchive instead of delete
 33. `dc23899` — KB archive UX: count on toggle, empty state message
 
-### New Features Added (v2.41)
+**Fourth batch (8):** UX redesign + declutter
+34. `aadfdaa` — CLAUDE.md update
+35. `a15c021` — Standup fix: use completedAt instead of created
+36. `7fcbc3a` — Dashboard auto-refresh: 60s while visible
+37. `b6b4990` — UX redesign: header sync cluster, dashboard greeting, task filter dropdown
+38. `4a55bca` — Global progress bar, breadcrumb back button
+39. `e2d6ba0` — Declutter: task detail footer + pipeline preset grid
+40. `58e4119` — Section-colored progress bar, declutter links toolbar
+41. Version bump to v2.42
+
+### New Features Added (v2.42)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
 - **Supabase sync**: Dual-write to Blob AND Supabase on every save
 - **Supabase Realtime**: CDN-loaded client subscribes to 6 tables for live cross-machine sync
@@ -167,11 +177,25 @@ Supabase migration gives ASTRA real persistent memory.
 - **KB archive**: Archive/unarchive KB items instead of deleting, toggle to show/hide archived
 - **Dashboard WIP section**: Shows in-progress tasks with project, elapsed time, due date
 - **Dashboard session timer**: Session duration + last save time in system status
-- **API updates**: health.js v2.41, pipeline uses Claude Sonnet 4.6 (latest)
+- **API updates**: health.js v2.42, pipeline uses Claude Sonnet 4.6 (latest)
 - **UX polish**: Sidebar active indicator (left border), smoother panel transitions, progressive icon opacity
 - **7 KB entries updated**: All stale entries now reflect March 7 state
 - **Supabase status dot**: Green when connected, glow when Realtime LIVE
 - **Cmd+K commands**: Push/Load/Status Supabase, Dashboard, Capture Inbox, Quick Rant, Prompt Templates, Ecosystem Health, Notification History, quick links
+- **Header redesign**: Sync indicators (cloud + Supabase) grouped into compact pill
+- **Dashboard greeting**: Time-based greeting (morning/afternoon/evening) with focus hint (urgent/wip/all-clear)
+- **Dashboard progress bar**: Task completion bar on metric card with animated fill
+- **Dashboard quick actions**: Icons + 3-column grid instead of text-only 2-column
+- **Dashboard empty state**: Better "all clear" message when no urgent tasks
+- **Global progress bar**: 2px gradient bar at top showing overall task completion %
+- **Section-colored progress**: Progress bar changes color per section (tasks=green, content=cyan, writer=purple, etc.)
+- **Breadcrumb back button**: Left arrow navigates to previous section (mirrors Cmd+`)
+- **Task filter dropdown**: Less-used filters (blocked/overdue/urgent/done-today/done-week) in collapsible menu
+- **Task detail declutter**: 14 footer buttons reduced to 7 visible + "More" dropdown
+- **Pipeline preset grid**: Prompt presets in responsive grid instead of wrapped row
+- **Links toolbar declutter**: Open All/Copy URLs/Tags/Check/Select grouped into More dropdown
+- **Standup fix**: Uses completedAt for done tasks instead of created date
+- **Dashboard auto-refresh**: 60s interval auto-refreshes while dashboard is visible
 
 ### Vercel Env Vars (ALL SET — verified March 6 audit)
 
