@@ -385,5 +385,12 @@
     "date": "2026-03-07",
     "text": "Shared SATURNO_ECOSYSTEM_MAP_MARCH7.html from iCloud. SVG architecture diagram showing all frontends (Client OS, ASTRA, Bonus), APIs (ASTRA API, Content Beast, Vimeo), backend (Supabase pending, Vercel Blob, Brevo), and future (WhatsApp, Whisper, SM App).",
     "context": "Visual ecosystem map created. Shows the full architecture. Supabase marked as GABO ACTION / PENDING — but now it's LIVE for Client OS."
+  },
+  {
+    "id": 63,
+    "project": "astra-command-center",
+    "date": "2026-03-07",
+    "text": "saturno movement command project on astra is what I mean by the back end of the back end. check KB",
+    "context": "Saturno's Command (proj_saturno_command) is the orchestration layer — prompts, commands, workflows, operational intelligence. ASTRA is the frontend dashboard, Supabase is the database brain, and Saturno's Command is the meta-layer that defines HOW everything operates. Now with Supabase wired, this orchestration layer can persist and sync across machines."
   }
 ]
