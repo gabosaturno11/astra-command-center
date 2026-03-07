@@ -97,15 +97,16 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 26c4227 (March 7 — Supabase + voice modes) |
-| Manual version | v2.39 |
-| File size | ~4.5 MB, 46,000+ lines |
+| Last commit | 3ab31a9 (March 7 — v2.40) |
+| Manual version | v2.40 |
+| File size | ~4.6 MB, 46,500+ lines |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync) |
 | Auto-backup | Saves snapshot to localStorage every hour |
 | Middleware | Restored (commit db85fb3) |
 | Audit | FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines) |
 
-### March 7 Session — 7 Commits
+### March 7 Session — 20 Commits
+**First batch (13):** Supabase + voice modes + brain dump + rant actions + KB
 1. `58ba812` — Supabase backend: migration SQL, sync API, config endpoint
 2. `0c32795` — Supabase frontend: dual-write, Cmd+K commands, status dot
 3. `ada9f52` — Brain Dump (rants) system: panel, Cmd+K, state init
@@ -113,14 +114,27 @@ Supabase migration gives ASTRA real persistent memory.
 5. `eaba70f` — Browse Rants viewer, Supabase first-connect notification
 6. `82f3d09` — Update 3 stale KB entries (Softzee, dev call, bonus deploy)
 7. `26c4227` — Voice modes + faders from Titan Forge in pipeline
+8-13. CLAUDE.md, rant->Supabase, Cmd+K links, shortcuts, rant actions, prompt templates
 
-### New Features Added
+**Second batch (7):** Dashboard + UX + KB audit
+14. `a955147` — Update 7 stale KB entries (voice pipeline, backend arch, app vision, speed, session log, rescue, handoff)
+15. `4484205` — Dashboard section: metrics, urgent tasks, recent activity, project grid, quick actions, system status
+16. `69a82d1` — Declutter Content toolbar: 16 buttons grouped into Export/More dropdowns
+17. `534da9c` — Capture Inbox viewer: browse and import Nexus extension captures
+18. `5482daf` — Declutter Tasks toolbar + responsive dashboard grid
+19. `3ab31a9` — Version bump to v2.40
+
+### New Features Added (v2.40)
+- **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
 - **Supabase sync**: Dual-write to Blob AND Supabase on every save
-- **Brain Dump**: Quick rant panel (Cmd+K > Quick Rant), browse rants viewer
+- **Brain Dump**: Quick rant panel (Cmd+K > Quick Rant), browse rants viewer, rant actions (To Content, To Pipeline, Copy)
 - **Voice Modes**: 8 modes (Raw, Teacher, Prophet, etc.) + 6 faders imported from Titan Forge
 - **Pipeline to Supabase**: Pipeline results saved to astra_pipeline_results table
-- **3 Cmd+K commands**: Push to Supabase, Load from Supabase, Supabase Status
+- **Capture Inbox**: Browse cloud captures from Nexus extension, import new ones
+- **Toolbar cleanup**: Content and Tasks toolbars decluttered with grouped dropdown menus
+- **7 KB entries updated**: All stale entries now reflect March 7 state
 - **Supabase status dot**: Green when connected, click to sync
+- **Cmd+K commands**: Push/Load/Status Supabase, Dashboard, Capture Inbox, Quick Rant, Prompt Templates, quick links
 
 ### Vercel Env Vars (ALL SET — verified March 6 audit)
 
@@ -164,11 +178,11 @@ Key KB entries:
 
 ---
 
-## ASTRA FEATURES (v2.39)
+## ASTRA FEATURES (v2.40)
 
-**7 Sections:** Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Whiteboard
+**11 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos
 **Core:** Projects, Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
-**New (March 7):** Brain Dump (rants), Voice Modes + Faders, Supabase sync, Browse Rants viewer
+**New (March 7):** Dashboard (Cmd+0), Brain Dump (rants), Voice Modes + Faders, Supabase sync, Capture Inbox, decluttered toolbars
 **Sessions:** 24+ documented sessions (Feb 16 - Mar 7)
 
 ---
