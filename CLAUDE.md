@@ -50,6 +50,8 @@ C1 completed a FULL ecosystem audit. 15 commits pushed. Everything deployed.
 - ~~#8 Pipeline runner in ASTRA~~ **DONE** (voice modes + faders wired)
 - #9 Blog CMS integration
 - #10 Vercel deployment status (partially in Ecosystem Health)
+- ~~#17 KB archive~~ **DONE** (March 7 — archive/unarchive, toggle visibility)
+- ~~#30 Session timer~~ **DONE** (March 7 — dashboard session time + last save)
 - #45 Book project dashboard (import AOC_MANUSCRIPT_TRACKER)
 
 ### GABO ACTION REQUIRED FOR SUPABASE
@@ -102,7 +104,7 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 5a7cf60 (March 7 — v2.41) |
+| Last commit | dc23899 (March 7 — v2.41) |
 | Manual version | v2.41 |
 | File size | ~4.7 MB, 46,700+ lines |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
@@ -112,7 +114,7 @@ Supabase migration gives ASTRA real persistent memory.
 | Middleware | Restored (commit db85fb3) |
 | Audit | FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines) |
 
-### March 7 Session — 28 Commits
+### March 7 Session — 37 Commits
 **First batch (13):** Supabase + voice modes + brain dump + rant actions + KB
 1. `58ba812` — Supabase backend: migration SQL, sync API, config endpoint
 2. `0c32795` — Supabase frontend: dual-write, Cmd+K commands, status dot
@@ -131,7 +133,7 @@ Supabase migration gives ASTRA real persistent memory.
 18. `5482daf` — Declutter Tasks toolbar + responsive dashboard grid
 19. `3ab31a9` — Version bump to v2.40
 
-**Third batch (8):** Realtime sync + UX polish + ecosystem health
+**Third batch (17):** Realtime sync + UX polish + ecosystem health + more
 20. `cfc7c0e` — Supabase Realtime: auto-sync every 60s + live cross-machine sync (6 tables)
 21. `d2199e2` — UX polish: sidebar active indicator, smoother transitions, count highlight
 22. `82672c0` — Ecosystem Health panel: live API/deployment/sync status checker
@@ -139,6 +141,13 @@ Supabase migration gives ASTRA real persistent memory.
 24. `38ddb12` — Export/Import versioning: metadata on export, validation on import
 25. `efa7343` — Shortcuts modal: add Dashboard (Cmd+0)
 26. `5a7cf60` — Notification history: toast log with Cmd+K viewer
+27. `9ffea82` — CLAUDE.md update
+28. `355dc43` — Dashboard: session timer + last save time in system status
+29. `96e4be8` — Dashboard: Work in Progress section
+30. `2f98413` — API: health v2.41, pipeline Claude Sonnet 4.6
+31. `6972f83` — Dashboard quick actions: Health Check replaces Push Supabase
+32. `2cd2718` — KB archive feature: archive/unarchive instead of delete
+33. `dc23899` — KB archive UX: count on toggle, empty state message
 
 ### New Features Added (v2.41)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
@@ -155,6 +164,10 @@ Supabase migration gives ASTRA real persistent memory.
 - **Notification History**: All toasts logged, browsable via Cmd+K
 - **Export versioning**: Exports include version, timestamp, item counts; imports show confirmation with metadata
 - **Silent auth fix**: 401 errors always show warning toast (was silently swallowed on auto-sync)
+- **KB archive**: Archive/unarchive KB items instead of deleting, toggle to show/hide archived
+- **Dashboard WIP section**: Shows in-progress tasks with project, elapsed time, due date
+- **Dashboard session timer**: Session duration + last save time in system status
+- **API updates**: health.js v2.41, pipeline uses Claude Sonnet 4.6 (latest)
 - **UX polish**: Sidebar active indicator (left border), smoother panel transitions, progressive icon opacity
 - **7 KB entries updated**: All stale entries now reflect March 7 state
 - **Supabase status dot**: Green when connected, glow when Realtime LIVE
