@@ -40,13 +40,18 @@ C1 completed a FULL ecosystem audit. 15 commits pushed. Everything deployed.
 - 2 completed tasks marked done (domain + env vars)
 
 ### REMAINING FROM 50 IMPROVEMENTS (not done yet)
-Top priorities for C2:
-- #1 Supabase migration (replaces localStorage)
-- #2 Real-time sync (Supabase Realtime)
+- ~~#1 Supabase migration~~ **DONE** (March 7 — dual-write to Blob + Supabase)
+- #2 Real-time sync (Supabase Realtime — subscribe to changes)
 - #3 Silent auth fix (stale password prompt improvement) — partially done
 - #7 Capture inbox (display Nexus captures in ASTRA — syncCaptures exists, needs UI)
-- #8 Pipeline runner in ASTRA
+- ~~#8 Pipeline runner in ASTRA~~ **DONE** (voice modes + faders wired)
 - #45 Book project dashboard (import AOC_MANUSCRIPT_TRACKER)
+
+### GABO ACTION REQUIRED FOR SUPABASE
+1. Run `docs/supabase-migration.sql` in Supabase SQL Editor
+2. Set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY` in Vercel for astra-command-center
+3. Open ASTRA, check green dot in header = Supabase connected
+4. Cmd+K > "Push to Supabase" to seed data
 
 ---
 
@@ -87,19 +92,35 @@ Supabase migration gives ASTRA real persistent memory.
 
 ---
 
-## CURRENT STATE (March 4, 2026)
+## CURRENT STATE (March 7, 2026)
 
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 460d3ee (March 6 audit — 15 commits) |
-| Uncommitted | This CLAUDE.md update |
-| Manual version | v2.38 |
-| File size | ~4.5 MB, 45,800+ lines |
-| Storage | localStorage + Vercel Blob cloud sync (Cmd+S) |
+| Last commit | 26c4227 (March 7 — Supabase + voice modes) |
+| Manual version | v2.39 |
+| File size | ~4.5 MB, 46,000+ lines |
+| Storage | localStorage + Vercel Blob + **Supabase** (triple sync) |
 | Auto-backup | Saves snapshot to localStorage every hour |
 | Middleware | Restored (commit db85fb3) |
 | Audit | FULL_ECOSYSTEM_AUDIT_MARCH6.md (660+ lines) |
+
+### March 7 Session — 7 Commits
+1. `58ba812` — Supabase backend: migration SQL, sync API, config endpoint
+2. `0c32795` — Supabase frontend: dual-write, Cmd+K commands, status dot
+3. `ada9f52` — Brain Dump (rants) system: panel, Cmd+K, state init
+4. `d2bd05e` — Pipeline results table in Supabase, dual-write
+5. `eaba70f` — Browse Rants viewer, Supabase first-connect notification
+6. `82f3d09` — Update 3 stale KB entries (Softzee, dev call, bonus deploy)
+7. `26c4227` — Voice modes + faders from Titan Forge in pipeline
+
+### New Features Added
+- **Supabase sync**: Dual-write to Blob AND Supabase on every save
+- **Brain Dump**: Quick rant panel (Cmd+K > Quick Rant), browse rants viewer
+- **Voice Modes**: 8 modes (Raw, Teacher, Prophet, etc.) + 6 faders imported from Titan Forge
+- **Pipeline to Supabase**: Pipeline results saved to astra_pipeline_results table
+- **3 Cmd+K commands**: Push to Supabase, Load from Supabase, Supabase Status
+- **Supabase status dot**: Green when connected, click to sync
 
 ### Vercel Env Vars (ALL SET — verified March 6 audit)
 
@@ -124,8 +145,9 @@ Supabase migration gives ASTRA real persistent memory.
 | De Aqui a Saturno | proj_karina | Complete | Valentine's experience |
 | Nexus Capture | proj_nexus_capture | Active | Chrome extension |
 | Content Beast | proj_content_beast | Active | Content pipeline |
-| Client OS | proj_client_os | Pending | Client management |
+| Client OS | proj_client_os | Active | CRM/Client Portal — DEPLOYED at client-os.vercel.app |
 | Branding | proj_branding | Active | Logo system, modular SVG |
+| Saturno's Command | proj_saturno_command | Active | Backend of the backend — orchestration layer |
 
 ---
 
@@ -142,27 +164,30 @@ Key KB entries:
 
 ---
 
-## ASTRA FEATURES (v2.38)
+## ASTRA FEATURES (v2.39)
 
 **7 Sections:** Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Whiteboard
-**Core:** Projects as first-class entities, Cmd+K command palette (200+ commands), drag-drop kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
-**Sessions:** 22+ documented sessions (Feb 16 - Mar 4), each adding features/fixes
+**Core:** Projects, Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
+**New (March 7):** Brain Dump (rants), Voice Modes + Faders, Supabase sync, Browse Rants viewer
+**Sessions:** 24+ documented sessions (Feb 16 - Mar 7)
 
 ---
 
-## API ENDPOINTS (9)
+## API ENDPOINTS (12)
 
 | Endpoint | Purpose | Auth |
 |----------|---------|------|
 | /api/astra-verify | Auth verification | Cookie |
 | /api/health | Health check | None |
 | /api/repos | GitHub repo info | ASTRA_ADMIN_PASSWORD |
-| /api/pipeline | Content pipeline | Custom |
+| /api/pipeline | Content pipeline (voice modes + faders) | Custom |
 | /api/capture | Nexus highlight capture | Token |
 | /api/transcribe | Audio transcription | Token |
 | /api/transcripts | Transcript storage | Token |
 | /api/query | Backend query | Token |
-| /api/state | State sync | Token |
+| /api/state | State sync (Vercel Blob) | Token |
+| /api/supabase-sync | Supabase CRUD (GET/POST/DELETE) | Bearer |
+| /api/config | Public config (Supabase URL, capability flags) | None |
 
 ---
 
