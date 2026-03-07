@@ -271,6 +271,21 @@ export default async function handler(req, res) {
       } catch (e) { /* Don't fail if storage fails */ }
     }
 
+    // Also save to Supabase if configured
+    try {
+      const sbUrl = process.env.SUPABASE_URL;
+      const sbKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
+      if (sbUrl && sbKey) {
+        const { createClient } = await import('@supabase/supabase-js');
+        const sb = createClient(sbUrl, sbKey);
+        await sb.from('astra_pipeline_results').upsert({
+          id: pipelineId, input_type: inputType, transcript, prompt,
+          synthesis: result.text, engine: result.engine, source,
+          duration, created_at: new Date().toISOString()
+        }, { onConflict: 'id' });
+      }
+    } catch (e) { /* Don't fail if Supabase save fails */ }
+
     return res.status(200).json({ ok: true, pipelineId, inputType, transcript, synthesis: result.text, engine: result.engine, duration, source });
   } catch (e) {
     return res.status(500).json({ ok: false, error: e.message });

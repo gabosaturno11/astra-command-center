@@ -130,6 +130,19 @@ CREATE TABLE IF NOT EXISTS astra_rants (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ===== PIPELINE RESULTS =====
+CREATE TABLE IF NOT EXISTS astra_pipeline_results (
+    id TEXT PRIMARY KEY,
+    input_type TEXT DEFAULT 'text',
+    transcript TEXT DEFAULT '',
+    prompt TEXT DEFAULT '',
+    synthesis TEXT DEFAULT '',
+    engine TEXT DEFAULT 'auto',
+    source TEXT DEFAULT '',
+    duration REAL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ===== SETTINGS =====
 CREATE TABLE IF NOT EXISTS astra_settings (
     key TEXT PRIMARY KEY,
@@ -150,6 +163,8 @@ CREATE INDEX IF NOT EXISTS idx_astra_specs_project ON astra_specs(project_id);
 CREATE INDEX IF NOT EXISTS idx_astra_kb_project ON astra_knowledge_base(project_id);
 CREATE INDEX IF NOT EXISTS idx_astra_calendar_date ON astra_calendar(date);
 CREATE INDEX IF NOT EXISTS idx_astra_rants_created ON astra_rants(created_at);
+CREATE INDEX IF NOT EXISTS idx_astra_pipeline_created ON astra_pipeline_results(created_at);
+CREATE INDEX IF NOT EXISTS idx_astra_pipeline_source ON astra_pipeline_results(source);
 
 -- ===== RLS POLICIES =====
 ALTER TABLE astra_projects ENABLE ROW LEVEL SECURITY;
@@ -162,6 +177,7 @@ ALTER TABLE astra_knowledge_base ENABLE ROW LEVEL SECURITY;
 ALTER TABLE astra_calendar ENABLE ROW LEVEL SECURITY;
 ALTER TABLE astra_whiteboard ENABLE ROW LEVEL SECURITY;
 ALTER TABLE astra_rants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE astra_pipeline_results ENABLE ROW LEVEL SECURITY;
 ALTER TABLE astra_settings ENABLE ROW LEVEL SECURITY;
 
 -- Permissive policies (single-user mode — Gabo only)
@@ -175,6 +191,7 @@ CREATE POLICY "allow_all_astra_kb" ON astra_knowledge_base FOR ALL USING (true) 
 CREATE POLICY "allow_all_astra_calendar" ON astra_calendar FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "allow_all_astra_whiteboard" ON astra_whiteboard FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "allow_all_astra_rants" ON astra_rants FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "allow_all_astra_pipeline" ON astra_pipeline_results FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "allow_all_astra_settings" ON astra_settings FOR ALL USING (true) WITH CHECK (true);
 
 -- ===== REALTIME =====
@@ -188,3 +205,4 @@ ALTER PUBLICATION supabase_realtime ADD TABLE astra_knowledge_base;
 ALTER PUBLICATION supabase_realtime ADD TABLE astra_calendar;
 ALTER PUBLICATION supabase_realtime ADD TABLE astra_whiteboard;
 ALTER PUBLICATION supabase_realtime ADD TABLE astra_rants;
+ALTER PUBLICATION supabase_realtime ADD TABLE astra_pipeline_results;
