@@ -294,7 +294,7 @@ export default async function handler(req, res) {
       const sbUrl = process.env.SUPABASE_URL;
       const sbKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
       if (sbUrl && sbKey) {
-        const { createClient } = await import('@supabase/supabase-js');
+        const { createClient } = require('@supabase/supabase-js');
         const sb = createClient(sbUrl, sbKey);
         await sb.from('astra_pipeline_results').upsert({
           id: pipelineId, input_type: inputType, transcript, prompt,

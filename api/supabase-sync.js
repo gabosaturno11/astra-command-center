@@ -40,7 +40,8 @@ var TABLE_MAP = {
   specs: 'astra_specs',
   knowledgeBase: 'astra_knowledge_base',
   calendar: 'astra_calendar',
-  rants: 'astra_rants'
+  rants: 'astra_rants',
+  pipelineResults: 'astra_pipeline_results'
 };
 
 // camelCase -> snake_case field mappers per table
