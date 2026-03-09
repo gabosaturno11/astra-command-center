@@ -1,91 +1,89 @@
 # ASTRA Command Center
 
 **Live:** [astra-command-center-sigma.vercel.app](https://astra-command-center-sigma.vercel.app)
-**Repo:** [github.com/gabosaturno11/astra-command-center](https://github.com/gabosaturno11/astra-command-center)
-**Local:** `~/dev/astra-command-center/`
-**Vercel Account:** `gabosaturno11` (Gabriele Saturno's projects)
-**Vercel Project:** `astra-command-center`
+**Version:** v2.42
+**Deploy:** `git push origin main` (Vercel auto-deploys)
 
-A zero-dependency, single-file command center for creative solopreneurs. Built as one self-contained HTML file — no frameworks, no build tools, no external APIs. Everything runs in the browser, persists to localStorage.
+A single-file command center for managing an entire digital ecosystem. Dark theme, zero frameworks, all inline JS/CSS. Built for solopreneurs who need everything in one place.
 
-## What It Is
-
-ASTRA is a private operating system for managing content, tasks, writing, knowledge, links, and visual planning — all from one dark, minimal interface. Designed for people who run entire businesses alone and need everything in one place without the overhead of 12 different SaaS subscriptions.
-
-## 7 Sections
+## 11 Sections
 
 | Section | What It Does |
 |---------|-------------|
-| **Content Vault** | Store and organize content pieces — filter by type (note, idea, draft, snippet, reference) and theme (book, brand, product, personal, research) |
-| **Tasks** | Full task manager with list view, kanban board, and calendar view — drag-and-drop, priorities (P1-P4), status tracking, project grouping |
-| **Calendar** | Month view with task pills — drag tasks between dates, ICS export, today highlighting |
-| **Writing Hub** | Distraction-free rich text editor with formatting toolbar, version history (50 snapshots), word/character count, markdown export, document management sidebar |
-| **Living Docs** | Structured knowledge base with collapsible sections — pre-loaded with 20 kernel sections covering identity, architecture, voice modes, agent stacks, research domains |
-| **Links** | Categorized link manager — deploy, tool, reference, resource, docs categories with search |
-| **Whiteboard** | Infinite canvas with pan/zoom, 20 enterprise templates (Mind Map, SWOT, Eisenhower, Org Chart, Flowchart, etc.), node connections with bezier curves, minimap, auto-layout, PNG/SVG/JSON export |
+| **Dashboard** | Metrics, urgent tasks, project grid, quick actions, session timer |
+| **Content Vault** | Content pieces — notes, ideas, drafts, snippets, references |
+| **Tasks** | List, kanban board, and calendar views — drag-and-drop, P1-P4 priorities |
+| **Calendar** | Month view with task pills, ICS export |
+| **Writing Hub** | Rich text editor with version history, word goals, zen mode |
+| **Living Docs** | Structured specs with collapsible sections |
+| **Links** | Categorized link manager with health checks |
+| **Doc Hub** | Knowledge base with markdown rendering, archive, tags |
+| **Whiteboard** | Infinite canvas with 20 templates, node connections, minimap |
+| **Pipeline** | AI content pipeline — 8 voice modes, 6 faders, prompt templates |
+| **Repos** | Connected GitHub repos with live status |
 
-## Features
+## Key Features
 
-- **Voice Input** — Browser-native speech-to-text on Writing Hub and Living Docs (Web Speech API)
-- **Drag-and-Drop** — Tasks across kanban columns, calendar dates, and board views
-- **Version History** — 50 snapshots per document with one-click restore
-- **Full Export/Import** — JSON backup of entire state, plus markdown export for individual docs
-- **20 Whiteboard Templates** — Blank Canvas, Mind Map, Eisenhower Matrix, SWOT Analysis, Project Roadmap, Org Chart, User Persona, Content Calendar, Product Breakdown, Stakeholder Map, 5 Whys, Impact Mapping, RACI Matrix, Action Plan, Gap Analysis, Communication Plan, Service Blueprint, Priority Matrix, Flowchart, Revenue Roadmap
-- **Keyboard Shortcuts** — Whiteboard: V(select), H(hand), N(node), C(connect), T(text), S(sticky), G(grid), Delete, Cmd+Z/Cmd+Shift+Z, +/-, 0(reset)
-- **ICS Calendar Export** — Export tasks as calendar events
-- **Autosave** — 1-second debounced save on every change
-- **LocalStorage Persistence** — All data stays in the browser, no server needed
-- **Storage Indicator** — Live display of how much localStorage is used
-
-## Design
-
-Endel-inspired dark interface with neutral grey gradients and mint-green accents:
-
-- **Palette**: Deep blacks (`#09090b`) with subtle grey gradient surfaces
-- **Accent**: Mint green (`#4ade80`) with teal secondary (`#2dd4bf`)
-- **Typography**: System fonts (SF Pro / Segoe UI) + SF Mono for code
-- **Borders**: Ultra-subtle `rgba(255,255,255,0.05)` with green glow on interaction
-- **Radii**: 8px standard, 12px for cards and panels
+- **Triple sync:** localStorage + Vercel Blob (30s) + Supabase (60s) + Realtime
+- **Cmd+K command palette:** 200+ commands, fuzzy search
+- **Keyboard shortcuts:** Cmd+0-9 sections, Cmd+N new, Cmd+K search
+- **Projects:** Multi-project management with KB, tasks, content per project
+- **Knowledge Base:** 125+ entries with inline markdown, tags, archive
+- **Brain Dump:** Quick rant capture with routing to content/pipeline
+- **Voice Modes:** 8 modes (Raw, Teacher, Prophet, etc.) + 6 faders
+- **Ecosystem Health:** Live API + deployment status checker
+- **Export/Import:** Full workspace backup with versioning metadata
+- **Supabase Realtime:** Cross-machine live sync (11 tables)
+- **Auto-restore:** Detects empty localStorage, offers cloud restore
 
 ## Tech
 
-- **1 HTML file** — `index.html` (120 KB, ~1,200 lines)
-- **0 dependencies** — no npm, no CDN, no build step
-- **0 external calls** — no APIs, no analytics, no tracking
-- **Pure vanilla** — HTML + CSS + JavaScript
-- **Works offline** — open the file, it works
-- **Browser storage** — localStorage for all persistence
+- **1 HTML file** — `index.html` (~46,700 lines, 4.7 MB)
+- **All JS/CSS inline** — no build step, no bundler
+- **Backend:** 12 Vercel serverless API endpoints
+- **Storage:** localStorage + Vercel Blob + Supabase Postgres
+- **Dependencies:** @vercel/blob, @supabase/supabase-js, openai
+- **Auth:** Middleware + password gate
 
-## Deployment
+## API Endpoints
 
-| What | Where |
-|------|-------|
-| **Production** | [astra-command-center-sigma.vercel.app](https://astra-command-center-sigma.vercel.app) |
-| **Vercel Account** | `gabosaturno11` (Gabriele Saturno's projects) |
-| **Vercel Project** | `astra-command-center` |
-| **GitHub Repo** | [gabosaturno11/astra-command-center](https://github.com/gabosaturno11/astra-command-center) |
-| **Local Path** | `~/dev/astra-command-center/` |
-| **Deploy Method** | `vercel --prod` from project root |
-
-```bash
-# Run locally
-open index.html
-
-# Deploy
-cd ~/dev/astra-command-center
-vercel --prod
-```
+| Endpoint | Purpose |
+|----------|---------|
+| /api/health | Health check |
+| /api/config | Public config (capabilities) |
+| /api/state | Vercel Blob state sync |
+| /api/supabase-sync | Supabase CRUD |
+| /api/pipeline | AI content pipeline |
+| /api/capture | Nexus extension capture |
+| /api/transcribe | Audio transcription |
+| /api/repos | GitHub repo info |
+| /api/astra-verify | Auth verification |
+| /api/transcripts | Transcript storage |
+| /api/query | Backend query |
 
 ## Structure
 
 ```
 ~/dev/astra-command-center/
-  index.html    # The entire application (120 KB)
-  README.md     # This file
-  .vercel/      # Vercel project config (gitignored)
+  index.html          # The entire frontend (~46,700 lines)
+  api/                # 12 Vercel serverless functions
+  docs/               # Supabase migration SQL
+  logs/               # Session logs, specs, audit reports
+  astra-gate.html     # Auth gate page
+  astra-manual.html   # User manual
+  middleware.js        # Auth middleware
+  package.json        # Node dependencies
+  CLAUDE.md           # Project-specific Claude Code context
+  README.md           # This file
 ```
 
-One file. Everything inside.
+## Design
+
+- Dark theme only — Endel-inspired
+- Base: `#050508`
+- Accent: mint green `#4ade80`
+- Section colors: tasks=green, content=cyan, writer=purple, calendar=yellow
+- Font: system stack (SF Pro / Segoe UI)
 
 ## License
 
