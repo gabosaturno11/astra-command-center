@@ -12,7 +12,7 @@ export default function handler(req, res) {
   return res.status(200).json({
     ok: true,
     service: 'astra-command-center',
-    version: '2.43',
+    version: '2.44',
     timestamp: new Date().toISOString()
   });
 }
