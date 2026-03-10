@@ -501,5 +501,17 @@
     "text": "my current reality please add to astra as document (document hub) and add each task to my task list please /Users/Gabosaturno/Desktop/GABO MARCH 9 — Full Task List + Claude Projects Reality Check.md",
     "timestamp": "2026-03-10T01:59:31.739Z",
     "context": "Added as KB entry kb_gabo_march9_reality_check + 55 tasks injected into ASTRA task list with [M9] prefix. Also added kb_gabo_ecosystem_master_map."
+  },
+  {
+    "id": 82,
+    "text": "lets always keep dev as a mirror in desktop for easy access nothing else!",
+    "timestamp": "2026-03-10T22:36:09.149Z",
+    "context": "Desktop rule established. DEV symlink stays permanent. All .md files deleted (archived to ASTRA logs). Only _ARCHIVE remains until G-DRIVE plugged in."
+  },
+  {
+    "id": 83,
+    "text": "thank you please save that in astra as usual!",
+    "timestamp": "2026-03-10T22:36:09.150Z",
+    "context": "Confirming save of session work to ASTRA logs/messages."
   }
 ]
