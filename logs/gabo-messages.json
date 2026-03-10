@@ -75,7 +75,7 @@
     "id": 13,
     "text": "the gold drives ;)",
     "timestamp": "2026-03-04T03:49:00Z",
-    "context": "G-DRIVE PRO, G-DRIVE USB-C, G-UTILITIES, Main LaCie \u2014 the drives with ALL brand assets."
+    "context": "G-DRIVE PRO, G-DRIVE USB-C, G-UTILITIES, Main LaCie — the drives with ALL brand assets."
   },
   {
     "id": 14,
@@ -189,7 +189,7 @@
     "id": 32,
     "text": "roulette still doesn make a sound",
     "timestamp": "2026-03-04T07:50:00Z",
-    "context": "wheelSfx volume was 0.012/0.015 \u2014 basically silent. Bumped to 0.4/0.5."
+    "context": "wheelSfx volume was 0.012/0.015 — basically silent. Bumped to 0.4/0.5."
   },
   {
     "id": 33,
@@ -199,7 +199,7 @@
   },
   {
     "id": 34,
-    "text": "do not even push until we make sure local version is actually the repo version because whatever is live is working... move to C2, automatic music, automatic music on blog page, move the quote to the big space below hero, sound of roulette, little sound effects on the squares, titan song sounds like 5 seconds, change ASTRA album cover to real covers from the drives (white universe, black universe, full moon \u2014 all on the LaCie). Songs are on the hard drive pushing them to repo wont work thats why we need Supabase.",
+    "text": "do not even push until we make sure local version is actually the repo version because whatever is live is working... move to C2, automatic music, automatic music on blog page, move the quote to the big space below hero, sound of roulette, little sound effects on the squares, titan song sounds like 5 seconds, change ASTRA album cover to real covers from the drives (white universe, black universe, full moon — all on the LaCie). Songs are on the hard drive pushing them to repo wont work thats why we need Supabase.",
     "timestamp": "2026-03-04T07:56:00Z",
     "context": "CRITICAL: Production has hero-quote-block that local repo does NOT have. DO NOT PUSH until HTML mismatch resolved. Full task list for C2 session. Gold drives have album covers + all music files."
   },
@@ -211,7 +211,7 @@
   },
   {
     "id": 36,
-    "text": "this might help: bonus-page-3.0.html, Bonus-page-3.1.html, Bonus-Page-3.2.html \u2014 the raw page (renamed) + architecture reference docs. 6 files total. All in your iCloud transfer folder.",
+    "text": "this might help: bonus-page-3.0.html, Bonus-page-3.1.html, Bonus-Page-3.2.html — the raw page (renamed) + architecture reference docs. 6 files total. All in your iCloud transfer folder.",
     "timestamp": "2026-03-06T06:05:00Z",
     "context": "3 bonus page reference docs in iCloud with architecture breakdowns and 15-section analysis. Useful for C2 bonus iteration."
   },
@@ -265,7 +265,7 @@
   },
   {
     "id": 45,
-    "text": "[Screenshot from C2 Claude] Pipeline returning Unauthorized. C2 diagnosed 3 possibilities: 1) OpenAI key out of credits, 2) Key rotated, 3) ASTRA's own auth blocking before reaching OpenAI. C2 confirmed #3 \u2014 the pipeline calls /api/astra-verify first, ASTRA's middleware rejects before OpenAI is touched.",
+    "text": "[Screenshot from C2 Claude] Pipeline returning Unauthorized. C2 diagnosed 3 possibilities: 1) OpenAI key out of credits, 2) Key rotated, 3) ASTRA's own auth blocking before reaching OpenAI. C2 confirmed #3 — the pipeline calls /api/astra-verify first, ASTRA's middleware rejects before OpenAI is touched.",
     "timestamp": "2026-03-06T07:55:00Z",
     "context": "C2 partially right but middleware actually ALLOWS /api/* through (line 17-19). The real issue: frontend stores ASTRA_ADMIN_PW in localStorage. If never entered via Cmd+S cloud sync prompt, every API call sends empty Bearer token -> 401. Fix: open ASTRA, Cmd+S, enter admin password once. All APIs unlock."
   },
@@ -369,7 +369,7 @@
     "project": "astra-command-center",
     "date": "2026-03-07",
     "type": "rant",
-    "text": "GABO RANT 12:20PM MARCH 7 2026 \u2014 THE VISION. Movement Studio is NOT dead \u2014 it's the Ableton of Movement (drag-and-drop exercises with faders, BPM control, tempo-to-exercise sync, habit volume calculator, AI agents backed by largest movement database). SM App is the main business. Bonus is a gift for the community. Client OS is a real SaaS. ASTRA solves MY problem first (running business solo: IG, reels, TikTok, LinkedIn, emails, campaigns, email marketing, Twitter, YouTube, podcasts, stories, finances). Then sells the framework to creators. Then the system-that-creates-systems for founders. 3-layer SaaS: 1) ASTRA for creators, 2) The framework behind it, 3) The meta-system for founders who build apps. Needs: pipeline synthesizer in ASTRA backend, rant extraction prompt router, prompt storage backend, media player. Blog admin is most important \u2014 needs undo on delete, smaller doc hub cards (like actual documents not big rectangles), HTML organization, bash scripts, Claude scripts (500+), prompts storage. Friday deadline: bonus page PDFs locked, 40+ tools refined, Stripe connected, Supabase wired to bonus. Titan Forge has logs + writer + pipeline synthesizer that should be in ASTRA backend. Content Beast atomizer has only ONE framework of what Gabo really has. DO NOT STOP BUILDING.",
+    "text": "GABO RANT 12:20PM MARCH 7 2026 — THE VISION. Movement Studio is NOT dead — it's the Ableton of Movement (drag-and-drop exercises with faders, BPM control, tempo-to-exercise sync, habit volume calculator, AI agents backed by largest movement database). SM App is the main business. Bonus is a gift for the community. Client OS is a real SaaS. ASTRA solves MY problem first (running business solo: IG, reels, TikTok, LinkedIn, emails, campaigns, email marketing, Twitter, YouTube, podcasts, stories, finances). Then sells the framework to creators. Then the system-that-creates-systems for founders. 3-layer SaaS: 1) ASTRA for creators, 2) The framework behind it, 3) The meta-system for founders who build apps. Needs: pipeline synthesizer in ASTRA backend, rant extraction prompt router, prompt storage backend, media player. Blog admin is most important — needs undo on delete, smaller doc hub cards (like actual documents not big rectangles), HTML organization, bash scripts, Claude scripts (500+), prompts storage. Friday deadline: bonus page PDFs locked, 40+ tools refined, Stripe connected, Supabase wired to bonus. Titan Forge has logs + writer + pipeline synthesizer that should be in ASTRA backend. Content Beast atomizer has only ONE framework of what Gabo really has. DO NOT STOP BUILDING.",
     "context": "Strategic voice rant. Key directives: 1) Fix blog admin (undo, smaller cards), 2) Wire ASTRA Supabase, 3) Movement Studio is a REAL product vision not dead, 4) ASTRA = solve own problem then sell, 5) Pipeline synthesizer belongs in ASTRA, 6) Friday deadline for bonus launch, 7) Keep building autonomously"
   },
   {
@@ -384,14 +384,14 @@
     "project": "ecosystem",
     "date": "2026-03-07",
     "text": "Shared SATURNO_ECOSYSTEM_MAP_MARCH7.html from iCloud. SVG architecture diagram showing all frontends (Client OS, ASTRA, Bonus), APIs (ASTRA API, Content Beast, Vimeo), backend (Supabase pending, Vercel Blob, Brevo), and future (WhatsApp, Whisper, SM App).",
-    "context": "Visual ecosystem map created. Shows the full architecture. Supabase marked as GABO ACTION / PENDING \u2014 but now it's LIVE for Client OS."
+    "context": "Visual ecosystem map created. Shows the full architecture. Supabase marked as GABO ACTION / PENDING — but now it's LIVE for Client OS."
   },
   {
     "id": 63,
     "project": "astra-command-center",
     "date": "2026-03-07",
     "text": "saturno movement command project on astra is what I mean by the back end of the back end. check KB",
-    "context": "Saturno's Command (proj_saturno_command) is the orchestration layer \u2014 prompts, commands, workflows, operational intelligence. ASTRA is the frontend dashboard, Supabase is the database brain, and Saturno's Command is the meta-layer that defines HOW everything operates. Now with Supabase wired, this orchestration layer can persist and sync across machines."
+    "context": "Saturno's Command (proj_saturno_command) is the orchestration layer — prompts, commands, workflows, operational intelligence. ASTRA is the frontend dashboard, Supabase is the database brain, and Saturno's Command is the meta-layer that defines HOW everything operates. Now with Supabase wired, this orchestration layer can persist and sync across machines."
   },
   {
     "id": 64,
@@ -453,5 +453,11 @@
     "text": "lets clean the mess!",
     "timestamp": "2026-03-10T01:31:00Z",
     "context": "Directive to clean up ecosystem mess. Message harvest (57 evergreen items) injected into ASTRA KB. Migration log complete."
+  },
+  {
+    "id": 74,
+    "text": "writting hub on astra is useless hahaha can we make it so i write and link to project?",
+    "timestamp": "2026-03-10T01:35:57.177Z",
+    "context": "Writing Hub needs project linking. Added: project bar below title (shows linked project or click to assign), auto-prompt for project on new doc, renderWriterProjectBar on doc switch."
   }
 ]
