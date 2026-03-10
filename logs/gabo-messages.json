@@ -459,5 +459,17 @@
     "text": "writting hub on astra is useless hahaha can we make it so i write and link to project?",
     "timestamp": "2026-03-10T01:35:57.177Z",
     "context": "Writing Hub needs project linking. Added: project bar below title (shows linked project or click to assign), auto-prompt for project on new doc, renderWriterProjectBar on doc switch."
+  },
+  {
+    "id": 75,
+    "text": "thank you!!! where can we save all these commits when you finish?",
+    "timestamp": "2026-03-10T01:45:51.506Z",
+    "context": "Gabo wants session log saved. Created SESSION_2026-03-10.md in logs/ with all 20 commits, features, decisions, and next steps."
+  },
+  {
+    "id": 76,
+    "text": "yes everything in astra!",
+    "timestamp": "2026-03-10T01:45:51.507Z",
+    "context": "Confirmed: save session log to astra-command-center/logs/"
   }
 ]
