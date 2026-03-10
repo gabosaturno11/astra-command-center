@@ -1,5 +1,5 @@
 # ASTRA COMMAND CENTER — CLAUDE.md
-## Last Updated: March 7, 2026
+## Last Updated: March 10, 2026
 
 ---
 
@@ -52,13 +52,13 @@ C1 completed a FULL ecosystem audit. 15 commits pushed. Everything deployed.
 - #10 Vercel deployment status (partially in Ecosystem Health)
 - ~~#17 KB archive~~ **DONE** (March 7 — archive/unarchive, toggle visibility)
 - ~~#30 Session timer~~ **DONE** (March 7 — dashboard session time + last save)
+- ~~Message harvest + KB injection~~ **DONE** (March 10 — 57 items from 746+ messages, 6 evergreen KB entries)
 - #45 Book project dashboard (import AOC_MANUSCRIPT_TRACKER)
 
 ### GABO ACTION REQUIRED FOR SUPABASE
-1. Run `docs/supabase-migration.sql` in Supabase SQL Editor
-2. Set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY` in Vercel for astra-command-center
-3. Open ASTRA, check green dot in header = Supabase connected
-4. Cmd+K > "Push to Supabase" to seed data
+- [x] Run `docs/supabase-migration.sql` in Supabase SQL Editor (DONE)
+- [x] Set `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY` in Vercel (DONE)
+- [ ] Open ASTRA in browser to trigger first Supabase sync
 
 ---
 
@@ -99,14 +99,14 @@ Supabase migration gives ASTRA real persistent memory.
 
 ---
 
-## CURRENT STATE (March 7, 2026)
+## CURRENT STATE (March 10, 2026)
 
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 8a4caf9 (March 7 — v2.42) |
+| Last commit | 198d33a (March 10 — Messages #71-73) |
 | Manual version | v2.42 |
-| File size | ~4.7 MB, 46,700+ lines |
+| File size | ~4.7 MB |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
 | Auto-backup | Saves snapshot to localStorage every hour |
 | Auto-sync | Blob every 30s, **Supabase every 60s** (debounced) |
@@ -166,6 +166,14 @@ Supabase migration gives ASTRA real persistent memory.
 45. `aa157b7` — Declutter: content card actions (14->4+dropdown), sidebar section dividers
 46. `1cd8a22` — Dashboard: count-up animation for metric cards
 47. `8a4caf9` — Fix: openProjectById was passing index instead of ID
+
+### March 10 Session — 6 Commits
+1. `3ea6f43` — Softzee sanitization (dev name/financial refs removed from KB)
+2. `385e44c` — Cmd+K changed to Shift+Cmd+K
+3. `64a28f9` — Critical syntax fix: missing } in cmdGetItems rant handler (line 10491)
+4. `92cfa03` — Save Gabo messages #65-70
+5. `bb5486f` — Add 6 evergreen KB entries (57 items from 746+ messages)
+6. `198d33a` — Save Gabo messages #71-73
 
 ### New Features Added (v2.42)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
