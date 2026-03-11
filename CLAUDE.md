@@ -104,7 +104,7 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 818e319 (March 11 — Doc Hub templates) |
+| Last commit | 5889901 (March 11 — Pipeline task extraction) |
 | Manual version | v2.47 |
 | File size | ~4.8 MB |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
@@ -175,12 +175,18 @@ Supabase migration gives ASTRA real persistent memory.
 4. `38216fc` — Dashboard: Blueprint Progress tracker with 6-phase visual bars
 
 **Internal Commander (Prompt Vault + Doc Hub + Pipeline flow):**
-5. `2d6a6b3` — CLAUDE.md: March 11 changelog, v2.47 features, accurate March 10 commits
+5. `2d6a6b3` — CLAUDE.md: March 11 changelog, accurate March 10 commits
 6. `0ac9ea4` — Prompt Vault: seed 20 prompts from real vault files + pipeline integration
 7. `1d6033f` — Pipeline <-> Prompt Vault <-> Doc Hub <-> Writer Hub full flow
 8. `aa6163f` — Prompt Vault UX: sorting, usage tracking, safe vault picker
-9. `818e319` — Doc Hub templates: 8 pre-built templates (session log, brief, sprint, etc)
-10. Version bump to v2.47
+9. `818e319` — Doc Hub templates: 8 pre-built templates
+10. `d581228` — Version bump to v2.47
+11. `7766862` — Prompt Vault: bulk import, JSON import/export, markdown export
+12. `11de580` — Doc Hub: version history with restore (keeps last 20 versions)
+13. `18efd4d` — Global search: KB entries + prompts added to search: results
+14. `3525f03` — Writing Hub: "Apply Prompt from Vault" + "Send to Pipeline"
+15. `f6375bd` — Archive: recovered prompt vault files from Google Drive Trash
+16. `5889901` — Pipeline: extract action items to tasks from results
 
 ### March 10 Session — 20+ Commits
 **Early batch (project locking + Writing Hub):**
