@@ -104,8 +104,8 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 38216fc (March 11 — Dashboard blueprint progress) |
-| Manual version | v2.46 |
+| Last commit | 818e319 (March 11 — Doc Hub templates) |
+| Manual version | v2.47 |
 | File size | ~4.8 MB |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
 | Auto-backup | Saves snapshot to localStorage every hour |
@@ -167,11 +167,20 @@ Supabase migration gives ASTRA real persistent memory.
 46. `1cd8a22` — Dashboard: count-up animation for metric cards
 47. `8a4caf9` — Fix: openProjectById was passing index instead of ID
 
-### March 11 Session — 4 Commits (Blueprint Integration)
+### March 11 Session — 10 Commits (Blueprint + Internal Commander)
+**Blueprint integration:**
 1. `5fbd810` — Blueprint north star: add 1437-line rebuild doc to ASTRA KB + repo logs
-2. `0cc1e93` — Ecosystem map on whiteboard (12 nodes, 12 connections) + v2.46
+2. `0cc1e93` — Ecosystem map on whiteboard (12 nodes, 12 connections) + v2.47
 3. `3824399` — Blueprint phase tasks: 12 actionable items from north star doc
 4. `38216fc` — Dashboard: Blueprint Progress tracker with 6-phase visual bars
+
+**Internal Commander (Prompt Vault + Doc Hub + Pipeline flow):**
+5. `2d6a6b3` — CLAUDE.md: March 11 changelog, v2.47 features, accurate March 10 commits
+6. `0ac9ea4` — Prompt Vault: seed 20 prompts from real vault files + pipeline integration
+7. `1d6033f` — Pipeline <-> Prompt Vault <-> Doc Hub <-> Writer Hub full flow
+8. `aa6163f` — Prompt Vault UX: sorting, usage tracking, safe vault picker
+9. `818e319` — Doc Hub templates: 8 pre-built templates (session log, brief, sprint, etc)
+10. Version bump to v2.47
 
 ### March 10 Session — 20+ Commits
 **Early batch (project locking + Writing Hub):**
@@ -210,7 +219,7 @@ Supabase migration gives ASTRA real persistent memory.
 27. `bb5486f` — Add 6 evergreen KB entries (57 items from 746+ messages)
 28. `198d33a` — Save Gabo messages #71-73
 
-### New Features Added (v2.46)
+### New Features Added (v2.47)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
 - **Supabase sync**: Dual-write to Blob AND Supabase on every save
 - **Supabase Realtime**: CDN-loaded client subscribes to 6 tables for live cross-machine sync
@@ -315,7 +324,7 @@ Key KB entries:
 
 ---
 
-## ASTRA FEATURES (v2.46)
+## ASTRA FEATURES (v2.47)
 
 **13 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos, Prompt Vault, Mind Maps
 **Core:** Projects, Shift+Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
@@ -461,7 +470,7 @@ All 22+ sessions from Feb 16 - Mar 4 are documented. Key milestones:
 | Mar 3 | - | C1 cleanup, cloud offload (522GB), transfer docs created |
 | Mar 4 | - | Per-project messages, Bonus 2.0 spec, ASTRA cleanup |
 | Mar 10 | v2.43-2.45 | Project locking, Writing Hub linking, Doc Hub upgrade, Prompt Vault, Mind Maps, 20+ commits |
-| Mar 11 | v2.46 | Blueprint integration: KB entries, whiteboard map, phase tasks, dashboard progress |
+| Mar 11 | v2.47 | Blueprint integration: KB entries, whiteboard map, phase tasks, dashboard progress |
 
 Full session details were in previous CLAUDE.md (1077 lines). Condensed to this.
 If you need session-specific details, check git log for commit messages.
