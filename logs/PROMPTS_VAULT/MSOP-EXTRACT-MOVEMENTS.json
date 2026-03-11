@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "title": "Movement Taxonomy Extraction",
+    "uid": "MSOP-EXTRACT-MOVEMENTS-V1",
+    "version": "1.0",
+    "command": "/MSOP",
+    "tags": ["msop", "extraction", "taxonomy", "movements"],
+    "updated_at": "2025-09-10T00:00:00Z"
+  },
+  "prompt": {
+    "template": "## ROLE\nYou are a data extraction agent tasked with creating a structured taxonomy of physical movements from unstructured text.\n\n## TASK\nFrom the provided source text, perform the following actions:\n1.  **IDENTIFY & EXTRACT**: Isolate all named physical exercises, movement patterns, and mobility assessments.\n2.  **HIERARCHIZE**: Organize the extracted items into a logical, multi-level hierarchy that reflects the structure and categories present in the source text.\n3.  **COMPILE**: Generate a single, comprehensive index from the organized data.\n\n## CONSTRAINTS\n- **Inclusion Criteria**: The output must only contain the names of exercises, movements, and mobility tests.\n- **Exclusion Criteria**: Omit all supplementary content, including but not limited to: philosophical explanations, training cues, authorial commentary, definitions, and analogies.\n- **Data Integrity**: Do not invent categories or movements not explicitly mentioned. The hierarchy must be derived directly from the source.\n- **Deduplication**: If a movement is mentioned multiple times, it should appear only once in the final index within its most logical category.\n\n## OUTPUT FORMAT\n- The final output must be a single document formatted as a Markdown index.\n- Use nested bullet points to represent the hierarchy of movements and their progressions.",
+    "role": "Data Extraction Agent",
+    "task": "Create a structured taxonomy of movements from unstructured text",
+    "constraints": [
+      "Only include exercise/movement/test names",
+      "Exclude all commentary/cues/definitions/analogies",
+      "No invented categories; derive from source",
+      "Deduplicate; place once in most logical category"
+    ],
+    "output_format": "Single Markdown index with nested bullet points"
+  },
+  "observations": {
+    "Structure": "The original prompt's structure is a single imperative paragraph. While logically sequenced (Analyze -> Extract -> Organize -> Exclude), it lacks modularity. The improved prompt introduces a role-based, component-driven structure (ROLE, TASK, CONSTRAINTS, OUTPUT FORMAT). This enhances readability, maintainability, and allows for more precise control over the LLM's operational context.",
+    "Clarity": "The original prompt is clear but contains minor redundancies (e.g., 'focusing solely on creating a structured exercise list' after already defining the exclusion criteria). The improved prompt eliminates this redundancy by using distinct 'Inclusion Criteria' and 'Exclusion Criteria' under a dedicated CONSTRAINTS module, which removes ambiguity and sharpens the instructions.",
+    "Intent": "The original prompt's intent is clear and well-defined. The core task of creating an exercise index is effectively communicated. The improved prompt preserves this intent but frames it within a more professional, agent-based context ('You are a data extraction agent'), which helps the model adopt a more precise operational mode.",
+    "Usability": "The primary weakness of the original prompt is its lack of a specified output format, which could lead to inconsistent results (e.g., plain text list, numbered list, etc.). The improved prompt rectifies this by adding a dedicated OUTPUT FORMAT module that explicitly requires Markdown with nested bullet points. This significantly increases the prompt's precision, reusability, and suitability for production environments where consistent, structured output is critical."
+  }
+}
+

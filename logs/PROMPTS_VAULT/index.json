@@ -1,0 +1,11 @@
+[
+  {
+    "uid": "MSOP-EXTRACT-MOVEMENTS-V1",
+    "command": "/MSOP",
+    "title": "Movement Taxonomy Extraction",
+    "path": "prompts/MSOP-EXTRACT-MOVEMENTS.json",
+    "tags": ["msop", "extraction", "taxonomy", "movements"],
+    "version": "1.0"
+  }
+]
+
