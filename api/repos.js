@@ -27,7 +27,7 @@ const REPO_REGISTRY = [
     role: 'backend-hub',
     description: 'Central hub — backend, KB, pipeline, voice, projects',
     hasApi: true,
-    apiEndpoints: ['/api/capture', '/api/transcribe', '/api/pipeline', '/api/state', '/api/query', '/api/transcripts', '/api/health', '/api/repos'],
+    apiEndpoints: ['/api/capture', '/api/transcribe', '/api/pipeline', '/api/state', '/api/query', '/api/transcripts', '/api/health', '/api/repos', '/api/ingest-ai-response'],
   },
   {
     id: 'saturno-bonus',
