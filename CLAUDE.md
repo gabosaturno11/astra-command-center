@@ -1,5 +1,5 @@
 # ASTRA COMMAND CENTER — CLAUDE.md
-## Last Updated: March 10, 2026
+## Last Updated: March 11, 2026
 
 ---
 
@@ -99,14 +99,14 @@ Supabase migration gives ASTRA real persistent memory.
 
 ---
 
-## CURRENT STATE (March 10, 2026)
+## CURRENT STATE (March 11, 2026)
 
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 198d33a (March 10 — Messages #71-73) |
-| Manual version | v2.42 |
-| File size | ~4.7 MB |
+| Last commit | 38216fc (March 11 — Dashboard blueprint progress) |
+| Manual version | v2.46 |
+| File size | ~4.8 MB |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
 | Auto-backup | Saves snapshot to localStorage every hour |
 | Auto-sync | Blob every 30s, **Supabase every 60s** (debounced) |
@@ -167,15 +167,50 @@ Supabase migration gives ASTRA real persistent memory.
 46. `1cd8a22` — Dashboard: count-up animation for metric cards
 47. `8a4caf9` — Fix: openProjectById was passing index instead of ID
 
-### March 10 Session — 6 Commits
-1. `3ea6f43` — Softzee sanitization (dev name/financial refs removed from KB)
-2. `385e44c` — Cmd+K changed to Shift+Cmd+K
-3. `64a28f9` — Critical syntax fix: missing } in cmdGetItems rant handler (line 10491)
-4. `92cfa03` — Save Gabo messages #65-70
-5. `bb5486f` — Add 6 evergreen KB entries (57 items from 746+ messages)
-6. `198d33a` — Save Gabo messages #71-73
+### March 11 Session — 4 Commits (Blueprint Integration)
+1. `5fbd810` — Blueprint north star: add 1437-line rebuild doc to ASTRA KB + repo logs
+2. `0cc1e93` — Ecosystem map on whiteboard (12 nodes, 12 connections) + v2.46
+3. `3824399` — Blueprint phase tasks: 12 actionable items from north star doc
+4. `38216fc` — Dashboard: Blueprint Progress tracker with 6-phase visual bars
 
-### New Features Added (v2.42)
+### March 10 Session — 20+ Commits
+**Early batch (project locking + Writing Hub):**
+1. `392b611` — Project locking: PIN-protect sensitive projects
+2. `2ba6f49` — Writing Hub: project bar, auto-assign on new doc
+3. `a3b1013` — Writing Hub: focus mode, write from project context, Cmd+K commands
+4. `7867bb4` — Writer tab in project panel, Write quick action on dashboard
+5. `ad28a2e` — Version bump to v2.44
+
+**Mid batch (Doc Hub + Prompt Vault + Mind Maps):**
+6. `e02cb85` — Dashboard: recent documents section
+7. `91ed6bb` — Fix Client OS URL, add Content Beast to health check, v2.43
+8. `ede827f` — Doc Hub: New entry button, Cmd+K commands
+9. `914cab2` — Fix markdown rendering for escaped newlines in KB
+10. `8387cf5` — Update CLAUDE.md: March 10 session state
+11. `6ca7228` — Compact Doc Hub cards, full-text KB search, rotating backups
+12. `52e974f` — Doc Hub reality check + 55 tasks + Ecosystem Master Map KB
+13. `08d4632` — Storage audit + archive 6 Desktop docs to ASTRA logs
+14. `c321806` — Storage audit deep findings: 239GB in Google Drive Trash
+15. `217159b` — Prompt Vault: new section for storing AI prompts by category
+16. `2c7ed2f` — Prompt Vault: Cmd+K commands + breadcrumb count
+17. `3cb35bf` — Mind Maps: upgrade from single to multiple maps with persistence
+18. `f593c9e` — v2.45: Content types (Notes + Ideas tabs)
+19. `9303166` — Fix sidebar double-click and breadcrumb menu bugs
+20. `8556833` — Doc Hub upgrade: folders, file types, sorting, Google Drive-style navigation
+
+**Late batch (messages + Whisper harvest):**
+21. `c71129b` — Save messages #88-93 + ecosystem map to repo
+22. `9bdb3c2` — Whisper Flow harvest: 6 months of voice transcriptions
+
+**Earlier (first 6 of the day):**
+23. `3ea6f43` — Softzee sanitization (dev name/financial refs removed from KB)
+24. `385e44c` — Cmd+K changed to Shift+Cmd+K
+25. `64a28f9` — Critical syntax fix: missing } in cmdGetItems rant handler
+26. `92cfa03` — Save Gabo messages #65-70
+27. `bb5486f` — Add 6 evergreen KB entries (57 items from 746+ messages)
+28. `198d33a` — Save Gabo messages #71-73
+
+### New Features Added (v2.46)
 - **Dashboard**: Overview section (Cmd+0) with 4 metric cards, urgent tasks, recent activity, project grid, quick actions, system status
 - **Supabase sync**: Dual-write to Blob AND Supabase on every save
 - **Supabase Realtime**: CDN-loaded client subscribes to 6 tables for live cross-machine sync
@@ -222,6 +257,21 @@ Supabase migration gives ASTRA real persistent memory.
 - **Sidebar section dividers**: Subtle dividers group sections into logical groups (Core/Organize/Reference/Create)
 - **Dashboard count-up**: Metric numbers animate counting up when dashboard renders
 - **Bugfix**: openProjectById was passing index instead of project ID — dashboard project cards now open correctly
+- **Project locking**: PIN-protect sensitive projects, locked items filtered from all views
+- **Writing Hub project bar**: Colored dot + project name, auto-assign prompt for new docs
+- **Focus mode**: Hide sidebar/toolbar/header for distraction-free writing, Esc to exit
+- **Write from project context**: "Write" button in project Context tab creates linked doc
+- **Writer tab in projects**: See all docs for a project with word count and preview
+- **Cmd+K commands**: "New Document", "Focus Mode" available from anywhere
+- **Dashboard recent docs**: Clickable recent documents section
+- **Doc Hub upgrade**: Folders, file types (md/txt/json), sorting, import, Google Drive-style navigation
+- **Prompt Vault**: New section for storing AI prompts by category with Cmd+K commands
+- **Mind Maps**: Upgrade from single to multiple maps with persistence
+- **Content types**: Notes + Ideas tabs in Content Vault
+- **Blueprint KB entries**: North star doc (1437 lines) + execution tracker in KB
+- **Ecosystem whiteboard map**: 12 nodes (Supabase, SM App, ASTRA, Bonus, etc.) with 12 connections
+- **Blueprint phase tasks**: 12 actionable tasks tagged with blueprint-phase
+- **Dashboard blueprint progress**: 6-phase visual progress bars (P1-P6) with completion tracking
 
 ### Vercel Env Vars (ALL SET — verified March 6 audit)
 
@@ -265,12 +315,12 @@ Key KB entries:
 
 ---
 
-## ASTRA FEATURES (v2.40)
+## ASTRA FEATURES (v2.46)
 
-**11 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos
-**Core:** Projects, Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
-**New (March 7):** Dashboard (Cmd+0), Brain Dump (rants), Voice Modes + Faders, Supabase sync + Realtime, Capture Inbox, Ecosystem Health, Notification History, decluttered toolbars, export versioning
-**Sessions:** 24+ documented sessions (Feb 16 - Mar 7)
+**13 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos, Prompt Vault, Mind Maps
+**Core:** Projects, Shift+Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
+**New (March 10-11):** Project locking, Writing Hub project linking + focus mode, Doc Hub folders + Google Drive nav, Prompt Vault, Mind Maps (multiple), Content types (Notes/Ideas), Blueprint integration (KB + whiteboard + tasks + dashboard progress)
+**Sessions:** 26+ documented sessions (Feb 16 - Mar 11)
 
 ---
 
@@ -410,6 +460,8 @@ All 22+ sessions from Feb 16 - Mar 4 are documented. Key milestones:
 | Mar 1-2 | - | Vercel outage, middleware removed/restored, auth lockout, data loss |
 | Mar 3 | - | C1 cleanup, cloud offload (522GB), transfer docs created |
 | Mar 4 | - | Per-project messages, Bonus 2.0 spec, ASTRA cleanup |
+| Mar 10 | v2.43-2.45 | Project locking, Writing Hub linking, Doc Hub upgrade, Prompt Vault, Mind Maps, 20+ commits |
+| Mar 11 | v2.46 | Blueprint integration: KB entries, whiteboard map, phase tasks, dashboard progress |
 
 Full session details were in previous CLAUDE.md (1077 lines). Condensed to this.
 If you need session-specific details, check git log for commit messages.
