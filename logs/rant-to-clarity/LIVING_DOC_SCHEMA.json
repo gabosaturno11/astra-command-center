@@ -1,0 +1,87 @@
+{
+  "meta": {
+    "document_id": "GABO_2026_MANIFESTO_LIVING_DOC",
+    "version": "0.1-seed",
+    "status": "living",
+    "author": "human",
+    "purpose": "Cross-LLM identity synthesis + doctrine extraction",
+    "update_rule": "append_only_until_fusion",
+    "mutation_policy": "NO_OVERWRITE_ONLY_APPEND"
+  },
+  "index": {
+    "identity_core": [],
+    "insights": [],
+    "roasts": [],
+    "behavioral_patterns": [],
+    "failure_events": [],
+    "values_words": [],
+    "kernel_rules": [],
+    "vector_maps": [],
+    "poems": [],
+    "captions": [],
+    "mantras": [],
+    "kernel_exports": []
+  },
+  "llm_runs": [
+    {
+      "_template": true,
+      "_note": "This is a template entry. Each real run replaces _template with actual data.",
+      "run_id": "RUN_001",
+      "llm": "OPENAI|CLAUDE|GEMINI|PERPLEXITY|MANUS",
+      "llm_color": "white|yellow_orange|black|blue|red",
+      "thread_id": "conversation_id_or_project_name",
+      "timestamp": "ISO_DATE",
+      "full_response": {
+        "top_insights": [],
+        "top_roasts": [],
+        "behavioral_patterns": [],
+        "failure_events": [],
+        "identity_words": [],
+        "kernel_rules": [],
+        "vector_map": {
+          "nodes": [],
+          "edges": []
+        },
+        "poems": [],
+        "captions": [],
+        "mantra": ""
+      },
+      "skeleton_export": {
+        "insights": 0,
+        "roasts": 0,
+        "behavioral_patterns": 0,
+        "failure_events": 0,
+        "identity_words": 0,
+        "kernel_rules": 0,
+        "vector_map_nodes": 0,
+        "vector_map_edges": 0,
+        "poems": 0,
+        "captions": 0,
+        "mantra": ""
+      },
+      "append_status": "SUCCESS|FAILED|PENDING"
+    }
+  ],
+  "fusion_output": {
+    "_note": "This section is populated AFTER all LLM runs are complete and fusion prompt is executed.",
+    "status": "PENDING",
+    "deduped_insights": [],
+    "deduped_roasts": [],
+    "deduped_patterns": [],
+    "deduped_kernel_rules": [],
+    "deduped_identity_words": [],
+    "unified_vector_map": {
+      "nodes": [],
+      "edges": []
+    },
+    "final_doctrine": [],
+    "final_constraints": [],
+    "execution_filters": [],
+    "next_year_kernel": ""
+  },
+  "protocol_reference": {
+    "iconic_year_skeleton_id": "ICONIC_YEAR_SKELETON_V1",
+    "mcp_router_id": "MCP_ROUTER_PROMPT_V1",
+    "titan_meta_kernel_id": "SATURNO_INFINITY_TITAN_META_KERNEL_V1_2"
+  }
+}

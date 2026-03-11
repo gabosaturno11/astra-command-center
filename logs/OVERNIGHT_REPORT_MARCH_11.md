@@ -1,0 +1,115 @@
+# Overnight Report — March 11-12, 2026
+## Claude Code Autonomous Session
+
+---
+
+## COMPLETED
+
+### 1. AI Inbox (ASTRA v2.48)
+- `/api/ingest-ai-response.js` — universal AI ingest endpoint (POST/GET/DELETE)
+- Full frontend section with source/status filters, Cmd+K, dashboard, search
+- Commit: `638e1eb` on astra-command-center (pushed, deployed)
+
+### 2. WhatsApp -> ASTRA Bridge (Client OS)
+- Voice memo transcriptions auto-forward to ASTRA AI Inbox
+- Commit: `ff7eaec` on client-os (pushed, deployed)
+- BLOCKER: Gabo must set 5 env vars (see ~/Desktop/WHATSAPP_SETUP_GUIDE.md)
+
+### 3. Rant-to-Clarity System Organized
+- Read `~/Desktop/THE-MASTER-CLAUDE-PROJECT/` (7 files, 4-layer meta-system)
+- All files copied to `~/dev/astra-command-center/logs/rant-to-clarity/`
+- Created `RUN_TOMORROW.md` with 5-step execution plan
+- Maps to existing tools: WhatsApp=Harvest, Prompt Vault=Router, Content Beast=Compiler, Doc Hub=Living Doc
+
+### 4. BB_EDITS Analysis (7 files scanned)
+- Canonical master: `00_AI_HUB/BB_EDITS.md` (964 lines)
+- Contains: 40 music tracks, 254 Gabo message phases, ASTRA KB harvest, tool classifications
+- 3 unique files (#2 Promo Upgrades, #4 Handoff Feb6, #6 Audit March4, #7 Session March1)
+- 2 duplicate subsets (#3 Master Control = subset of #1, #5 Bonus Master = condensed #4)
+- Actionable items for ASTRA migration:
+  - Prompt Vault: Wake Up Wired Protocol (5-agent chain), 3-Monster Architecture, 4 agent definitions
+  - Doc Hub: Frameworks system (linguistic-console, collision-matrix, persuasion-system), BONUS_VAULT_ITEMS schema, 4-state emotional arc
+
+### 5. iCloud Drive Manifest (190GB mapped)
+- _PRIVATE: 42GB (personal video/WhatsApp — irreplaceable)
+- ICLOUD_C1_03.03.2026: 147GB (AI Hub 25GB, Content Production 33GB, Archive 40GB, Backup Feb7 41GB, Saturno Movement 7GB)
+- ASTRA_INTERNAL_TRANSFER: 2.7MB (handoff docs)
+- Desktop: 4.3MB (scripts, screenshots)
+- Biggest single items: 17GB Whisper file, 38GB MOV videos, 38GB MacBook backup
+
+### 6. OneDrive Analysis (241 items mapped)
+- 232 folders + 9 loose files
+- Instagram/Meta exports: 76 items (32%) — UNIQUE, only in OneDrive
+- Google Takeout: 8 archives — UNIQUE
+- Book/AOC content: 26 items — HIGH overlap with Google Drive/iCloud
+- AI/LLM content: 20 items — HIGH overlap
+- Estimated duplicates: ~50-55 items (23%)
+- ALL CLOUD-ONLY: Cannot rsync — need OneDrive app to download first
+- High-value unique items: Instagram DM history, Google Takeout, DEV_REPOS_BACKUP_C2, Manus deliverables, Evernote export
+
+---
+
+## RUNNING OVERNIGHT
+
+### iCloud Photos Export
+- Tool: osxphotos (in /tmp/osxphotos-env/)
+- Progress: 116/20,779 items (0.6%)
+- Destination: /Volumes/G-DRIVE PRO/08_BACKUP_MARCH_2026/iCloud_Photos/
+- Speed: Slow — downloading cloud-only originals from Apple servers
+- ETA: At ~5 items/hour for videos, this will take days. Will speed up when it hits photos (smaller files).
+- Check: `tail -5 "/Volumes/G-DRIVE PRO/08_BACKUP_MARCH_2026/icloud_export.log"`
+
+### iCloud Drive Backup
+- rsync completed but only 2.4GB copied (most files are iCloud-evicted cloud-only stubs)
+- Need to force-download files first via Finder or `brctl download` commands
+- Alternative: Use iCloud web interface to download
+
+### Mac Caffeinated
+- PID 47606 (`caffeinate -dis`)
+- Will prevent sleep during Photos export
+
+---
+
+## NOT STARTED / BLOCKED
+
+### OneDrive Backup
+- 241 folders, ALL cloud-only (64-byte stubs)
+- Cannot copy via CLI — need OneDrive app set to "Always Keep on This Device"
+- Or download via OneDrive web interface
+- Priority unique items: Instagram exports (76), Google Takeout (8), DEV_REPOS_BACKUP_C2
+
+### iCloud Drive Full Download
+- rsync only got locally-cached files (2.4GB of 190GB)
+- Options to get the rest:
+  1. Open folders in Finder (triggers iCloud download)
+  2. Use `brctl download` for individual files
+  3. Enable "Download Originals" in System Settings > iCloud > iCloud Drive
+  4. Use iCloud web (tedious for 190GB)
+- Recommended: Enable "Download Originals" in iCloud settings, wait for sync, then rsync again
+
+### Duplicate Elimination
+- Cross-reference analysis done (OneDrive agent report)
+- Cannot execute until OneDrive files are downloaded
+- Book/AOC content has highest duplication (5+ copies across drives)
+
+---
+
+## GABO ACTION ITEMS (when you wake)
+
+### Immediate (5 min each)
+1. Check Photos export: `tail -5 "/Volumes/G-DRIVE PRO/08_BACKUP_MARCH_2026/icloud_export.log"`
+2. Load Rant-to-Clarity prompts into ASTRA Prompt Vault (see `logs/rant-to-clarity/RUN_TOMORROW.md`)
+
+### Short (15 min each)
+3. Set WhatsApp env vars in Vercel (see ~/Desktop/WHATSAPP_SETUP_GUIDE.md)
+4. Enable iCloud Drive "Download Originals" in System Settings > Apple ID > iCloud > iCloud Drive
+5. Open OneDrive app > Settings > "Always Keep on This Device" for Documents folder
+
+### Strategic
+6. Set BREVO_API_KEY + BREVO_LIST_ID for saturno-bonus
+7. Switch Stripe from test to live keys
+8. Get .jks keystore from Softzee
+
+---
+
+*Generated by Claude Code overnight session. Mac caffeinated, Photos exporting.*

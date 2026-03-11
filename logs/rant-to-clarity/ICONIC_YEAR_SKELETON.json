@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "id": "ICONIC_YEAR_SKELETON_V1",
+    "label": "End-of-Year Identity Synthesis Skeleton",
+    "role": "Reusable Public Framework (OpenAI / Claude Compatible)",
+    "intent": "Extract signal, not sentiment. Behaviors > stories.",
+    "color": "#64748B"
+  },
+  "framework_overview": {
+    "description": "A neutral, reusable skeleton to turn a chaotic year into identity signal, doctrine, and forward constraints.",
+    "design_principles": [
+      "Behavioral truth over emotional labeling",
+      "Extraction before interpretation",
+      "Finish > explain",
+      "Portable across models and years"
+    ]
+  },
+  "sections": [
+    {
+      "id": "S1_INSIGHTS",
+      "title": "Top N Insights",
+      "definition": "Things that became true through repetition, not theory.",
+      "prompt_hint": "What did reality force you to accept this year?"
+    },
+    {
+      "id": "S2_ROASTS",
+      "title": "Top N Roasts",
+      "definition": "Observed contradictions between intention and behavior.",
+      "prompt_hint": "Where did your actions quietly expose you?"
+    },
+    {
+      "id": "S3_BEHAVIORAL_PATTERNS",
+      "title": "Top N Maladaptive Behaviors (formerly 'Fears')",
+      "definition": "Avoidance, overuse, or compensatory behaviors that shaped outcomes.",
+      "prompt_hint": "What patterns cost you energy, clarity, or time?"
+    },
+    {
+      "id": "S4_FAILURE_EVENTS",
+      "title": "Major System Stress Events",
+      "definition": "Moments where systems, relationships, or identity cracked.",
+      "prompt_hint": "What events forced re-architecture?"
+    },
+    {
+      "id": "S5_IDENTITY_WORDS",
+      "title": "Single-Word Identity & Values",
+      "definition": "Words that survived pressure and guided decisions.",
+      "prompt_hint": "Which words still feel true after the year?"
+    },
+    {
+      "id": "S6_CREATIONS",
+      "title": "Top Creations / Artifacts",
+      "definition": "Things you actually built, shipped, or formalized.",
+      "prompt_hint": "What exists now that didn't before?"
+    },
+    {
+      "id": "S7_BLIND_SPOT",
+      "title": "One Non-Obvious Pattern",
+      "definition": "A meta-observation you wouldn't have seen alone.",
+      "prompt_hint": "What pattern explains many others?"
+    },
+    {
+      "id": "S8_PRACTICES",
+      "title": "Practices Worth Religious Consistency",
+      "definition": "Skills or behaviors that compound disproportionately.",
+      "prompt_hint": "What deserves daily, boring repetition?"
+    },
+    {
+      "id": "S9_KERNEL_RULE",
+      "title": "One Rule to Carry Forward",
+      "definition": "A constraint that should govern future decisions.",
+      "prompt_hint": "What rule would have prevented most damage?"
+    },
+    {
+      "id": "S10_LAST_DAY_MOVES",
+      "title": "Last-24-Hours Decisions",
+      "definition": "Actions under extreme constraint reveal true leverage.",
+      "prompt_hint": "If time collapsed, what still matters?"
+    },
+    {
+      "id": "S11_DEFINITION",
+      "title": "Identity Compression Paragraph",
+      "definition": "A name-less, role-less description of who emerged.",
+      "prompt_hint": "Describe the pattern, not the persona."
+    }
+  ],
+  "outputs": [
+    "Identity Doctrine",
+    "Behavioral Constraints",
+    "Execution Filters",
+    "Next-Year Entry Rules"
+  ]
+}
