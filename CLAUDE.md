@@ -104,8 +104,8 @@ Supabase migration gives ASTRA real persistent memory.
 | Aspect | Status |
 |--------|--------|
 | Branch | main, up to date with origin |
-| Last commit | 5889901 (March 11 — Pipeline task extraction) |
-| Manual version | v2.47 |
+| Last commit | 638e1eb (March 11 — AI Inbox endpoint + frontend) |
+| Manual version | v2.48 |
 | File size | ~4.8 MB |
 | Storage | localStorage + Vercel Blob + **Supabase** (triple sync + **Realtime**) |
 | Auto-backup | Saves snapshot to localStorage every hour |
@@ -167,7 +167,7 @@ Supabase migration gives ASTRA real persistent memory.
 46. `1cd8a22` — Dashboard: count-up animation for metric cards
 47. `8a4caf9` — Fix: openProjectById was passing index instead of ID
 
-### March 11 Session — 10 Commits (Blueprint + Internal Commander)
+### March 11 Session — 20 Commits (Blueprint + Internal Commander + AI Inbox)
 **Blueprint integration:**
 1. `5fbd810` — Blueprint north star: add 1437-line rebuild doc to ASTRA KB + repo logs
 2. `0cc1e93` — Ecosystem map on whiteboard (12 nodes, 12 connections) + v2.47
@@ -187,6 +187,16 @@ Supabase migration gives ASTRA real persistent memory.
 14. `3525f03` — Writing Hub: "Apply Prompt from Vault" + "Send to Pipeline"
 15. `f6375bd` — Archive: recovered prompt vault files from Google Drive Trash
 16. `5889901` — Pipeline: extract action items to tasks from results
+
+**AI Inbox + Ecosystem Integration (late session):**
+17. `64df41d` — Save Gabo message #94: tonight battle plan
+18. `c599a1b` — Update CLAUDE.md with full 16-commit March 11 session
+19. `638e1eb` — AI Inbox: universal /api/ingest-ai-response endpoint + 14th sidebar section
+    - POST: receive AI outputs from any LLM (Perplexity, ChatGPT, Gemini, Claude, Whisper)
+    - GET: retrieve with source/status/space filters
+    - Frontend: sidebar section, source/status filters, view modal with actions
+    - Dashboard quick action, system status row, Cmd+K commands, global search
+    - Ecosystem Health: 12th endpoint added
 
 ### March 10 Session — 20+ Commits
 **Early batch (project locking + Writing Hub):**
@@ -332,7 +342,7 @@ Key KB entries:
 
 ## ASTRA FEATURES (v2.47)
 
-**13 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos, Prompt Vault, Mind Maps
+**14 Sections:** Dashboard, Content Vault, Tasks, Calendar, Writing Hub, Living Docs, Links, Doc Hub, Whiteboard, Pipeline, Repos, Prompt Vault, AI Inbox, Mind Maps
 **Core:** Projects, Shift+Cmd+K (200+ commands), kanban, voice input, wiki-links, knowledge graph, focus timer, keyboard shortcuts, export/import, ICS calendar, PWA
 **New (March 10-11):** Project locking, Writing Hub project linking + focus mode, Doc Hub folders + Google Drive nav, Prompt Vault, Mind Maps (multiple), Content types (Notes/Ideas), Blueprint integration (KB + whiteboard + tasks + dashboard progress)
 **Sessions:** 26+ documented sessions (Feb 16 - Mar 11)
@@ -354,6 +364,7 @@ Key KB entries:
 | /api/state | State sync (Vercel Blob) | Token |
 | /api/supabase-sync | Supabase CRUD (GET/POST/DELETE) | Bearer |
 | /api/config | Public config (Supabase URL, capability flags) | None |
+| /api/ingest-ai-response | Universal AI inbox (any LLM -> ASTRA) | Bearer/Cookie |
 
 ---
 
