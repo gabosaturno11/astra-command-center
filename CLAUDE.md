@@ -411,15 +411,14 @@ Full plan documented at:
 
 ---
 
-## C1/C2 DISTINCTION (CRITICAL)
+## C1/C2 DISTINCTION
 
 | Code | Machine | Username | Role |
 |------|---------|----------|------|
-| C1 | iMac | Gabosaturno (CAPITAL G) | Planning, chat, Max 20x context |
-| C2 | MacBook Pro | gabosaturno (lowercase g) | Execution, deploys, backend work |
+| C1 | iMac | Gabosaturno (CAPITAL G) | Primary — code, pushes, deploys, planning |
+| C2 | MacBook Pro | gabosaturno (lowercase g) | Secondary — can also push |
 
-C1 session is CLOSED for code pushes. C2 does all deployments.
-C1 (this machine) is for planning and context building with Max 20x.
+C1 pushes to all repos. The old rule ("C1 is planning only") was wrong — confirmed March 13.
 
 ---
 
@@ -453,7 +452,7 @@ C1 (this machine) is for planning and context building with Max 20x.
 5. Save ASTRA-related Gabo messages to THIS repo's logs/gabo-messages.json
 6. Save bonus-related messages to saturno-bonus/logs/gabo-messages.json
 7. UPDATE this file before session ends with honest state
-8. NEVER push from C1 (planning only). C2 pushes.
+8. Push from C1 (iMac) directly — C1 is the primary machine for all work.
 
 ---
 
