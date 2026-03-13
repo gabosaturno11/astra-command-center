@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RANT HARVESTER — ASTRA</title>
+<style>
+  :root {
+    --bg: #050508;
+    --bg-base: #0a0a0f;
+    --bg-elevated: #0f0f18;
+    --bg-surface: #141420;
+    --accent: #4ade80;
+    --accent-dim: rgba(74,222,128,0.15);
+    --accent-border: rgba(74,222,128,0.3);
+    --text: #e4e4e7;
+    --text-dim: #71717a;
+    --text-muted: #3f3f46;
+    --border: #1c1c27;
+    --border-bright: #2a2a3a;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --cyan: #38bdf8;
+    --purple: #a78bfa;
+    --orange: #fb923c;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 13px; }
+
+  /* HEADER */
+  .hdr {
+    height: 48px;
+    background: var(--bg-base);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .hdr-left { display: flex; align-items: center; gap: 16px; }
+  .hdr-back {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .hdr-back:hover { color: var(--accent); border-color: var(--accent-border); }
+  .hdr-title { font-size: 11px; letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; }
+  .hdr-right { display: flex; align-items: center; gap: 10px; }
+  .hdr-status { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    height: calc(100vh - 48px);
+    overflow: hidden;
+    transition: grid-template-columns 0.2s;
+  }
+  .layout.sidebar-collapsed { grid-template-columns: 1fr 0px; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .sidebar { border-left: none; border-top: 1px solid var(--border); max-height: 45vh; }
+  }
+
+  /* MAIN */
+  .main { overflow-y: auto; padding: 28px 28px 60px; display: flex; flex-direction: column; gap: 20px; }
+
+  /* RECORD PANEL */
+  .record-panel {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+  .record-panel-title {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .record-center { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .mic-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 2px solid var(--border-bright);
+    background: var(--bg-elevated);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .mic-btn:hover { border-color: var(--accent); }
+  .mic-btn.recording {
+    border-color: var(--red);
+    background: rgba(248,113,113,0.1);
+    animation: pulse-red 1.5s infinite;
+  }
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,0.4); }
+    50% { box-shadow: 0 0 0 12px rgba(248,113,113,0); }
+  }
+  .mic-btn svg { transition: all 0.2s; }
+  .mic-btn.recording svg { color: var(--red); }
+  .record-timer { font-size: 24px; letter-spacing: 0.1em; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .record-timer.active { color: var(--red); }
+  .record-hint { font-size: 11px; color: var(--text-muted); text-align: center; }
+
+  /* TRANSCRIPT */
+  .transcript-panel {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-label { font-size: 10px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; }
+  .panel-actions { display: flex; gap: 8px; }
+  .btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border: 1px solid var(--border-bright);
+    background: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 3px;
+  }
+  .btn:hover { color: var(--text); border-color: var(--text-muted); }
+  .btn.accent { border-color: var(--accent-border); color: var(--accent); }
+  .btn.accent:hover { background: var(--accent-dim); }
+  .btn.danger { border-color: rgba(248,113,113,0.3); color: var(--red); }
+  .btn.danger:hover { background: rgba(248,113,113,0.1); }
+  .transcript-area {
+    width: 100%;
+    min-height: 120px;
+    max-height: 200px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 16px;
+    resize: vertical;
+    outline: none;
+  }
+  .transcript-area::placeholder { color: var(--text-muted); }
+
+  /* HARVEST BTN */
+  .harvest-row { display: flex; gap: 12px; align-items: center; }
+  .harvest-btn {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 10px 24px;
+    border: 1px solid var(--accent-border);
+    background: var(--accent-dim);
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 4px;
+    flex: 1;
+  }
+  .harvest-btn:hover:not(:disabled) { background: rgba(74,222,128,0.25); border-color: var(--accent); }
+  .harvest-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .harvest-source {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 10px;
+    border-radius: 4px;
+    outline: none;
+  }
+  .harvest-source option { background: var(--bg-elevated); }
+
+  /* STATUS BAR */
+  .status-bar {
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .status-dot.green { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .status-dot.yellow { background: var(--yellow); }
+  .status-dot.red { background: var(--red); }
+  .status-dot.pulse { animation: blink 1s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* HARVEST RESULTS */
+  .results-grid { display: flex; flex-direction: column; gap: 12px; }
+  .category-card {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .category-card.hidden { display: none; }
+  .category-header {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .category-header:hover { background: var(--bg-elevated); }
+  .cat-label { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; }
+  .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cat-count { font-size: 10px; color: var(--text-muted); }
+  .category-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .cat-item {
+    padding: 8px 10px;
+    background: var(--bg-elevated);
+    border-left: 2px solid var(--border-bright);
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 0 4px 4px 0;
+    position: relative;
+  }
+  .cat-item-meta { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+  .cat-item-tag {
+    display: inline-block;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 1px 5px;
+    border-radius: 2px;
+    margin-right: 4px;
+    text-transform: uppercase;
+  }
+  .route-btn {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border: 1px solid var(--border-bright);
+    background: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 2px;
+    float: right;
+    margin-left: 8px;
+    margin-top: 2px;
+  }
+  .route-btn:hover { color: var(--accent); border-color: var(--accent-border); }
+  .route-btn.routed { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); cursor: default; }
+
+  /* COPY PANEL */
+  .copy-panel {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .copy-panel-title { font-size: 10px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px; }
+  .copy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .copy-btn-llm {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 8px 12px;
+    border: 1px solid var(--border-bright);
+    background: var(--bg-elevated);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .copy-btn-llm:hover { color: var(--text); border-color: var(--text-muted); }
+  .copy-btn-llm.copied { color: var(--accent); border-color: var(--accent-border); background: var(--accent-dim); }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-left: 1px solid var(--border);
+    background: var(--bg-base);
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s;
+    min-width: 0;
+  }
+  .layout.sidebar-collapsed .sidebar { border-left: none; }
+  .layout.sidebar-collapsed .sidebar > * { opacity: 0; pointer-events: none; }
+  .sidebar-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-bright);
+    background: var(--bg-elevated);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 50;
+    transition: all 0.15s;
+  }
+  .sidebar-toggle:hover { border-color: var(--accent-border); color: var(--accent); }
+  .sidebar-section {
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+  }
+  .sidebar-label { font-size: 10px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
+  .sidebar-summary { font-size: 12px; line-height: 1.6; color: var(--text-dim); }
+  .sidebar-meta { display: flex; flex-direction: column; gap: 6px; }
+  .meta-row { display: flex; justify-content: space-between; font-size: 11px; }
+  .meta-key { color: var(--text-muted); }
+  .meta-val { color: var(--text-dim); }
+  .routing-items { display: flex; flex-direction: column; gap: 6px; }
+  .routing-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    padding: 6px 8px;
+    background: var(--bg-elevated);
+    border-radius: 4px;
+  }
+  .routing-item-label { color: var(--text-dim); }
+  .routing-item-count { color: var(--accent); font-size: 12px; font-weight: 700; }
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-item {
+    padding: 8px 10px;
+    background: var(--bg-elevated);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .history-item:hover { border-color: var(--border-bright); }
+  .history-item.active { border-color: var(--accent-border); background: var(--accent-dim); }
+  .history-date { font-size: 10px; color: var(--text-muted); margin-bottom: 2px; }
+  .history-theme { font-size: 11px; color: var(--text-dim); }
+  .history-stats { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+  }
+  .empty-state svg { opacity: 0.3; }
+
+  /* ROUTE ALL BTN */
+  .route-all-row { display: flex; gap: 8px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-bright);
+    padding: 8px 16px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border-radius: 4px;
+    transition: transform 0.25s;
+    z-index: 1000;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--accent-border); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <button class="hdr-back" onclick="goBack()">← ASTRA</button>
+    <span class="hdr-title">RANT HARVESTER</span>
+  </div>
+  <div class="hdr-right">
+    <span class="hdr-status" id="hdr-status">READY</span>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- MAIN COLUMN -->
+  <div class="main">
+
+    <!-- RECORD -->
+    <div class="record-panel">
+      <div class="record-panel-title">Voice Input</div>
+      <div class="record-center">
+        <button class="mic-btn" id="mic-btn" onclick="toggleRecord()" title="Record voice memo">
+          <svg id="mic-icon" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+          </svg>
+        </button>
+        <div class="record-timer" id="record-timer">0:00</div>
+        <div class="record-hint" id="record-hint">Tap to record · or paste transcript below</div>
+      </div>
+    </div>
+
+    <!-- TRANSCRIPT -->
+    <div class="transcript-panel">
+      <div class="panel-header">
+        <span class="panel-label">Transcript</span>
+        <div class="panel-actions">
+          <button class="btn" onclick="clearTranscript()">Clear</button>
+          <button class="btn" onclick="pasteFromClipboard()">Paste</button>
+        </div>
+      </div>
+      <textarea class="transcript-area" id="transcript" placeholder="Your rant lands here after recording — or paste it directly...&#10;&#10;Voice memo · Whisper Flow output · ChatGPT dump · stream of consciousness · anything."></textarea>
+    </div>
+
+    <!-- HARVEST -->
+    <div class="harvest-row">
+      <select class="harvest-source" id="harvest-source">
+        <option value="voice_memo">Voice Memo</option>
+        <option value="whisperflow">WhisperFlow</option>
+        <option value="chatgpt_dump">ChatGPT Dump</option>
+        <option value="transcript">Transcript</option>
+        <option value="text">Direct Text</option>
+      </select>
+      <button class="harvest-btn" id="harvest-btn" onclick="runHarvest()">HARVEST RANT →</button>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot" id="status-dot"></div>
+      <span id="status-text">Ready to harvest.</span>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results-area">
+      <div class="empty-state" id="empty-state">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+        </svg>
+        <span>Record or paste a rant, then hit Harvest.</span>
+      </div>
+
+      <div class="results-grid hidden" id="results-grid"></div>
+
+      <!-- COPY FOR LLM -->
+      <div class="copy-panel hidden" id="copy-panel">
+        <div class="copy-panel-title">Copy for LLM</div>
+        <div class="copy-grid">
+          <button class="copy-btn-llm" onclick="copyForLLM('claude')">Claude</button>
+          <button class="copy-btn-llm" onclick="copyForLLM('gpt')">ChatGPT</button>
+          <button class="copy-btn-llm" onclick="copyForLLM('perplexity')">Perplexity</button>
+          <button class="copy-btn-llm" onclick="copyForLLM('gemini')">Gemini</button>
+          <button class="copy-btn-llm" onclick="copyForLLM('raw')">Raw Transcript</button>
+          <button class="copy-btn-llm" onclick="copyForLLM('mcp')">MCP Router</button>
+        </div>
+      </div>
+
+      <!-- ROUTE ALL -->
+      <div class="route-all-row hidden" id="route-all-row">
+        <button class="btn accent" onclick="routeAll()" style="flex:1;padding:10px;">ROUTE ALL TO ASTRA →</button>
+        <button class="btn" onclick="saveToHistory()">Save to History</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Summary</div>
+      <div class="sidebar-summary" id="sidebar-summary">No harvest yet.</div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Signal Breakdown</div>
+      <div class="meta-row" style="margin-bottom:6px">
+        <span class="meta-key">Energy</span>
+        <span class="meta-val" id="meta-energy">—</span>
+      </div>
+      <div class="meta-row" style="margin-bottom:12px">
+        <span class="meta-key">Theme</span>
+        <span class="meta-val" id="meta-theme">—</span>
+      </div>
+      <div class="routing-items" id="routing-counts">
+        <div class="routing-item"><span class="routing-item-label">Tasks</span><span class="routing-item-count" id="cnt-tasks">0</span></div>
+        <div class="routing-item"><span class="routing-item-label">Quotes</span><span class="routing-item-count" id="cnt-quotes">0</span></div>
+        <div class="routing-item"><span class="routing-item-label">Decisions</span><span class="routing-item-count" id="cnt-decisions">0</span></div>
+        <div class="routing-item"><span class="routing-item-label">Questions</span><span class="routing-item-count" id="cnt-questions">0</span></div>
+        <div class="routing-item"><span class="routing-item-label">Insights</span><span class="routing-item-count" id="cnt-insights">0</span></div>
+        <div class="routing-item"><span class="routing-item-label">Systems</span><span class="routing-item-count" id="cnt-systems">0</span></div>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Next Action</div>
+      <div class="sidebar-summary" id="sidebar-next">—</div>
+    </div>
+    <div class="sidebar-section" style="flex:1">
+      <div class="sidebar-label">History</div>
+      <div class="history-list" id="history-list">
+        <div style="font-size:11px;color:var(--text-muted)">No saved harvests yet.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">⇥</button>
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let mediaRecorder = null;
+let audioChunks = [];
+let recordInterval = null;
+let recordSeconds = 0;
+let isRecording = false;
+let currentHarvest = null;
+let routedItems = new Set();
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function goBack() {
+  // Go back to ASTRA — same tab
+  if (document.referrer && document.referrer.includes(location.hostname)) {
+    history.back();
+  } else {
+    window.location.href = '/';
+  }
+}
+
+// ─── RECORD ───────────────────────────────────────────────────────────────────
+async function toggleRecord() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    recordSeconds = 0;
+
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.onstop = handleRecordingStop;
+
+    mediaRecorder.start(200);
+    isRecording = true;
+
+    document.getElementById('mic-btn').classList.add('recording');
+    document.getElementById('record-hint').textContent = 'Recording... tap to stop';
+    document.getElementById('record-timer').classList.add('active');
+    document.getElementById('hdr-status').textContent = 'RECORDING';
+
+    recordInterval = setInterval(() => {
+      recordSeconds++;
+      const m = Math.floor(recordSeconds / 60);
+      const s = recordSeconds % 60;
+      document.getElementById('record-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    }, 1000);
+
+  } catch (err) {
+    toast('Mic access denied. Paste transcript manually.', false);
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+  }
+  isRecording = false;
+  clearInterval(recordInterval);
+  document.getElementById('mic-btn').classList.remove('recording');
+  document.getElementById('record-hint').textContent = 'Transcribing...';
+  document.getElementById('record-timer').classList.remove('active');
+  document.getElementById('hdr-status').textContent = 'TRANSCRIBING';
+  setStatus('Transcribing audio...', 'pulse');
+}
+
+async function handleRecordingStop() {
+  const blob = new Blob(audioChunks, { type: 'audio/webm' });
+  const form = new FormData();
+  form.append('audio', blob, 'rant.webm');
+
+  try {
+    const res = await fetch('/api/transcribe', { method: 'POST', body: form });
+    if (!res.ok) throw new Error(`${res.status}`);
+    const data = await res.json();
+    const text = data.text || data.transcript || '';
+    if (text) {
+      document.getElementById('transcript').value = text;
+      setStatus(`Transcribed (${text.split(/\s+/).length} words). Ready to harvest.`, 'green');
+      document.getElementById('record-hint').textContent = 'Tap to record again';
+      document.getElementById('hdr-status').textContent = 'READY';
+    } else {
+      setStatus('Transcription returned empty. Paste manually.', 'red');
+      document.getElementById('record-hint').textContent = 'Tap to record again';
+    }
+  } catch (err) {
+    setStatus('Transcription failed. Paste manually.', 'red');
+    document.getElementById('record-hint').textContent = 'Tap to record again';
+    document.getElementById('hdr-status').textContent = 'READY';
+  }
+}
+
+// ─── HARVEST ─────────────────────────────────────────────────────────────────
+async function runHarvest() {
+  const transcript = document.getElementById('transcript').value.trim();
+  if (!transcript) { toast('No transcript to harvest.', false); return; }
+
+  const source = document.getElementById('harvest-source').value;
+  const btn = document.getElementById('harvest-btn');
+
+  btn.disabled = true;
+  btn.textContent = 'HARVESTING...';
+  setStatus('Running RANT_HARVESTER...', 'pulse');
+  document.getElementById('hdr-status').textContent = 'HARVESTING';
+
+  try {
+    const res = await fetch('/api/rant-harvest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transcript, source, date: new Date().toISOString() })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `${res.status}`);
+    }
+
+    const harvest = await res.json();
+    currentHarvest = harvest;
+    routedItems.clear();
+
+    renderResults(harvest);
+    updateSidebar(harvest);
+    setStatus('Harvest complete.', 'green');
+    document.getElementById('hdr-status').textContent = 'HARVESTED';
+    toast('Harvest complete.', true);
+
+  } catch (err) {
+    setStatus(`Harvest failed: ${err.message}`, 'red');
+    document.getElementById('hdr-status').textContent = 'ERROR';
+    toast(`Error: ${err.message}`, false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'HARVEST RANT →';
+  }
+}
+
+// ─── RENDER RESULTS ───────────────────────────────────────────────────────────
+const CAT_CONFIG = {
+  tasks:         { color: '#4ade80', label: 'TASKS',         dot: '#4ade80' },
+  quotes:        { color: '#38bdf8', label: 'QUOTES',        dot: '#38bdf8' },
+  decisions:     { color: '#fbbf24', label: 'DECISIONS',     dot: '#fbbf24' },
+  questions:     { color: '#a78bfa', label: 'QUESTIONS',     dot: '#a78bfa' },
+  insights:      { color: '#34d399', label: 'INSIGHTS',      dot: '#34d399' },
+  systems:       { color: '#fb923c', label: 'SYSTEMS',       dot: '#fb923c' },
+  roasts:        { color: '#f87171', label: 'ROASTS',        dot: '#f87171' },
+  contradictions:{ color: '#e879f9', label: 'CONTRADICTIONS',dot: '#e879f9' },
+  emotions:      { color: '#94a3b8', label: 'EMOTIONS',      dot: '#94a3b8' },
+  people:        { color: '#64748b', label: 'PEOPLE',        dot: '#64748b' },
+};
+
+function renderResults(harvest) {
+  const grid = document.getElementById('results-grid');
+  grid.innerHTML = '';
+
+  const order = ['tasks','quotes','decisions','questions','insights','systems','roasts','contradictions','emotions','people'];
+
+  for (const key of order) {
+    const items = harvest[key];
+    if (!items || !items.length) continue;
+
+    const cfg = CAT_CONFIG[key];
+    const card = document.createElement('div');
+    card.className = 'category-card';
+    card.dataset.key = key;
+
+    const itemsHtml = items.map((item, i) => {
+      const mainText = item.text || item.task || item.decision || item.question || item.tension || item.emotion || item.name || JSON.stringify(item);
+      const meta = buildMeta(key, item);
+      const routeLabel = key === 'tasks' ? 'ASTRA' : key === 'quotes' ? 'CONTENT' : key === 'decisions' ? 'KB' : key === 'questions' ? 'RESEARCH' : '';
+      const routeBtn = routeLabel ? `<button class="route-btn" id="route-${key}-${i}" onclick="routeItem('${key}', ${i})">${routeLabel}</button>` : '';
+      return `<div class="cat-item">
+        ${routeBtn}
+        ${mainText}
+        ${meta ? `<div class="cat-item-meta">${meta}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="category-header" onclick="toggleCard(this)">
+        <div class="cat-label">
+          <div class="cat-dot" style="background:${cfg.dot}"></div>
+          ${cfg.label}
+        </div>
+        <span class="cat-count">${items.length}</span>
+      </div>
+      <div class="category-body">${itemsHtml}</div>
+    `;
+    grid.appendChild(card);
+  }
+
+  document.getElementById('empty-state').classList.add('hidden');
+  grid.classList.remove('hidden');
+  document.getElementById('copy-panel').classList.remove('hidden');
+  document.getElementById('route-all-row').classList.remove('hidden');
+}
+
+function buildMeta(key, item) {
+  const parts = [];
+  if (item.priority) parts.push(`<span class="cat-item-tag" style="background:rgba(74,222,128,0.15);color:#4ade80">${item.priority}</span>`);
+  if (item.mode) parts.push(`<span class="cat-item-tag" style="background:rgba(56,189,248,0.15);color:#38bdf8">${item.mode}</span>`);
+  if (item.type) parts.push(`<span class="cat-item-tag" style="background:rgba(167,139,250,0.15);color:#a78bfa">${item.type}</span>`);
+  if (item.use_for) parts.push(`<span class="cat-item-tag" style="background:rgba(251,191,36,0.15);color:#fbbf24">${item.use_for}</span>`);
+  if (item.route_to) parts.push(`→ ${item.route_to}`);
+  if (item.context) parts.push(item.context);
+  if (item.contradiction) parts.push(item.contradiction);
+  if (item.content_potential) parts.push(item.content_potential);
+  return parts.join(' ');
+}
+
+function toggleCard(header) {
+  const body = header.nextElementSibling;
+  body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+
+// ─── SIDEBAR ──────────────────────────────────────────────────────────────────
+function updateSidebar(harvest) {
+  const meta = harvest.harvest_meta || {};
+  const summary = harvest.summary || {};
+
+  document.getElementById('sidebar-summary').textContent = summary.one_sentence || summary.key_theme || 'Harvested.';
+  document.getElementById('sidebar-next').textContent = summary.next_action || '—';
+  document.getElementById('meta-energy').textContent = meta.energy_level || '—';
+  document.getElementById('meta-theme').textContent = summary.key_theme || meta.dominant_theme || '—';
+
+  document.getElementById('cnt-tasks').textContent = (harvest.tasks || []).length;
+  document.getElementById('cnt-quotes').textContent = (harvest.quotes || []).length;
+  document.getElementById('cnt-decisions').textContent = (harvest.decisions || []).length;
+  document.getElementById('cnt-questions').textContent = (harvest.questions || []).length;
+  document.getElementById('cnt-insights').textContent = (harvest.insights || []).length;
+  document.getElementById('cnt-systems').textContent = (harvest.systems || []).length;
+}
+
+// ─── ROUTING ──────────────────────────────────────────────────────────────────
+async function routeItem(key, index) {
+  if (!currentHarvest) return;
+  const item = currentHarvest[key]?.[index];
+  if (!item) return;
+
+  const routeId = `${key}-${index}`;
+  if (routedItems.has(routeId)) return;
+
+  const btn = document.getElementById(`route-${key}-${index}`);
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+
+  try {
+    await pushToAstra(key, item);
+    routedItems.add(routeId);
+    if (btn) { btn.textContent = '✓'; btn.classList.add('routed'); }
+    toast(`${key.toUpperCase()} routed to ASTRA.`, true);
+  } catch (err) {
+    if (btn) { btn.textContent = 'RETRY'; btn.disabled = false; }
+    toast(`Route failed: ${err.message}`, false);
+  }
+}
+
+async function routeAll() {
+  if (!currentHarvest) return;
+  setStatus('Routing all to ASTRA...', 'pulse');
+  let count = 0;
+
+  const routeMap = {
+    tasks: (item) => ({ table: 'astra_tasks', data: { title: item.task, priority: item.priority, context: item.context, source: 'rant_harvester', status: 'todo', created_at: new Date().toISOString() } }),
+    quotes: (item) => ({ table: 'astra_content', data: { text: item.text, type: 'quote', mode: item.mode, use_for: item.use_for, source: 'rant_harvester', created_at: new Date().toISOString() } }),
+    decisions: (item) => ({ table: 'astra_kb', data: { title: item.decision, type: 'decision', commitment: item.commitment_level, source: 'rant_harvester', created_at: new Date().toISOString() } }),
+    insights: (item) => ({ table: 'astra_kb', data: { title: item.text, type: 'insight', depth: item.depth, source: 'rant_harvester', created_at: new Date().toISOString() } }),
+  };
+
+  for (const [key, mapper] of Object.entries(routeMap)) {
+    const items = currentHarvest[key] || [];
+    for (let i = 0; i < items.length; i++) {
+      const routeId = `${key}-${i}`;
+      if (routedItems.has(routeId)) continue;
+      try {
+        const { table, data } = mapper(items[i]);
+        await supabaseInsert(table, data);
+        routedItems.add(routeId);
+        const btn = document.getElementById(`route-${key}-${i}`);
+        if (btn) { btn.textContent = '✓'; btn.classList.add('routed'); }
+        count++;
+      } catch {}
+    }
+  }
+
+  setStatus(`Routed ${count} items to ASTRA.`, 'green');
+  toast(`${count} items routed.`, true);
+}
+
+async function pushToAstra(key, item) {
+  const tableMap = { tasks: 'astra_tasks', quotes: 'astra_content', decisions: 'astra_kb', insights: 'astra_kb', questions: 'astra_kb', systems: 'astra_kb' };
+  const table = tableMap[key] || 'astra_kb';
+
+  const dataMap = {
+    tasks:     { title: item.task, type: 'task', priority: item.priority, context: item.context, source: 'rant_harvester', status: 'todo' },
+    quotes:    { title: item.text, type: 'quote', mode: item.mode, use_for: item.use_for, source: 'rant_harvester' },
+    decisions: { title: item.decision, type: 'decision', commitment: item.commitment_level, source: 'rant_harvester' },
+    insights:  { title: item.text, type: 'insight', depth: item.depth, source: 'rant_harvester' },
+    questions: { title: item.question, type: 'question', q_type: item.type, route_to: item.route_to, source: 'rant_harvester' },
+    systems:   { title: item.name, type: 'system', description: item.description, status: item.status, source: 'rant_harvester' },
+  };
+
+  const data = { ...(dataMap[key] || { title: JSON.stringify(item), type: key }), created_at: new Date().toISOString() };
+  await supabaseInsert(table, data);
+}
+
+async function supabaseInsert(table, data) {
+  const res = await fetch('/api/supabase-sync', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${getAdminPassword()}`
+    },
+    body: JSON.stringify({ action: 'insert', table, data })
+  });
+  if (!res.ok) throw new Error(`Supabase error ${res.status}`);
+}
+
+function getAdminPassword() {
+  // Read from cookie or localStorage (same as ASTRA)
+  const match = document.cookie.match(/astra_auth=([^;]+)/);
+  if (match) return decodeURIComponent(match[1]);
+  return localStorage.getItem('astra_admin_password') || '';
+}
+
+// ─── COPY FOR LLM ────────────────────────────────────────────────────────────
+const MCP_ROUTER_PROMPT = `You are an MCP-style Identity Router and Year-End Synthesizer.
+You do NOT motivate, praise, soften, or speculate.
+You extract behavioral signal, compress doctrine, and preserve structure.
+
+Analyze the rant and harvest below. Produce:
+1. Top Insights
+2. Roasts (behavioral contradictions)
+3. Maladaptive Behavioral Patterns
+4. One Non-Obvious Meta Pattern
+5. Kernel Rules (exactly 5)
+6. Three captions
+7. One private mantra
+
+No inspiration. No coaching tone. Observational, compressive language only.`;
+
+function copyForLLM(llm) {
+  if (!currentHarvest) { toast('Harvest first.', false); return; }
+
+  const transcript = document.getElementById('transcript').value.trim();
+  const summary = currentHarvest.summary || {};
+  const meta = currentHarvest.harvest_meta || {};
+
+  let text = '';
+
+  if (llm === 'raw') {
+    text = transcript;
+  } else if (llm === 'mcp') {
+    text = `${MCP_ROUTER_PROMPT}\n\n---\n\nRANT TRANSCRIPT:\n${transcript}\n\n---\n\nHARVEST SIGNAL:\n${JSON.stringify(currentHarvest, null, 2)}`;
+  } else {
+    const instructions = {
+      claude: 'Use this rant + harvest as context. Continue from the next_action. Ask nothing. Execute.',
+      gpt: 'Analyze this rant. Focus on the decisions and systems. Be direct and specific.',
+      perplexity: 'Research the questions flagged as RESEARCH in this harvest. Cite sources.',
+      gemini: 'Analyze the structure and patterns in this harvest. Prioritize structural clarity.',
+    };
+
+    text = `[RANT HARVEST — ${new Date().toLocaleDateString()}]
+SOURCE: ${meta.source || 'voice_memo'}
+ENERGY: ${meta.energy_level || '?'} | THEME: ${summary.key_theme || '?'}
+WORDS: ${meta.word_count || '?'}
+
+SUMMARY: ${summary.one_sentence || ''}
+NEXT ACTION: ${summary.next_action || ''}
+
+---
+
+TRANSCRIPT:
+${transcript}
+
+---
+
+EXTRACTED SIGNAL:
+Tasks (${(currentHarvest.tasks||[]).length}): ${(currentHarvest.tasks||[]).map(t=>`${t.task} [${t.priority}]`).join(' | ')}
+Quotes (${(currentHarvest.quotes||[]).length}): ${(currentHarvest.quotes||[]).map(q=>q.text).join(' | ')}
+Decisions (${(currentHarvest.decisions||[]).length}): ${(currentHarvest.decisions||[]).map(d=>d.decision).join(' | ')}
+Questions (${(currentHarvest.questions||[]).length}): ${(currentHarvest.questions||[]).map(q=>q.question).join(' | ')}
+Insights (${(currentHarvest.insights||[]).length}): ${(currentHarvest.insights||[]).map(i=>i.text).join(' | ')}
+
+---
+
+INSTRUCTION: ${instructions[llm] || 'Analyze and respond.'}`;
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btns = document.querySelectorAll('.copy-btn-llm');
+    btns.forEach(b => { if (b.textContent.toLowerCase().includes(llm) || (llm==='raw' && b.textContent.includes('Raw')) || (llm==='mcp' && b.textContent.includes('MCP'))) { b.classList.add('copied'); setTimeout(()=>b.classList.remove('copied'), 2000); } });
+    toast(`Copied for ${llm === 'raw' ? 'Raw' : llm.charAt(0).toUpperCase()+llm.slice(1)}.`, true);
+  });
+}
+
+// ─── HISTORY ─────────────────────────────────────────────────────────────────
+function saveToHistory() {
+  if (!currentHarvest) return;
+  const history = JSON.parse(localStorage.getItem('rant_harvest_history') || '[]');
+  const entry = {
+    id: Date.now(),
+    date: new Date().toISOString(),
+    theme: currentHarvest.summary?.key_theme || 'Untitled',
+    word_count: currentHarvest.harvest_meta?.word_count || 0,
+    tasks: (currentHarvest.tasks||[]).length,
+    quotes: (currentHarvest.quotes||[]).length,
+    harvest: currentHarvest,
+    transcript: document.getElementById('transcript').value.trim()
+  };
+  history.unshift(entry);
+  if (history.length > 50) history.pop();
+  localStorage.setItem('rant_harvest_history', JSON.stringify(history));
+  renderHistory();
+  toast('Saved to history.', true);
+}
+
+function renderHistory() {
+  const history = JSON.parse(localStorage.getItem('rant_harvest_history') || '[]');
+  const list = document.getElementById('history-list');
+  if (!history.length) {
+    list.innerHTML = '<div style="font-size:11px;color:var(--text-muted)">No saved harvests yet.</div>';
+    return;
+  }
+  list.innerHTML = history.slice(0, 10).map((h, i) => `
+    <div class="history-item" onclick="loadHistory(${i})">
+      <div class="history-date">${new Date(h.date).toLocaleDateString()} ${new Date(h.date).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+      <div class="history-theme">${h.theme}</div>
+      <div class="history-stats">${h.word_count}w · ${h.tasks}T ${h.quotes}Q</div>
+    </div>
+  `).join('');
+}
+
+function loadHistory(index) {
+  const history = JSON.parse(localStorage.getItem('rant_harvest_history') || '[]');
+  const entry = history[index];
+  if (!entry) return;
+  document.getElementById('transcript').value = entry.transcript || '';
+  currentHarvest = entry.harvest;
+  renderResults(currentHarvest);
+  updateSidebar(currentHarvest);
+  toast('Loaded from history.', true);
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function clearTranscript() {
+  document.getElementById('transcript').value = '';
+  document.getElementById('record-timer').textContent = '0:00';
+  setStatus('Cleared.', '');
+}
+
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('transcript').value = text;
+    setStatus(`Pasted (${text.split(/\s+/).length} words).`, 'green');
+  } catch {
+    toast('Clipboard access denied. Paste manually.', false);
+  }
+}
+
+function setStatus(msg, type) {
+  document.getElementById('status-text').textContent = msg;
+  const dot = document.getElementById('status-dot');
+  dot.className = 'status-dot';
+  if (type === 'green') dot.classList.add('green');
+  else if (type === 'red') dot.classList.add('red');
+  else if (type === 'yellow') dot.classList.add('yellow');
+  else if (type === 'pulse') { dot.classList.add('green'); dot.classList.add('pulse'); }
+}
+
+function toast(msg, success) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (success ? ' success' : '');
+  setTimeout(() => { el.className = 'toast'; }, 2500);
+}
+
+// ─── SIDEBAR TOGGLE ──────────────────────────────────────────────────────────
+function toggleSidebar() {
+  const layout = document.querySelector('.layout');
+  const btn = document.getElementById('sidebar-toggle');
+  const collapsed = layout.classList.toggle('sidebar-collapsed');
+  btn.textContent = collapsed ? '⇤' : '⇥';
+  btn.title = collapsed ? 'Show sidebar' : 'Hide sidebar';
+  localStorage.setItem('rant_sidebar_collapsed', collapsed ? '1' : '0');
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+renderHistory();
+if (localStorage.getItem('rant_sidebar_collapsed') === '1') {
+  document.querySelector('.layout').classList.add('sidebar-collapsed');
+  document.getElementById('sidebar-toggle').textContent = '⇤';
+}
+</script>
+</body>
+</html>
